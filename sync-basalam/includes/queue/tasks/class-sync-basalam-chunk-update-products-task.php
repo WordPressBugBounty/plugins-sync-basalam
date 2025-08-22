@@ -1,0 +1,53 @@
+<?php
+if (! defined('ABSPATH')) exit;
+
+class Sync_basalam_Chunk_Update_Products_Task extends sync_basalam_AbstractTask
+{
+    protected function get_hook_name()
+    {
+        return 'sync_basalam_plugin_chunk_update_products';
+    }
+
+    public function handle($args)
+    {
+        $posts_per_page = $args['posts_per_page'] ?? 100;
+        $offset = $args['offset'] ?? 0;
+        $max_chunks = $args['max_chunks'] ?? 10;
+        $current_chunk = 0;
+
+        do {
+
+            $batch_data = [
+                'posts_per_page' => $posts_per_page,
+                'offset'         => $offset,
+            ];
+
+            $product_ids = sync_basalam_Product_Queue_Manager::get_products_for_update($batch_data);
+            if (empty($product_ids)) {
+                break;
+            }
+            foreach ($product_ids as $product_id) {
+                sync_basalam_Product_Queue_Manager::add_to_schedule(new sync_basalam_Update_Product_Task(), ['type' => 'update_product', 'id' => $product_id]);
+            }
+
+            sync_basalam_Product_Queue_Manager::add_to_schedule(new sync_basalam_Update_Product_Task(), ['type' => 'update_chunk', 'offset_id' => ($offset + $posts_per_page) * 10]);
+
+            $offset += $posts_per_page;
+            $current_chunk++;
+        } while ($current_chunk < $max_chunks && count($product_ids) === $posts_per_page);
+    }
+
+    public function schedule($data, $delay = null)
+    {
+
+        if ($delay == null) {
+            if ($this->get_last_run_timestamp() > time()) {
+                $delay = $this->get_last_run_timestamp() - time() + 60;
+            } else {
+                $delay = 60;
+            }
+        }
+
+        return $this->queue_manager->schedule_single_task($data, $delay);
+    }
+}

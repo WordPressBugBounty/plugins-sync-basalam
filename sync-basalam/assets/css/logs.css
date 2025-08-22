@@ -1,0 +1,934 @@
+.basalam-container {
+    margin-top: 20px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+    padding: 0 20px;
+}
+
+/* Header Section Styles */
+.log-basalam-header-section {
+    padding: 24px;
+    margin-bottom: 24px;
+    color: var(--basalam-gray-800);
+}
+
+.log-basalam-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.log-basalam-header-left {
+    flex: 1;
+}
+
+.log-basalam-heading {
+    width: 100%;
+    text-align: right;
+    margin-bottom: 16px;
+    color: var(--basalam-gray-800);
+    font-size: 1.5em;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+    font-family: Morabba !important;
+}
+
+.log-basalam-stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--basalam-gray-100);
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--basalam-gray-200);
+    min-width: 100px;
+}
+
+.log-basalam-stat-number {
+    font-size: 1.5em;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--basalam-gray-800);
+}
+
+.log-basalam-stat-label {
+    font-size: 0.85em;
+    color: var(--basalam-gray-600);
+    font-family: PelakFA;
+}
+
+.log-basalam-error-count {
+    color: var(--basalam-danger-color);
+}
+
+.log-basalam-warning-count {
+    color: #ffc107;
+}
+
+.log-basalam-header-actions {
+    display: flex;
+    align-items: center;
+}
+
+.log-basalam-clear-logs-button {
+    background: var(--basalam-primary-color);
+    border: 1px solid var(--basalam-primary-color);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    font-family: PelakFA;
+}
+
+.log-basalam-clear-logs-button:hover {
+    background: var(--basalam-primary-hover);
+    border-color: var(--basalam-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 92, 53, 0.3);
+}
+
+.log-basalam-btn-icon {
+    width: 16px;
+    height: 16px;
+    filter: brightness(0) invert(1);
+}
+
+/* Modern Tabs Styles */
+.log-basalam-tabs-modern {
+    display: flex;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 8px;
+    background: white;
+    padding: 8px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--basalam-gray-200);
+}
+
+.log-basalam-tab-button-modern {
+    background-color: var(--basalam-gray-100);
+    padding: 12px 20px;
+    border: 1px solid var(--basalam-gray-200);
+    cursor: pointer;
+    border-radius: 8px;
+    flex: 1;
+    text-align: center;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: var(--basalam-gray-700);
+    min-width: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 500;
+    font-family: PelakFA;
+}
+
+.log-basalam-tab-button-modern:hover {
+    background-color: var(--basalam-gray-200);
+    border-color: var(--basalam-gray-300);
+    color: var(--basalam-gray-800);
+    transform: translateY(-1px);
+}
+
+.log-basalam-tab-button-modern.log-basalam-active {
+    background: var(--basalam-primary-color);
+    color: white;
+    border-color: var(--basalam-primary-color);
+    box-shadow: 0 4px 12px rgba(255, 92, 53, 0.3);
+}
+
+.log-basalam-tab-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+}
+
+.log-basalam-tab-icon-info {
+    background-color: #17a2b8;
+}
+
+.log-basalam-tab-icon-warning {
+    background-color: #ffc107;
+}
+
+.log-basalam-tab-icon-error {
+    background-color: var(--basalam-danger-color);
+}
+
+.log-basalam-tab-icon-debug {
+    background-color: #6c757d;
+}
+
+.log-basalam-tab-icon-alert {
+    background-color: #fd7e14;
+}
+
+.log-basalam-tab-label {
+    font-weight: 500;
+    font-family: PelakFA;
+}
+
+.log-basalam-tab-count-modern {
+    background: rgba(0, 0, 0, 0.1);
+    color: inherit;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: 600;
+    min-width: 20px;
+    text-align: center;
+}
+
+.log-basalam-tab-button-modern.log-basalam-active .log-basalam-tab-count-modern {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.log-basalam-tab-content {
+    display: none;
+    width: 100%;
+}
+
+.log-basalam-tab-content.log-basalam-active {
+    display: block;
+}
+
+/* Empty State */
+.log-basalam-empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+    color: var(--basalam-gray-600);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--basalam-gray-200);
+}
+
+.log-basalam-empty-icon {
+    font-size: 3em;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.log-basalam-empty-state h3 {
+    margin: 0 0 8px 0;
+    color: var(--basalam-gray-700);
+    font-size: 1.2em;
+    font-family: Morabba;
+}
+
+.log-basalam-empty-state p {
+    margin: 0;
+    opacity: 0.7;
+    font-family: PelakFA;
+}
+
+/* Modern Log List Styles */
+.log-basalam-log-list-modern {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+    margin: 0;
+}
+
+.log-basalam-log-item-modern {
+    padding: 16px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+    border: 1px solid var(--basalam-gray-200);
+    background: white;
+}
+
+.log-basalam-log-item-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    border-color: var(--basalam-gray-300);
+}
+
+.log-basalam-log-item-modern.log-basalam-info {
+    border-left: 4px solid #17a2b8;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e3f2fd 100%);
+}
+
+.log-basalam-log-item-modern.log-basalam-warning {
+    border-left: 4px solid #ffc107;
+    background: linear-gradient(135deg, #fff8e1 0%, #fff3cd 100%);
+}
+
+.log-basalam-log-item-modern.log-basalam-error {
+    border-left: 4px solid var(--basalam-danger-color);
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+}
+
+.log-basalam-log-item-modern.log-basalam-debug {
+    border-left: 4px solid #6c757d;
+    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+}
+
+.log-basalam-log-item-modern.log-basalam-alert {
+    border-left: 4px solid #fd7e14;
+    background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+}
+
+.log-basalam-log-header-modern {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 96%;
+    margin-bottom: 12px;
+}
+
+.log-basalam-log-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.log-basalam-log-date-modern {
+    font-size: 0.85em;
+    color: var(--basalam-gray-600);
+    font-weight: 500;
+    font-family: PelakFA;
+}
+
+.log-basalam-log-level-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: PelakFA;
+}
+
+.log-basalam-level-info {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.log-basalam-level-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.log-basalam-level-error {
+    background-color: var(--basalam-danger-color);
+    color: white;
+}
+
+.log-basalam-level-debug {
+    background-color: #6c757d;
+    color: white;
+}
+
+.log-basalam-level-alert {
+    background-color: #fd7e14;
+    color: white;
+}
+
+.log-basalam-context-toggle-modern {
+    cursor: pointer;
+    color: var(--basalam-primary-color);
+    padding: 6px 12px;
+    font-size: 0.85em;
+    transition: all 0.3s ease;
+    border: 1px solid var(--basalam-primary-color);
+    border-radius: 6px;
+    background: rgba(255, 92, 53, 0.1);
+    font-weight: 500;
+    font-family: PelakFA;
+}
+
+.log-basalam-context-toggle-modern:hover {
+    background: var(--basalam-primary-color);
+    color: white;
+}
+
+.log-basalam-log-message-modern {
+    width: 100%;
+    word-break: break-word;
+    text-align: right;
+    padding: 8px 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--basalam-gray-800);
+    font-weight: 500;
+    font-family: PelakFA;
+}
+
+.log-basalam-log-context-modern {
+    background: var(--basalam-gray-100);
+    padding: 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    display: none;
+    margin-top: 12px;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid var(--basalam-gray-200);
+}
+
+.log-basalam-log-context-modern.log-basalam-show {
+    display: block;
+}
+
+.log-basalam-context-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.log-basalam-context-json {
+    background: var(--basalam-gray-800);
+    color: #e2e8f0;
+    padding: 12px;
+    border-radius: 6px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 11px;
+    line-height: 1.4;
+    overflow-x: auto;
+    margin: 0;
+    direction: ltr;
+    text-align: left;
+}
+
+.log-basalam-product-actions-modern {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.log-basalam-btn-modern {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-family: PelakFA;
+}
+
+.log-basalam-edit-btn {
+    background-color: var(--basalam-success-color);
+    color: white;
+}
+
+.log-basalam-edit-btn:hover {
+    background-color: var(--basalam-success-hover);
+    transform: translateY(-1px);
+}
+
+.log-basalam-view-btn {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.log-basalam-view-btn:hover {
+    background-color: #138496;
+    transform: translateY(-1px);
+}
+
+.log-basalam-btn-modern img {
+    width: 14px;
+    height: 14px;
+    filter: brightness(0) invert(1);
+}
+
+.log-basalam-log-count-modern {
+    text-align: right;
+    margin-bottom: 16px;
+    color: var(--basalam-gray-600);
+    font-size: 0.9em;
+    font-weight: 500;
+    padding: 8px 12px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid var(--basalam-gray-200);
+    font-family: PelakFA;
+}
+
+/* Modern Pagination */
+.log-basalam-pagination-modern {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+    padding: 20px 0;
+    margin-top: 24px;
+}
+
+.log-basalam-page-link-modern {
+    text-decoration: none;
+    padding: 8px 12px;
+    border: 1px solid var(--basalam-gray-300);
+    color: var(--basalam-gray-700);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    min-width: 20px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    background: white;
+    font-family: PelakFA;
+}
+
+.log-basalam-page-link-modern:hover {
+    background-color: var(--basalam-gray-100);
+    border-color: var(--basalam-gray-400);
+    color: var(--basalam-gray-800);
+    transform: translateY(-1px);
+}
+
+.log-basalam-page-link-modern.log-basalam-active {
+    background: var(--basalam-primary-color);
+    color: white;
+    border-color: var(--basalam-primary-color);
+    font-weight: 600;
+}
+
+/* Modal Styles */
+.log-basalam-modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.log-basalam-modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 0;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease-out;
+    border: 1px solid var(--basalam-gray-200);
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.log-basalam-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--basalam-gray-200);
+}
+
+.log-basalam-modal-header h3 {
+    margin: 0;
+    color: var(--basalam-gray-800);
+    font-size: 1.2em;
+    font-weight: 600;
+    font-family: Morabba;
+}
+
+.log-basalam-modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--basalam-gray-500);
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.log-basalam-modal-close:hover {
+    background-color: var(--basalam-gray-100);
+    color: var(--basalam-gray-800);
+}
+
+.log-basalam-modal-body {
+    padding: 24px;
+}
+
+.log-basalam-modal-body p {
+    margin: 0 0 12px 0;
+    color: var(--basalam-gray-700);
+    line-height: 1.6;
+    font-family: PelakFA;
+}
+
+.log-basalam-warning-text {
+    color: var(--basalam-danger-color) !important;
+    font-weight: 600;
+    background: #f8d7da;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #f5c6cb;
+    font-family: PelakFA;
+}
+
+.log-basalam-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px 24px;
+    border-top: 1px solid var(--basalam-gray-200);
+    background: var(--basalam-gray-100);
+    border-radius: 0 0 12px 12px;
+}
+
+.log-basalam-btn-secondary {
+    background-color: var(--basalam-gray-600);
+    color: white;
+    font-family: PelakFA;
+}
+
+.log-basalam-btn-secondary:hover {
+    background-color: var(--basalam-gray-700);
+}
+
+.log-basalam-btn-danger {
+    background-color: var(--basalam-danger-color);
+    color: white;
+    font-family: PelakFA;
+}
+
+.log-basalam-btn-danger:hover {
+    background-color: var(--basalam-danger-hover);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .log-basalam-header-content {
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .log-basalam-stat-item {
+        min-width: 80px;
+        padding: 8px 12px;
+    }
+    
+    .log-basalam-stat-number {
+        font-size: 1.2em;
+    }
+    
+    .log-basalam-tabs-modern {
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .log-basalam-tab-button-modern {
+        min-width: auto;
+        padding: 10px 16px;
+    }
+    
+    .log-basalam-modal-content {
+        width: 95%;
+        margin: 10% auto;
+    }
+    
+    .log-basalam-modal-footer {
+        flex-direction: column;
+    }
+    
+    .log-basalam-product-actions-modern {
+        flex-direction: column;
+    }
+    
+    .log-basalam-log-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .log-basalam-log-header-modern {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .log-basalam-stat-item {
+        width: 100%;
+        max-width: 200px;
+    }
+    
+    .log-basalam-tab-button-modern {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    
+    .log-basalam-log-item-modern {
+        padding: 12px;
+    }
+    
+    .log-basalam-modal-body {
+        padding: 16px;
+    }
+    
+    .log-basalam-modal-footer {
+        padding: 16px;
+    }
+}
+
+/* Legacy styles for backward compatibility */
+.basalam-tabs {
+    display: flex;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 5px;
+}
+
+.basalam-tab-button {
+    background-color: #f1f1f1;
+    padding: 8px 15px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    border-radius: 5px;
+    flex: 1;
+    text-align: center;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    color: #444;
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.basalam-tab-button:hover {
+    background-color: #e9e9e9;
+    border-color: #999;
+    color: #000;
+}
+
+.basalam-tab-button.basalam-active {
+    background-color: var(--basalam-primary-color);
+    color: white;
+}
+
+.basalam-tab-count {
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
+.basalam-tab-content {
+    display: none;
+    width: 100%;
+}
+
+.basalam-tab-content.basalam-active {
+    display: block;
+}
+
+.basalam-log-list {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+    margin: 0;
+}
+
+.basalam-log-item {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    box-sizing: border-box;
+    transition: transform 0.2s ease;
+}
+
+.basalam-log-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.basalam-log-item.basalam-info {
+    background-color: #e3f7e3;
+    border-left: 4px solid #46b450;
+}
+
+.basalam-log-item.basalam-warning {
+    background-color: #f9f3d1;
+    border-left: 4px solid #ffb900;
+}
+
+.basalam-log-item.basalam-error {
+    background-color: #f8d7da;
+    border-left: 4px solid #dc3232;
+}
+
+.basalam-log-item.basalam-debug {
+    background-color: #d1ecf1;
+    border-left: 4px solid #00a0d2;
+}
+
+.basalam-log-item.basalam-alert {
+    background-color: #fff3cd;
+    border-left: 4px solid #f56e28;
+}
+
+.basalam-log-header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 11px;
+    color: #666;
+}
+
+.basalam-log-message {
+    width: 100%;
+    word-break: break-word;
+    text-align: right;
+    padding: 8px 0;
+    font-size: 13px;
+    position: relative;
+    line-height: 1.5;
+}
+
+.basalam-context-toggle {
+    cursor: pointer;
+    color: var(--basalam-primary-color);
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 2px 5px;
+    font-size: 12px;
+    transition: all 0.3s ease;
+}
+
+.basalam-context-toggle:hover {
+    color: var(--basalam-primary-color);
+}
+
+.basalam-log-context {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 5px;
+    font-size: 12px;
+    display: none;
+    margin-top: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: auto;
+    direction: ltr;
+    text-align: left;
+    border: 1px solid #eee;
+}
+
+.basalam-log-context.Basalam-show {
+    display: flex;
+    justify-content: space-between;
+    text-align: right;
+    direction: rtl;
+}
+
+.basalam-heading {
+    width: 100%;
+    text-align: right;
+    margin-bottom: 20px;
+    color: #23282d;
+    font-size: 1.3em;
+    font-weight: 600;
+}
+
+.basalam-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+    padding: 10px 0;
+    margin-top: 25px !important;
+    margin: auto;
+}
+
+.basalam-pagination a:hover {
+    color: #000;
+}
+
+.basalam-page-link {
+    text-decoration: none;
+    padding: 6px 12px;
+    border: 1px solid var(--basalam-primary-color);
+    color: var(--basalam-primary-color);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    min-width: 15px;
+    text-align: center;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.basalam-page-link:hover {
+    background-color: #0073aa;
+    color: white;
+}
+
+.basalam-page-link.basalam-active {
+    background-color: #0073aa;
+    color: white;
+    font-weight: bold;
+}
+
+.basalam--no-log {
+    text-align: center;
+    padding: 20px;
+    background: #f5f5f5;
+    border-radius: 5px;
+    color: #666;
+}
+
+.basalam-log-count {
+    text-align: right;
+    margin-bottom: 15px;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.basalam-edit-product,
+.basalam-view-product {
+    text-decoration: none;
+    color: white;
+    padding: 4px;
+}

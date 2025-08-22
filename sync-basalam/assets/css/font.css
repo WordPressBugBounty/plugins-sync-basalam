@@ -1,0 +1,42 @@
+@font-face {
+    font-family: 'Morabba';
+    src: url('../fonts/moraba/Morabba-Bold.woff2') format('woff2');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Morabba';
+    src: url('../fonts/moraba/Morabba-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Morabba';
+    src: url('../fonts/moraba/Morabba-SemiBold.woff2') format('woff2');
+    font-weight: 600; /* SemiBold */
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'PelakFA';
+    src: url('../fonts/pelak/PelakFA-Bold.woff2') format('woff2');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'PelakFA';
+    src: url('../fonts/pelak/PelakFA-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'PelakFA';
+    src: url('../fonts/pelak/PelakFA-SemiBold.woff2') format('woff2');
+    font-weight: 600; 
+    font-style: normal;
+}
+

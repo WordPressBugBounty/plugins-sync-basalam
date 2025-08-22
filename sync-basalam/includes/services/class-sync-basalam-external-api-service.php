@@ -1,0 +1,205 @@
+<?php
+if (! defined('ABSPATH')) exit;
+
+class Sync_basalam_External_API_Service
+{
+    private array $headers;
+
+    public function __construct()
+    {
+        $this->headers = [
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+            'user-agent' => 'Wp-Basalam',
+            'referer' => get_site_url(),
+        ];
+    }
+
+    public function send_post_request($url, $data, $headers = [])
+    {
+        $headers = array_merge($this->headers, $headers);
+
+        $response = wp_remote_post($url, array(
+            'timeout' => 15,
+            'body'    => $data,
+            'headers' => $headers,
+        ));
+        if (is_wp_error($response)) {
+            sync_basalam_Logger::error("درخواست API برای آدرس " . $url . " با خطا مواجه شد. پاسخ: " . $response->get_error_message());
+            return [
+                'body' => null,
+                'status_code' => 500
+            ];
+        }
+
+        $body = wp_remote_retrieve_body($response);
+        $status_code = wp_remote_retrieve_response_code($response);
+        if ($status_code == 401) {
+            $data = [
+                sync_basalam_Admin_Settings::TOKEN => '',
+                sync_basalam_Admin_Settings::REFRESH_TOKEN => '',
+            ];
+            sync_basalam_Admin_Settings::update_settings($data);
+            sync_basalam_QueueManager::cancel_all_tasks_group('sync_basalam_plugin_create_product');
+            sync_basalam_QueueManager::cancel_all_tasks_group('sync_basalam_plugin_update_product');
+            sync_basalam_QueueManager::cancel_all_tasks_group('sync_basalam_plugin_connect_auto_product');
+        }
+
+        return [
+            'body' => json_decode($body, true),
+            'status_code' => $status_code
+        ];
+    }
+
+    public function send_get_request($url, $headers = [])
+    {
+        $headers = array_merge($this->headers, $headers);
+
+        $response = wp_remote_get($url, array(
+            'timeout'   => 15,
+            'headers'   => $headers,
+        ));
+
+        if (is_wp_error($response)) {
+            sync_basalam_Logger::error("درخواست API برای آدرس " . $url . " با خطا مواجه شد. پاسخ: " . $response->get_error_message());
+            return false;
+        }
+
+        $body = wp_remote_retrieve_body($response);
+        $status_code = wp_remote_retrieve_response_code($response);
+        if ($status_code == 401) {
+            $data = [
+                sync_basalam_Admin_Settings::TOKEN => '',
+                sync_basalam_Admin_Settings::REFRESH_TOKEN => '',
+            ];
+            sync_basalam_Admin_Settings::update_settings($data);
+            sync_basalam_QueueManager::cancel_all_tasks_group('sync_basalam_plugin_create_product');
+            sync_basalam_QueueManager::cancel_all_tasks_group('sync_basalam_plugin_update_product');
+            sync_basalam_QueueManager::cancel_all_tasks_group('sync_basalam_plugin_connect_auto_product');
+        }
+
+        return [
+            'data' => json_decode($body, true),
+            'status_code' => $status_code,
+        ];
+    }
+
+    public function send_patch_request($url, $data, $headers = [])
+    {
+        $headers = array_merge($this->headers, $headers);
+        $response = wp_remote_request($url, array(
+            'method' => 'PATCH',
+            'timeout'     => 15,
+            'body'      => $data,
+            'headers'   => $headers,
+        ));
+
+        if (is_wp_error($response)) {
+            sync_basalam_Logger::error("درخواست API برای آدرس " . $url . " با خطا مواجه شد. پاسخ: " . $response->get_error_message());
+            return [
+                'body' => null,
+                'status_code' => 500
+            ];
+        }
+
+        $body = wp_remote_retrieve_body($response);
+        $status_code = wp_remote_retrieve_response_code($response);
+        if ($status_code == 401) {
+            $data = [
+                sync_basalam_Admin_Settings::TOKEN => '',
+                sync_basalam_Admin_Settings::REFRESH_TOKEN => '',
+            ];
+            sync_basalam_Admin_Settings::update_settings($data);
+            sync_basalam_QueueManager::cancel_all_tasks_group('sync_basalam_plugin_create_product');
+            sync_basalam_QueueManager::cancel_all_tasks_group('sync_basalam_plugin_update_product');
+            sync_basalam_QueueManager::cancel_all_tasks_group('sync_basalam_plugin_connect_auto_product');
+        }
+        return [
+            'body' => json_decode($body, true),
+            'status_code' => $status_code
+        ];
+    }
+    public function upload_file_request($url, $local_file, $data = [], $headers = [])
+    {
+        if (!file_exists($local_file)) {
+            sync_basalam_Logger::error("فایل وجود ندارد: " . $local_file);
+            return false;
+        } elseif (!is_readable($local_file)) {
+            sync_basalam_Logger::error("فایل قابل خواندن نیست: " . $local_file);
+            return false;
+        } else {
+            $file_content = file_get_contents($local_file);
+            if ($file_content === false) {
+                sync_basalam_Logger::error("file_get_contents شکست خورد: " . $local_file);
+                return false;
+            }
+        }
+
+        $boundary = wp_generate_password(24);
+
+        $payload = $this->make_payload_upload_file_request($data, $local_file, $boundary);
+
+        $headers  = array_merge(
+            $headers,
+            array(
+                'content-type' => 'multipart/form-data; boundary=' . $boundary,
+                'user-agent' => 'Wp-Basalam',
+                'Accept' => 'application/json',
+                'referer' => get_site_url(),
+            )
+        );
+
+        $response = wp_remote_post(
+            $url,
+            array(
+                'timeout'     => 50,
+                'headers'    => $headers,
+                'body'       => $payload,
+            )
+        );
+
+        if (is_wp_error($response)) {
+            sync_basalam_Logger::error("درخواست API برای آدرس " . $url  . " با خطا مواجه شد. پاسخ: " . $response->get_error_message());
+            return false;
+        }
+
+        $body = wp_remote_retrieve_body($response);
+        $status_code = wp_remote_retrieve_response_code($response);
+
+        return [
+            'body' => json_decode($body, true),
+            'status_code' => $status_code
+        ];
+    }
+
+    private function make_payload_upload_file_request($data, $local_file, $boundary)
+    {
+        $payload = '';
+        $eol = "\r\n";
+
+        foreach ($data as $name => $value) {
+            $payload .= '--' . $boundary . $eol;
+            $payload .= 'Content-Disposition: form-data; name="' . $name . '"' . $eol . $eol;
+            $payload .= $value . $eol;
+        }
+
+        if ($local_file) {
+            $filename = basename($local_file);
+            $file_content = file_get_contents($local_file);
+
+            $filetype_info = wp_check_filetype($local_file);
+            $mime_type = $filetype_info['type'] ?? 'application/octet-stream';
+
+
+            $payload .= '--' . $boundary . $eol;
+            $payload .= 'Content-Disposition: form-data; name="file"; filename="' . $filename . '"' . $eol;
+            $payload .= 'Content-Type: ' . $mime_type . $eol;
+            $payload .= 'Content-Transfer-Encoding: binary' . $eol . $eol;
+            $payload .= $file_content . $eol;
+        }
+
+        $payload .= '--' . $boundary . '--' . $eol;
+
+        return $payload;
+    }
+}

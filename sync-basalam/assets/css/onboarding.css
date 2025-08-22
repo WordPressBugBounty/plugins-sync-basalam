@@ -1,0 +1,460 @@
+/* Onboarding Wrapper */
+
+.basalam-onboarding-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--basalam-gray-100, #f8f9fa);
+    z-index: 99999;
+    margin-left: -20px;
+    font-family: IRANSans, Tahoma, Arial, sans-serif;
+    direction: rtl;
+    overflow-y: auto;
+}
+
+.basalam-onboarding {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* Step Indicator */
+.step-indicator {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+.step-indicator::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 60px;
+    right: 60px;
+    height: 2px;
+    background: var(--basalam-gray-300, #dee2e6);
+    z-index: 1;
+}
+
+.step-indicator .step {
+    position: relative;
+    z-index: 2;
+    background: var(--basalam-gray-100, #f8f9fa);
+    padding: 0 10px;
+    text-align: center;
+}
+
+.step-indicator .step-number {
+    width: 40px;
+    height: 40px;
+    background: #fff;
+    border: 2px solid var(--basalam-gray-300, #dee2e6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    font-weight: bold;
+    color: var(--basalam-gray-600, #6c757d);
+    font-family: PelakFA;
+}
+
+.step-indicator .step.active .step-number {
+    background: var(--basalam-primary, #00b67a);
+    border-color: var(--basalam-primary, #00b67a);
+    color: #fff;
+}
+
+.step-indicator .step.completed .step-number {
+    background: var(--basalam-primary, #00b67a);
+    border-color: var(--basalam-primary, #00b67a);
+    color: #fff;
+}
+
+.step-indicator .step-title {
+    font-size: 14px;
+    color: var(--basalam-gray-600, #6c757d);
+    display: block;
+    font-family: PelakFA, IRANSans;
+}
+
+.step-indicator .step.active .step-title {
+    color: var(--basalam-primary, #00b67a);
+    font-weight: bold;
+}
+
+/* Step Content */
+.step-content-wrapper {
+    background: #fff;
+    max-height: 450px;
+    padding: 11px 40px 11px 40px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.step-content-wrapper h1 {
+    text-align: center;
+    color: var(--basalam-gray-800, #343a40);
+    font-size: 24px;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--basalam-gray-200, #e9ecef);
+    font-family: Morabba, IRANSans;
+}
+
+/* Welcome Screen */
+.welcome-content {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.welcome-logo {
+    max-width: 70px;
+    margin: auto;
+
+}
+
+.welcome-content h2 {
+    font-family: Morabba, IRANSans;
+    color: var(--basalam-gray-800, #343a40);
+    margin-bottom: 20px;
+}
+
+.welcome-content ul {
+    text-align: right;
+    list-style-type: none;
+    margin: 20px 0;
+    font-family: PelakFA, IRANSans;
+}
+
+.welcome-content ul li {
+    margin: 15px 0;
+    padding-right: 30px;
+    position: relative;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.welcome-content ul li::before {
+    content: '+';
+    position: absolute;
+    right: 0;
+    color: var(--basalam-primary-color);
+    font-weight: bold;
+}
+
+/* Step Content */
+.step-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+}
+
+.step-content a {
+    margin: auto;
+    width: -webkit-fill-available;
+}
+
+.step-instructions {
+    padding: 30px;
+    background: var(--basalam-gray-100, #f8f9fa);
+    border-radius: 12px;
+    border: 1px solid var(--basalam-gray-200, #e9ecef);
+}
+
+.step-instructions h3 {
+    font-family: Morabba;
+    color: var(--basalam-gray-800, #343a40);
+    margin-bottom: 20px;
+}
+
+.step-instructions ol {
+    margin: 0;
+    padding-right: 20px;
+    font-family: PelakFA;
+}
+
+.step-instructions li {
+    margin-bottom: 15px;
+    line-height: 1.6;
+    font-size: 15px;
+    font-family: PelakFa;
+    color: var(--basalam-gray-700, #495057);
+}
+
+.step-image img {
+    max-width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Existing Credentials Display */
+.existing-credentials {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.existing-credentials p {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+}
+
+.credential-info {
+    background: #fff;
+    border-radius: 6px;
+    padding: 15px;
+    margin: 10px 0;
+}
+
+.credential-info p {
+    margin: 5px 0;
+}
+
+.credential-info strong {
+    color: #666;
+    margin-left: 5px;
+}
+
+.reset-client-credentials,
+.reset-webhook {
+    margin-top: 10px !important;
+    width: 100%;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Finish Screen */
+.finish-content {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto !important;
+}
+
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.action-buttons .button {
+    min-width: 150px;
+    text-align: center;
+    height: auto;
+    padding: 12px 24px;
+    font-family: PelakFA, IRANSans;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+/* Navigation */
+.step-navigation {
+    display: flex;
+    justify-content: flex-end;
+    padding: 20px 40px;
+    border-radius: 0 0 12px 12px;
+    margin: 0 -40px -11px -40px;
+    background: #f8f9fa;
+    gap: 15px;
+}
+
+.nav-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.nav-buttons .basalam-button,
+.nav-buttons .basalam-primary-button {
+    margin: 0 !important;
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.nav-buttons .basalam-primary-button svg {
+    width: 16px;
+    height: 16px;
+}
+
+
+
+.step-navigation .basalam-button {
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    font-size: 14px;
+}
+/* Navigation Links */
+.basalam-nav-link {
+    text-decoration: none;
+    padding: 9px 16px;
+    border-radius: 8px;
+    color: var(--basalam-primary-color) !important;
+    border: 2px solid var(--basalam-primary-color);
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.basalam-nav-link:hover {
+    color: white !important;
+    background-color: var(--basalam-primary-color);
+}
+
+/* Success and Error Messages */
+.basalam-success-message {
+    background-color: #e8f5e9;
+    border: 1px solid #4caf50;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.basalam-success-message h2 {
+    color: #2e7d32;
+    margin: 0 0 10px 0;
+}
+
+.basalam-success-message p {
+    color: #1b5e20;
+    margin: 0;
+}
+
+.basalam--no-token {
+    margin-top: 50px;
+}
+
+.basalam-error-message {
+    background-color: #ffebee;
+    border: 1px solid #ef5350;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    width: 50%;
+    justify-content: center;
+    gap: 5px;
+    margin: auto;
+}
+
+
+.basalam-error-message h2 {
+    color: #c62828;
+    margin: 0 0 10px 0;
+}
+
+.basalam-error-message p {
+    color: #b71c1c;
+    margin: 0 0 10px 0;
+
+}
+
+.basalam-error-message ul {
+    margin: 0;
+    padding-right: 20px;
+    color: #b71c1c;
+}
+
+.basalam-error-message li {
+    margin-bottom: 5px;
+}
+
+.basalam-error-message li:last-child {
+    margin-bottom: 0;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 1024px) {
+    .basalam-onboarding {
+        padding: 20px;
+    }
+
+    .step-content {
+        grid-template-columns: 1fr;
+    }
+
+    .step-image {
+        order: -1;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .step-indicator {
+        padding: 0 20px;
+        overflow-x: auto;
+        justify-content: start;
+        padding-bottom: 10px;
+    }
+
+    .step-indicator .step {
+        min-width: 100px;
+        margin-right: 10px;
+    }
+
+    .step-content-wrapper {
+        padding: 20px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-buttons .button {
+        width: 100%;
+    }
+
+    .step-navigation {
+        margin: 0 -20px -20px -20px;
+        padding: 15px 20px;
+        position: sticky;
+        bottom: 0;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .step-indicator .step-title {
+        display: none;
+    }
+
+    .step-indicator .step {
+        min-width: auto;
+    }
+
+    .welcome-content ul li {
+        font-size: 14px;
+    }
+
+    .step-instructions li {
+        font-size: 14px;
+    }
+}
+
+.basalam-skip-onboarding {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+}
