@@ -22,7 +22,7 @@ class Sync_basalam_Update_Product extends Sync_BasalamController
             $result = $product_operations->update_exist_product($product_id, $category_ids);
         }
         if (!$result['success']) {
-            wp_send_json_error(['message' => $result['message']], $result['status_code'] ?? 500);
+            wp_send_json_error(['message' => $result['message']], 200);
         }
 
         wp_send_json_success(['message' => $result['message']], $result['status_code'] ?? 200);

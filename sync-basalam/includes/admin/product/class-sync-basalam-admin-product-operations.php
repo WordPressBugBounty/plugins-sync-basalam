@@ -18,6 +18,7 @@ class Sync_basalam_Admin_Product_Operations
             $product_data = $this->get_product_data($product_id, 'update', $category_ids);
             return $this->update_product_service->update_product_in_basalam($product_data, $product_id);
         } catch (\Throwable $th) {
+            update_post_meta($product_id, 'sync_basalam_product_sync_status', 'no');
             sync_basalam_Logger::error("خطا در بروزرسانی محصول: " . $th->getMessage(), [
                 'product_id' => $product_id,
                 'عملیات' => 'بروزرسانی محصول باسلام',
@@ -25,7 +26,7 @@ class Sync_basalam_Admin_Product_Operations
 
             return [
                 'success' => false,
-                'message' => 'فرایند به روزرسانی محصول ناموفق بود.',
+                'message' => 'فرایند به روزرسانی محصول ناموفق بود : ' . $th->getMessage(),
                 'error' => $th->getMessage(),
                 'status_code' => 400
             ];
@@ -33,12 +34,13 @@ class Sync_basalam_Admin_Product_Operations
     }
 
 
-    public function create_new_product($product_id)
+    public function create_new_product($product_id, $category_ids)
     {
         try {
-            $product_data = $this->get_product_data($product_id);
+            $product_data = $this->get_product_data($product_id, false, $category_ids);
             return $this->create_product_service->create_product_in_basalam($product_data, $product_id);
         } catch (\Throwable $th) {
+            update_post_meta($product_id, 'sync_basalam_product_sync_status', 'no');
             sync_basalam_Logger::error("خطا در اضافه کردن محصول: " . $th->getMessage(), [
                 'product_id' => $product_id,
                 'عملیات' => 'اضافه کردن محصول به باسلام',
@@ -46,7 +48,7 @@ class Sync_basalam_Admin_Product_Operations
 
             return [
                 'success' => false,
-                'message' => 'فرایند اضافه کردن محصول ناموفق بود.',
+                'message' => 'فرایند اضافه کردن محصول ناموفق بود : ' . $th->getMessage(),
                 'status_code' => 400
             ];
         }
@@ -63,7 +65,7 @@ class Sync_basalam_Admin_Product_Operations
         } catch (\Throwable $th) {
             return [
                 'success' => false,
-                'message' => 'تغییر وضعیت محصول در باسلام ناموفق بود.',
+                'message' => 'تغییر وضعیت محصول در باسلام ناموفق بود : ' . $th->getMessage(),
                 'status_code' => 400
             ];
         }
@@ -80,7 +82,7 @@ class Sync_basalam_Admin_Product_Operations
         } catch (\Throwable $th) {
             return [
                 'success' => false,
-                'message' => 'تغییر وضعیت محصول در باسلام ناموفق بود.',
+                'message' => 'تغییر وضعیت محصول در باسلام ناموفق بود : ' . $th->getMessage(),
                 'status_code' => 400
             ];
         }

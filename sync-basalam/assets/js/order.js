@@ -28,29 +28,110 @@ jQuery(document).ready(function ($) {
     }
   });
 
-  // $(".cancel-order").click(function () {
-  //   if (confirm("آیا از لغو سفارش اطمینان دارید؟")) {
-  //     var orderId = $(this).data("order");
-  //     var nonce = $(this).data("nonce");
+  $(".cancel-order").click(function () {
+    var orderId = $(this).data("order");
+    var nonce = $(this).data("nonce");
 
-  //     $.ajax({
-  //       url: ajaxurl,
-  //       type: "POST",
-  //       data: {
-  //         action: "admin_cancel_order",
-  //         order_id: orderId,
-  //         basalam_order_nonce: nonce,
-  //       },
-  //       success: function (response) {
-  //         if (response.success) {
-  //           location.reload();
-  //         } else {
-  //           alert("خطا: " + response.data);
-  //         }
-  //       },
-  //     });
-  //   }
-  // });
+    $("#cancel-order-popup").show();
+  });
+
+  $("#cancel-cancel-order").click(function () {
+    $("#cancel-order-popup").hide();
+    $("#cancel-reason").val("");
+    $("#cancel-description").val("");
+  });
+
+  $("#submit-cancel-order").click(function () {
+    var orderId = $(this).data("order");
+    var nonce = $(this).data("nonce");
+    var reasonId = $("#cancel-reason").val();
+    var description = $("#cancel-description").val();
+
+    if (!reasonId) {
+      alert("لطفاً دلیل لغو سفارش را انتخاب کنید.");
+      return;
+    }
+
+    if (!description.trim()) {
+      alert("لطفاً توضیحات را وارد کنید.");
+      return;
+    }
+
+    $.ajax({
+      url: ajaxurl,
+      type: "POST",
+      data: {
+        action: "cancel_basalam_order",
+        order_id: orderId,
+        reason_id: reasonId,
+        description: description,
+        _wpnonce: nonce,
+      },
+      success: function (data) {
+        if (data.success) {
+          alert(data.data?.message || "عملیات با موفقیت انجام شد.");
+        } else {
+          alert(data.data?.message || "خطایی رخ داده است.");
+          console.error("Server error:", data);
+        }
+        location.reload();
+      },
+      error: function () {
+        alert("خطایی در ارسال درخواست رخ داد.");
+      },
+    });
+  });
+
+  $(".request-cancel-order").click(function () {
+    var orderId = $(this).data("order");
+    var nonce = $(this).data("nonce");
+
+    $("#request-cancel-order-popup").show();
+
+    $("#submit-request-cancel-order")
+      .data("order", orderId)
+      .data("nonce", nonce);
+  });
+
+  $("#cancel-request-cancel-order").click(function () {
+    $("#request-cancel-order-popup").hide();
+    $("#request-cancel-description").val("");
+  });
+
+  $("#submit-request-cancel-order").click(function () {
+    var orderId = $(this).data("order");
+    var nonce = $(this).data("nonce");
+    var description = $("#request-cancel-description").val();
+
+    if (!description.trim()) {
+      alert("لطفاً توضیحات را وارد کنید.");
+      return;
+    }
+
+    $.ajax({
+      url: ajaxurl,
+      type: "POST",
+      data: {
+        action: "request_cancel_basalam_order",
+        order_id: orderId,
+        description: description,
+        _wpnonce: nonce,
+      },
+      success: function (response) {
+        if (response.success) {
+          alert(
+            response.data?.message || "درخواست لغو سفارش با موفقیت ارسال شد."
+          );
+          location.reload();
+        } else {
+          alert(response.data?.message || "خطایی رخ داده است");
+        }
+      },
+      error: function () {
+        alert("خطایی در ارسال درخواست رخ داد.");
+      },
+    });
+  });
 
   $(".save-tracking-code").click(function () {
     var orderId = $(this).data("order");

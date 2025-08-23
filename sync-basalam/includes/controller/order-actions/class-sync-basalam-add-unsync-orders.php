@@ -9,7 +9,7 @@ class Sync_basalam_Add_Unsync_Orders extends Sync_BasalamController
         $result = $get_unsync_orders_service->add_unsync_basalam_order_to_woo();
 
         if (!$result['success']) {
-            wp_send_json_error(['message' => $result['message']], $result['status_code'] ?? 500);
+            wp_send_json_error(['message' => $result['message']], 200);
         }
 
         wp_send_json_success(['message' => $result['message']], $result['status_code'] ?? 200);

@@ -3,8 +3,10 @@ if (! defined('ABSPATH')) exit;
 
 require_once plugin_dir_path(__FILE__) . '../controller/class-sync-basalam-controller.php';
 
-require_once plugin_dir_path(__FILE__) . '../controller/product-actions/class-sync-basalam-add-products-controller.php';
-require_once plugin_dir_path(__FILE__) . '../controller/product-actions/class-sync-basalam-cancel-add-products-controller.php';
+require_once plugin_dir_path(__FILE__) . '../controller/product-actions/class-sync-basalam-cancel-debug-controller.php';
+
+require_once plugin_dir_path(__FILE__) . '../controller/product-actions/class-sync-basalam-create-products-controller.php';
+require_once plugin_dir_path(__FILE__) . '../controller/product-actions/class-sync-basalam-cancel-create-products-controller.php';
 
 require_once plugin_dir_path(__FILE__) . '../controller/product-actions/class-sync-basalam-update-products-controller.php';
 require_once plugin_dir_path(__FILE__) . '../controller/product-actions/class-sync-basalam-cancel-update-products-controller.php';
@@ -14,13 +16,15 @@ require_once plugin_dir_path(__FILE__) . '../controller/product-actions/class-sy
 
 require_once plugin_dir_path(__FILE__) . '../controller/order-actions/class-sync-basalam-add-unsync-orders.php';
 require_once plugin_dir_path(__FILE__) . '../controller/order-actions/class-sync-basalam-confirm-order.php';
+require_once plugin_dir_path(__FILE__) . '../controller/order-actions/class-sync-basalam-cancel-order.php';
+require_once plugin_dir_path(__FILE__) . '../controller/order-actions/class-sync-basalam-request-cancel-order.php';
 require_once plugin_dir_path(__FILE__) . '../controller/order-actions/class-sync-basalam-delay-req-order.php';
 require_once plugin_dir_path(__FILE__) . '../controller/order-actions/class-sync-basalam-tracking-code-order.php';
 
 require_once plugin_dir_path(__FILE__) . '../controller/option-actions/class-sync-basalam-add-map-option-controller.php';
 require_once plugin_dir_path(__FILE__) . '../controller/option-actions/class-sync-basalam-delete-map-option-controller.php';
 
-require_once plugin_dir_path(__FILE__) . '../controller/product-actions/class-sync-basalam-add-product-controller.php';
+require_once plugin_dir_path(__FILE__) . '../controller/product-actions/class-sync-basalam-create-product-controller.php';
 require_once plugin_dir_path(__FILE__) . '../controller/product-actions/class-sync-basalam-update-product-controller.php';
 require_once plugin_dir_path(__FILE__) . '../controller/product-actions/class-sync-basalam-restore-product-controller.php';
 require_once plugin_dir_path(__FILE__) . '../controller/product-actions/class-sync-basalam-archive-product-controller.php';
@@ -34,8 +38,8 @@ require_once plugin_dir_path(__FILE__) . '../controller/class-sync-basalam-updat
 
 require_once plugin_dir_path(__FILE__) . '../services/routeHandler/class-sync-basalam-route.php';
 
-sync_basalam_Route::postAjax('create_products_to_basalam', sync_basalam_Add_Products::class);
-sync_basalam_Route::postAction('cancel_create_products_to_basalam', sync_basalam_Cancel_Add_Products::class);
+sync_basalam_Route::postAjax('create_products_to_basalam', Sync_basalam_Create_Products::class);
+sync_basalam_Route::postAction('cancel_create_products_to_basalam', Sync_basalam_Cancel_Create_Products::class);
 
 sync_basalam_Route::postAjax('update_products_in_basalam', sync_basalam_Update_Products::class);
 sync_basalam_Route::postAction('cancel_update_products_in_basalam', sync_basalam_Cancel_Update_Products::class);
@@ -48,7 +52,7 @@ sync_basalam_Route::postAjax('add_unsync_orders_from_basalam', sync_basalam_Add_
 sync_basalam_Route::postAjax('basalam_add_map_option', sync_basalam_Add_Map_Option::class);
 sync_basalam_Route::postAjax('basalam_delete_mapped_option', sync_basalam_Delete_Map_Option::class);
 
-sync_basalam_Route::postAction('create_product_basalam', sync_basalam_Add_Product::class);
+sync_basalam_Route::postAction('create_product_basalam', sync_basalam_Create_Product::class);
 
 sync_basalam_Route::postAction('update_product_in_basalam', sync_basalam_Update_Product::class);
 
@@ -61,6 +65,10 @@ sync_basalam_Route::postAction('disconnect_exist_product_on_basalam', sync_basal
 sync_basalam_Route::postAction('basalam_update_setting', sync_basalam_Update_Setting::class);
 
 sync_basalam_Route::postAjax('confirm_basalam_order', sync_basalam_Confirm_Order::class);
+
+sync_basalam_Route::postAjax('cancel_basalam_order', Sync_basalam_Cancel_Order::class);
+
+sync_basalam_Route::postAjax('request_cancel_basalam_order', Sync_basalam_Request_Cancel_Order::class);
 
 sync_basalam_Route::postAjax('delay_req_basalam_order', sync_basalam_Delay_Req_Order::class);
 

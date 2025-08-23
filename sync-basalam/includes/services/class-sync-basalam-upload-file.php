@@ -6,7 +6,6 @@ class Sync_basalam_Upload_File
 
     static function upload($filePath)
     {
-
         if (!self::check_file_size($filePath)) {
             return false;
         }
@@ -16,7 +15,6 @@ class Sync_basalam_Upload_File
         }
 
         $response = self::upload_file_to_basalam($filePath);
-
         if ($response and in_array($response['status_code'], [200, 201]) and $response['body']) {
             return [
                 'file_id' => $response['body']['id'],
@@ -57,7 +55,6 @@ class Sync_basalam_Upload_File
 
     static function upload_file_to_basalam($file_path)
     {
-
         $api_service = new sync_basalam_External_API_Service();
         $url = "https://uploadio.basalam.com/api_v2/files";
 
@@ -72,7 +69,7 @@ class Sync_basalam_Upload_File
         ];
 
         $data = ['file_type' => 'product.photo'];
-
-        return $api_service->upload_file_request($url, $file_path, $data, $headers);
+        $response =  $api_service->upload_file_request($url, $file_path, $data, $headers);
+        return $response;
     }
 }

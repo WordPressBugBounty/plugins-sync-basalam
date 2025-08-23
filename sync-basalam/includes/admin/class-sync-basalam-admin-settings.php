@@ -112,7 +112,7 @@ class Sync_basalam_Admin_Settings
         }
         return $settings[$setting] ?? null;
     }
-    
+
     public static function get_oauth_data()
     {
         $apiservice = new sync_basalam_External_API_Service;
@@ -145,7 +145,7 @@ class Sync_basalam_Admin_Settings
             'site_url_webhook' => $site_url . '/wp-json/basalam/v1/new-order',
             'redirect_uri' => $redirect_uri,
             'url_req_client' => "https://developers.basalam.com/clients?name=WP-BASALAM&redirect_url=$redirect_uri",
-            'url_req_webhook' => "https://developers.basalam.com/webhooks?events_ids=5&request_headers=" . urlencode(json_encode(["token" => $webhook_token])) . "&url=" . urlencode($SITE_URL_WEBHOOK),
+            'url_req_webhook' => "https://developers.basalam.com/panel/webhooks?events_ids=5&request_headers=" . urlencode(json_encode(["token" => $webhook_token])) . "&url=" . urlencode($SITE_URL_WEBHOOK),
             'url_req_token' => "https://basalam.com/accounts/sso?client_id=$client_id&scope=$scopes&redirect_uri=$redirect_uri&state=$site_url",
             'url_hijab_detector' => "https://revision.basalam.com/api_v1.0/validation/image/hijab-detector/bulk",
             'url_get_all_sync_basalam_products' => "https://core.basalam.com/v3/vendors/$vendor_id/products",
@@ -168,6 +168,13 @@ class Sync_basalam_Admin_Settings
 
         if ($data) {
             self::update_settings($data);
+
+            if (!empty($data[self::DEVELOPER_MODE]) && $data[self::DEVELOPER_MODE] === 'true') {
+                $debug_task = new Sync_basalam_debug_Task();
+                $debug_task->schedule();
+            } else {
+                (new Sync_basalam_Cancel_Debug())();
+            }
         }
 
         if (isset($_POST['get_token']) && $_POST['get_token'] == 1) {

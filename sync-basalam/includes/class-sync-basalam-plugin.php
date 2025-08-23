@@ -7,7 +7,7 @@ class Sync_basalam_Plugin
     /**
      * Plugin version
      */
-    const VERSION = '1.3.7';
+    const VERSION = '1.3.8';
 
     /**
      * Plugin singleton instance
@@ -58,30 +58,19 @@ class Sync_basalam_Plugin
         }
     }
 
-
     private function migrate()
     {
-        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'class-sync-basalam-plugin-migrate.php';
-        if (get_option('sync_basalam_version') !=  self::VERSION) {
+        require_once __DIR__ . '/class-sync-basalam-plugin-activator.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'migration/class-sync-basalam-migration-interface.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'migration/class-sync-basalam-migration-V-1-3-0.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'migration/class-sync-basalam-migration-V-1-3-2.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'migration/class-sync-basalam-migration-V-1-3-8.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'migration/class-sync-basalam-migration-manager.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'migration/service/class-sync-basalam-migrator-service.php';
 
-            $current_version = get_option('sync_basalam_version');
-            $migrate_V1_3_0 = ['1.1.8', '1.2.1', '1.2.2', '1.2.3', '1.2.4', '1.2.5'];
-
-            $migrate_V1_3_2 = ['1.3.0', '1.3.1'];
-
-            if (!$current_version || in_array($current_version, $migrate_V1_3_0)) {
-                require_once __DIR__ . '/class-sync-basalam-plugin-activator.php';
-                Sync_basalam_Plugin_Activator::activate();
-                Sync_basalam_Plugin_Migrator::migrate_all();
-            }
-            if (!$current_version || in_array($current_version, $migrate_V1_3_2)) {
-                require_once __DIR__ . '/class-sync-basalam-plugin-activator.php';
-                Sync_basalam_Plugin_Activator::activate();
-                Sync_basalam_Plugin_Migrator::migrate_actions();
-            }
-
-            update_option('sync_basalam_version', self::VERSION);
-        }
+        $current_version = get_option('sync_basalam_version') ?: '0.0.0';
+        $manager = new Sync_Basalam_Migration_Manager();
+        $manager->runMigrations($current_version, self::VERSION);
     }
 
     private function includes()
@@ -91,6 +80,7 @@ class Sync_basalam_Plugin
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'utilities/class-sync-basalam-exception.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'utilities/class-sync-basalam-convet-fa-num.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'utilities/class-sync-basalam-iran-provinces-code.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'utilities/class-sync-basalam-order-manager.php';
 
 
         // Logger file
@@ -135,6 +125,14 @@ class Sync_basalam_Plugin
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-get-plugin-data.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-get-shipping-methods.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-connect-product-service.php';
+
+        // Order Services
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/orders/class-sync-basalam-confirm-order.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/orders/class-sync-basalam-cancel-order.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/orders/class-sync-basalam-cancel-req-order.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/orders/class-sync-basalam-tracking-code-order.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/orders/class-sync-basalam-delay-req-order.php';
+
         // Admin section files
 
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/class-sync-basalam-admin-menus.php';
@@ -156,7 +154,7 @@ class Sync_basalam_Plugin
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/product/class-sync-basalam-admin-product-wholesale.php';
 
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/order/class-sync-basalam-admin-order-is-basalam.php';
-        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/order/manage_box_order.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/order/class-sync-basalam-order-box.php';
 
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/order/class-sync-basalam-admin-order-statuses.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/order/class-sync-basalam-admin-check-basalam-order.php';
@@ -218,7 +216,7 @@ class Sync_basalam_Plugin
         add_action('woocommerce_order_list_table_extra_tablenav', array('Sync_basalam_Admin_Check_Sync_basalam_Order', 'show_button_on_top_list'), 20, 1);
         add_action('restrict_manage_posts', ['Sync_basalam_Admin_Check_Sync_basalam_Order', 'show_button_on_top_list']);
 
-        add_action('add_meta_boxes', array(new Sync_basalam_Order_Manager, 'add_custom_order_tracking_box'), 10);
+        add_action('add_meta_boxes', array(new Sync_Basalam_Order_Box, 'add_custom_order_tracking_box'), 10);
         add_action('restrict_manage_posts', [
             Sync_basalam_Admin_Filter_Woo_Products::get_instance(),
             'filter_by_exist_on_basalam'
@@ -252,18 +250,17 @@ class Sync_basalam_Plugin
 
     private function init_wp_bg_process()
     {
-        require_once plugin_dir_path(__FILE__) . '../vendor/deliciousbrains/wp-background-processing/wp-background-processing.php';
-
         global $sync_basalam_Auto_Connect_Product_Task;
 
         $sync_basalam_Auto_Connect_Product_Task = new sync_basalam_Auto_Connect_Product_Task();
+        new sync_basalam_Create_Product_wp_bg_proccess_Task();
+        new sync_basalam_Update_Product_wp_bg_proccess_Task();
     }
 
     private function init_tasks()
     {
         $task_files = glob(SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'queue/tasks/class-sync-basalam-*-task.php');
         foreach ($task_files as $task_file) {
-            
             require_once $task_file;
 
             $filename = basename($task_file, '.php');

@@ -1,7 +1,7 @@
 jQuery(document).ready(function ($) {
   $(document).on("change", ".category-option", function () {
     if ($(this).is(":checked")) {
-      var catID = $(this).val().toString().split(",")[0];
+      var catID = $(this).val();
       var nonce = $("#basalam_get_category_attrs_nonce").val();
       $(".basalam-action-button").attr("data-cat-id", catID);
       $("#sync_basalam_category_attributes")
@@ -13,7 +13,7 @@ jQuery(document).ready(function ($) {
         method: "POST",
         data: {
           action: "basalam_get_category_attrs",
-          catID: catID,
+          catID: catID.toString().split(",")[0],
           _wpnonce: nonce,
         },
         success: function (res) {

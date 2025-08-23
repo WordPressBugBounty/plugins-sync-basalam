@@ -19,7 +19,7 @@ class Sync_basalam_Delete_Map_Option extends Sync_BasalamController
         $result = $categoryOptionsManager->delete($woo_name, $sync_basalam_name);
 
         if (!$result['success']) {
-            wp_send_json_error(['message' => $result['message']], $result['status_code'] ?? 500);
+            wp_send_json_error(['message' => $result['message']], 200);
         }
 
         wp_send_json_success(['message' => $result['message']], $result['status_code'] ?? 200);

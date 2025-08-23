@@ -13,6 +13,7 @@ class Sync_basalam_Plugin_Activator
         $table_name_payments       = $wpdb->prefix . 'sync_basalam_payments';
         $table_name_options        = $wpdb->prefix . 'sync_basalam_map_options';
         $table_name_uploaded_photo = $wpdb->prefix . 'sync_basalam_uploaded_photo';
+        $table_name_debug_logs     = $wpdb->prefix . 'sync_basalam_debug_logs';
         $charset_collate           = $wpdb->get_charset_collate();
 
         $sql_Payment = "CREATE TABLE $table_name_payments (
@@ -40,12 +41,26 @@ class Sync_basalam_Plugin_Activator
             woo_photo_id INT UNIQUE,
             sync_basalam_photo_id INT,
             sync_basalam_photo_url VARCHAR(2083),
+            created_at DATETIME NOT NULL,
             PRIMARY KEY (id)
+        ) $charset_collate;";
+
+        $sql_debug_logs = "CREATE TABLE $table_name_debug_logs (
+            id BIGINT UNSIGNED AUTO_INCREMENT,
+            request_url VARCHAR(2083) NOT NULL,
+            status_code INT NULL,
+            success TINYINT(1) NOT NULL DEFAULT 0,
+            response_time_ms INT NULL,
+            error_message TEXT NULL,
+            created_at DATETIME NOT NULL,
+            PRIMARY KEY (id),
+            KEY created_at_idx (created_at)
         ) $charset_collate;";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql_Payment);
         dbDelta($sql_options);
         dbDelta($sql_uploaded_photo);
+        dbDelta($sql_debug_logs);
     }
 }

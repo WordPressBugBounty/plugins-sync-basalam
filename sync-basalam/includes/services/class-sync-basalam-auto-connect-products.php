@@ -29,6 +29,14 @@ class Sync_basalam_Auto_Connect_Products
                 $sync_basalam_products = $get_sync_basalam_product_data->get_sync_basalam_product_data($this->url, $this->token, null, $page);
             }
 
+            if (isset($sync_basalam_products['timeout_error']) && $sync_basalam_products['timeout_error'] === true) {
+                return [
+                    'timeout_error' => true,
+                    'message' => 'درخواست به دلیل timeout ناموفق بود.',
+                    'status_code' => 400
+                ];
+            }
+
             if ($title) {
                 return $sync_basalam_products['products'];
             }

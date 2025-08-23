@@ -12,7 +12,7 @@ class Sync_basalam_Add_Map_Option extends Sync_BasalamController
         $categoryOptionsManager = new sync_basalam_Manage_Category_Options($wpdb);
         $result =  $categoryOptionsManager->add($woo_map_option, $sync_basalam_map_option);
         if (!$result['success']) {
-            wp_send_json_error(['message' => $result['message']], $result['status_code'] ?? 500);
+            wp_send_json_error(['message' => $result['message']], 200);
         }
         wp_send_json_success(['message' => $result['message']], $result['status_code'] ?? 200);
     }

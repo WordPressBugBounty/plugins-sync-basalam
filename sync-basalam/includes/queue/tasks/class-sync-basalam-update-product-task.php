@@ -10,28 +10,19 @@ class Sync_basalam_Update_Product_Task extends sync_basalam_AbstractTask
 
     public function handle($args)
     {
-        if ($args['type'] == 'update_product') {
-            $operator = new sync_basalam_Admin_Product_Operations;
-            $operator->update_exist_product($args['id']);
-        }
 
-        if ($args['type'] == 'update_chunk') {
+        $class = new sync_basalam_Update_Product_wp_bg_proccess_Task();
 
-            $chunk_size = 100;
-            $max_chunks_per_task = 10;
-
-            $data = [
-                'posts_per_page' => $chunk_size,
-                'offset'         => $args['offset_id'] ? $args['offset_id'] : 0,
-                'max_chunks'     => $max_chunks_per_task,
-            ];
-
-            (new sync_basalam_Chunk_Update_Products_Task())->schedule($data);
-        }
+        $class->push($args);
+        $class->save();
+        $class->dispatch();
     }
 
     public function schedule($data, $delay = null)
     {
+        if (isset($data['id'])) {
+            update_post_meta($data['id'], 'sync_basalam_product_sync_status', 'pending');
+        }
         if ($delay == null) {
             if ($this->get_last_run_timestamp() > time()) {
                 $delay = $this->get_last_run_timestamp() - time() + 60;

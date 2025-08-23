@@ -11,6 +11,51 @@ class Sync_basalam_Admin_UI
         );
     }
 
+    // Render info popup modal system
+    public static function render_info_popup($content, $unique_id = '')
+    {
+        $info_icon_url = sync_basalam_configure()->assets_url() . "/icons/info-black.svg";
+        $modal_id = 'basalam-info-modal-' . $unique_id;
+        
+        return sprintf(
+            '<div class="basalam-info-trigger" data-modal-id="%s">' .
+            '<img src="%s" alt="اطلاعات" class="basalam-info-icon" title="برای مشاهده توضیحات کلیک کنید">' .
+            '</div>' .
+            '<div id="%s" class="basalam-info-modal" style="display: none;">' .
+            '<div class="basalam-info-modal-overlay"></div>' .
+            '<div class="basalam-info-modal-content">' .
+            '<div class="basalam-info-modal-header">' .
+            '<h3 style="color: #fff;">راهنما</h3>' .
+            '<span class="basalam-info-modal-close">&times;</span>' .
+            '</div>' .
+            '<div class="basalam-info-modal-body">%s</div>' .
+            '</div>' .
+            '</div>',
+            esc_attr($modal_id),
+            esc_url($info_icon_url),
+            esc_attr($modal_id),
+            esc_html($content)
+        );
+    }
+
+    // Render label with info popup
+    public static function render_label_with_tooltip($label_text, $tooltip_content, $position = 'top')
+    {
+        // Create unique ID based on label text
+        $unique_id = sanitize_title($label_text);
+        
+        return sprintf(
+            '<div class="basalam-label-container">' .
+            '<label class="basalam-label">' .
+            '<span class="basalam-label-text">%s</span>' .
+            '%s' .
+            '</label>' .
+            '</div>',
+            esc_html($label_text),
+            self::render_info_popup($tooltip_content, $unique_id)
+        );
+    }
+
     public static function render_sync_basalam_delete_access()
     {
         echo '<input type="hidden" name="sync_basalam_settings[' . esc_attr(sync_basalam_Admin_Settings::TOKEN) . ']" value="">' .

@@ -32,7 +32,7 @@ class Sync_basalam_Chunk_Create_Products_Task extends sync_basalam_AbstractTask
                 sync_basalam_Product_Queue_Manager::add_to_schedule(new sync_basalam_Create_Product_Task(), ['type' => 'create_product', 'id' => $product_id]);
             }
 
-            sync_basalam_Product_Queue_Manager::add_to_schedule(new sync_basalam_Create_Product_Task(), ['type' => 'create_chunk', 'offset_id' => ($offset + $posts_per_page) * 10, 'include_out_of_stock' => $include_out_of_stock]);
+            sync_basalam_Product_Queue_Manager::add_to_schedule(new sync_basalam_Create_Product_Task(), ['type' => 'create_chunk', 'offset_id' => ($offset + $posts_per_page), 'include_out_of_stock' => $include_out_of_stock]);
 
             $offset += $posts_per_page;
             $current_chunk++;

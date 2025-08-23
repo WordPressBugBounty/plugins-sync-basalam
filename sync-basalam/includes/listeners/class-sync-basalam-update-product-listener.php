@@ -26,20 +26,21 @@ class Sync_basalam_Update_Product_Listener extends sync_basalam_Listener impleme
 
         $sync_status = $this->sync_basalam_Check_Product_Sync_Status();
         $sync_basalam_product_id = get_post_meta($product_id, 'sync_basalam_product_id', true);
-        $last_update_time = get_post_meta($sync_basalam_product_id, 'last_update_req_sync_basalam_time', true);
 
         if (
             !$sync_status ||
             !$sync_basalam_product_id ||
-            !wc_get_product($product_id) ||
-            ($last_update_time && (time() - $last_update_time) < 10)
+            !wc_get_product($product_id)
         ) {
             return;
         }
 
-        $product_operations = new sync_basalam_Admin_Product_Operations();
-        $product_operations->update_exist_product($product_id);
+        // $has_job = get_post_meta($product_id, 'sync_basalam_product_sync_status', true) === 'pending';
+        // if ($has_job) {
+        //     return;
+        // }
 
-        update_post_meta($sync_basalam_product_id, 'last_update_req_sync_basalam_time', time());
+        sync_basalam_Product_Queue_Manager::add_to_schedule(new sync_basalam_Update_Product_Task(), ['type' => 'update_product', 'id' => $product_id], 1);
+
     }
 }

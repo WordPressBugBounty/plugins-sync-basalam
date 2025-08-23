@@ -128,4 +128,96 @@ document.addEventListener("DOMContentLoaded", function () {
     toggleFields(select.value);
     select.addEventListener("change", (e) => toggleFields(e.target.value));
   }
+
+  // Info Modal functionality
+  const infoTriggers = document.querySelectorAll('.basalam-info-trigger');
+  
+  // Move all modals to body on page load
+  const moveModalsToBody = () => {
+    const allModals = document.querySelectorAll('.basalam-info-modal');
+    allModals.forEach(modal => {
+      if (modal.parentNode !== document.body) {
+        document.body.appendChild(modal);
+      }
+    });
+  };
+  
+  // Call it on page load
+  moveModalsToBody();
+  
+  // Function to close all modals
+  const closeAllModals = () => {
+    const allModals = document.querySelectorAll('.basalam-info-modal');
+    allModals.forEach(modal => {
+      modal.style.display = 'none';
+      modal.classList.remove('show');
+    });
+    document.body.style.overflow = 'auto';
+  };
+  
+  // Function to open modal
+  const openModal = (modalId) => {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      closeAllModals(); // Close any open modals first
+      
+      // Move modal to body if it's not already there
+      if (modal.parentNode !== document.body) {
+        document.body.appendChild(modal);
+      }
+      
+      modal.style.display = 'block';
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+      
+      // Focus on modal for accessibility
+      modal.focus();
+    }
+  };
+  
+  // Add click event to info triggers
+  infoTriggers.forEach(trigger => {
+    trigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const modalId = trigger.getAttribute('data-modal-id');
+      if (modalId) {
+        openModal(modalId);
+      }
+    });
+  });
+  
+  // Add event listeners to close buttons and overlays
+  document.addEventListener('click', (e) => {
+    // Close button functionality
+    if (e.target.classList.contains('basalam-info-modal-close')) {
+      e.preventDefault();
+      closeAllModals();
+    }
+    
+    // Overlay click functionality
+    if (e.target.classList.contains('basalam-info-modal-overlay')) {
+      closeAllModals();
+    }
+    
+    // Click outside modal content
+    if (e.target.classList.contains('basalam-info-modal')) {
+      closeAllModals();
+    }
+  });
+  
+  // Close modal with Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeAllModals();
+    }
+  });
+  
+  // Prevent closing when clicking inside modal content
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.basalam-info-modal-content')) {
+      e.stopPropagation();
+    }
+  });
 });

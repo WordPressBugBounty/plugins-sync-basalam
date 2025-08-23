@@ -4,7 +4,7 @@ if (! defined('ABSPATH')) exit;
 <div class="basalam-action-card" style="position: relative;">
     <div class="basalam-info-icon" style="position: absolute;top: 10px;left: 10px;border: 1px solid;border-radius: 70%;width: 22px;height: 22px;">
         <a href="https://www.aparat.com/v/qbf0kw7?playlist=20857018" target="_blank">
-            <img src="<?php echo esc_url(sync_basalam_configure()->assets_url() . "/icons/info-black.svg"); ?>" alt="اطلاعات" style="width: 20px; height: 20px; cursor: pointer;">
+            <img src="<?php echo esc_url(sync_basalam_configure()->assets_url() . "/icons/info-black.svg"); ?>" alt="اطلاعات" style="width: 22px; height: 20px; cursor: pointer;">
         </a>
     </div>
 

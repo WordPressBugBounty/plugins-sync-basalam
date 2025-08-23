@@ -258,7 +258,7 @@
   font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
 }
 
 .basalam-action-card .basalam-label::before {
@@ -708,6 +708,10 @@
   cursor: pointer;
   transition: all 0.3s ease;
   background: #ffe7db;
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
 }
 
 .basalam-product-locked {
@@ -833,7 +837,7 @@
   background: #f0f6fc;
   border-radius: 4px;
   margin-bottom: 1rem;
-  gap: 15px;
+  gap: 12px;
 }
 
 .basalam-sync-status.active {
@@ -849,6 +853,10 @@
   to {
     transform: translateY(0);
     opacity: 1;
+    -webkit-transform: translateY(0);
+    -moz-transform: translateY(0);
+    -ms-transform: translateY(0);
+    -o-transform: translateY(0);
   }
 }
 
@@ -1279,6 +1287,10 @@ input[type=number]::-webkit-outer-spin-button {
   background: var(--basalam-gray-100);
   border-radius: 8px;
   transition: all 0.3s ease;
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
 }
 
 .info-item:hover {
@@ -1364,6 +1376,10 @@ input[type=number]::-webkit-outer-spin-button {
   transition: all 0.2s ease;
   width: 100%;
   justify-content: center;
+  -webkit-transition: all 0.2s ease;
+  -moz-transition: all 0.2s ease;
+  -ms-transition: all 0.2s ease;
+  -o-transition: all 0.2s ease;
 }
 
 .basalam-danger-button:hover {
@@ -1773,4 +1789,282 @@ input[type=number]::-webkit-outer-spin-button {
 
 .sync-checkbox-label {
   display: inline-block !important;
+}
+
+#toplevel_page_sync_basalam>a>div.wp-menu-image.dashicons-before>img {
+  padding: 5px 0 0;
+}
+
+/* Info Modal Popup Styles */
+.basalam-info-trigger {
+  display: inline-block;
+  cursor: pointer;
+  flex-shrink: 0;
+  order: 2;
+}
+
+.basalam-info-icon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+  vertical-align: middle;
+  border-radius: 50%;
+}
+
+.basalam-info-icon:hover {
+  opacity: 1;
+  background-color: rgba(255, 92, 53, 0.1);
+  transform: scale(1.1);
+}
+
+.basalam-info-modal {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 999999 !important;
+  display: none;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.basalam-info-modal-overlay {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(2px);
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.basalam-info-modal-content {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  background: white !important;
+  border-radius: 12px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
+  max-width: 500px !important;
+  width: 90% !important;
+  max-height: 80vh !important;
+  overflow: hidden !important;
+  animation: basalam-modal-appear 0.3s ease-out !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+@keyframes basalam-modal-appear {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.basalam-info-modal-header {
+  background: var(--basalam-primary-color);
+  color: white;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 12px 12px 0 0;
+}
+
+.basalam-info-modal-header h3 {
+  margin: 0;
+  font-family: PelakFA;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.basalam-info-modal-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+  line-height: 1;
+}
+
+.basalam-info-modal-close:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.basalam-info-modal-body {
+  padding: 20px;
+  font-family: PelakFA;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--basalam-gray-700);
+  text-align: right;
+  direction: rtl;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.basalam-info-modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.basalam-info-modal-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.basalam-info-modal-body::-webkit-scrollbar-thumb {
+  background: var(--basalam-primary-color);
+  border-radius: 3px;
+}
+
+.basalam-info-modal-body::-webkit-scrollbar-thumb:hover {
+  background: var(--basalam-primary-hover);
+}
+
+/* Show modal animation */
+.basalam-info-modal.show {
+  display: block !important;
+  animation: basalam-modal-fade-in 0.3s ease-out;
+}
+
+/* Ensure modal appears above everything */
+body > .basalam-info-modal {
+  position: fixed !important;
+  z-index: 2147483647 !important; /* Maximum z-index */
+}
+
+/* Override any parent container constraints */
+.basalam-info-modal {
+  transform: none !important;
+  clip: none !important;
+  clip-path: none !important;
+}
+
+/* WordPress admin specific overrides */
+#wpwrap .basalam-info-modal,
+#wpadminbar ~ * .basalam-info-modal,
+.wp-admin .basalam-info-modal {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 999999 !important;
+}
+
+/* Ensure modal content stays centered even in WordPress admin */
+#wpwrap .basalam-info-modal-content,
+.wp-admin .basalam-info-modal-content {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+@keyframes basalam-modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Label container with tooltip */
+.basalam-label-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.basalam-label-container .basalam-label {
+  margin-bottom: 0 !important;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.basalam-label-text {
+  flex: 1;
+  text-align: right;
+  order: 1;
+}
+
+/* Mobile responsive modal */
+@media (max-width: 768px) {
+  .basalam-info-modal-content {
+    width: 95% !important;
+    max-width: none !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
+    position: absolute !important;
+  }
+  
+  .basalam-info-modal-header {
+    padding: 12px 16px !important;
+  }
+  
+  .basalam-info-modal-header h3 {
+    font-size: 14px !important;
+  }
+  
+  .basalam-info-modal-body {
+    padding: 16px !important;
+    font-size: 13px !important;
+  }
+  
+  .basalam-info-icon {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .basalam-label-container {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  .basalam-label-text {
+    text-align: right;
+  }
+  
+  .basalam-info-trigger {
+    margin-left: 8px;
+    margin-right: 0;
+  }
+}
+
+/* Touch device optimization */
+@media (pointer: coarse) {
+  .basalam-info-trigger {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  }
+  
+  .basalam-info-icon {
+    width: 20px;
+    height: 20px;
+    padding: 4px;
+  }
 }

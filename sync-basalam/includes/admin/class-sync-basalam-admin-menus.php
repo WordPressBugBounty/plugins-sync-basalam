@@ -6,14 +6,24 @@ class Sync_basalam_Admin_Menus
     public static function register_menus()
     {
         add_menu_page(
-            'باسلام',
-            'باسلام',
+            'ووسلام',
+            'ووسلام',
             'manage_options',
             'sync_basalam',
             array(__CLASS__, 'render_main_page'),
-            plugin_dir_url(__FILE__) . '../../assets/images/menu-logo.png',
+            plugin_dir_url(__FILE__) . '../../assets/images/logowoosalam.png',
             4
         );
+
+        add_submenu_page(
+            'sync_basalam',
+            'خانه',
+            Sync_Basalam_Admin_UI::render_icon('dashicons-admin-home') . 'خانه',
+            'manage_options',
+            'sync_basalam',
+            array(__CLASS__, 'render_main_page')
+        );
+
 
         add_submenu_page(
             'sync_basalam',
@@ -76,6 +86,7 @@ class Sync_basalam_Admin_Menus
             require_once($template);
         }
     }
+
     public static function render_show_sync_basalam_unsync_products_submenu_content()
     {
         $template = sync_basalam_configure()->template_path("admin/menu/basalam-uncync-product-page.php");

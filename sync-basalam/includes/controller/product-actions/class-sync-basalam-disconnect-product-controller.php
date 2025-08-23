@@ -22,7 +22,7 @@ class Sync_basalam_Disconnect_Product extends Sync_BasalamController
             $result = $product_operations->disconnect_product($product_id);
         }
         if (!$result['success']) {
-            wp_send_json_error(['message' => $result['message']], $result['status_code'] ?? 500);
+            wp_send_json_error(['message' => $result['message']], 200);
         }
 
         wp_send_json_success(['message' => $result['message']], $result['status_code'] ?? 200);

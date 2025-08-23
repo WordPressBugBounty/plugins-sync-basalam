@@ -20,10 +20,27 @@ class Sync_basalam_External_API_Service
         $headers = array_merge($this->headers, $headers);
 
         $response = wp_remote_post($url, array(
-            'timeout' => 15,
+            // 'timeout' => 15,
             'body'    => $data,
             'headers' => $headers,
         ));
+
+        if (is_wp_error($response)) {
+            $error_code = $response->get_error_code();
+            $error_message = $response->get_error_message();
+
+            if ($error_code === 'timeout') {
+                sync_basalam_Logger::error("ارسال درخواست به آدرس $url به دلیل timeout ناموفق بود ، این خطا به علت اختلالات api های باسلام یا هاست سایت شماست.");
+            } else {
+                sync_basalam_Logger::error("درخواست API برای آدرس $url با خطا مواجه شد. پاسخ: $error_message");
+            }
+
+            return [
+                'body' => null,
+                'status_code' => 500
+            ];
+        }
+
         if (is_wp_error($response)) {
             sync_basalam_Logger::error("درخواست API برای آدرس " . $url . " با خطا مواجه شد. پاسخ: " . $response->get_error_message());
             return [
@@ -51,18 +68,47 @@ class Sync_basalam_External_API_Service
         ];
     }
 
-    public function send_get_request($url, $headers = [])
+    public function send_get_request($url, $headers = [], $max_retries = 3)
     {
         $headers = array_merge($this->headers, $headers);
+        $attempt = 0;
+        $response = null;
 
-        $response = wp_remote_get($url, array(
-            'timeout'   => 15,
-            'headers'   => $headers,
-        ));
+        while ($attempt < $max_retries) {
+            $response = wp_remote_get($url, array(
+                'timeout'   => 30,
+                'headers'   => $headers,
+            ));
 
-        if (is_wp_error($response)) {
-            sync_basalam_Logger::error("درخواست API برای آدرس " . $url . " با خطا مواجه شد. پاسخ: " . $response->get_error_message());
-            return false;
+            if (!is_wp_error($response)) {
+                break;
+            }
+
+            $error_code = $response->get_error_code();
+            $error_message = $response->get_error_message();
+
+            if (
+                $error_code === 'http_request_failed' &&
+                (strpos($error_message, 'cURL error 28') !== false ||
+                    strpos($error_message, 'Operation timed out') !== false ||
+                    strpos($error_message, 'Connection timed out') !== false)
+            ) {
+                $attempt++;
+                if ($attempt < $max_retries) {
+                    sync_basalam_Logger::debug("تلاش $attempt از $max_retries برای درخواست به $url به دلیل timeout ناموفق بود. در حال تلاش مجدد...");
+                    sleep(2 * $attempt);
+                } else {
+                    sync_basalam_Logger::error("درخواست به $url پس از $max_retries تلاش به دلیل timeout ناموفق بود.");
+                    return [
+                        'data' => null,
+                        'status_code' => 500,
+                        'timeout_error' => true
+                    ];
+                }
+            } else {
+                sync_basalam_Logger::error("درخواست API برای آدرس " . $url . " با خطا مواجه شد. پاسخ: " . $error_message);
+                return false;
+            }
         }
 
         $body = wp_remote_retrieve_body($response);
@@ -89,7 +135,7 @@ class Sync_basalam_External_API_Service
         $headers = array_merge($this->headers, $headers);
         $response = wp_remote_request($url, array(
             'method' => 'PATCH',
-            'timeout'     => 15,
+            // 'timeout'     => 15,
             'body'      => $data,
             'headers'   => $headers,
         ));
@@ -152,7 +198,7 @@ class Sync_basalam_External_API_Service
         $response = wp_remote_post(
             $url,
             array(
-                'timeout'     => 50,
+                // 'timeout'     => 15,
                 'headers'    => $headers,
                 'body'       => $payload,
             )
@@ -165,6 +211,17 @@ class Sync_basalam_External_API_Service
 
         $body = wp_remote_retrieve_body($response);
         $status_code = wp_remote_retrieve_response_code($response);
+
+        if ($status_code == 401) {
+            $data = [
+                sync_basalam_Admin_Settings::TOKEN => '',
+                sync_basalam_Admin_Settings::REFRESH_TOKEN => '',
+            ];
+            sync_basalam_Admin_Settings::update_settings($data);
+            sync_basalam_QueueManager::cancel_all_tasks_group('sync_basalam_plugin_create_product');
+            sync_basalam_QueueManager::cancel_all_tasks_group('sync_basalam_plugin_update_product');
+            sync_basalam_QueueManager::cancel_all_tasks_group('sync_basalam_plugin_connect_auto_product');
+        }
 
         return [
             'body' => json_decode($body, true),

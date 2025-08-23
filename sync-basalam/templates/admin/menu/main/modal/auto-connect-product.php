@@ -12,10 +12,6 @@ if (! defined('ABSPATH')) exit;
         <p class="basalam-p" style="padding: 10px 0;font-size: 14px;text-align: justify;">
             اتصال محصول تنها در صورتی انجام میشود که عنوان دو محصول در باسلام و ووکامرس دقیقا یکسان باشند.
         </p>
-        <?php if ($auto_connect_product_job_exist_status): ?>
-            <p class="basalam-p" style="padding: 10px 0;font-size: 14px;text-align: justify;">
-            </p>
-        <?php endif; ?>
 
         <form method="POST" action="" id="BasalamConnectProductsForm" class="<?php echo esc_html($auto_connect_product_job_exist); ?>">
             <?php wp_nonce_field('connect_products_with_basalam_nonce', '_wpnonce'); ?>

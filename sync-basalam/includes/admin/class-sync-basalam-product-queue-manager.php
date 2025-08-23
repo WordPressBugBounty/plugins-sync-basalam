@@ -190,17 +190,17 @@ class Sync_basalam_Product_Queue_Manager
         return array_values($product_ids);
     }
 
-    public static function  sync_basalam_auto_connect_all_products($page = 1)
+    public static function sync_basalam_auto_connect_all_products($page = 1)
     {
         $class = new Sync_basalam_Auto_Connect_Product_Task();
 
-        $class->push_to_queue($page);
+        $class->push($page);
 
         $class->save()->dispatch();
     }
 
-    public static function add_to_schedule($create_task_class, $args)
+    public static function add_to_schedule($create_task_class, $args, $delay = null)
     {
-        ($create_task_class)->schedule($args);
+        ($create_task_class)->schedule($args, $delay);
     }
 }

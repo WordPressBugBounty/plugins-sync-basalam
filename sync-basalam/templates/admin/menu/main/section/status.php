@@ -34,7 +34,7 @@ if (! defined('ABSPATH')) exit;
         </form>
         <div class="basalam-info-icon" style="border: 1px solid;border-radius: 70%;width: 22px;height: 22px;">
             <a href="https://www.aparat.com/v/vja08ql" target="_blank">
-                <img src="<?php echo esc_url(sync_basalam_configure()->assets_url() . "/icons/info-black.svg"); ?>" alt="اطلاعات" style="width: 20px; height: 20px; cursor: pointer;">
+                <img src="<?php echo esc_url(sync_basalam_configure()->assets_url() . "/icons/info-black.svg"); ?>" alt="اطلاعات" style="width: 22px; height: 20px; cursor: pointer;">
             </a>
         </div>
 

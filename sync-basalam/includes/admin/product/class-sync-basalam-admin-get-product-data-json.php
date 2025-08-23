@@ -3,14 +3,10 @@ if (! defined('ABSPATH')) exit;
 
 class Sync_basalam_Admin_Get_Product_Data_Json
 {
-    private $vendor_id;
-    private $token;
     private $currency;
 
     public function __construct()
     {
-        $this->vendor_id = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::VENDOR_ID);
-        $this->token = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::TOKEN);
         $this->currency = get_woocommerce_currency();
     }
 
@@ -50,6 +46,8 @@ class Sync_basalam_Admin_Get_Product_Data_Json
                         throw new \Exception('دریافت متغیر ها با مشکل مواجه شد.');
                     }
                     $product_data['variants'] = $variants;
+                } else {
+                    $product_data['variants'] = [];
                 }
                 return $product_data;
             } elseif ($sync_fields == 'custom') {
@@ -76,15 +74,26 @@ class Sync_basalam_Admin_Get_Product_Data_Json
                     }
                     if ($product->is_type('variable')) {
                         $variants = $this->get_variants($product, $category_ids);
-                        if (!$variants) {
-                            throw new \Exception('دریافت متغیر ها با مشکل مواجه شد.');
+                        if ($variants) {
+                            $product_data['variants'] = $variants;
                         }
-                        $product_data['variants'] = $variants;
+                    } else {
+                        $product_data['variants'] = [];
                     }
                 }
                 $sync_field_stock = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::SYNC_PRODUCT_FIELD_STOCK);
                 if ($sync_field_stock == true) {
-                    $product_data['stock'] = $stock_quantity;
+                    if (!$product->is_type('variable')) {
+                        $product_data['stock'] = $stock_quantity;
+                    }
+                    if ($product->is_type('variable')) {
+                        $variants = $this->get_variants($product, $category_ids);
+                        if ($variants) {
+                            $product_data['variants'] = $variants;
+                        }
+                    } else {
+                        $product_data['variants'] = [];
+                    }
                 }
                 $sync_field_weight = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::SYNC_PRODUCT_FIELD_WEIGHT);
                 if ($sync_field_weight == true) {
@@ -226,10 +235,10 @@ class Sync_basalam_Admin_Get_Product_Data_Json
                 'file_path' => get_attached_file($photo_id)
             ];
         }
-
         foreach ($photoFiles as $photoFile) {
             if ($photoFile) {
                 $check_exist = $this->check_exsit_photo_in_db($photoFile['id']);
+
                 if (!$check_exist) {
                     $uploaded = sync_basalam_Upload_File::upload($photoFile['file_path']);
                     if ($uploaded) {
@@ -241,11 +250,11 @@ class Sync_basalam_Admin_Get_Product_Data_Json
                 }
             }
         }
+
         $image_checker = new sync_basalam_Check_Photos_Ban_status();
         $images = $image_checker->check_ban_status($photos);
         $main_photo_id = null;
         $gallery_photo_ids = [];
-
         foreach ($images['valid'] as $image) {
             if (is_null($main_photo_id)) {
                 $main_photo_id = $image['file_id'];
@@ -253,7 +262,6 @@ class Sync_basalam_Admin_Get_Product_Data_Json
                 $gallery_photo_ids[] = $image['file_id'];
             }
         }
-
         if (is_null($main_photo_id)) {
             throw new \Exception('محصول دارای هیچ عکسی نیست ، تنها محصولات دارای عکس در باسلام ثبت میشوند');
         }
@@ -275,30 +283,45 @@ class Sync_basalam_Admin_Get_Product_Data_Json
         $wpdb->insert(
             $table_name_uploaded_photo,
             array(
-                'woo_photo_id'  => $woo_photo_id,
-                'sync_basalam_photo_id' => $sync_basalam_photo['file_id'],
-                'sync_basalam_photo_url' => $sync_basalam_photo['url'],
+                'woo_photo_id'              => (int) $woo_photo_id,
+                'sync_basalam_photo_id'     => (int) $sync_basalam_photo['file_id'],
+                'sync_basalam_photo_url'    => $sync_basalam_photo['url'],
+                'created_at'                => current_time('mysql') // بر اساس timezone وردپرس
             ),
-            array(
-                '%d',
-                '%d',
-                '%s'
-            )
+            array('%d', '%d', '%s', '%s')
         );
     }
 
     private function check_exsit_photo_in_db($woo_photo_id)
     {
         global $wpdb;
+        $table_name_uploaded_photo = $wpdb->prefix . 'sync_basalam_uploaded_photo';
 
-        $results = $wpdb->get_results(
+        $result = (array) $wpdb->get_row(
             $wpdb->prepare(
-                "SELECT sync_basalam_photo_id AS file_id, sync_basalam_photo_url AS url FROM wp_sync_basalam_uploaded_photo WHERE woo_photo_id = %d",
+                "SELECT sync_basalam_photo_id AS file_id, sync_basalam_photo_url AS url, created_at
+             FROM $table_name_uploaded_photo
+             WHERE woo_photo_id = %d",
                 $woo_photo_id
             )
         );
 
-        return !empty($results) ? $results[0] : null;
+        if ($result) {
+            $created_at_ts = strtotime($result['created_at']);
+            $now_wp = current_time('timestamp');
+            $fourteen_days = 14 * DAY_IN_SECONDS;
+
+            if (($now_wp - $created_at_ts) >= $fourteen_days) {
+                $wpdb->delete(
+                    $table_name_uploaded_photo,
+                    array('woo_photo_id' => $woo_photo_id),
+                    array('%d')
+                );
+                return false;
+            }
+        }
+
+        return $result ?: null;
     }
 
     private function get_price($product)
@@ -356,7 +379,7 @@ class Sync_basalam_Admin_Get_Product_Data_Json
         } elseif ($increase_value <= 100) {
             $finalPrice = $converted_price + ($converted_price * ($increase_value / 100));
         } else {
-            $finalPrice = $converted_price + $increase_value;
+            $finalPrice = $converted_price + ($increase_value * 10);
         }
 
         if ($round_mode === 'up') {
@@ -598,12 +621,10 @@ class Sync_basalam_Admin_Get_Product_Data_Json
     {
         return get_post_meta($product->get_id(), '_sync_basalam_is_product_type_checkbox', true) === 'yes';
     }
-
     private function is_wholesale($product)
     {
         return get_post_meta($product->get_id(), '_sync_basalam_is_wholesale', true) === 'yes';
     }
-    
     private function get_description($product)
     {
         $add_attrs_to_desc = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::ADD_ATTR_TO_DESC_PRODUCT);

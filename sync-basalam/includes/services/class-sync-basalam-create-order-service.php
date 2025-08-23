@@ -317,7 +317,7 @@ class Sync_basalam_Create_Order_Service
     }
     public static function auto_confirm_order($order_id)
     {
-        $orderManager = new sync_basalam_Order_Manager();
+        $orderManager = new Sync_Basalam_Confirm_Order_Service();
         $result = $orderManager->confirm_order_automatically($order_id);
 
         if (is_wp_error($result)) {

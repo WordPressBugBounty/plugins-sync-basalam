@@ -38,7 +38,6 @@ class Sync_basalam_Create_Product_Service
         }
 
         if (is_wp_error($request)) {
-            update_post_meta($product_id, 'sync_basalam_product_sync_status', 'no');
             throw new \Exception('درخواست موفقیت آمیز نبود: ' . esc_html($request['body'][0]['message']));
             return false;
         }

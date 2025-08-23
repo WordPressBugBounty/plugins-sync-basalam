@@ -20,7 +20,6 @@ class Sync_basalam_Listener
 
     public function init_hook($event, $data)
     {
-
         return $this->fetch($data);
     }
 }

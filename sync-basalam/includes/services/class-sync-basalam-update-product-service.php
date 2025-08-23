@@ -170,7 +170,6 @@ class Sync_basalam_Update_Product_Service
                 'status_code' => 200
             ];
         }
-
         throw new \Exception("تغییر وضعیت محصول در باسلام ناموفق بود.");
     }
 }

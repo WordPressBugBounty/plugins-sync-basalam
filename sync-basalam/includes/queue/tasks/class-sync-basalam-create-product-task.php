@@ -10,25 +10,11 @@ class Sync_basalam_Create_Product_Task extends sync_basalam_AbstractTask
 
     public function handle($args)
     {
-        if ($args['type'] == 'create_product') {
-            $operator = new sync_basalam_Admin_Product_Operations;
-            $operator->create_new_product($args['id']);
-        }
+        $class = new sync_basalam_Create_Product_wp_bg_proccess_Task();
 
-        if ($args['type'] == 'create_chunk') {
-
-            $chunk_size = 100;
-            $max_chunks_per_task = 10;
-
-            $data = [
-                'posts_per_page'        => $chunk_size,
-                'offset'                => $args['offset_id'] ? $args['offset_id'] : 0,
-                'max_chunks'            => $max_chunks_per_task,
-                'include_out_of_stock'  => $args['include_out_of_stock'] ? $args['include_out_of_stock'] : false,
-            ];
-
-            (new sync_basalam_Chunk_Create_Products_Task())->schedule($data);
-        }
+        $class->push($args);
+        $class->save();
+        $class->dispatch();
     }
 
     public function schedule($data, $delay = null)
