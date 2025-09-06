@@ -528,14 +528,18 @@ class Sync_basalam_Admin_Get_Product_Data_Json
     private function get_variants($product, $category_ids)
     {
         $variants = [];
-        $available_variations = $product->get_available_variations();
+        $variation_ids = $product->get_children();
+
         $price_field = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::PRODUCT_PRICE_FIELD);
 
-        foreach ($available_variations as $variation) {
-            $variant_product = wc_get_product($variation['variation_id']);
+        foreach ($variation_ids as $variation_id) {
+            $variant_product = wc_get_product($variation_id);
+            if (!$variant_product) {
+                continue;
+            }
 
             $regular_price = $variant_product->get_regular_price();
-            $sale_price = $variant_product->get_sale_price();
+            $sale_price    = $variant_product->get_sale_price();
 
             if ($price_field === 'original_price') {
                 $variant_price = $this->get_final_price($regular_price, $category_ids);
@@ -553,8 +557,9 @@ class Sync_basalam_Admin_Get_Product_Data_Json
 
             $attributes = [];
 
-            foreach ($variation['attributes'] as $attribute_name => $attribute_value) {
-                $taxonomy_name = str_replace('attribute_', '', $attribute_name);
+            $variation_data = $variant_product->get_variation_attributes();
+            foreach ($variation_data as $attribute_name => $attribute_value) {
+                $taxonomy_name   = str_replace('attribute_', '', $attribute_name);
                 $attribute_label = str_replace(['pa_', '-'], ' ', wc_attribute_label($taxonomy_name, $product));
 
                 $value_name = rawurldecode($attribute_value);
@@ -567,20 +572,19 @@ class Sync_basalam_Admin_Get_Product_Data_Json
 
                 $attributes[] = [
                     'property' => $attribute_label,
-                    'value' => str_replace('-', ' ', mb_convert_encoding($value_name, 'UTF-8', 'auto')),
+                    'value'    => str_replace('-', ' ', mb_convert_encoding($value_name, 'UTF-8', 'auto')),
                 ];
             }
 
             $variants[] = [
                 'primary_price' => $variant_price,
-                'stock' => $this->get_stock_quantity($variant_product),
-                'properties' => $attributes,
+                'stock'         => $this->get_stock_quantity($variant_product),
+                'properties'    => $attributes,
             ];
         }
 
         return $variants;
     }
-
 
     private function is_mobile_product($product)
     {

@@ -1,24 +1,43 @@
 <?php
 defined('ABSPATH') || exit;
 
-class Sync_basalam_Create_Order_Service
+class SyncBasalamOrderManger
 {
-
     private $apiservice;
+
     public function __construct()
     {
         $this->apiservice = new sync_basalam_External_API_Service;
     }
 
-    public static function create_order_in_woo(WP_REST_Request $request, $check_sync_status = true)
+    public static function orderManger(WP_REST_Request $request, $check_sync_status = true)
     {
+        $parsed_params = $request->get_params();
+
         if ($check_sync_status) {
             $sync_status_order = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::SYNC_STATUS_ORDER);
             if (!$sync_status_order) {
                 return;
             }
         }
-        $parsed_params = $request->get_params();
+
+        if (isset($parsed_params['event_id']) && $parsed_params['event_id'] == 7) {
+            if ($parsed_params['type'] == 'shipped') {
+                self::shippedOrderWoo($parsed_params['invoice_id']);
+            } elseif ($parsed_params['type'] == 'cancelled') {
+                self::cancelOrderWoo($parsed_params['invoice_id']);
+            } elseif ($parsed_params['type'] == 'delivered') {
+                self::completeOrderWoo($parsed_params['invoice_id']);
+            } elseif ($parsed_params['type'] == 'preparation') {
+                self::confrimOrderWoo($parsed_params['invoice_id']);
+            }
+        } else {
+            self::createOrderWoo($parsed_params);
+        }
+    }
+
+    public static function createOrderWoo($parsed_params)
+    {
         $payment_id = $parsed_params['payment_id'] ?? null;
         $invoice_id = $parsed_params['invoice_id'] ?? null;
         $user_id = $parsed_params['user_id'] ?? null;
@@ -34,8 +53,9 @@ class Sync_basalam_Create_Order_Service
                 $invoice_id
             )
         );
+
         if ($existing) {
-            sync_basalam_Logger::error("سفارش با شناسه فاکتور $province_id قبلا ایجاد شده");
+            sync_basalam_Logger::error("سفارش با شناسه فاکتور $invoice_id قبلا ایجاد شده");
             return false;
         }
 
@@ -44,8 +64,8 @@ class Sync_basalam_Create_Order_Service
             array(
                 'payment_id' => $payment_id,
                 'invoice_id' => $invoice_id,
-                'user_id' => $user_id,
-                'city_id' => $city_id,
+                'user_id'    => $user_id,
+                'city_id'    => $city_id,
                 'province_id' => $province_id,
             ),
             array('%d', '%d', '%d', '%d', '%d')
@@ -55,14 +75,12 @@ class Sync_basalam_Create_Order_Service
             return new WP_REST_Response(array(
                 'success' => false,
                 'message' => 'Failed to insert payment data.',
-                'error' => $wpdb->last_error,
+                'error'   => $wpdb->last_error,
             ), 500);
         }
 
-        $token = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::TOKEN);
+        $token     = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::TOKEN);
         $vendor_id = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::VENDOR_ID);
-
-        sleep(5);
 
         $api_url = "https://order-processing.basalam.com/v2/vendors/$vendor_id/orders/$invoice_id";
 
@@ -71,17 +89,16 @@ class Sync_basalam_Create_Order_Service
             array(
                 'headers' => array(
                     'Authorization' => "Bearer {$token}",
-                    'user-agent' => 'Wp-Basalam',
+                    'user-agent'    => 'Wp-Basalam',
                 ),
             )
         );
 
         if (is_wp_error($response)) {
-            ("API Error: " . $response->get_error_message());
             return new WP_REST_Response(array(
                 'success' => false,
                 'message' => 'Failed to fetch invoice details.',
-                'error' => $response->get_error_message(),
+                'error'   => $response->get_error_message(),
             ), 500);
         }
 
@@ -97,19 +114,16 @@ class Sync_basalam_Create_Order_Service
 
         try {
             $order = wc_create_order();
-
             if (isset($data['items']) && is_array($data['items'])) {
                 foreach ($data['items'] as $item) {
                     $sync_basalam_product_id = $item['product']['id'] ?? null;
                     $quantity = $item['quantity'] ?? 1;
-                    $price = $item['price'] ?? 0;
-                    $item_id = $item['id'] ?? null;
+                    $item_id  = $item['id'] ?? null;
 
                     if ($sync_basalam_product_id) {
                         try {
-                            if (!empty($item['variation']) && !empty($item['variation']['id'])) {
-                                $variation_id = self::get_woo_product_variable_id($item['variation']['id']);
-                                $woo_product_id = $variation_id;
+                            if (!empty($item['variation']['id'])) {
+                                $woo_product_id = self::get_woo_product_variable_id($item['variation']['id']);
                             } else {
                                 $woo_product_id = self::get_woo_product_simple_id($sync_basalam_product_id);
                             }
@@ -118,14 +132,6 @@ class Sync_basalam_Create_Order_Service
                                 $product = wc_get_product($woo_product_id);
                                 if ($product) {
                                     $order_item_id = $order->add_product($product, $quantity);
-
-                                    $stock_quantity = $product->get_stock_quantity();
-                                    if ($stock_quantity !== null) {
-                                        $new_stock = max(0, $stock_quantity - $quantity);
-                                        $product->set_stock_quantity($new_stock);
-                                        $product->save();
-                                    }
-
                                     if ($item_id && $order_item_id) {
                                         $order->update_meta_data('_sync_basalam_item_id_' . $order_item_id, $item_id);
                                     }
@@ -150,11 +156,11 @@ class Sync_basalam_Create_Order_Service
                 }
             }
 
-            // Set address from new response structure
+            // Set address
             if (isset($data['customer_data']['recipient']) && is_array($data['customer_data']['recipient'])) {
                 $recipient = $data['customer_data']['recipient'];
-                $province = $data['customer_data']['city']['parent']['title'] ?? '';
-                $city = $data['customer_data']['city']['title'] ?? '';
+                $province  = $data['customer_data']['city']['parent']['title'] ?? '';
+                $city      = $data['customer_data']['city']['title'] ?? '';
 
                 $stateCode = Sync_Basalam_Iran_Provinces_Code::getCodeByName($province);
 
@@ -162,12 +168,16 @@ class Sync_basalam_Create_Order_Service
                     $order->set_billing_state($stateCode);
                     $order->set_shipping_state($stateCode);
                 }
+
                 $full_name = $recipient['name'] ?? '';
+                $first_name = '';
+                $last_name  = '';
                 if (!empty($full_name)) {
-                    $patrs_of_full_name = explode(' ', $full_name);
-                    $first_name = array_shift($patrs_of_full_name);
-                    $last_name = implode(' ', $patrs_of_full_name);
+                    $parts_of_full_name = explode(' ', $full_name);
+                    $first_name = array_shift($parts_of_full_name);
+                    $last_name  = implode(' ', $parts_of_full_name);
                 }
+
                 $order->set_billing_first_name($first_name);
                 $order->set_billing_last_name($last_name);
                 $order->set_billing_address_1($recipient['postal_address'] ?? '');
@@ -185,13 +195,11 @@ class Sync_basalam_Create_Order_Service
                 $order->set_shipping_country('IR');
 
                 $default_method = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::ORDER_SHIPPING_METHOD);
-                $default_method = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::ORDER_SHIPPING_METHOD);
 
                 if ($default_method && $default_method !== 'false') {
                     $methods = (new sync_basalam_Get_Shipping_Methods)->get_woo_shipping_methods();
 
-                    $shipping_cost = isset($data['parcel_detail']['shipping_cost']) ? $data['parcel_detail']['shipping_cost'] : 0;
-
+                    $shipping_cost = $data['parcel_detail']['shipping_cost'] ?? 0;
                     if (get_woocommerce_currency() === 'IRT') {
                         $shipping_cost = $shipping_cost / 10;
                     }
@@ -203,13 +211,10 @@ class Sync_basalam_Create_Order_Service
                             $shipping_item->set_method_id($method['method_id']);
                             $shipping_item->set_total(floatval($shipping_cost));
                             $shipping_item->set_taxes(array());
-
                             $order->add_item($shipping_item);
                             break;
                         }
                     }
-
-                    $order->save();
                 }
             }
 
@@ -218,11 +223,9 @@ class Sync_basalam_Create_Order_Service
             }
 
             $total_price = 0;
-
             if (isset($data['financial_report']['product_cost']['report_items'][0]['amount'])) {
                 $total_price += $data['financial_report']['product_cost']['report_items'][0]['amount'];
             }
-
             if (isset($data['financial_report']['shipping_cost']['total']['amount'])) {
                 $total_price += $data['financial_report']['shipping_cost']['total']['amount'];
             }
@@ -231,12 +234,12 @@ class Sync_basalam_Create_Order_Service
                 if (get_woocommerce_currency() === 'IRT') {
                     $total_price = $total_price / 10;
                 }
-
                 $order->set_total($total_price);
             }
 
             $order->set_payment_method('basalam payment method');
             $order->set_payment_method_title('Basalam Payment');
+
             $order_status_type = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::ORDER_STATUES_TYPE);
 
             $status_map = [
@@ -247,19 +250,18 @@ class Sync_basalam_Create_Order_Service
                 3195 => 'bslm-completed',
                 3233 => 'bslm-rejected'
             ];
-
             $status_id = $data['status']['id'] ?? null;
 
             if ($order_status_type == 'woocommerce_statuses') {
                 $order->set_status('processing');
             } else {
-
                 $order_status = $status_map[$status_id] ?? 'bslm-wait-vendor';
-
                 $order->set_status($order_status);
+                wc_reduce_stock_levels($order->get_id());
             }
 
             $order->update_meta_data('_is_sync_basalam_order', true);
+
             $order->save();
 
             $order_id = $order->get_id();
@@ -286,10 +288,57 @@ class Sync_basalam_Create_Order_Service
             return new WP_REST_Response(array(
                 'success' => false,
                 'message' => 'Failed to create order.',
-                'error' => $e->getMessage(),
+                'error'   => $e->getMessage(),
             ), 500);
         }
     }
+
+    public static function cancelOrderWoo($invoice_id)
+    {
+        return self::updateOrderStatus($invoice_id, 'bslm-rejected');
+    }
+
+    public static function completeOrderWoo($invoice_id)
+    {
+        return self::updateOrderStatus($invoice_id, 'bslm-completed');
+    }
+
+    public static function confrimOrderWoo($invoice_id)
+    {
+        return self::updateOrderStatus($invoice_id, 'bslm-preparation');
+    }
+
+    public static function shippedOrderWoo($invoice_id)
+    {
+        return self::updateOrderStatus($invoice_id, 'bslm-shipping');
+    }
+
+    private static function updateOrderStatus($invoice_id, $status)
+    {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'sync_basalam_payments';
+
+        $order_id = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT order_id FROM {$table_name} WHERE invoice_id = %d",
+                $invoice_id
+            )
+        );
+
+        if (!$order_id) {
+            sync_basalam_Logger::error("سفارشی با این invoice_id پیدا نشد: $invoice_id");
+            return false;
+        }
+
+        $order = wc_get_order($order_id);
+        if ($order && $order instanceof WC_Order) {
+            $order->update_status($status);
+            return $order_id;
+        }
+
+        return false;
+    }
+
     static function get_placeholder_product_id()
     {
         $placeholder_name = 'این محصول در سایت شما تعریف نشده است ، برای مشاهده جزییات به باسلام مراجعه کنید';
@@ -308,13 +357,14 @@ class Sync_basalam_Create_Order_Service
     static function get_woo_product_simple_id($sync_basalam_product_id)
     {
         $product = get_posts(array(
-            'post_type' => 'product',
-            'meta_key' => 'sync_basalam_product_id',
-            'meta_value' => $sync_basalam_product_id,
+            'post_type'      => 'product',
+            'meta_key'       => 'sync_basalam_product_id',
+            'meta_value'     => $sync_basalam_product_id,
             'posts_per_page' => 1
         ));
         return !empty($product) ? $product[0]->ID : null;
     }
+
     public static function auto_confirm_order($order_id)
     {
         $orderManager = new Sync_Basalam_Confirm_Order_Service();
@@ -336,22 +386,18 @@ class Sync_basalam_Create_Order_Service
         );
 
         $variation = get_posts($args);
-
         return !empty($variation) ? $variation[0] : null;
     }
-
 
     static function product_exists_by_title($title)
     {
         global $wpdb;
-
         $product_id = $wpdb->get_var(
             $wpdb->prepare(
                 "SELECT ID FROM {$wpdb->posts} WHERE post_type = 'product' AND post_status != 'private' AND post_title = %s LIMIT 1",
                 $title
             )
         );
-
         return $product_id ? $product_id : false;
     }
 }

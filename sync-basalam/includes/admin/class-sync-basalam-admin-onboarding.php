@@ -28,53 +28,9 @@ class Sync_basalam_Admin_Onboarding
     // Process onboarding forms
     public function sync_basalam_process_onboarding_form()
     {
-        if (isset($_POST['webhook_id'])) {
-            // Nonce verification
-            $nonce = isset($_POST['sync_basalam_webhook_nonce']) ? sanitize_text_field(wp_unslash($_POST['sync_basalam_webhook_nonce'])) : '';
-            if (!wp_verify_nonce($nonce, 'sync_basalam_save_webhook_action')) {
-                wp_die('درخواست نامعتبر است.');
-            }
-
-            // Sanitize webhook_id input
-            $webhook_id = sanitize_text_field(wp_unslash($_POST['webhook_id']));
-
-            if (empty($webhook_id)) {
-                wp_die('لطفاً یک شناسه وب‌هوک وارد کنید.');
-            }
-
-            // Save webhook ID to settings
-            $data = [
-                sync_basalam_Admin_Settings::WEBHOOK_ID => $webhook_id,
-            ];
-
-            sync_basalam_Admin_Settings::update_settings($data);
             wp_redirect(sync_basalam_Admin_Settings::get_static_settings('url_req_token'));
             exit;
-        }
     }
-
-    public function handle_delete_webhook()
-    {
-        // Nonce verification
-        $nonce = isset($_POST['sync_basalam_delete_webhook_nonce']) ? sanitize_text_field(wp_unslash($_POST['sync_basalam_delete_webhook_nonce'])) : '';
-        if (!wp_verify_nonce($nonce, 'sync_basalam_delete_webhook_action')) {
-            wp_die('درخواست نامعتبر است.');
-        }
-
-        // Clear webhook and token settings
-        $data = [
-            sync_basalam_Admin_Settings::WEBHOOK_ID => '',
-            sync_basalam_Admin_Settings::REFRESH_TOKEN => '',
-            sync_basalam_Admin_Settings::TOKEN => '',
-        ];
-        sync_basalam_Admin_Settings::update_settings($data);
-
-        // Sanitize and redirect to the appropriate page
-        $redirect = !empty($_POST['redirect_to']) ? esc_url_raw(wp_unslash($_POST['redirect_to'])) : admin_url();
-        wp_redirect($redirect);
-        exit;
-    }
-
 
     // Define onboarding steps
     public function sync_basalam_get_onboarding_steps()
@@ -90,7 +46,7 @@ class Sync_basalam_Admin_Onboarding
                 }
             ],
             2 => [
-                'title' => 'دریافت وب هوک',
+                'title' => 'دریافت دسترسی از باسلام',
                 'content' => function () {
                     ob_start();
                     require sync_basalam_configure()->template_path('admin/onboarding/step2.php');
@@ -98,18 +54,10 @@ class Sync_basalam_Admin_Onboarding
                 }
             ],
             3 => [
-                'title' => 'دریافت دسترسی از باسلام',
-                'content' => function () {
-                    ob_start();
-                    require sync_basalam_configure()->template_path('admin/onboarding/step3.php');
-                    return ob_get_clean();
-                }
-            ],
-            4 => [
                 'title' => 'تکمیل فرایند',
                 'content' => function () {
                     ob_start();
-                    require sync_basalam_configure()->template_path('admin/onboarding/step4.php');
+                    require sync_basalam_configure()->template_path('admin/onboarding/step3.php');
                     return ob_get_clean();
                 }
             ]

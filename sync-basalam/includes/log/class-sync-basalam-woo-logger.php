@@ -28,9 +28,12 @@ class Sync_basalam_WooLogger implements sync_basalam_Logger_Interface
             $lines = file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
             foreach (array_reverse($lines) as $line) {
                 if (preg_match('/^(.*?) (INFO|WARNING|ERROR|DEBUG|ALERT) (.*?)( CONTEXT: (.*))?$/', $line, $matches)) {
-                    $datetime = explode("T", $matches[1]);
-                    $date_parts = explode("-", $datetime[0]);
-                    $jalali_date = sync_basalam_Date_Converter::gregorian_to_jalali($date_parts[0], $date_parts[1], $date_parts[2]) . ' - ' . substr($datetime[1], 0, 8);
+                    $tehran_datetime = Sync_basalam_Date_Converter::utc_to_tehran($matches[1]);
+                    $jalali_date = Sync_basalam_Date_Converter::gregorian_to_jalali(
+                        $tehran_datetime->format('Y'),
+                        $tehran_datetime->format('m'),
+                        $tehran_datetime->format('d')
+                    ) . ' - ' . $tehran_datetime->format('H:i:s');
 
                     $context = isset($matches[5]) ? json_decode($matches[5], true) : null;
 

@@ -228,8 +228,7 @@
     margin-left: 5px;
 }
 
-.reset-client-credentials,
-.reset-webhook {
+.reset-client-credentials {
     margin-top: 10px !important;
     width: 100%;
     justify-content: center;
@@ -308,6 +307,7 @@
     padding: 8px 16px;
     font-size: 14px;
 }
+
 /* Navigation Links */
 .basalam-nav-link {
     text-decoration: none;

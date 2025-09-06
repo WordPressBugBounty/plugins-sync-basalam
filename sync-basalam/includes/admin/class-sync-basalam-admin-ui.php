@@ -59,14 +59,9 @@ class Sync_basalam_Admin_UI
     public static function render_sync_basalam_delete_access()
     {
         echo '<input type="hidden" name="sync_basalam_settings[' . esc_attr(sync_basalam_Admin_Settings::TOKEN) . ']" value="">' .
-            '<input type="hidden" name="sync_basalam_settings[' . esc_attr(sync_basalam_Admin_Settings::WEBHOOK_ID) . ']" value="">' .
             '<input type="hidden" name="sync_basalam_settings[' . esc_attr(sync_basalam_Admin_Settings::REFRESH_TOKEN) . ']" value="">';
     }
 
-    public static function render_sync_basalam_delete_webhook()
-    {
-        return '<input type="hidden" name="sync_basalam_settings[' . esc_attr(sync_basalam_Admin_Settings::WEBHOOK_ID) . ']" value="' . esc_attr(null) . '">';
-    }
 
     // Render the input field for sync product
     public static function sync_status_product()
@@ -85,13 +80,6 @@ class Sync_basalam_Admin_UI
         $value = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::AUTO_CONFIRM_ORDER) == true ? false : true;
         echo '<input type="hidden" name="sync_basalam_settings[' . esc_attr(sync_basalam_Admin_Settings::AUTO_CONFIRM_ORDER) . ']" value="' . esc_attr($value) . '">';
     }
-    // Render the input field for basalam webhook id
-    public static function render_sync_basalam_webhook_id()
-    {
-        $current_value = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::WEBHOOK_ID);
-        echo '<input type="text" name="sync_basalam_settings[' . esc_attr(sync_basalam_Admin_Settings::WEBHOOK_ID) . ']" value="' . esc_attr($current_value) . '" class="basalam-input" required>';
-    }
-
     // Render the input field for basalam default weight
     public static function render_default_weight()
     {
@@ -217,6 +205,15 @@ class Sync_basalam_Admin_UI
         echo '<select style="text-align: center; font-size:12px;" name="sync_basalam_settings[' . esc_attr(sync_basalam_Admin_Settings::PRODUCT_PRICE_FIELD) . ']" class="basalam-select">' .
             '<option value="original_price"' . selected($current_value, 'original_price', false) . '>قیمت اصلی</option>' .
             '<option value="sale_price"' . selected($current_value, 'sale_price', false) . '>قیمت حراجی</option>' .
+            '</select>';
+    }
+
+    public static function render_product_operation_type()
+    {
+        $current_value = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::PRODUCT_OPERATION_TYPE);
+        echo '<select style="text-align: center; font-size:12px;" name="sync_basalam_settings[' . esc_attr(sync_basalam_Admin_Settings::PRODUCT_OPERATION_TYPE) . ']" class="basalam-select">' .
+            '<option value="optimized"' . selected($current_value, 'optimized', false) . '>بهینه (استفاده از صف)</option>' .
+            '<option value="immediate"' . selected($current_value, 'immediate', false) . '>در لحظه</option>' .
             '</select>';
     }
 

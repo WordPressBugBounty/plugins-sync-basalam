@@ -129,6 +129,12 @@ $shipping_methods = $get_shipping_methods->get_woo_shipping_methods();
                     <?php echo sync_basalam_Admin_UI::render_label_with_tooltip('قیمت محصول در باسلام', 'انتخاب کنید که قیمت اصلی یا قیمت حراجی محصول به باسلام ارسال شود ، در صورتی که قیمت حراجی را انتخاب کنید و محصولی قیمت حراجی نداشته باشد قیمت اصلی به باسلام ارسال میشود.'); ?>
                     <?php sync_basalam_Admin_UI::render_product_price(); ?>
                 </div>
+                <div class="basalam-form-group basalam-p">
+                    <?php echo sync_basalam_Admin_UI::render_label_with_tooltip('روش همگام سازی محصولات', 'نحوه بروزرسانی و افزودن محصولات را انتخاب کنید.
+                    بهینه (پیشنهادی): عملیات از طریق WP-Cron با کمی تأخیر انجام می‌شود و هیچ تاثیری روی سرعت سایت وارد نمی‌کند.
+                    در لحظه: عملیات بلافاصله انجام می‌شود. ممکن است تأثیر لحظه‌ای روی سرعت سایت داشته باشد. اگر از افزونه‌های بهینه‌سازی و سیستم کشینگ استفاده می‌کنید، گزینه در‌لحظه مناسب تر است.'); ?>
+                    <?php sync_basalam_Admin_UI::render_product_operation_type(); ?>
+                </div>
 
             </div>
             <div id="Basalam-custom-fields" style="display:none; margin-top:15px;margin-bottom: 20px;">

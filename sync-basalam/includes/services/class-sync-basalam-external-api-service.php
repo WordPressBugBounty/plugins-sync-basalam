@@ -165,6 +165,41 @@ class Sync_basalam_External_API_Service
             'status_code' => $status_code
         ];
     }
+    
+    public function send_delete_request($url, $headers = [])
+    {
+        $headers = array_merge($this->headers, $headers);
+        $response = wp_remote_request($url, array(
+            'method' => 'DELETE',
+            // 'timeout'     => 15,
+            'headers'   => $headers,
+        ));
+
+        if (is_wp_error($response)) {
+            sync_basalam_Logger::error("درخواست API برای آدرس " . $url . " با خطا مواجه شد. پاسخ: " . $response->get_error_message());
+            return [
+                'body' => null,
+                'status_code' => 500
+            ];
+        }
+
+        $body = wp_remote_retrieve_body($response);
+        $status_code = wp_remote_retrieve_response_code($response);
+        if ($status_code == 401) {
+            $data = [
+                sync_basalam_Admin_Settings::TOKEN => '',
+                sync_basalam_Admin_Settings::REFRESH_TOKEN => '',
+            ];
+            sync_basalam_Admin_Settings::update_settings($data);
+            sync_basalam_QueueManager::cancel_all_tasks_group('sync_basalam_plugin_create_product');
+            sync_basalam_QueueManager::cancel_all_tasks_group('sync_basalam_plugin_update_product');
+            sync_basalam_QueueManager::cancel_all_tasks_group('sync_basalam_plugin_connect_auto_product');
+        }
+        return [
+            'body' => json_decode($body, true),
+            'status_code' => $status_code
+        ];
+    }
     public function upload_file_request($url, $local_file, $data = [], $headers = [])
     {
         if (!file_exists($local_file)) {

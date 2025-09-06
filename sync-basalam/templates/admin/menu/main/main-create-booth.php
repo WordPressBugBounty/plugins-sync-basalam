@@ -14,7 +14,7 @@ if (! defined('ABSPATH')) exit;
     <p class="basalam-p basalam-p__right-align" style="font-size: 12px;font-weight: bold;">
         چنانچه تمایل دارید با حساب دیگری فرآیند دریافت دسترسی را انجام دهید،در <a class="basalam-a" target="_blank" style="color: black !important;" href="https://basalam.com">باسلام</a> با حساب دارای غرفه وارد شوید و روی گزینه احراز هویت کلیک کنید.
     </p>
-    <div style="display: flex;max-width: max-content;gap: 10px;margin: auto;align-items: center;">
+    <div style="display: flex;max-width: max-content;gap: 10px;margin: auto;align-items: center;margin-top: 20px;">
         <button class="basalam-button basalam-p" style="width: unset;margin:auto !important;height: 35px;">
             <a class="basalam-a" href="https://vendor.basalam.com/create-vendor" target="_blank">ایجاد غرفه</a>
         </button>

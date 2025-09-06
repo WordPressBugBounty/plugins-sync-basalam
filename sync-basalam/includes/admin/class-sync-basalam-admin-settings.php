@@ -3,11 +3,11 @@ if (! defined('ABSPATH')) exit;
 
 class Sync_basalam_Admin_Settings
 {
+    private static $oauth_cache = null;
     const DEFAULT_WEIGHT = "default_weight";
     const DEFAULT_PACKAGE_WEIGHT = "default_package_weight";
     const DEFAULT_PREPARATION = "default_preparation";
     const DEFAULT_STOCK_QUANTITY = "default_stock_quantity";
-    const CLIENT_ID = "client_id";
     const WEBHOOK_ID = "webhook_id";
     const TOKEN = "token";
     const REFRESH_TOKEN = "refresh_token";
@@ -18,7 +18,6 @@ class Sync_basalam_Admin_Settings
     const DEVELOPER_MODE = "developer_mode";
     const INCREASE_PRICE_VALUE = "increase_price_value";
     const ROUND_PRICE = "round_price";
-    const REDIRECT_URI = "redirect_uri";
     const EXPIRE_TOKEN_TIME = "expire_token_time";
     const WEBHOOK_HEADER_TOKEN = "webhook_header_token";
     const PRODUCT_PREFIX_TITLE = "product_prefix_title";
@@ -38,6 +37,7 @@ class Sync_basalam_Admin_Settings
     const ADD_SHORT_DESC_TO_DESC_PRODUCT = "add_short_desc_to_desc_product";
     const PRODUCT_PRICE_FIELD = "product_price_field";
     const ORDER_STATUES_TYPE = "order_statues_type";
+    const PRODUCT_OPERATION_TYPE = "product_operation_type";
 
 
     public static function get_default_settings()
@@ -46,7 +46,6 @@ class Sync_basalam_Admin_Settings
             self::DEFAULT_WEIGHT        => 100,
             self::DEFAULT_PACKAGE_WEIGHT        => 50,
             self::DEFAULT_PREPARATION   => 1,
-            self::CLIENT_ID     => null,
             self::WEBHOOK_ID    => null,
             self::TOKEN         => null,
             self::WEBHOOK_HEADER_TOKEN         => null,
@@ -58,7 +57,6 @@ class Sync_basalam_Admin_Settings
             self::IS_VENDOR     => true,
             self::INCREASE_PRICE_VALUE     => 0,
             self::ROUND_PRICE    => null,
-            self::REDIRECT_URI    => null,
             self::EXPIRE_TOKEN_TIME    => null,
             self::PRODUCT_PREFIX_TITLE    => null,
             self::PRODUCT_SUFFIX_TITLE    => null,
@@ -78,6 +76,7 @@ class Sync_basalam_Admin_Settings
             self::ADD_SHORT_DESC_TO_DESC_PRODUCT => false,
             self::PRODUCT_PRICE_FIELD => 'original_price',
             self::ORDER_STATUES_TYPE => 'woosalam_statuses',
+            self::PRODUCT_OPERATION_TYPE => 'optimized',
         );
     }
 
@@ -113,47 +112,59 @@ class Sync_basalam_Admin_Settings
         return $settings[$setting] ?? null;
     }
 
-    public static function get_oauth_data()
+    public static function get_oauth_data($force_refresh = false)
     {
+        if (!$force_refresh && self::$oauth_cache !== null) {
+            return self::$oauth_cache;
+        }
+        
         $apiservice = new sync_basalam_External_API_Service;
-        $request = $apiservice->send_get_request('https://integration.basalam.com/api/v1/basalam-proxy/wp-oauth-data');
+        $request = $apiservice->send_get_request('https://api.hamsalam.ir/api/v1/basalam-proxy/wp-oauth-data');
         $client_id = $request['data']['client_id'] ?? 779;
-        $redirect_uri = $request['data']['redirect_uri'] ?? 'https://integration.basalam.com/api/v1/basalam-proxy/wp-get-token';
-        $data = [
-            sync_basalam_Admin_Settings::CLIENT_ID => $client_id,
-            sync_basalam_Admin_Settings::REDIRECT_URI => $redirect_uri,
+        $redirect_uri = $request['data']['redirect_uri'] ?? 'https://api.hamsalam.ir/api/v1/basalam-proxy/wp-get-token';
+        
+        self::$oauth_cache = [
+            'client_id' => $client_id,
+            'redirect_uri' => $redirect_uri,
         ];
-        self::update_settings($data);
+        
+        return self::$oauth_cache;
     }
     public static function get_static_settings($setting = null)
     {
         $site_url = get_site_url();
-        $client_id = self::get_settings(self::CLIENT_ID);
         $scopes = "vendor.product.write vendor.parcel.write customer.profile.read vendor.profile.read vendor.parcel.read";
         $webhook_token = self::get_settings(sync_basalam_Admin_Settings::WEBHOOK_HEADER_TOKEN);
         $vendor_id = self::get_settings(sync_basalam_Admin_Settings::VENDOR_ID);
         if (!$webhook_token) {
             $webhook_token = self::generate_webhook_token();
         }
-        $SITE_URL_WEBHOOK = $site_url . '/wp-json/basalam/v1/new-order';
-        $redirect_uri = self::get_settings(self::REDIRECT_URI);
-        if (!$client_id || !$redirect_uri) {
-            self::get_oauth_data();
-        }
+        $SITE_URL_WEBHOOK = $site_url . '/wp-json/sync-basalam/v1/order-manager';
         $settings = array(
             'site_url' => $site_url,
-            'site_url_webhook' => $site_url . '/wp-json/basalam/v1/new-order',
-            'redirect_uri' => $redirect_uri,
-            'url_req_client' => "https://developers.basalam.com/clients?name=WP-BASALAM&redirect_url=$redirect_uri",
-            'url_req_webhook' => "https://developers.basalam.com/panel/webhooks?events_ids=5&request_headers=" . urlencode(json_encode(["token" => $webhook_token])) . "&url=" . urlencode($SITE_URL_WEBHOOK),
-            'url_req_token' => "https://basalam.com/accounts/sso?client_id=$client_id&scope=$scopes&redirect_uri=$redirect_uri&state=$site_url",
+            'site_url_webhook' => $SITE_URL_WEBHOOK,
             'url_hijab_detector' => "https://revision.basalam.com/api_v1.0/validation/image/hijab-detector/bulk",
             'url_get_all_sync_basalam_products' => "https://core.basalam.com/v3/vendors/$vendor_id/products",
             'url_like_woo_on_basalam' => "https://apps-api.basalam.com/v1/apps/13/like",
             'get_like_status_url_from_basalam' => "https://apps-api.basalam.com/v1/apps/13",
             'url_get_sync_basalam_account_data' => "https://core.basalam.com/v3/users/me",
-            'url_get_sync_basalam_orders' => "https://order-processing.basalam.com/v3/vendor-parcels"
+            'url_get_sync_basalam_orders' => "https://order-processing.basalam.com/v3/vendor-parcels",
+            'get_webhooks_url_from_basalam' => "https://webhook.basalam.com/v1/webhooks",
         );
+        
+        $oauth_dependent_settings = ['redirect_uri', 'url_req_client', 'url_req_webhook', 'url_req_token'];
+        
+        if ($setting === null || in_array($setting, $oauth_dependent_settings)) {
+            $oauth_data = self::get_oauth_data();
+            $client_id = $oauth_data['client_id'];
+            $redirect_uri = $oauth_data['redirect_uri'];
+            
+            // Add OAuth-dependent settings
+            $settings['redirect_uri'] = $redirect_uri;
+            $settings['url_req_client'] = "https://developers.basalam.com/clients?name=WP-BASALAM&redirect_url=$redirect_uri";
+            $settings['url_req_webhook'] = "https://developers.basalam.com/panel/webhooks?events_ids=3,5,7&request_headers=" . urlencode(json_encode(["token" => $webhook_token])) . "&url=" . urlencode($SITE_URL_WEBHOOK);
+            $settings['url_req_token'] = "https://basalam.com/accounts/sso?client_id=$client_id&scope=$scopes&redirect_uri=$redirect_uri&state=$site_url";
+        }
 
         if ($setting == null) {
             return $settings;
@@ -178,8 +189,11 @@ class Sync_basalam_Admin_Settings
         }
 
         if (isset($_POST['get_token']) && $_POST['get_token'] == 1) {
-            self::get_oauth_data();
-            wp_redirect(self::get_static_settings('url_req_token'));
+            $oauth_data = self::get_oauth_data(true);
+            $site_url = get_site_url();
+            $scopes = "vendor.product.write vendor.parcel.write customer.profile.read vendor.profile.read vendor.parcel.read";
+            $url_req_token = "https://basalam.com/accounts/sso?client_id={$oauth_data['client_id']}&scope=$scopes&redirect_uri={$oauth_data['redirect_uri']}&state=$site_url";
+            wp_redirect($url_req_token);
             exit();
         }
     }
@@ -220,6 +234,11 @@ class Sync_basalam_Admin_Settings
             sync_basalam_Admin_Settings::EXPIRE_TOKEN_TIME => $expires_in,
         ];
         self::update_settings($data);
+        
+        // Setup webhooks after getting access token
+        $webhookService = new Sync_Basalam_Webhook_Service();
+        $webhookService->setupWebhooks();
+        
         wp_redirect(admin_url('admin.php?page=sync_basalam'));
         exit();
     }

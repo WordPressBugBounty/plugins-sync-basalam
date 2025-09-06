@@ -56,29 +56,6 @@ if (! defined('ABSPATH')) exit;
                         class="basalam-nav-link basalam-p basalam-p__small">
                         قبلی
                     </a>
-                    <?php
-                    $button_text = 'ذخیره وب هوک و ادامه';
-                    $button_name = 'submit_webhook';
-                    ?>
-                    <button type="submit"
-                        name="<?php echo esc_attr($button_name); ?>"
-                        form="onboarding-form"
-                        class="basalam-primary-button basalam-p">
-                        <svg width="16" height="16" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                            <line class="basalam-st0" x1="16" y1="20" x2="16" y2="4" />
-                            <polyline class="basalam-st0" points="12,8 16,4 20,8" />
-                            <polyline class="basalam-st0" points="9,13 3,16.5 3,21.5 16,29 29,21.5 29,16.5 23,13" />
-                        </svg>
-                        <?php echo esc_html($button_text); ?>
-                    </button>
-                </div>
-            <?php endif; ?>
-            <?php if ($current_step == 3) : ?>
-                <div class="nav-buttons">
-                    <a href="<?php echo esc_url(admin_url('admin.php?page=basalam-onboarding&step=' . ($current_step - 1))); ?>"
-                        class="basalam-nav-link basalam-p basalam-p__small">
-                        قبلی
-                    </a>
                 </div>
             <?php endif; ?>
         </div>

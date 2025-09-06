@@ -4,7 +4,7 @@ defined('ABSPATH') || exit;
 class Sync_Basalam_Migrator_Service
 {
     private $wpdb;
-    
+
     public function __construct()
     {
         global $wpdb;
@@ -177,5 +177,15 @@ class Sync_Basalam_Migrator_Service
         if ($this->tableExists($table) && !$this->columnExists($table, 'created_at')) {
             $this->wpdb->query("ALTER TABLE $table ADD COLUMN created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP");
         }
+    }
+
+    public function addNewWebhookEvents()
+    {
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-external-api-service.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/class-sync-basalam-admin-settings.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-webhook-service.php';
+
+        $webhookService = new Sync_Basalam_Webhook_Service();
+        $webhookService->setupWebhooks();
     }
 }

@@ -36,10 +36,36 @@ class Sync_basalam_Product_Queue_Manager
     public static function create_specific_products_in_basalam($product_ids)
     {
         if (is_array($product_ids)) {
+            // Check operation type setting
+            $operation_type = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::PRODUCT_OPERATION_TYPE);
+
             foreach ($product_ids as $product_id) {
                 $basalam_product_id = get_post_meta($product_id, 'sync_basalam_product_id', true);
                 if (empty($basalam_product_id)) {
-                    sync_basalam_Product_Queue_Manager::add_to_schedule(new sync_basalam_Create_Product_Task(), ['type' => 'create_product', 'id' => $product_id]);
+                    if ($operation_type === 'immediate') {
+                        // Execute immediately
+                        $product_operations = new sync_basalam_Admin_Product_Operations();
+
+                        try {
+                            update_post_meta($product_id, 'sync_basalam_product_sync_status', 'pending');
+                            $result = $product_operations->create_new_product($product_id, []);
+
+                            if ($result['success']) {
+                                update_post_meta($product_id, 'sync_basalam_product_sync_status', 'ok');
+                            } else {
+                                update_post_meta($product_id, 'sync_basalam_product_sync_status', 'no');
+                            }
+                        } catch (\Throwable $th) {
+                            update_post_meta($product_id, 'sync_basalam_product_sync_status', 'no');
+                            sync_basalam_Logger::error("خطا در ایجاد محصول فوری: " . $th->getMessage(), [
+                                'product_id' => $product_id,
+                                'عملیات' => 'ایجاد فوری محصولات انتخابی',
+                            ]);
+                        }
+                    } else {
+                        // Use WP Cron (original behavior)
+                        sync_basalam_Product_Queue_Manager::add_to_schedule(new sync_basalam_Create_Product_Task(), ['type' => 'create_product', 'id' => $product_id]);
+                    }
                 }
             }
         }
@@ -60,9 +86,13 @@ class Sync_basalam_Product_Queue_Manager
                 ],
                 [
                     'key'     => '_price',
-                    'value'   => 100,
+                    'compare' => 'EXISTS',
+                ],
+                [
+                    'key'     => '_price',
+                    'value'   => 1000,
                     'type'    => 'NUMERIC',
-                    'compare' => '>',
+                    'compare' => '>=',
                 ],
                 [
                     'key'     => '_downloadable',
@@ -144,11 +174,37 @@ class Sync_basalam_Product_Queue_Manager
     public static function update_specific_products_in_basalam($product_ids)
     {
         if (is_array($product_ids)) {
+            // Check operation type setting
+            $operation_type = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::PRODUCT_OPERATION_TYPE);
+
             foreach ($product_ids as $product_id) {
                 $basalam_product_id = get_post_meta($product_id, 'sync_basalam_product_id', true);
 
                 if (!empty($basalam_product_id)) {
-                    self::add_to_schedule(new sync_basalam_Update_Product_Task(), ['type' => 'update_product', 'id' => $product_id]);
+                    if ($operation_type === 'immediate') {
+                        // Execute immediately
+                        $product_operations = new sync_basalam_Admin_Product_Operations();
+
+                        try {
+                            update_post_meta($product_id, 'sync_basalam_product_sync_status', 'pending');
+                            $result = $product_operations->update_exist_product($product_id, null);
+
+                            if ($result['success']) {
+                                update_post_meta($product_id, 'sync_basalam_product_sync_status', 'ok');
+                            } else {
+                                update_post_meta($product_id, 'sync_basalam_product_sync_status', 'no');
+                            }
+                        } catch (\Throwable $th) {
+                            update_post_meta($product_id, 'sync_basalam_product_sync_status', 'no');
+                            sync_basalam_Logger::error("خطا در بروزرسانی محصول فوری: " . $th->getMessage(), [
+                                'product_id' => $product_id,
+                                'عملیات' => 'بروزرسانی فوری محصولات انتخابی',
+                            ]);
+                        }
+                    } else {
+                        // Use WP Cron (original behavior)
+                        self::add_to_schedule(new sync_basalam_Update_Product_Task(), ['type' => 'update_product', 'id' => $product_id]);
+                    }
                 }
             }
         }

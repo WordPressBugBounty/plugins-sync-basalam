@@ -2,7 +2,6 @@
 if (! defined('ABSPATH')) exit;
 $current_default_weight = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::DEFAULT_WEIGHT);
 $current_preparation_time = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::DEFAULT_PREPARATION);
-$webhook_id = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::WEBHOOK_ID);
 $sync_basalam_token = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::TOKEN);
 $sync_basalam_refresh_token = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::REFRESH_TOKEN);
 $sync_status_product = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::SYNC_STATUS_PRODUCT);
@@ -28,10 +27,7 @@ if ($woo_queue_status === false) {
         </div>
     </div>
 
-    <?php if (!$webhook_id):
-        require_once(sync_basalam_configure()->template_path() . "/admin/menu/main/main-get-webhook.php");
-
-    elseif (!$is_vendor_status):
+    <?php if (!$is_vendor_status):
         require_once(sync_basalam_configure()->template_path() . "/admin/menu/main/main-create-booth.php");
 
     elseif (!$sync_basalam_token || !$sync_basalam_refresh_token):

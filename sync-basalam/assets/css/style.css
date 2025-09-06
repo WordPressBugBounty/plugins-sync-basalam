@@ -151,6 +151,7 @@
 }
 
 .basalam-status-card {
+  width: 956px;
   background: white;
   border-radius: 12px;
   padding: 24px;
@@ -741,6 +742,10 @@
   border: 1px solid var(--basalam-danger-color);
   position: relative;
   overflow: hidden;
+  height: 251px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .basalam-h {
@@ -1864,6 +1869,7 @@ input[type=number]::-webkit-outer-spin-button {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.8);
   }
+
   to {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
@@ -1945,9 +1951,10 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 /* Ensure modal appears above everything */
-body > .basalam-info-modal {
+body>.basalam-info-modal {
   position: fixed !important;
-  z-index: 2147483647 !important; /* Maximum z-index */
+  z-index: 2147483647 !important;
+  /* Maximum z-index */
 }
 
 /* Override any parent container constraints */
@@ -1959,7 +1966,7 @@ body > .basalam-info-modal {
 
 /* WordPress admin specific overrides */
 #wpwrap .basalam-info-modal,
-#wpadminbar ~ * .basalam-info-modal,
+#wpadminbar~* .basalam-info-modal,
 .wp-admin .basalam-info-modal {
   position: fixed !important;
   top: 0 !important;
@@ -1982,6 +1989,7 @@ body > .basalam-info-modal {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -2022,34 +2030,34 @@ body > .basalam-info-modal {
     margin: 0 !important;
     position: absolute !important;
   }
-  
+
   .basalam-info-modal-header {
     padding: 12px 16px !important;
   }
-  
+
   .basalam-info-modal-header h3 {
     font-size: 14px !important;
   }
-  
+
   .basalam-info-modal-body {
     padding: 16px !important;
     font-size: 13px !important;
   }
-  
+
   .basalam-info-icon {
     width: 18px;
     height: 18px;
   }
-  
+
   .basalam-label-container {
     flex-direction: row;
     justify-content: space-between;
   }
-  
+
   .basalam-label-text {
     text-align: right;
   }
-  
+
   .basalam-info-trigger {
     margin-left: 8px;
     margin-right: 0;
@@ -2061,7 +2069,7 @@ body > .basalam-info-modal {
   .basalam-info-trigger {
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
   }
-  
+
   .basalam-info-icon {
     width: 20px;
     height: 20px;

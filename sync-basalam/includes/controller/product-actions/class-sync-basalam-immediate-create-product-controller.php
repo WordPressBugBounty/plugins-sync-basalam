@@ -1,7 +1,7 @@
 <?php
 if (! defined('ABSPATH')) exit;
 
-class Sync_basalam_Create_Product extends Sync_BasalamController
+class Sync_basalam_Immediate_Create_Product extends Sync_BasalamController
 {
     public function __invoke()
     {
@@ -9,12 +9,8 @@ class Sync_basalam_Create_Product extends Sync_BasalamController
 
         $product_id = isset($_POST['product_id']) ? sanitize_text_field(wp_unslash($_POST['product_id'])) : null;
 
-        $cat_id = isset($_POST['cat_id']) ? sanitize_text_field(wp_unslash($_POST['cat_id'])) : '';
-
-        $cat_id = !empty($cat_id) ? explode(',', $cat_id) : [];
-
         if ($product_id) {
-            $result = $product_operations->create_new_product($product_id, $cat_id);
+            $result = $product_operations->create_new_product($product_id, []);
         }
 
         if (!$result['success']) {

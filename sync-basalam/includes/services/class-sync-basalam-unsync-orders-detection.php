@@ -7,7 +7,7 @@ class Sync_basalam_Unsync_Orders_Detection
     public function __construct()
     {
         $this->get_sync_basalam_orders_service = new sync_basalam_Get_sync_basalam_Orders();
-        $this->create_order_service = new sync_basalam_Create_Order_Service();
+        $this->create_order_service = new SyncBasalamOrderManger();
     }
     public function add_unsync_basalam_order_to_woo()
     {
@@ -34,14 +34,13 @@ class Sync_basalam_Unsync_Orders_Detection
                 )
             );
 
-
             if (!$exists) {
                 $request = new WP_REST_Request('POST');
                 $request->set_param('invoice_id', $order['order']['id']);
                 $request->set_param('user_id', $order['order']['customer']['user']['id']);
                 $request->set_param('city_id', $order['order']['customer']['city']['id']);
                 $request->set_param('province_id', $order['order']['customer']['city']['parent']['id']);
-                $this->create_order_service->create_order_in_woo($request, false);
+                $this->create_order_service->orderManger($request, false);
                 $new_order = true;
             }
         }

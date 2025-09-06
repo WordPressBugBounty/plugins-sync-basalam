@@ -7,7 +7,7 @@ class Sync_basalam_Plugin
     /**
      * Plugin version
      */
-    const VERSION = '1.3.8';
+    const VERSION = '1.3.9';
 
     /**
      * Plugin singleton instance
@@ -65,6 +65,7 @@ class Sync_basalam_Plugin
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'migration/class-sync-basalam-migration-V-1-3-0.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'migration/class-sync-basalam-migration-V-1-3-2.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'migration/class-sync-basalam-migration-V-1-3-8.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'migration/class-sync-basalam-migration-V-1-3-9.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'migration/class-sync-basalam-migration-manager.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'migration/service/class-sync-basalam-migrator-service.php';
 
@@ -75,19 +76,18 @@ class Sync_basalam_Plugin
 
     private function includes()
     {
+        // Logger file
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'log/interface-sync-basalam-logger-interface.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'log/class-sync-basalam-woo-logger.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'log/class-sync-basalam-error-logger.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'log/class-sync-basalam-logger.php';
+
         // Utility files
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'utilities/class-sync-basalam-text-cleaner.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'utilities/class-sync-basalam-exception.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'utilities/class-sync-basalam-convet-fa-num.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'utilities/class-sync-basalam-iran-provinces-code.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'utilities/class-sync-basalam-order-manager.php';
-
-
-        // Logger file
-        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'log/interface-sync-basalam-logger-interface.php';
-        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'log/class-sync-basalam-woo-logger.php';
-        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'log/class-sync-basalam-error-logger.php';
-        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'log/class-sync-basalam-logger.php';
 
         // Listener file
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'listeners/trait-sync-basalam-check-product-status.php';
@@ -97,7 +97,6 @@ class Sync_basalam_Plugin
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'listeners/class-sync-basalam-create-product-listener.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'listeners/class-sync-basalam-restore-product-listener.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'listeners/class-sync-basalam-archive-product-listener.php';
-
 
         // Queue related files
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'queue/class-sync-basalam-queue-manager.php';
@@ -126,6 +125,8 @@ class Sync_basalam_Plugin
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-get-shipping-methods.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-connect-product-service.php';
 
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-webhook-service.php';
+
         // Order Services
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/orders/class-sync-basalam-confirm-order.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/orders/class-sync-basalam-cancel-order.php';
@@ -134,7 +135,6 @@ class Sync_basalam_Plugin
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/orders/class-sync-basalam-delay-req-order.php';
 
         // Admin section files
-
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/class-sync-basalam-admin-menus.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/class-sync-basalam-admin-manage-category-options.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/product/class-sync-basalam-admin-product-status.php';
@@ -144,7 +144,6 @@ class Sync_basalam_Plugin
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/class-sync-basalam-admin-ui.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/class-sync-basalam-admin-settings.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/class-sync-basalam-admin-help.php';
-
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/product/class-sync-basalam-admin-product-mobile-category-fields.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/product/class-sync-basalam-admin-product-type.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/product/class-sync-basalam-admin-get-product-data-json.php';
@@ -152,10 +151,8 @@ class Sync_basalam_Plugin
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/product/class-sync-basalam-admin-product-operations.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/product/class-sync-basalam-admin-single-product-box.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/product/class-sync-basalam-admin-product-wholesale.php';
-
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/order/class-sync-basalam-admin-order-is-basalam.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/order/class-sync-basalam-order-box.php';
-
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/order/class-sync-basalam-admin-order-statuses.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/order/class-sync-basalam-admin-check-basalam-order.php';
         require_once $this->template_path("admin/utilities/connect-ajax-single-product-page.php");
@@ -166,9 +163,6 @@ class Sync_basalam_Plugin
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'route/class-sync-basalam-route-action.php';
     }
 
-    /**
-     * Register required actions and filters
-     */
     private function init_hooks()
     {
         // Initialize admin menus
@@ -222,10 +216,6 @@ class Sync_basalam_Plugin
             'filter_by_exist_on_basalam'
         ]);
 
-        add_action('admin_post_Sync_basalam_delete_webhook', function () {
-            $onboarding = new Sync_basalam_Admin_Onboarding();
-            $onboarding->handle_delete_webhook();
-        });
         add_action('pre_get_posts', [
             Sync_basalam_Admin_Filter_Woo_Products::get_instance(),
             'filter_query_for_basalam'
@@ -274,7 +264,6 @@ class Sync_basalam_Plugin
             }
         }
     }
-
 
     /**
      * Get the plugin url.
@@ -327,7 +316,6 @@ class Sync_basalam_Plugin
         return $this->plugin_url() . "assets" . $path;
     }
 
-
     /**
      * Add styles to admin page
      */
@@ -364,6 +352,7 @@ class Sync_basalam_Plugin
             SYNC_BASALAM_PLUGIN_VERSION
         );
     }
+
     /**
      * Add scripts to admin page
      */
@@ -372,13 +361,6 @@ class Sync_basalam_Plugin
         wp_enqueue_script(
             'basalam-admin-logs-script',
             $this->assets_url("js/logs.js"),
-            array('jquery'),
-            SYNC_BASALAM_PLUGIN_VERSION,
-            true
-        );
-        wp_enqueue_script(
-            'basalam-admin-onboarding-script',
-            $this->assets_url("js/onboarding.js"),
             array('jquery'),
             SYNC_BASALAM_PLUGIN_VERSION,
             true

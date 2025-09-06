@@ -3,6 +3,14 @@ if (! defined('ABSPATH')) exit;
 class Sync_basalam_Date_Converter
 {
     private const GREGORIAN_MONTH_DAYS = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    
+    public static function utc_to_tehran($utc_datetime)
+    {
+        $utc_date = new DateTime($utc_datetime, new DateTimeZone('UTC'));
+        $tehran_date = $utc_date->setTimezone(new DateTimeZone('Asia/Tehran'));
+        return $tehran_date;
+    }
+    
     public static function gregorian_to_jalali($gy, $gm, $gd)
     {
         $jy = $gy > 1600 ? 979 : 0;

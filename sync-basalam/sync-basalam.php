@@ -4,7 +4,7 @@ if (! defined('ABSPATH')) exit;
 /**
  * Plugin Name: sync basalam | ووسلام
  * Description: با استفاده از پلاگین ووسلام  میتوایند تمامی محصولات ووکامرس را با یک کلیک به غرفه باسلامی خود اضافه کنید‌، همچنین تمامی سفارش باسلامی شما به سایت شما اضافه میگردد.
- * Version: 1.3.8
+ * Version: 1.3.9
  * Author: Woosalam Dev
  * Author URI: https://wp.hamsalam.ir/help
  * Plugin URI: https://wp.hamsalam.ir
@@ -62,6 +62,8 @@ function sync_basalam_init()
 
 function sync_basalam_redirect_after_activation()
 {
+    $token = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::TOKEN);
+    if ($token) return;
     if (get_transient('sync_basalam_do_activation_redirect')) {
         delete_transient('sync_basalam_do_activation_redirect');
 
