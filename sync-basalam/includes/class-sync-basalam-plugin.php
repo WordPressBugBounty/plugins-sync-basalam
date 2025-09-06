@@ -7,7 +7,7 @@ class Sync_basalam_Plugin
     /**
      * Plugin version
      */
-    const VERSION = '1.3.9';
+    const VERSION = '1.3.10';
 
     /**
      * Plugin singleton instance
@@ -111,7 +111,7 @@ class Sync_basalam_Plugin
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-get-category-id.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-upload-file.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-get-commission.php';
-        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-create-order-service.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-order-manager.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-get-product-data.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-check-unsync-basalam-products.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-check-photos-ban-status.php';
