@@ -7,7 +7,7 @@ class Sync_basalam_Plugin
     /**
      * Plugin version
      */
-    const VERSION = '1.3.10';
+    const VERSION = '1.3.11';
 
     /**
      * Plugin singleton instance
