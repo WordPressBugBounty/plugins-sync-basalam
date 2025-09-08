@@ -11,10 +11,10 @@ class Sync_basalam_Create_Product_Listener extends sync_basalam_Listener impleme
         if (!$this->is_avalabile_product($product_id)) {
             return;
         }
-        
+
         // Check operation type setting
         $operation_type = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::PRODUCT_OPERATION_TYPE);
-        
+
         if ($operation_type === 'immediate') {
             // Execute immediately via Ajax controller
             $this->execute_immediate_create($product_id);
@@ -28,11 +28,11 @@ class Sync_basalam_Create_Product_Listener extends sync_basalam_Listener impleme
     {
         // Set status to pending
         update_post_meta($product_id, 'sync_basalam_product_sync_status', 'pending');
-        
+
         // Execute immediately
         $product_operations = new sync_basalam_Admin_Product_Operations();
         $result = $product_operations->create_new_product($product_id, []);
-        
+
         // Update status based on result
         if ($result['success']) {
             update_post_meta($product_id, 'sync_basalam_product_sync_status', 'ok');

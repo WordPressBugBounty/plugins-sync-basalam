@@ -10,7 +10,7 @@ $logo_filename = "logo.svg";
             <div>
                 <h1 style="text-align: justify;" class="basalam-h">راهنمای استفاده از افزونه باسلام</h1>
                 <p class="basalam-p" style="margin-top: 17px !important;">در این صفحه می‌توانید پاسخ سوالات متداول و راهنمای استفاده از افزونه را مشاهده کنید.</p>
-                <p class="basalam-p" style="text-align: justify;">برای مشاهده ویدیو های آموزشی پلاگین <b> <a href="https://www.aparat.com/playlist/20857018" target="_blank">کلیک</a></b> کنید</p>
+                <p class="basalam-p" style="text-align: justify;">برای مشاهده ویدیو های آموزشی پلاگین <b> <a href="https://wp.hamsalam.ir/help" target="_blank">کلیک</a></b> کنید</p>
             </div>
         </div>
     </div>

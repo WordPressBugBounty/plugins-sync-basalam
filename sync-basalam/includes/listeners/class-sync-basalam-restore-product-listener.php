@@ -6,8 +6,8 @@ class Sync_basalam_Restore_Product_Listener extends sync_basalam_Listener implem
     public function handle($product_id)
     {
         $product = wc_get_product($product_id);
-        
-        if ($product->is_type('variation')) {
+
+        if (!$product || $product->is_type('variation')) {
             return;
         }
 

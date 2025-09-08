@@ -52,14 +52,14 @@ if (! defined('ABSPATH')) exit;
                                 <img src="<?php echo esc_url(sync_basalam_configure()->assets_url('/images/telegram.png')); ?>" alt="telegram" style="width: 40px;">
                             </div>
                         </a>
-                        <a href="https://ble.ir/join/9XayvXfnEj" target="_blank">
-                            <div class="basalam-contact-btn basalam-btn-contact__green">
-                                <img src="<?php echo esc_url(sync_basalam_configure()->assets_url('/images/bale.png')); ?>" alt="bale" style="width: 40px;">
-                            </div>
-                        </a>
                         <a href="https://www.aparat.com/playlist/20857018" target="_blank">
                             <div class="basalam-contact-btn basalam-btn-contact__red">
                                 <img src="<?php echo esc_url(sync_basalam_configure()->assets_url('/images/aparat.png')); ?>" alt="aparat" style="width: 40px;">
+                            </div>
+                        </a>
+                        <a href="https://wp.hamsalam.ir/help" target="_blank">
+                            <div class="basalam-contact-btn basalam-btn-contact__blue">
+                                <img src="<?php echo esc_url(sync_basalam_configure()->assets_url('/images/help.svg')); ?>" alt="help page" style="width: 70px;">
                             </div>
                         </a>
                     </div>

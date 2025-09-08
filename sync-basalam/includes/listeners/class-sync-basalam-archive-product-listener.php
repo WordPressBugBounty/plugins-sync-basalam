@@ -9,7 +9,7 @@ class Sync_basalam_Archive_Product_Listener extends sync_basalam_Listener implem
     {
         $product = wc_get_product($product_id);
 
-        if ($product->is_type('variation')) {
+        if (!$product || $product->is_type('variation')) {
             return;
         }
         
