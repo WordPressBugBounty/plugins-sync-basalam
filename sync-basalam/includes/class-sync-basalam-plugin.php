@@ -7,7 +7,7 @@ class Sync_basalam_Plugin
     /**
      * Plugin version
      */
-    const VERSION = '1.3.12';
+    const VERSION = '1.4.0';
 
     /**
      * Plugin singleton instance
@@ -124,6 +124,12 @@ class Sync_basalam_Plugin
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-get-plugin-data.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-get-shipping-methods.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-connect-product-service.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-discount-manager.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-discount-task-processor.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-discount-task-scheduler.php';
+
+        // Models
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'models/class-sync-basalam-discount-task.php';
 
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-webhook-service.php';
 
@@ -133,6 +139,12 @@ class Sync_basalam_Plugin
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/orders/class-sync-basalam-cancel-req-order.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/orders/class-sync-basalam-tracking-code-order.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/orders/class-sync-basalam-delay-req-order.php';
+
+        // Discount Services
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/discount/class-sync-basalam-discount-strategy.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/discount/class-sync-basalam-product-discount-handler.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/discount/class-sync-basalam-simple-discount-strategy.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/discount/class-sync-basalam-variable-discount-strategy.php';
 
         // Admin section files
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/class-sync-basalam-admin-menus.php';
@@ -196,6 +208,9 @@ class Sync_basalam_Plugin
 
         add_action('init', [new Sync_basalam_Admin_Order_Statuses(), 'register_custom_order_statuses'], 20);
         add_filter('wc_order_statuses', [new Sync_basalam_Admin_Order_Statuses(), 'add_custom_order_statuses']);
+
+        // Discount task processor cron hook
+        add_action('sync_basalam_process_discount_tasks', array($this, 'process_discount_tasks_cron'));
         add_filter('bulk_actions-edit-shop_order', [new Sync_basalam_Admin_Order_Statuses(), 'add_custom_status_to_bulk_actions']);
 
         add_action('wp_ajax_basalam_search_products', 'Sync_basalam_handle_search_products_ajax');
@@ -443,5 +458,26 @@ class Sync_basalam_Plugin
             SYNC_BASALAM_PLUGIN_VERSION,
             true
         );
+    }
+
+    /**
+     * Process discount tasks via cron job
+     * This method is called every minute by WordPress cron
+     */
+    public function process_discount_tasks_cron()
+    {
+        try {
+            // Load required classes
+            require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'models/class-sync-basalam-discount-task.php';
+            require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-discount-task-processor.php';
+            require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-discount-manager.php';
+
+            $processor = new Sync_Basalam_Discount_Task_Processor();
+
+            // Process only one group per cron execution
+            $result = $processor->process_single_discount_group();
+        } catch (Exception $e) {
+            error_log('Discount processor cron exception: ' . $e->getMessage());
+        }
     }
 }

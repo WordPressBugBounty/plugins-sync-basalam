@@ -68,16 +68,16 @@ class Sync_basalam_Update_Product_Service
 
         $product = wc_get_product($product_id);
         if ($product && $product->is_type('variable')) {
-            $needs_mapping = false;
+            $needs_mapping = true;
             $variations = $product->get_children();
 
-            foreach ($variations as $variation_id) {
-                $sync_basalam_variation_id = get_post_meta($variation_id, 'sync_basalam_variation_id', true);
-                if (empty($sync_basalam_variation_id)) {
-                    $needs_mapping = true;
-                    break;
-                }
-            }
+            // foreach ($variations as $variation_id) {
+            // $sync_basalam_variation_id = get_post_meta($variation_id, 'sync_basalam_variation_id', true);
+            // if (empty($sync_basalam_variation_id)) {
+            // $needs_mapping = true;
+            // break;
+            // }
+            // }
 
             if ($needs_mapping && isset($request['body']['variants'])) {
                 $wc_variations = [];

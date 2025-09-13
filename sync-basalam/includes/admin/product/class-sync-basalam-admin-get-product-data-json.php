@@ -326,26 +326,24 @@ class Sync_basalam_Admin_Get_Product_Data_Json
 
     private function get_price($product)
     {
-        $price_field = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::PRODUCT_PRICE_FIELD);
-
         $regular_price = $product->get_regular_price();
         $sale_price = $product->get_sale_price();
 
-        if ($price_field == 'original_price') {
-            if ($this->get_final_price($regular_price)) {
-                return $regular_price;
-            }
-        } else {
-            if ($sale_price) {
-                if ($this->get_final_price($sale_price)) {
-                    return $sale_price;
-                }
-            }
-            if ($this->get_final_price($regular_price)) {
-                return $regular_price;
-            }
+        // if ($price_field == 'original_price') {
+        if ($this->get_final_price($regular_price)) {
+            return $regular_price;
         }
+        // } else {
+        // if ($sale_price) {
+        // if ($this->get_final_price($sale_price)) {
+        // return $sale_price;
+        // }
+        // }
+        // if ($this->get_final_price($regular_price)) {
+        // return $regular_price;
+        // }
         return null;
+        // }
     }
 
     private function get_final_price($price, $category_ids = null)
@@ -530,7 +528,7 @@ class Sync_basalam_Admin_Get_Product_Data_Json
         $variants = [];
         $variation_ids = $product->get_children();
 
-        $price_field = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::PRODUCT_PRICE_FIELD);
+        // $price_field = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::PRODUCT_PRICE_FIELD);
 
         foreach ($variation_ids as $variation_id) {
             $variant_product = wc_get_product($variation_id);
@@ -541,15 +539,15 @@ class Sync_basalam_Admin_Get_Product_Data_Json
             $regular_price = $variant_product->get_regular_price();
             $sale_price    = $variant_product->get_sale_price();
 
-            if ($price_field === 'original_price') {
-                $variant_price = $this->get_final_price($regular_price, $category_ids);
-            } else {
-                if ($sale_price && $this->get_final_price($sale_price, $category_ids)) {
-                    $variant_price = $this->get_final_price($sale_price, $category_ids);
-                } else {
-                    $variant_price = $this->get_final_price($regular_price, $category_ids);
-                }
-            }
+            // if ($price_field === 'original_price') {
+            $variant_price = $this->get_final_price($regular_price, $category_ids);
+            // } else {
+            // if ($sale_price && $this->get_final_price($sale_price, $category_ids)) {
+            // $variant_price = $this->get_final_price($sale_price, $category_ids);
+            // } else {
+            // $variant_price = $this->get_final_price($regular_price, $category_ids);
+            // }
+            // }
 
             if (!$variant_price) {
                 throw new \Exception('قیمت محصول ' . esc_html($product->get_name()) . ' کمتر از ۱۰۰۰ تومان است.');

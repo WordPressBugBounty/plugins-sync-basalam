@@ -3,20 +3,28 @@ if (! defined('ABSPATH')) exit;
 
 class Sync_basalam_Admin_Product_Operations
 {
+    private const STATUS_ACTIVE = 2976;
+    private const STATUS_ARCHIVED = 3790;
+
     private $update_product_service;
     private $create_product_service;
+    private $discount_handler;
 
     public function __construct()
     {
-        $this->update_product_service = new sync_basalam_Update_Product_Service;
-        $this->create_product_service = new sync_basalam_Create_Product_Service;
+        $this->update_product_service = new sync_basalam_Update_Product_Service();
+        $this->create_product_service = new sync_basalam_Create_Product_Service();
+        $this->discount_handler = new Sync_Basalam_Product_Discount_Handler();
     }
 
     public function update_exist_product($product_id, $category_ids = null)
     {
         try {
             $product_data = $this->get_product_data($product_id, 'update', $category_ids);
-            return $this->update_product_service->update_product_in_basalam($product_data, $product_id);
+            $update_result = $this->update_product_service->update_product_in_basalam($product_data, $product_id);
+            $this->discount_handler->handle($product_id);
+
+            return $update_result;
         } catch (\Throwable $th) {
             update_post_meta($product_id, 'sync_basalam_product_sync_status', 'no');
             sync_basalam_Logger::error("خطا در بروزرسانی محصول: " . $th->getMessage(), [
@@ -33,12 +41,14 @@ class Sync_basalam_Admin_Product_Operations
         }
     }
 
-
     public function create_new_product($product_id, $category_ids)
     {
         try {
             $product_data = $this->get_product_data($product_id, false, $category_ids);
-            return $this->create_product_service->create_product_in_basalam($product_data, $product_id);
+            $create_result = $this->create_product_service->create_product_in_basalam($product_data, $product_id);
+            $this->discount_handler->handle($product_id);
+
+            return $create_result;
         } catch (\Throwable $th) {
             update_post_meta($product_id, 'sync_basalam_product_sync_status', 'no');
             sync_basalam_Logger::error("خطا در اضافه کردن محصول: " . $th->getMessage(), [
@@ -57,11 +67,11 @@ class Sync_basalam_Admin_Product_Operations
     public function restore_exist_product($product_id)
     {
         try {
-            $result =  $this->update_product_service->update_product_status($product_id, 2976);
+            $result = $this->update_product_service->update_product_status($product_id, self::STATUS_ACTIVE);
             if ($result) {
                 return $result;
             }
-            throw new \Exception();
+            throw new \Exception('Failed to restore product status');
         } catch (\Throwable $th) {
             return [
                 'success' => false,
@@ -74,11 +84,11 @@ class Sync_basalam_Admin_Product_Operations
     public function archive_exist_product($product_id)
     {
         try {
-            $result = $this->update_product_service->update_product_status($product_id, 3790);
+            $result = $this->update_product_service->update_product_status($product_id, self::STATUS_ARCHIVED);
             if ($result) {
                 return $result;
             }
-            throw new \Exception();
+            throw new \Exception('Failed to archive product status');
         } catch (\Throwable $th) {
             return [
                 'success' => false,
@@ -95,6 +105,8 @@ class Sync_basalam_Admin_Product_Operations
         return $product_data;
     }
 
+
+    // TODO: implement disconnect varinats
     public static function disconnect_product($product_id)
     {
         $meta_keys_to_remove = [

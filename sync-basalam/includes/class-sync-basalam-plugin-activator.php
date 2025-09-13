@@ -14,6 +14,7 @@ class Sync_basalam_Plugin_Activator
         $table_name_options        = $wpdb->prefix . 'sync_basalam_map_options';
         $table_name_uploaded_photo = $wpdb->prefix . 'sync_basalam_uploaded_photo';
         $table_name_debug_logs     = $wpdb->prefix . 'sync_basalam_debug_logs';
+        $table_name_discount_tasks = $wpdb->prefix . 'sync_basalam_discount_tasks';
         $charset_collate           = $wpdb->get_charset_collate();
 
         $sql_Payment = "CREATE TABLE $table_name_payments (
@@ -57,10 +58,32 @@ class Sync_basalam_Plugin_Activator
             KEY created_at_idx (created_at)
         ) $charset_collate;";
 
+        $sql_discount_tasks = "CREATE TABLE $table_name_discount_tasks (
+            id BIGINT(20) NOT NULL AUTO_INCREMENT,
+            product_id VARCHAR(50) DEFAULT NULL,
+            variation_id VARCHAR(50) DEFAULT NULL,
+            discount_percent DECIMAL(5,2) NOT NULL,
+            active_days INT(11) NOT NULL,
+            action ENUM('apply','remove') DEFAULT 'apply',
+            status ENUM('pending','processing','completed','failed') DEFAULT 'pending',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            scheduled_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            processed_at DATETIME DEFAULT NULL,
+            error_message TEXT DEFAULT NULL,
+            PRIMARY KEY (id),
+            KEY idx_status (status),
+            KEY idx_action (action),
+            KEY idx_discount_percent (discount_percent),
+            KEY idx_scheduled_at (scheduled_at),
+            KEY idx_product_id (product_id),
+            KEY idx_variation_id (variation_id)
+        ) $charset_collate;";
+
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
         dbDelta($sql_Payment);
         dbDelta($sql_options);
         dbDelta($sql_uploaded_photo);
         dbDelta($sql_debug_logs);
+        dbDelta($sql_discount_tasks);
     }
 }

@@ -165,14 +165,15 @@ class Sync_basalam_External_API_Service
             'status_code' => $status_code
         ];
     }
-    
-    public function send_delete_request($url, $headers = [])
+
+    public function send_delete_request($url, $headers = [], $data = null)
     {
         $headers = array_merge($this->headers, $headers);
         $response = wp_remote_request($url, array(
             'method' => 'DELETE',
             // 'timeout'     => 15,
             'headers'   => $headers,
+            'body'      => $data,
         ));
 
         if (is_wp_error($response)) {

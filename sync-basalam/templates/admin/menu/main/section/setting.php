@@ -135,6 +135,13 @@ $shipping_methods = $get_shipping_methods->get_woo_shipping_methods();
                     در لحظه: عملیات بلافاصله انجام می‌شود. ممکن است تأثیر لحظه‌ای روی سرعت سایت داشته باشد. اگر از افزونه‌های بهینه‌سازی و سیستم کشینگ استفاده می‌کنید، گزینه در‌لحظه مناسب تر است.'); ?>
                     <?php sync_basalam_Admin_UI::render_product_operation_type(); ?>
                 </div>
+                <div class="basalam-form-group basalam-p">
+                    <?php echo sync_basalam_Admin_UI::render_label_with_tooltip(
+                        'مدت زمان تخفیف محصول',
+                        'در باسلام هر تخفیف بازه زمانی مشخصی دارد. از این بخش می‌توانید مدت اعتبار تخفیف محصولات را تعیین کنید. با هر بار بروزرسانی محصول، این زمان نیز به‌روز خواهد شد.'
+                    ); ?>
+                    <?php sync_basalam_Admin_UI::render_product_discount_duration(); ?>
+                </div>
 
             </div>
             <div id="Basalam-custom-fields" style="display:none; margin-top:15px;margin-bottom: 20px;">

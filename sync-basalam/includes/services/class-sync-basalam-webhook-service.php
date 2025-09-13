@@ -77,9 +77,6 @@ class Sync_Basalam_Webhook_Service
 
     private function getWebhooks()
     {
-
-        error_log($this->token);
-
         $headers = [
             'authorization' => $this->token
         ];

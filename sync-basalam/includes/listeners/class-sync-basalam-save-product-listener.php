@@ -43,8 +43,6 @@ class Sync_basalam_Save_Product_Listener extends sync_basalam_Listener implement
         // Set transient to prevent duplicate processing for 2 seconds
         set_transient($transient_key, true, 2);
         
-        error_log("Save Product Listener Triggered for Product ID: " . $product_id);
-        
         // Validate product availability for sync
         if (!$this->is_avalabile_product($product_id)) {
             return;

@@ -11,7 +11,6 @@ class Sync_basalam_Create_Product_Task extends sync_basalam_AbstractTask
     public function handle($args)
     {
         $class = new sync_basalam_Create_Product_wp_bg_proccess_Task();
-
         $class->push($args);
         $class->save();
         $class->dispatch();
