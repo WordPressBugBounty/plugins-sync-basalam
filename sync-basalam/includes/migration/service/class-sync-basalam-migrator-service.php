@@ -181,7 +181,7 @@ class Sync_Basalam_Migrator_Service
 
     public function addNewWebhookEvents()
     {
-        // Load required classes for migration
+        
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'log/interface-sync-basalam-logger-interface.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'log/class-sync-basalam-woo-logger.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'log/class-sync-basalam-logger.php';

@@ -10,6 +10,8 @@ class Sync_Basalam_migration_manager
             '1.3.2' => new Sync_Basalam_Migration_1_3_2(),
             '1.3.8' => new Sync_Basalam_Migration_1_3_8(),
             '1.3.9' => new Sync_Basalam_Migration_1_3_9(),
+            '1.4.0' => new Sync_Basalam_Migration_1_4_0(),
+            '1.4.1' => new Sync_Basalam_Migration_1_4_1(),
         ];
     }
     public function runMigrations($current_version, $new_version)

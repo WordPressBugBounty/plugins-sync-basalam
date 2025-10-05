@@ -51,6 +51,15 @@ class Sync_basalam_Admin_Menus
             'sync_basalam_help',
             array(__CLASS__, 'render_help_submenu_content'),
         );
+
+        add_submenu_page(
+            'sync_basalam',
+            'اتصال دسته‌بندی‌ها',
+            Sync_Basalam_Admin_UI::render_icon('dashicons-category') . 'اتصال دسته‌بندی‌ها',
+            'manage_options',
+            'sync_basalam_category_mapping',
+            array(__CLASS__, 'render_category_mapping_page'),
+        );
         add_submenu_page(
             'آنبوردینگ',
             'آنبوردینگ باسلام',
@@ -114,6 +123,14 @@ class Sync_basalam_Admin_Menus
     public static function render_help_submenu_content()
     {
         $template = sync_basalam_configure()->template_path("admin/menu/help-page.php");
+        if (file_exists($template)) {
+            require_once($template);
+        }
+    }
+
+    public static function render_category_mapping_page()
+    {
+        $template = sync_basalam_configure()->template_path("admin/menu/category-mapping-page.php");
         if (file_exists($template)) {
             require_once($template);
         }

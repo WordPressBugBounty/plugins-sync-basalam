@@ -1,55 +1,62 @@
 <?php
+
 if (! defined('ABSPATH')) exit;
 
-class Sync_basalam_Chunk_Create_Products_Task extends sync_basalam_AbstractTask
+class Sync_basalam_Chunk_Create_Products_Task extends WP_Async_Background_Process
 {
-    protected function get_hook_name()
-    {
-        return 'sync_basalam_plugin_chunk_create_products';
-    }
+    protected $action = 'sync_basalam_create_products_task';
+    protected $batch_size = 1;
 
-    public function handle($args)
+    protected function task($args)
     {
-        $posts_per_page = $args['posts_per_page'] ?? 100;
-        $offset = $args['offset'] ?? 0;
-        $max_chunks = $args['max_chunks'] ?? 10;
+        $job_manager = new SyncBasalamJobManager();
+
+        $posts_per_page = 200;
+        $offset = get_option('last_offset_create_products') ?? 0;
         $include_out_of_stock = $args['include_out_of_stock'] ?? false;
-        $current_chunk = 0;
 
-        do {
+        $batch_data = [
+            'posts_per_page'        => $posts_per_page,
+            'offset'                => $offset,
+            'include_out_of_stock'  => $include_out_of_stock
+        ];
 
-            $batch_data = [
-                'posts_per_page'        => $posts_per_page,
-                'offset'                => $offset,
-                'include_out_of_stock'  => $include_out_of_stock
-            ];
+        $product_ids = sync_basalam_Product_Queue_Manager::get_products_for_creation($batch_data);
 
-            $product_ids = sync_basalam_Product_Queue_Manager::get_products_for_creation($batch_data);
-            if (empty($product_ids)) {
-                break;
-            }
-            foreach ($product_ids as $product_id) {
-                sync_basalam_Product_Queue_Manager::add_to_schedule(new sync_basalam_Create_Product_Task(), ['type' => 'create_product', 'id' => $product_id]);
-            }
-
-            sync_basalam_Product_Queue_Manager::add_to_schedule(new sync_basalam_Create_Product_Task(), ['type' => 'create_chunk', 'offset_id' => ($offset + $posts_per_page), 'include_out_of_stock' => $include_out_of_stock]);
-
-            $offset += $posts_per_page;
-            $current_chunk++;
-        } while ($current_chunk < $max_chunks && count($product_ids) === $posts_per_page);
-    }
-
-    public function schedule($data, $delay = null)
-    {
-
-        if ($delay == null) {
-            if ($this->get_last_run_timestamp() > time()) {
-                $delay = $this->get_last_run_timestamp() - time() + 60;
-            } else {
-                $delay = 60;
-            }
+        if (!$product_ids) {
+            delete_option('last_offset_create_products');
+            return false;
         }
 
-        return $this->queue_manager->schedule_single_task($data, $delay);
+        
+        foreach ($product_ids as $product_id) {
+            $job_manager->create_job(
+                'sync_basalam_create_single_product',
+                'pending',
+                json_encode(['product_id' => $product_id])
+            );
+        }
+
+        
+        update_option('last_offset_create_products', $offset + $posts_per_page);
+
+        
+        $next_batch_data = json_encode([
+            'offset' => $offset + $posts_per_page,
+            'include_out_of_stock' => $include_out_of_stock
+        ]);
+
+        $job_manager->create_job(
+            'sync_basalam_create_all_products',
+            'pending',
+            $next_batch_data
+        );
+
+        return false;
+    }
+
+    protected function complete()
+    {
+        parent::complete();
     }
 }

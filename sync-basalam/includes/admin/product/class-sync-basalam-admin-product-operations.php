@@ -105,8 +105,6 @@ class Sync_basalam_Admin_Product_Operations
         return $product_data;
     }
 
-
-    // TODO: implement disconnect varinats
     public static function disconnect_product($product_id)
     {
         $meta_keys_to_remove = [
@@ -118,6 +116,16 @@ class Sync_basalam_Admin_Product_Operations
         foreach ($meta_keys_to_remove as $meta_key) {
             delete_post_meta($product_id, $meta_key);
         }
+
+        $product = wc_get_product($product_id);
+
+        if ($product && $product->is_type('variable')) {
+            $variation_ids = $product->get_children();
+            foreach ($variation_ids as $variation_id) {
+                delete_post_meta($variation_id, 'sync_basalam_variation_id');
+            }
+        }
+
         return [
             'success' => true,
             'message' => 'اتصال محصولات با موفقیت حذف شد.',

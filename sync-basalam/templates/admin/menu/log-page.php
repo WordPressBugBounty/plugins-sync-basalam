@@ -19,7 +19,7 @@ $tabs = [
     'alert' => 'توجه'
 ];
 
-// Calculate total logs
+
 $total_logs = 0;
 foreach ($logs_by_level as $level_logs) {
     $total_logs += count($level_logs);

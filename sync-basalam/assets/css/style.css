@@ -2076,3 +2076,63 @@ body>.basalam-info-modal {
     padding: 4px;
   }
 }
+
+/* Toggle Switch Styles */
+.basalam-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.basalam-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.basalam-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 24px;
+}
+
+.basalam-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+.basalam-switch input:checked + .basalam-slider {
+  background-color: var(--basalam-primary-color);
+}
+
+.basalam-switch input:checked + .basalam-slider:before {
+  transform: translateX(26px);
+}
+
+.basalam-tasks-manual-container {
+  transition: opacity 0.3s ease;
+}
+
+.basalam-tasks-manual-input:disabled {
+  background-color: #e9ecef !important;
+  cursor: not-allowed !important;
+  opacity: 0.6;
+}
+
+.basalam-tasks-info {
+  transition: all 0.3s ease;
+}

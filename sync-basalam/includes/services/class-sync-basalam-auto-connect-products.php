@@ -69,6 +69,14 @@ class Sync_basalam_Auto_Connect_Products
                 if ($product_id) {
                     $connect_product_service = new Sync_basalam_connect_product_service;
                     $result = $connect_product_service->connect_product_by_id($product_id, $sync_basalam_product['id']);
+
+                    $job_manager = new SyncBasalamJobManager();
+                    $job_manager->create_job(
+                        'sync_basalam_update_product',
+                        'pending',
+                        $product_id,
+                    );
+
                     if ($result) {
                         sync_basalam_Logger::info($sync_basalam_product['title'] . ' به محصول مشابه خود در باسلام متصل شد', [
                             'product_id' => $product_id,

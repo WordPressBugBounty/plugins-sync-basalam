@@ -33,7 +33,7 @@ class Sync_basalam_Clear_Logs_Controller extends Sync_BasalamController
 
         if ($deleted_count > 0) {
             wp_send_json_success([
-                'message' => sprintf('تعداد %d فایل لاگ با موفقیت حذف شد.', $deleted_count)
+                'message' => sprintf('%d فایل لاگ با موفقیت حذف شد.', $deleted_count)
             ]);
         } else {
             wp_send_json_error([

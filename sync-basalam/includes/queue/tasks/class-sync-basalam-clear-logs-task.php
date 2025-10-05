@@ -15,7 +15,6 @@ class Sync_basalam_Clear_Logs_Task extends sync_basalam_AbstractTask
         if (is_dir($log_dir)) {
             $files = glob($log_dir . '/basalam-sync-plugin-*.log');
 
-
             if ($files) {
                 $now = time();
                 $days_ago = 1 * 24 * 60 * 60;
@@ -39,6 +38,6 @@ class Sync_basalam_Clear_Logs_Task extends sync_basalam_AbstractTask
             }
         }
 
-        return $this->queue_manager->schedule_single_task($data, $delay);
+        return $this->queue_manager->schedule_recurring_task(604800);
     }
 }

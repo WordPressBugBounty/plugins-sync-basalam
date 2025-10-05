@@ -4,20 +4,14 @@ defined('ABSPATH') || exit;
 class Sync_basalam_Plugin
 {
 
-    /**
-     * Plugin version
-     */
-    const VERSION = '1.4.0';
+    
+    const VERSION = '1.5.0';
 
-    /**
-     * Plugin singleton instance
-     */
+    
 
     protected static $instance = null;
 
-    /**
-     * Get Singleton instance
-     */
+    
     public static function instance()
     {
         if (self::$instance === null) {
@@ -26,9 +20,7 @@ class Sync_basalam_Plugin
         return self::$instance;
     }
 
-    /**
-     * Class constructor - private to ensure Singleton
-     */
+    
     private function __construct()
     {
         $this->define_constants();
@@ -40,9 +32,7 @@ class Sync_basalam_Plugin
         $this->init_wp_bg_process();
     }
 
-    /**
-     * Define plugin constants
-     */
+    
     private function define_constants()
     {
         if (!defined('SYNC_BASALAM_PLUGIN_DIR')) {
@@ -66,6 +56,8 @@ class Sync_basalam_Plugin
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'migration/class-sync-basalam-migration-V-1-3-2.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'migration/class-sync-basalam-migration-V-1-3-8.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'migration/class-sync-basalam-migration-V-1-3-9.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'migration/class-sync-basalam-migration-V-1-4-0.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'migration/class-sync-basalam-migration-V-1-4-1.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'migration/class-sync-basalam-migration-manager.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'migration/service/class-sync-basalam-migrator-service.php';
 
@@ -76,20 +68,20 @@ class Sync_basalam_Plugin
 
     private function includes()
     {
-        // Logger file
+        
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'log/interface-sync-basalam-logger-interface.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'log/class-sync-basalam-woo-logger.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'log/class-sync-basalam-error-logger.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'log/class-sync-basalam-logger.php';
 
-        // Utility files
+        
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'utilities/class-sync-basalam-text-cleaner.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'utilities/class-sync-basalam-exception.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'utilities/class-sync-basalam-convet-fa-num.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'utilities/class-sync-basalam-iran-provinces-code.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'utilities/class-sync-basalam-order-manager.php';
 
-        // Listener file
+        
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'listeners/trait-sync-basalam-check-product-status.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'listeners/class-sync-basalam-listener.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'listeners/interface-sync-basalam-listener-interface.php';
@@ -98,14 +90,15 @@ class Sync_basalam_Plugin
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'listeners/class-sync-basalam-restore-product-listener.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'listeners/class-sync-basalam-archive-product-listener.php';
 
-        // Queue related files
+        
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'queue/class-sync-basalam-queue-manager.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'queue/class-sync-basalam-abstract-task.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/class-sync-basalam-product-queue-manager.php';
 
-        // Services
+        
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-external-api-service.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-date-converter.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-system-resource-monitor.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-create-product-service.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-update-product-service.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-get-category-id.php';
@@ -120,6 +113,7 @@ class Sync_basalam_Plugin
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-like-woosalam.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-get-basalam-orders.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-unsync-orders-detection.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-post-auto-confirm-order.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-get-image-sizes.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-get-plugin-data.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-get-shipping-methods.php';
@@ -128,25 +122,25 @@ class Sync_basalam_Plugin
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-discount-task-processor.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-discount-task-scheduler.php';
 
-        // Models
-        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'models/class-sync-basalam-discount-task.php';
+        
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-discount-task-model.php';
 
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-webhook-service.php';
 
-        // Order Services
+        
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/orders/class-sync-basalam-confirm-order.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/orders/class-sync-basalam-cancel-order.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/orders/class-sync-basalam-cancel-req-order.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/orders/class-sync-basalam-tracking-code-order.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/orders/class-sync-basalam-delay-req-order.php';
 
-        // Discount Services
+        
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/discount/class-sync-basalam-discount-strategy.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/discount/class-sync-basalam-product-discount-handler.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/discount/class-sync-basalam-simple-discount-strategy.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/discount/class-sync-basalam-variable-discount-strategy.php';
 
-        // Admin section files
+        
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/class-sync-basalam-admin-menus.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/class-sync-basalam-admin-manage-category-options.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/product/class-sync-basalam-admin-product-status.php';
@@ -156,9 +150,11 @@ class Sync_basalam_Plugin
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/class-sync-basalam-admin-ui.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/class-sync-basalam-admin-settings.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/class-sync-basalam-admin-help.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/class-sync-basalam-category-mapping.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/product/class-sync-basalam-admin-product-mobile-category-fields.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/product/class-sync-basalam-admin-product-type.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/product/class-sync-basalam-admin-get-product-data-json.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/product/class-sync-basalam-admin-get-product-data-v2.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/product/class-sync-basalam-admin-asset.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/product/class-sync-basalam-admin-product-operations.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/product/class-sync-basalam-admin-single-product-box.php';
@@ -169,7 +165,7 @@ class Sync_basalam_Plugin
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'admin/order/class-sync-basalam-admin-check-basalam-order.php';
         require_once $this->template_path("admin/utilities/connect-ajax-single-product-page.php");
 
-        // REST API files
+        
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'api/class-sync-basalam-rest-controller.php';
 
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'route/class-sync-basalam-route-action.php';
@@ -177,10 +173,10 @@ class Sync_basalam_Plugin
 
     private function init_hooks()
     {
-        // Initialize admin menus
+        
         add_action('admin_menu', array('Sync_basalam_Admin_Menus', 'register_menus'));
 
-        // Register REST API routes
+        
         add_action('rest_api_init', array('Sync_basalam_REST_Controller', 'register_routes'));
 
         add_action('admin_enqueue_scripts', array($this, 'admin_enqueue_styles'));
@@ -209,7 +205,7 @@ class Sync_basalam_Plugin
         add_action('init', [new Sync_basalam_Admin_Order_Statuses(), 'register_custom_order_statuses'], 20);
         add_filter('wc_order_statuses', [new Sync_basalam_Admin_Order_Statuses(), 'add_custom_order_statuses']);
 
-        // Discount task processor cron hook
+        
         add_action('sync_basalam_process_discount_tasks', array($this, 'process_discount_tasks_cron'));
         add_filter('bulk_actions-edit-shop_order', [new Sync_basalam_Admin_Order_Statuses(), 'add_custom_status_to_bulk_actions']);
 
@@ -255,7 +251,11 @@ class Sync_basalam_Plugin
 
     private function init_wp_bg_process()
     {
+        global $sync_basalam_Update_Products_Task;
         global $sync_basalam_Auto_Connect_Product_Task;
+
+        $sync_basalam_Update_Products_Task = new Sync_basalam_Update_Products_wp_bg_proccess_Task();
+        new Sync_basalam_Chunk_Create_Products_Task();
 
         $sync_basalam_Auto_Connect_Product_Task = new sync_basalam_Auto_Connect_Product_Task();
         new sync_basalam_Create_Product_wp_bg_proccess_Task();
@@ -278,62 +278,50 @@ class Sync_basalam_Plugin
                 $task->register_hooks();
             }
         }
+
+        $clear_logs_exist = WC()->queue()->search([
+            'hook'     => 'sync_basalam_plugin_clear_logs',
+            'status'   => 'pending',
+            'per_page' => 1,
+        ]);
+
+        if (!$clear_logs_exist) {
+            (new Sync_basalam_Clear_Logs_Task())->schedule(null);
+        }
     }
 
-    /**
-     * Get the plugin url.
-     *
-     * @return string
-     */
+    
     public function plugin_url()
     {
         return plugin_dir_url(SYNC_BASALAM_PLUGIN_INCLUDES_DIR);
     }
 
-    /**
-     * Get the plugin path.
-     *
-     * @return string
-     */
+    
     public function plugin_path()
     {
         return untrailingslashit(SYNC_BASALAM_PLUGIN_DIR);
     }
 
-    /**
-     * Get the template path.
-     *
-     * @return string
-     */
+    
     public function template_path($path = null)
     {
-        /**
-         * Filter to adjust the base templates path.
-         */
+        
         $path = $path ? "/" . $path : null;
 
         return $this->plugin_path() . "/templates" . $path;
     }
 
-    /**
-     * Get the template path.
-     *
-     * @return string
-     */
+    
     public function assets_url($path = null)
     {
-        /**
-         * Filter to adjust the base templates path.
-         */
+        
 
         $path = $path ? "/" . $path : null;
 
         return $this->plugin_url() . "assets" . $path;
     }
 
-    /**
-     * Add styles to admin page
-     */
+    
     public function admin_enqueue_styles()
     {
         wp_enqueue_style(
@@ -368,9 +356,7 @@ class Sync_basalam_Plugin
         );
     }
 
-    /**
-     * Add scripts to admin page
-     */
+    
     public function admin_enqueue_scripts()
     {
         wp_enqueue_script(
@@ -460,21 +446,18 @@ class Sync_basalam_Plugin
         );
     }
 
-    /**
-     * Process discount tasks via cron job
-     * This method is called every minute by WordPress cron
-     */
+    
     public function process_discount_tasks_cron()
     {
         try {
-            // Load required classes
-            require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'models/class-sync-basalam-discount-task.php';
+            
+            require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-discount-task-model.php';
             require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-discount-task-processor.php';
             require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-discount-manager.php';
 
             $processor = new Sync_Basalam_Discount_Task_Processor();
 
-            // Process only one group per cron execution
+            
             $result = $processor->process_single_discount_group();
         } catch (Exception $e) {
             error_log('Discount processor cron exception: ' . $e->getMessage());

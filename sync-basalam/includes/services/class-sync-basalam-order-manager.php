@@ -162,7 +162,7 @@ class SyncBasalamOrderManger
                 }
             }
 
-            // Set address
+            
             if (isset($data['customer_data']['recipient']) && is_array($data['customer_data']['recipient'])) {
                 $recipient = $data['customer_data']['recipient'];
                 $province  = $data['customer_data']['city']['parent']['title'] ?? '';
@@ -280,11 +280,6 @@ class SyncBasalamOrderManger
             );
             update_post_meta($order_id, '_is_sync_basalam_order', true);
 
-            $auto_confirm = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::AUTO_CONFIRM_ORDER);
-            if ($auto_confirm && $status_id == 3739) {
-                self::auto_confirm_order($order_id);
-            }
-
             return new WP_REST_Response(array(
                 'success' => true,
                 'message' => 'Order created successfully',
@@ -369,16 +364,6 @@ class SyncBasalamOrderManger
             'posts_per_page' => 1
         ));
         return !empty($product) ? $product[0]->ID : null;
-    }
-
-    public static function auto_confirm_order($order_id)
-    {
-        $orderManager = new Sync_Basalam_Confirm_Order_Service();
-        $result = $orderManager->confirm_order_automatically($order_id);
-
-        if (is_wp_error($result)) {
-            sync_basalam_Logger::error('فرایند تایید اتوماتیک سفارش ناموفق بود: ' . $result->get_error_message());
-        }
     }
 
     static function get_woo_product_variable_id($sync_basalam_product_variant_id)

@@ -20,7 +20,7 @@ class Sync_basalam_External_API_Service
         $headers = array_merge($this->headers, $headers);
 
         $response = wp_remote_post($url, array(
-            // 'timeout' => 15,
+
             'body'    => $data,
             'headers' => $headers,
         ));
@@ -135,7 +135,43 @@ class Sync_basalam_External_API_Service
         $headers = array_merge($this->headers, $headers);
         $response = wp_remote_request($url, array(
             'method' => 'PATCH',
-            // 'timeout'     => 15,
+
+            'body'      => $data,
+            'headers'   => $headers,
+        ));
+
+        if (is_wp_error($response)) {
+            sync_basalam_Logger::error("درخواست API برای آدرس " . $url . " با خطا مواجه شد. پاسخ: " . $response->get_error_message());
+            return [
+                'body' => null,
+                'status_code' => 500
+            ];
+        }
+
+        $body = wp_remote_retrieve_body($response);
+        $status_code = wp_remote_retrieve_response_code($response);
+        if ($status_code == 401) {
+            $data = [
+                sync_basalam_Admin_Settings::TOKEN => '',
+                sync_basalam_Admin_Settings::REFRESH_TOKEN => '',
+            ];
+            sync_basalam_Admin_Settings::update_settings($data);
+            sync_basalam_QueueManager::cancel_all_tasks_group('sync_basalam_plugin_create_product');
+            sync_basalam_QueueManager::cancel_all_tasks_group('sync_basalam_plugin_update_product');
+            sync_basalam_QueueManager::cancel_all_tasks_group('sync_basalam_plugin_connect_auto_product');
+        }
+        return [
+            'body' => json_decode($body, true),
+            'status_code' => $status_code
+        ];
+    }
+
+    public function send_put_request($url, $data, $headers = [])
+    {
+        $headers = array_merge($this->headers, $headers);
+        $response = wp_remote_request($url, array(
+            'method' => 'PUT',
+
             'body'      => $data,
             'headers'   => $headers,
         ));
@@ -171,7 +207,7 @@ class Sync_basalam_External_API_Service
         $headers = array_merge($this->headers, $headers);
         $response = wp_remote_request($url, array(
             'method' => 'DELETE',
-            // 'timeout'     => 15,
+
             'headers'   => $headers,
             'body'      => $data,
         ));
@@ -234,7 +270,7 @@ class Sync_basalam_External_API_Service
         $response = wp_remote_post(
             $url,
             array(
-                // 'timeout'     => 15,
+
                 'headers'    => $headers,
                 'body'       => $payload,
             )

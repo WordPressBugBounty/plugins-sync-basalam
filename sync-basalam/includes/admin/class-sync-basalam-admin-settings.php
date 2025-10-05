@@ -39,6 +39,8 @@ class Sync_basalam_Admin_Settings
     const ORDER_STATUES_TYPE = "order_statues_type";
     const PRODUCT_OPERATION_TYPE = "product_operation_type";
     const DISCOUNT_DURATION = "discount_duration";
+    const TASKS_PER_MINUTE = "tasks_per_minute";
+    const TASKS_PER_MINUTE_AUTO = "tasks_per_minute_auto";
 
 
     public static function get_default_settings()
@@ -79,19 +81,21 @@ class Sync_basalam_Admin_Settings
             self::ORDER_STATUES_TYPE => 'woosalam_statuses',
             self::PRODUCT_OPERATION_TYPE => 'optimized',
             self::DISCOUNT_DURATION => 7,
+            self::TASKS_PER_MINUTE => 10,
+            self::TASKS_PER_MINUTE_AUTO => true,
         );
     }
 
-    // Sanitize input settings values
+
     public static function sanitize_settings($input)
     {
         $input = array_merge(self::get_settings() ?: [], $input);
 
-        // Sanitize weight and preparation values
+
         $input[self::DEFAULT_WEIGHT] = absint($input[self::DEFAULT_WEIGHT]);
         $input[self::DEFAULT_PREPARATION] = absint($input[self::DEFAULT_PREPARATION]);
 
-        // Sanitize other fields if necessary
+
         return $input;
     }
 
@@ -152,6 +156,8 @@ class Sync_basalam_Admin_Settings
             'url_get_sync_basalam_orders' => "https://order-processing.basalam.com/v3/vendor-parcels",
             'get_webhooks_url_from_basalam' => "https://webhook.basalam.com/v1/webhooks",
             'discount_price_url' => "https://core.basalam.com/v3/vendors/{vendor_id}/discounts",
+            'auto_confirm_order_url' => "https://order-processing.basalam.com/v1/vendor/automation-config",
+            'update_bulk_products_url' => "https://core.basalam.com/v4/vendors/$vendor_id/products?continue_on_error=true",
         );
 
         $oauth_dependent_settings = ['redirect_uri', 'url_req_client', 'url_req_webhook', 'url_req_token'];
@@ -161,7 +167,7 @@ class Sync_basalam_Admin_Settings
             $client_id = $oauth_data['client_id'];
             $redirect_uri = $oauth_data['redirect_uri'];
 
-            // Add OAuth-dependent settings
+
             $settings['redirect_uri'] = $redirect_uri;
             $settings['url_req_client'] = "https://developers.basalam.com/clients?name=WP-BASALAM&redirect_url=$redirect_uri";
             $settings['url_req_webhook'] = "https://developers.basalam.com/panel/webhooks?events_ids=3,5,7&request_headers=" . urlencode(json_encode(["token" => $webhook_token])) . "&url=" . urlencode($SITE_URL_WEBHOOK);
@@ -237,7 +243,7 @@ class Sync_basalam_Admin_Settings
         ];
         self::update_settings($data);
 
-        // Setup webhooks after getting access token
+
         $webhookService = new Sync_Basalam_Webhook_Service();
         $webhookService->setupWebhooks();
 
@@ -252,5 +258,22 @@ class Sync_basalam_Admin_Settings
         ];
         self::update_settings($data);
         return $webhook_token;
+    }
+
+    /**
+     * Get effective tasks per minute (auto-detect or manual)
+     */
+    public static function get_effective_tasks_per_minute()
+    {
+        $is_auto = self::get_settings(self::TASKS_PER_MINUTE_AUTO) == 'true';
+
+        if ($is_auto) {
+            // Use auto-detected value
+            $monitor = Sync_Basalam_System_Resource_Monitor::get_instance();
+            return $monitor->calculate_optimal_tasks_per_minute();
+        } else {
+            // Use manual value
+            return self::get_settings(self::TASKS_PER_MINUTE) ?? 10;
+        }
     }
 }

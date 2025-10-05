@@ -39,6 +39,17 @@ document.addEventListener("DOMContentLoaded", function () {
       openBtn.addEventListener("click", () => {
         modal.style.display = "block";
         document.body.style.overflow = "hidden";
+
+        // Reset update modal to selection screen if it's the update modal
+        if (modalId === "BasalamUpdateProductsModal") {
+          const selectionDiv = document.getElementById("update-type-selection");
+          const quickConfirm = document.getElementById("quick-update-confirm");
+          const fullConfirm = document.getElementById("full-update-confirm");
+
+          if (selectionDiv) selectionDiv.style.display = "block";
+          if (quickConfirm) quickConfirm.style.display = "none";
+          if (fullConfirm) fullConfirm.style.display = "none";
+        }
       });
     }
 
@@ -68,7 +79,83 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  function submitToServer(form, action) {
+  // Handle Update Modal Type Selection
+  setTimeout(() => {
+    const quickUpdateBtn = document.getElementById("quick-update-btn");
+    const fullUpdateBtn = document.getElementById("full-update-btn");
+
+    if (quickUpdateBtn) {
+      quickUpdateBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        // Create a temporary form with update type
+        const formData = new FormData();
+        formData.append("update_type", "quick");
+        formData.append("action", "update_products_in_basalam");
+        formData.append("_wpnonce", document.querySelector('#BasalamUpdateProductsModal input[name="_wpnonce"]')?.value || '');
+
+        // Submit directly
+        submitUpdateRequest(formData, "quick");
+      });
+    }
+
+    if (fullUpdateBtn) {
+      fullUpdateBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        // Create a temporary form with update type
+        const formData = new FormData();
+        formData.append("update_type", "full");
+        formData.append("action", "update_products_in_basalam");
+        formData.append("_wpnonce", document.querySelector('#BasalamUpdateProductsModal input[name="_wpnonce"]')?.value || '');
+
+        // Submit directly
+        submitUpdateRequest(formData, "full");
+      });
+    }
+  }, 100);
+
+  function submitUpdateRequest(formData, updateType) {
+    // Disable both buttons
+    const quickBtn = document.getElementById("quick-update-btn");
+    const fullBtn = document.getElementById("full-update-btn");
+
+    if (quickBtn) quickBtn.disabled = true;
+    if (fullBtn) fullBtn.disabled = true;
+
+    // Change text of clicked button
+    const clickedBtn = updateType === "quick" ? quickBtn : fullBtn;
+    if (clickedBtn) {
+      const originalText = clickedBtn.innerHTML;
+      clickedBtn.innerHTML = '<span style="color: white;">در حال ارسال...</span>';
+
+      fetch(ajaxurl, {
+        method: "POST",
+        body: formData,
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        closeModal();
+        if (data.success) {
+          alert(data.data?.message || "عملیات با موفقیت آغاز شد.");
+        } else {
+          alert(data.data?.message || "خطایی رخ داده است.");
+        }
+        location.reload();
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        alert("خطایی در ارسال رخ داده است.");
+
+        // Re-enable buttons on error
+        if (quickBtn) quickBtn.disabled = false;
+        if (fullBtn) fullBtn.disabled = false;
+        if (clickedBtn) clickedBtn.innerHTML = originalText;
+      });
+    }
+  }
+
+  function submitToServer(form, action, updateType = null) {
     const formData = new FormData(form);
     formData.append("action", action);
 
@@ -220,4 +307,31 @@ document.addEventListener("DOMContentLoaded", function () {
       e.stopPropagation();
     }
   });
+
+  // Tasks per minute auto toggle functionality
+  const tasksAutoToggle = document.querySelector('.basalam-tasks-auto-toggle');
+  const tasksManualContainer = document.querySelector('.basalam-tasks-manual-container');
+  const tasksManualInput = document.querySelector('.basalam-tasks-manual-input');
+  const tasksAutoHidden = document.querySelector('.basalam-tasks-auto-hidden');
+
+  const toggleTasksManualInput = () => {
+    if (tasksAutoToggle && tasksManualInput) {
+      const isAuto = tasksAutoToggle.checked;
+
+      if (isAuto) {
+        // Disable manual input when auto is ON
+        tasksManualInput.disabled = true;
+        if (tasksAutoHidden) tasksAutoHidden.disabled = true;
+      } else {
+        // Enable manual input when auto is OFF
+        tasksManualInput.disabled = false;
+        if (tasksAutoHidden) tasksAutoHidden.disabled = false;
+      }
+    }
+  };
+
+  if (tasksAutoToggle) {
+    toggleTasksManualInput(); // Initial state
+    tasksAutoToggle.addEventListener('change', toggleTasksManualInput);
+  }
 });

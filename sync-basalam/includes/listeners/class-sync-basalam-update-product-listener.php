@@ -15,28 +15,32 @@ class Sync_basalam_Update_Product_Listener extends sync_basalam_Listener impleme
         $transient_key = 'sync_basalam_processing_' . $product_id;
         set_transient($transient_key, true, 2);
 
-        // Check operation type setting
+
         $operation_type = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::PRODUCT_OPERATION_TYPE);
-        
+
         if ($operation_type === 'immediate') {
-            // Execute immediately via Ajax controller
+
             $this->execute_immediate_update($product_id);
         } else {
-            // Use WP Cron (original behavior)
-            sync_basalam_Product_Queue_Manager::add_to_schedule(new sync_basalam_Update_Product_Task(), ['type' => 'update_product', 'id' => $product_id], 1);
+            $job_manager = new SyncBasalamJobManager();
+            $job_manager->create_job(
+                'sync_basalam_update_single_product',
+                'pending',
+                $product_id,
+            );
         }
     }
 
     private function execute_immediate_update($product_id)
     {
-        // Set status to pending
+
         update_post_meta($product_id, 'sync_basalam_product_sync_status', 'pending');
-        
-        // Execute immediately
+
+
         $product_operations = new sync_basalam_Admin_Product_Operations();
         $result = $product_operations->update_exist_product($product_id, null);
-        
-        // Update status based on result
+
+
         if ($result['success']) {
             update_post_meta($product_id, 'sync_basalam_product_sync_status', 'ok');
         } else {

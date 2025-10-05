@@ -13,7 +13,7 @@ if (!$sync_basalam_token) {
     require_once(sync_basalam_configure()->template_path() . "/admin/menu/info/info-not-auth.php");
     return;
 }
-// Get vendor details from Basalam API if we have vendor_id and token
+
 $api_url = "https://core.basalam.com/v3/vendors/$sync_basalam_vendor_id";
 $api_service = new sync_basalam_External_API_Service();
 $response = $api_service->send_get_request($api_url, [

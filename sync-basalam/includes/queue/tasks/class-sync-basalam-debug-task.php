@@ -24,7 +24,7 @@ class Sync_basalam_debug_Task extends sync_basalam_AbstractTask
         $error_message = null;
 
         if (is_wp_error($response)) {
-            $error_message = $response->get_error_message();
+            $error_message = $response['data'];
         } else {
             $status_code = $response['status_code'];
             $success = $status_code >= 200 && $status_code < 400;
@@ -44,12 +44,12 @@ class Sync_basalam_debug_Task extends sync_basalam_AbstractTask
                 'created_at' => current_time('mysql'),
             ],
             [
-                '%s', // request_url
-                '%d', // status_code
-                '%d', // success
-                '%d', // response_time_ms
-                '%s', // error_message
-                '%s', // created_at
+                '%s', 
+                '%d', 
+                '%d', 
+                '%d', 
+                '%s', 
+                '%s', 
             ]
         );
     }

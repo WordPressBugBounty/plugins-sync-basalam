@@ -6,7 +6,15 @@ class Sync_basalam_Product_Queue_Manager
 
     public static function create_all_products_in_basalam($include_out_of_stock = false)
     {
-        if (sync_basalam_QueueManager::has_pending_tasks('sync_basalam_plugin_chunk_create_products')) {
+
+        $job_manager = new SyncBasalamJobManager();
+
+        $existing_job = $job_manager->get_job([
+            'job_type' => 'sync_basalam_create_all_products',
+            'status' => 'pending'
+        ]);
+
+        if ($existing_job) {
             return [
                 'success' => false,
                 'message' => 'در حال حاضر یک عملیات در صف انتظار است.',
@@ -14,17 +22,20 @@ class Sync_basalam_Product_Queue_Manager
             ];
         }
 
-        $chunk_size = 100;
-        $max_chunks_per_task = 10;
 
-        $data = [
-            'posts_per_page'        => $chunk_size,
-            'offset'                => 0,
-            'max_chunks'            => $max_chunks_per_task,
-            'include_out_of_stock'  => $include_out_of_stock,
-        ];
+        delete_option('last_offset_create_products');
 
-        (new sync_basalam_Chunk_Create_Products_Task())->schedule($data);
+
+        $initial_data = json_encode([
+            'offset' => 0,
+            'include_out_of_stock' => $include_out_of_stock
+        ]);
+
+        $job_manager->create_job(
+            'sync_basalam_create_all_products',
+            'pending',
+            $initial_data
+        );
 
         return [
             'success' => true,
@@ -36,25 +47,18 @@ class Sync_basalam_Product_Queue_Manager
     public static function create_specific_products_in_basalam($product_ids)
     {
         if (is_array($product_ids)) {
-            // Check operation type setting
+
             $operation_type = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::PRODUCT_OPERATION_TYPE);
 
             foreach ($product_ids as $product_id) {
                 $basalam_product_id = get_post_meta($product_id, 'sync_basalam_product_id', true);
                 if (empty($basalam_product_id)) {
+                    update_post_meta($product_id, 'sync_basalam_product_sync_status', 'pending');
                     if ($operation_type === 'immediate') {
-                        // Execute immediately
-                        $product_operations = new sync_basalam_Admin_Product_Operations();
-
                         try {
-                            update_post_meta($product_id, 'sync_basalam_product_sync_status', 'pending');
-                            $result = $product_operations->create_new_product($product_id, []);
-
-                            if ($result['success']) {
-                                update_post_meta($product_id, 'sync_basalam_product_sync_status', 'ok');
-                            } else {
-                                update_post_meta($product_id, 'sync_basalam_product_sync_status', 'no');
-                            }
+                            $class = new sync_basalam_Create_Product_wp_bg_proccess_Task();
+                            $class->push(['type' => 'create_product', 'id' => $product_id]);
+                            $class->save();
                         } catch (\Throwable $th) {
                             update_post_meta($product_id, 'sync_basalam_product_sync_status', 'no');
                             sync_basalam_Logger::error("خطا در ایجاد محصول فوری: " . $th->getMessage(), [
@@ -63,10 +67,17 @@ class Sync_basalam_Product_Queue_Manager
                             ]);
                         }
                     } else {
-                        // Use WP Cron (original behavior)
-                        sync_basalam_Product_Queue_Manager::add_to_schedule(new sync_basalam_Create_Product_Task(), ['type' => 'create_product', 'id' => $product_id]);
+                        $job_manager = new SyncBasalamJobManager();
+                        $job_manager->create_job(
+                            'sync_basalam_create_single_product',
+                            'pending',
+                            $product_id,
+                        );
                     }
                 }
+            }
+            if ($operation_type === 'immediate') {
+                $class->dispatch();
             }
         }
     }
@@ -145,24 +156,10 @@ class Sync_basalam_Product_Queue_Manager
 
     public static function update_all_products_in_basalam()
     {
-        if (sync_basalam_QueueManager::has_pending_tasks('sync_basalam_plugin_chunk_update_products')) {
-            return [
-                'success' => false,
-                'message' => 'در حال حاضر یک عملیات در صف انتظار است.',
-                'status_code' => 409
-            ];
-        }
-
-        $chunk_size = 100;
-        $max_chunks_per_task = 10;
-
-        $data = [
-            'posts_per_page' => $chunk_size,
-            'offset'         => 0,
-            'max_chunks'     => $max_chunks_per_task,
-        ];
-
-        (new sync_basalam_Chunk_Update_Products_Task())->schedule($data);
+        $class = new Sync_basalam_Update_Products_wp_bg_proccess_Task();
+        $class->push(null);
+        $class->save();
+        $class->dispatch();
 
         return [
             'success' => true,
@@ -174,26 +171,18 @@ class Sync_basalam_Product_Queue_Manager
     public static function update_specific_products_in_basalam($product_ids)
     {
         if (is_array($product_ids)) {
-            // Check operation type setting
             $operation_type = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::PRODUCT_OPERATION_TYPE);
 
             foreach ($product_ids as $product_id) {
                 $basalam_product_id = get_post_meta($product_id, 'sync_basalam_product_id', true);
 
                 if (!empty($basalam_product_id)) {
+                    update_post_meta($product_id, 'sync_basalam_product_sync_status', 'pending');
                     if ($operation_type === 'immediate') {
-                        // Execute immediately
-                        $product_operations = new sync_basalam_Admin_Product_Operations();
-
                         try {
-                            update_post_meta($product_id, 'sync_basalam_product_sync_status', 'pending');
-                            $result = $product_operations->update_exist_product($product_id, null);
-
-                            if ($result['success']) {
-                                update_post_meta($product_id, 'sync_basalam_product_sync_status', 'ok');
-                            } else {
-                                update_post_meta($product_id, 'sync_basalam_product_sync_status', 'no');
-                            }
+                            $class = new sync_basalam_Update_Product_wp_bg_proccess_Task();
+                            $class->push(['type' => 'update_product', 'id' => $product_id]);
+                            $class->save();
                         } catch (\Throwable $th) {
                             update_post_meta($product_id, 'sync_basalam_product_sync_status', 'no');
                             sync_basalam_Logger::error("خطا در بروزرسانی محصول فوری: " . $th->getMessage(), [
@@ -202,10 +191,17 @@ class Sync_basalam_Product_Queue_Manager
                             ]);
                         }
                     } else {
-                        // Use WP Cron (original behavior)
-                        self::add_to_schedule(new sync_basalam_Update_Product_Task(), ['type' => 'update_product', 'id' => $product_id]);
+                        $job_manager = new SyncBasalamJobManager();
+                        $job_manager->create_job(
+                            'sync_basalam_update_single_product',
+                            'pending',
+                            $product_id,
+                        );
                     }
                 }
+            }
+            if ($operation_type === 'immediate') {
+                $class->dispatch();
             }
         }
     }
@@ -213,7 +209,6 @@ class Sync_basalam_Product_Queue_Manager
     public static function disconnect_specific_products_in_basalam($product_ids)
     {
         if (is_array($product_ids)) {
-
             foreach ($product_ids as $product_id) {
                 $operator = new sync_basalam_Admin_Product_Operations;
                 $operator->disconnect_product($product_id);

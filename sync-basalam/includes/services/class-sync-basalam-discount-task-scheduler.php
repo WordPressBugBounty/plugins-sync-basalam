@@ -10,8 +10,8 @@ class Sync_Basalam_Discount_Task_Scheduler
 
     public function __construct()
     {
-        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'models/class-sync-basalam-discount-task.php';
-        $this->task_model = new Sync_Basalam_Discount_Task();
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-discount-task-model.php';
+        $this->task_model = new Sync_Basalam_Discount_Task_Model();
         $this->queue_manager = new Sync_basalam_QueueManager(self::PROCESSOR_TASK_NAME);
     }
 
@@ -29,7 +29,7 @@ class Sync_Basalam_Discount_Task_Scheduler
             'active_days' => $active_days,
             'action' => $action,
             'scheduled_at' => $scheduled_at,
-            'status' => Sync_Basalam_Discount_Task::STATUS_PENDING
+            'status' => Sync_Basalam_Discount_Task_Model::STATUS_PENDING
         ]);
     }
 
@@ -67,10 +67,10 @@ class Sync_Basalam_Discount_Task_Scheduler
     public function get_task_statistics()
     {
         return [
-            'pending' => $this->task_model->get_tasks_count_by_status(Sync_Basalam_Discount_Task::STATUS_PENDING),
-            'processing' => $this->task_model->get_tasks_count_by_status(Sync_Basalam_Discount_Task::STATUS_PROCESSING),
-            'completed' => $this->task_model->get_tasks_count_by_status(Sync_Basalam_Discount_Task::STATUS_COMPLETED),
-            'failed' => $this->task_model->get_tasks_count_by_status(Sync_Basalam_Discount_Task::STATUS_FAILED),
+            'pending' => $this->task_model->get_tasks_count_by_status(Sync_Basalam_Discount_Task_Model::STATUS_PENDING),
+            'processing' => $this->task_model->get_tasks_count_by_status(Sync_Basalam_Discount_Task_Model::STATUS_PROCESSING),
+            'completed' => $this->task_model->get_tasks_count_by_status(Sync_Basalam_Discount_Task_Model::STATUS_COMPLETED),
+            'failed' => $this->task_model->get_tasks_count_by_status(Sync_Basalam_Discount_Task_Model::STATUS_FAILED),
             'total' => $this->task_model->get_tasks_count_by_status()
         ];
     }

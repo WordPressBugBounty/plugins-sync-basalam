@@ -59,7 +59,7 @@ class Sync_basalam_Update_Product_Service
                 $field = '';
             }
 
-            throw new \Exception("بروزرسانی محصول ناموفق بود :" . esc_html($message) . esc_html($field));
+            throw new \Exception("بروزرسانی محصول ناموفق بود :" . esc_html($message) . ' ' . esc_html($field));
         }
 
         if (is_wp_error($request)) {
@@ -68,18 +68,9 @@ class Sync_basalam_Update_Product_Service
 
         $product = wc_get_product($product_id);
         if ($product && $product->is_type('variable')) {
-            $needs_mapping = true;
             $variations = $product->get_children();
 
-            // foreach ($variations as $variation_id) {
-            // $sync_basalam_variation_id = get_post_meta($variation_id, 'sync_basalam_variation_id', true);
-            // if (empty($sync_basalam_variation_id)) {
-            // $needs_mapping = true;
-            // break;
-            // }
-            // }
-
-            if ($needs_mapping && isset($request['body']['variants'])) {
+            if (isset($request['body']['variants'])) {
                 $wc_variations = [];
                 $attributes = $product->get_attributes();
 
@@ -91,6 +82,11 @@ class Sync_basalam_Update_Product_Service
                         if ($attribute->get_variation()) {
                             $clean_attribute_name = str_replace('attribute_', '', $attribute_name);
                             $value = $variation->get_attribute($clean_attribute_name);
+
+                            $value = urldecode($value);
+                            $value = trim(mb_strtolower($value, 'UTF-8'));
+                            $value = str_replace(['ي', 'ك'], ['ی', 'ک'], $value);
+
                             if (!empty($value)) {
                                 $attribute_values[] = $value;
                             }
@@ -108,7 +104,11 @@ class Sync_basalam_Update_Product_Service
                     $attribute_values = [];
                     if (!empty($variant['properties'])) {
                         foreach ($variant['properties'] as $property) {
-                            $attribute_values[] = $property['value']['value'];
+                            $val = trim(mb_strtolower($property['value']['value'], 'UTF-8'));
+                            $val = str_replace(['ي', 'ك'], ['ی', 'ک'], $val);
+                            if (!empty($val)) {
+                                $attribute_values[] = $val;
+                            }
                         }
                     }
 

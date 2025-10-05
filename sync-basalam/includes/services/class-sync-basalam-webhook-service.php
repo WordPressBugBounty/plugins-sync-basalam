@@ -41,34 +41,34 @@ class Sync_Basalam_Webhook_Service
                     }
                 }
 
-                // Check if this webhook has any of our target event IDs
+                
                 $hasTargetEvents = !empty(array_intersect($webhookEventIds, self::TARGET_EVENT_IDS));
 
                 if ($hasTargetEvents) {
-                    // Check if it has all three event IDs
+                    
                     $hasAllEvents = count(array_intersect($webhookEventIds, self::TARGET_EVENT_IDS)) == count(self::TARGET_EVENT_IDS);
 
                     if ($hasAllEvents) {
-                        // This webhook has all three events, keep it for update
+                        
                         $webhookWithAllEvents = $webhook['id'];
                     } else {
-                        // This webhook has some but not all events, mark for deletion
+                        
                         $webhooksToDelete[] = $webhook['id'];
                     }
                 }
             }
         }
 
-        // Delete webhooks that have some but not all target events
+        
         foreach (array_unique($webhooksToDelete) as $webhookId) {
             $this->deleteWebhook($webhookId);
         }
 
         if ($webhookWithAllEvents) {
-            // Update the existing webhook that has all three events
+            
             $this->updateWebhook($webhookWithAllEvents, self::TARGET_EVENT_IDS, $webhookUrl);
         } else {
-            // Create new webhook with all three event IDs
+            
             $this->createWebhook(self::TARGET_EVENT_IDS, $webhookUrl);
         }
 

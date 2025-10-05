@@ -15,9 +15,16 @@ class Sync_basalam_Admin_Get_Product_Data_Json
         $product = wc_get_product($product_id);
         $product_data = [];
         $description = $this->get_description($product);
+
         if (!$category_ids) {
-            $product_title = mb_substr($product->get_name(), 0, 120);
-            $category_ids = sync_basalam_Get_Category_id::get_category_id_from_basalam(urlencode($product_title), 'multi');
+            $mapped_category_id = $this->get_mapped_category($product_id);
+
+            if ($mapped_category_id) {
+                $category_ids = [$mapped_category_id];
+            } else {
+                $product_title = mb_substr($product->get_name(), 0, 120);
+                $category_ids = sync_basalam_Get_Category_id::get_category_id_from_basalam(urlencode($product_title), 'multi');
+            }
         }
         $category_id = isset($category_ids[0]) ? $category_ids[0] : null;
 
@@ -127,7 +134,7 @@ class Sync_basalam_Admin_Get_Product_Data_Json
                 return $product_data;
             }
         }
-        $attr = $this->compare_attributes_with_Basalam($product, $category_id);
+        
         $photos = $this->get_product_photos($product);
         if (!$photos) {
             throw new \Exception('دریاف تصاویر محصول با خطا مواجه شد.');
@@ -140,7 +147,7 @@ class Sync_basalam_Admin_Get_Product_Data_Json
         $product_data['photos'] = $gallery_photos;
         $product_data['status'] = $this->get_stock_status($product);
         $product_data['stock'] = $stock_quantity;
-        $product_data['product_attribute'] = $attr;
+        
         if (!$is_update) {
             $product_data['category_id'] = $category_id;
         }
@@ -286,7 +293,7 @@ class Sync_basalam_Admin_Get_Product_Data_Json
                 'woo_photo_id'              => (int) $woo_photo_id,
                 'sync_basalam_photo_id'     => (int) $sync_basalam_photo['file_id'],
                 'sync_basalam_photo_url'    => $sync_basalam_photo['url'],
-                'created_at'                => current_time('mysql') // بر اساس timezone وردپرس
+                'created_at'                => current_time('mysql')
             ),
             array('%d', '%d', '%s', '%s')
         );
@@ -326,24 +333,30 @@ class Sync_basalam_Admin_Get_Product_Data_Json
 
     private function get_price($product)
     {
+        $price_field = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::PRODUCT_PRICE_FIELD);
+
         $regular_price = $product->get_regular_price();
         $sale_price = $product->get_sale_price();
 
-        // if ($price_field == 'original_price') {
-        if ($this->get_final_price($regular_price)) {
-            return $regular_price;
+        
+        $regular_price = !empty($regular_price) && is_numeric($regular_price) ? $regular_price : null;
+        $sale_price = !empty($sale_price) && is_numeric($sale_price) ? $sale_price : null;
+
+        if ($price_field == 'original_price' || $price_field == 'sale_strikethrough_price') {
+            if ($regular_price !== null && $this->get_final_price($regular_price)) {
+                return $regular_price;
+            }
+        } elseif ($price_field == 'sale_price') {
+            if ($sale_price) {
+                if ($this->get_final_price($sale_price)) {
+                    return $sale_price;
+                }
+            }
+            if ($this->get_final_price($regular_price)) {
+                return $regular_price;
+            }
+            return null;
         }
-        // } else {
-        // if ($sale_price) {
-        // if ($this->get_final_price($sale_price)) {
-        // return $sale_price;
-        // }
-        // }
-        // if ($this->get_final_price($regular_price)) {
-        // return $regular_price;
-        // }
-        return null;
-        // }
     }
 
     private function get_final_price($price, $category_ids = null)
@@ -357,6 +370,9 @@ class Sync_basalam_Admin_Get_Product_Data_Json
             return false;
         }
 
+        
+        $converted_price = floatval($converted_price);
+
         if ($increase_value == -1) {
             $category_data = sync_basalam_Get_Commission::get_commission_basalam($category_ids);
 
@@ -367,10 +383,11 @@ class Sync_basalam_Admin_Get_Product_Data_Json
                 $max_amount = null;
             }
 
+            $category_percent = floatval($category_percent);
             $calculated_increase = $converted_price * ($category_percent / 100);
 
             if ($max_amount !== null && $calculated_increase > $max_amount) {
-                $finalPrice = $converted_price + $max_amount;
+                $finalPrice = $converted_price + floatval($max_amount);
             } else {
                 $finalPrice = $converted_price + $calculated_increase;
             }
@@ -391,6 +408,12 @@ class Sync_basalam_Admin_Get_Product_Data_Json
 
     private function convert_price_to_rial($price, $currency)
     {
+        
+        if (empty($price) || !is_numeric($price)) {
+            return 0;
+        }
+
+        $price = floatval($price);
 
         if ($currency == 'IRT') {
             return $price * 10;
@@ -528,7 +551,7 @@ class Sync_basalam_Admin_Get_Product_Data_Json
         $variants = [];
         $variation_ids = $product->get_children();
 
-        // $price_field = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::PRODUCT_PRICE_FIELD);
+        $price_field = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::PRODUCT_PRICE_FIELD);
 
         foreach ($variation_ids as $variation_id) {
             $variant_product = wc_get_product($variation_id);
@@ -539,18 +562,23 @@ class Sync_basalam_Admin_Get_Product_Data_Json
             $regular_price = $variant_product->get_regular_price();
             $sale_price    = $variant_product->get_sale_price();
 
-            // if ($price_field === 'original_price') {
-            $variant_price = $this->get_final_price($regular_price, $category_ids);
-            // } else {
-            // if ($sale_price && $this->get_final_price($sale_price, $category_ids)) {
-            // $variant_price = $this->get_final_price($sale_price, $category_ids);
-            // } else {
-            // $variant_price = $this->get_final_price($regular_price, $category_ids);
-            // }
-            // }
+            
+            $regular_price = !empty($regular_price) && is_numeric($regular_price) ? $regular_price : null;
+            $sale_price = !empty($sale_price) && is_numeric($sale_price) ? $sale_price : null;
+
+            if ($price_field === 'original_price' || $price_field == 'sale_strikethrough_price') {
+                $variant_price = $regular_price !== null ? $this->get_final_price($regular_price, $category_ids) : false;
+            } elseif ($price_field == 'sale_price') {
+                if ($sale_price && $this->get_final_price($sale_price, $category_ids)) {
+                    $variant_price = $this->get_final_price($sale_price, $category_ids);
+                } else {
+                    $variant_price = $this->get_final_price($regular_price, $category_ids);
+                }
+            }
 
             if (!$variant_price) {
-                throw new \Exception('قیمت محصول ' . esc_html($product->get_name()) . ' کمتر از ۱۰۰۰ تومان است.');
+                
+                continue;
             }
 
             $attributes = [];
@@ -670,5 +698,39 @@ class Sync_basalam_Admin_Get_Product_Data_Json
         $full_description = implode("\n\n", $description_parts);
 
         return mb_substr($full_description, 0, 5000);
+    }
+
+    private function get_mapped_category($product_id)
+    {
+        $product = wc_get_product($product_id);
+        if (!$product) {
+            return false;
+        }
+
+        $woo_categories = $product->get_category_ids();
+
+        if (empty($woo_categories)) {
+            return false;
+        }
+
+        foreach ($woo_categories as $woo_category_id) {
+            $mapped_category = Sync_Basalam_Category_Mapping::get_basalam_category_for_woo_category($woo_category_id);
+
+            if ($mapped_category && isset($mapped_category->basalam_category_id)) {
+                sync_basalam_Logger::info(
+                    'استفاده از اتصال دسته‌بندی',
+                    [
+                        'product_id' => $product_id,
+                        'woo_category_id' => $woo_category_id,
+                        'basalam_category_id' => $mapped_category->basalam_category_id,
+                        'basalam_category_name' => $mapped_category->basalam_category_name
+                    ]
+                );
+
+                return $mapped_category->basalam_category_id;
+            }
+        }
+
+        return false;
     }
 }

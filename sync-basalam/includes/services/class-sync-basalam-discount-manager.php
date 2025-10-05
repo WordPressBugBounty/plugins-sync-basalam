@@ -24,8 +24,8 @@ class Sync_Basalam_Discount_Manager
             'product_filter' => [
                 'product_ids'      => $product_ids,
                 'variation_ids'    => $variation_ids,
+                'status' => [3568, 2976]
             ],
-
             'discount_percent' => $discount_percent,
             'active_days'      => $active_days,
         ]);

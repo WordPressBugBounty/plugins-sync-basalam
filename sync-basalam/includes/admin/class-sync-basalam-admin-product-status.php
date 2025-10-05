@@ -19,7 +19,7 @@ class Sync_basalam_Admin_Product_Status
     public static function add_sync_basalam_status_column_content($column, $product_id)
     {
         if ($column === 'basalam_status') {
-            // Get product info from basalam products table
+            
             $product = get_post_meta($product_id, 'sync_basalam_product_sync_status', true);
 
             if ($product && $product == 'ok') {

@@ -1,8 +1,6 @@
 <?php
 if (! defined('ABSPATH')) exit;
-/**
- * Plugin Logger Class
- */
+
 class Sync_basalam_Logger
 {
     private static $instance = [];

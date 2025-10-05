@@ -30,8 +30,8 @@ if (! defined('ABSPATH')) exit;
         </form>
 
         <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" class="Basalam-form" style="margin: 0;">
-            <input type="hidden" name="action" value="basalam_update_setting">
-            <?php wp_nonce_field('basalam_update_setting_nonce', '_wpnonce'); ?>
+            <input type="hidden" name="action" value="auto_confirm_order_in_basalam">
+            <?php wp_nonce_field('auto_confirm_order_in_basalam_nonce', '_wpnonce'); ?>
             <?php sync_basalam_Admin_UI::render_auto_confirm_order_button(); ?>
             <?php if ($auto_confirm_order == true): ?>
                 <button type="submit" class="basalam-danger-button basalam-p" style="width: -webkit-fill-available;">

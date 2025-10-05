@@ -3,7 +3,7 @@ if (! defined('ABSPATH')) exit;
 
 class Sync_basalam_Admin_Onboarding
 {
-    // Get current onboarding step
+    
     public function sync_basalam_get_current_step()
     {
         if (isset($_POST['sync_basalam_onboarding_nonce']) && !check_admin_referer('sync_basalam_onboarding_action', 'sync_basalam_onboarding_nonce')) {
@@ -25,14 +25,14 @@ class Sync_basalam_Admin_Onboarding
         require_once sync_basalam_configure()->template_path('/admin/onboarding/template-onboarding-page.php');
     }
 
-    // Process onboarding forms
+    
     public function sync_basalam_process_onboarding_form()
     {
             wp_redirect(sync_basalam_Admin_Settings::get_static_settings('url_req_token'));
             exit;
     }
 
-    // Define onboarding steps
+    
     public function sync_basalam_get_onboarding_steps()
     {
         return [

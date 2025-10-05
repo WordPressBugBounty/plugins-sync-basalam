@@ -4,7 +4,7 @@ if (! defined('ABSPATH')) exit;
 /**
  * Plugin Name: sync basalam | ووسلام
  * Description: با استفاده از پلاگین ووسلام  میتوایند تمامی محصولات ووکامرس را با یک کلیک به غرفه باسلامی خود اضافه کنید‌، همچنین تمامی سفارش باسلامی شما به سایت شما اضافه میگردد.
- * Version: 1.4.0
+ * Version: 1.5.0
  * Author: Woosalam Dev
  * Author URI: https://wp.hamsalam.ir/help
  * Plugin URI: https://wp.hamsalam.ir
@@ -81,9 +81,7 @@ function sync_basalam_configure()
     return Sync_Basalam_Plugin::instance();
 }
 
-/**
- * Function to install tables or initial settings when activating the plugin
- */
+
 
 register_activation_hook(__FILE__, 'Sync_basalam_handle_plugin_activation');
 function Sync_basalam_run_activation()
@@ -91,6 +89,7 @@ function Sync_basalam_run_activation()
     require_once __DIR__ . '/includes/class-sync-basalam-plugin-activator.php';
     Sync_basalam_Plugin_Activator::activate();
 }
+
 function Sync_Basalam_handle_plugin_activation()
 {
     Sync_basalam_run_activation();
@@ -98,13 +97,16 @@ function Sync_Basalam_handle_plugin_activation()
 }
 
 
-/**
- * Function to handle any required actions when deactivating the plugin.
- */
+
 register_deactivation_hook(__FILE__, 'Sync_basalam_on_deactivation');
 function Sync_basalam_on_deactivation()
 {
-    // Deactivation Logics
+    
 }
 
 require_once plugin_dir_path(__FILE__)  . 'wp-bg-procces.php';
+require_once plugin_dir_path(__FILE__)  . 'sync-basalam-jobs-runner.php';
+require_once plugin_dir_path(__FILE__)  . 'class-sync-basalam-job-manager.php';
+
+SyncBasalamJobManager::get_instance();
+new SyncBasalamJobsRunner();

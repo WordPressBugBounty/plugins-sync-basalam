@@ -3,9 +3,7 @@ if (! defined('ABSPATH')) exit;
 
 class Sync_basalam_REST_Controller
 {
-    /**
-     * Register routes
-     */
+    
     public static function register_routes()
     {
         register_rest_route(

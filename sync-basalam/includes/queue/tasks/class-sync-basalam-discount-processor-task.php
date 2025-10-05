@@ -12,13 +12,13 @@ class Sync_Basalam_Discount_Processor_Task extends Sync_basalam_AbstractTask
 
     public function run()
     {
-        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'models/class-sync-basalam-discount-task.php';
+        require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-discount-task-model.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-discount-task-processor.php';
         require_once SYNC_BASALAM_PLUGIN_INCLUDES_DIR . 'services/class-sync-basalam-discount-manager.php';
 
         $processor = new Sync_Basalam_Discount_Task_Processor();
         
-        // Process only one group per cron execution for better performance and API rate limiting
+        
         $result = $processor->process_single_discount_group();
         
     }

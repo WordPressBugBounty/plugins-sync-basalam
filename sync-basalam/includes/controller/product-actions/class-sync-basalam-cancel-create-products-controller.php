@@ -28,6 +28,5 @@ class Sync_basalam_Cancel_Create_Products extends Sync_BasalamController
             update_post_meta($product->ID, 'sync_basalam_product_sync_status', 'no');
         }
         sync_basalam_QueueManager::cancel_all_tasks_group('sync_basalam_plugin_create_product');
-        sync_basalam_QueueManager::cancel_all_tasks_group('sync_basalam_plugin_chunk_create_products');
     }
 }

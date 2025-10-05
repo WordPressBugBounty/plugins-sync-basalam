@@ -20,8 +20,16 @@ function sync_basalam_handle_connect_product_ajax()
             'status_code' => 400
         ];
     }
+
     $connect_product_service = new Sync_basalam_connect_product_service;
     $connect_status = $connect_product_service->connect_product_by_id($woo_product_id, $sync_basalam_product_id);
+
+    $job_manager = new SyncBasalamJobManager();
+    $job_manager->create_job(
+        'sync_basalam_update_single_product',
+        'pending',
+        $woo_product_id,
+    );
 
     if ($connect_status) {
         return [
@@ -50,7 +58,7 @@ function sync_basalam_handle_search_products_ajax()
         echo '<p>عنوان محصول وارد نشده است.</p>';
         wp_die();
     }
-    
+
 
     $checker = new sync_basalam_Auto_Connect_Products();
     $products = $checker->check_same_product($title, 1);

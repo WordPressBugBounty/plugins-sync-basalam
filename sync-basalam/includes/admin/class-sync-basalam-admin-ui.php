@@ -11,7 +11,7 @@ class Sync_basalam_Admin_UI
         );
     }
 
-    // Render info popup modal system
+
     public static function render_info_popup($content, $unique_id = '')
     {
         $info_icon_url = sync_basalam_configure()->assets_url() . "/icons/info-black.svg";
@@ -38,10 +38,10 @@ class Sync_basalam_Admin_UI
         );
     }
 
-    // Render label with info popup
+
     public static function render_label_with_tooltip($label_text, $tooltip_content, $position = 'top')
     {
-        // Create unique ID based on label text
+
         $unique_id = sanitize_title($label_text);
 
         return sprintf(
@@ -63,7 +63,7 @@ class Sync_basalam_Admin_UI
     }
 
 
-    // Render the input field for sync product
+
     public static function sync_status_product()
     {
         $value = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::SYNC_STATUS_PRODUCT) == true ? false : true;
@@ -80,7 +80,7 @@ class Sync_basalam_Admin_UI
         $value = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::AUTO_CONFIRM_ORDER) == true ? false : true;
         echo '<input type="hidden" name="sync_basalam_settings[' . esc_attr(sync_basalam_Admin_Settings::AUTO_CONFIRM_ORDER) . ']" value="' . esc_attr($value) . '">';
     }
-    // Render the input field for basalam default weight
+
     public static function render_default_weight()
     {
         $current_value = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::DEFAULT_WEIGHT);
@@ -92,7 +92,7 @@ class Sync_basalam_Admin_UI
         $current_value = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::DEFAULT_PACKAGE_WEIGHT);
         echo '<input type="number" name="sync_basalam_settings[' . esc_attr(sync_basalam_Admin_Settings::DEFAULT_PACKAGE_WEIGHT) . ']" min="10" value="' . esc_attr($current_value) . '" class="basalam-input basalam-p" required>';
     }
-    // Render the input field for basalam default preparation
+
     public static function render_default_preparation()
     {
         $current_value = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::DEFAULT_PREPARATION);
@@ -105,7 +105,7 @@ class Sync_basalam_Admin_UI
         echo '<input type="number" name="sync_basalam_settings[' . esc_attr(sync_basalam_Admin_Settings::DEFAULT_STOCK_QUANTITY) . ']" min="0" value="' . esc_attr($current_value) . '" class="basalam-input basalam-p" required>';
     }
 
-    // Render the input field for basalam default percentage
+
     public static function render_default_percentage()
     {
         $current_value = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::INCREASE_PRICE_VALUE);
@@ -126,7 +126,7 @@ class Sync_basalam_Admin_UI
         echo '<input type="hidden" id="final-value" name="sync_basalam_settings[' . esc_attr(sync_basalam_Admin_Settings::INCREASE_PRICE_VALUE) . ']" value="' . esc_attr($current_value) . '">';
     }
 
-    // Render the input field for basalam default round
+
     public static function render_default_round()
     {
         $current_value = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::ROUND_PRICE);
@@ -204,10 +204,10 @@ class Sync_basalam_Admin_UI
         $current_value = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::PRODUCT_PRICE_FIELD);
         echo '<select style="text-align: center; font-size:12px;" name="sync_basalam_settings[' . esc_attr(sync_basalam_Admin_Settings::PRODUCT_PRICE_FIELD) . ']" class="basalam-select">' .
             '<option value="original_price"' . selected($current_value, 'original_price', false) . '>قیمت اصلی</option>' .
-            '<option value="sale_price"' . selected($current_value, 'sale_price', false) . '>قیمت حراجی</option>' .
+            '<option value="sale_price"' . selected($current_value, 'sale_price', false) . '>قیمت حراجی (تک قیمت)</option>' .
+            '<option value="sale_strikethrough_price"' . selected($current_value, 'sale_strikethrough_price', false) . '>قیمت حراجی (خط خورده)</option>' .
             '</select>';
     }
-
     public static function render_product_operation_type()
     {
         $current_value = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::PRODUCT_OPERATION_TYPE);
@@ -221,7 +221,60 @@ class Sync_basalam_Admin_UI
     {
         $current_value = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::DISCOUNT_DURATION);
 
-        echo '<input type="text" id="percentage-input" name="sync_basalam_settings[' . esc_attr(sync_basalam_Admin_Settings::DISCOUNT_DURATION) . ']" min="0" max="90" value="' . esc_attr($current_value) . '" class="basalam-input basalam-p percentage-input" required>';
+        echo '<input type="number" id="percentage-input" name="sync_basalam_settings[' . esc_attr(sync_basalam_Admin_Settings::DISCOUNT_DURATION) . ']" min="1" max="90" value="' . esc_attr($current_value) . '" class="basalam-input basalam-p percentage-input" required>';
+    }
+
+    public static function render_tasks_per_minute()
+    {
+        $current_value = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::TASKS_PER_MINUTE);
+        $is_auto = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::TASKS_PER_MINUTE_AUTO) == 'true';
+        $disabled = $is_auto ? 'disabled' : '';
+
+        echo '<input type="number" name="sync_basalam_settings[' . esc_attr(sync_basalam_Admin_Settings::TASKS_PER_MINUTE) . ']" min="1" max="60" value="' . esc_attr($current_value) . '" class="basalam-input basalam-p basalam-tasks-manual-input" ' . $disabled . ' required>';
+    }
+
+    public static function render_tasks_per_minute_auto_toggle()
+    {
+        $is_auto = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::TASKS_PER_MINUTE_AUTO) == 'true';
+        $checked = $is_auto ? 'checked' : '';
+
+        echo '<label class="basalam-switch">';
+        echo '<input type="checkbox" name="sync_basalam_settings[' . esc_attr(sync_basalam_Admin_Settings::TASKS_PER_MINUTE_AUTO) . ']" value="true" ' . $checked . ' class="basalam-tasks-auto-toggle">';
+        echo '<span class="basalam-slider"></span>';
+        echo '</label>';
+        echo '<input type="hidden" name="sync_basalam_settings[' . esc_attr(sync_basalam_Admin_Settings::TASKS_PER_MINUTE_AUTO) . ']" value="false" class="basalam-tasks-auto-hidden">';
+    }
+
+    public static function render_tasks_per_minute_info()
+    {
+        $is_auto = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::TASKS_PER_MINUTE_AUTO) == 'true';
+
+        if ($is_auto) {
+            $monitor = Sync_Basalam_System_Resource_Monitor::get_instance();
+            $optimal = $monitor->calculate_optimal_tasks_per_minute();
+            $batch_size = $monitor->calculate_optimal_batch_size(20, 200);
+
+            echo '<div class="basalam-form-group basalam-p" style="grid-column: 1 / -1;">';
+            echo '<div class="basalam-tasks-info basalam-p" style="margin-top: 10px; padding: 15px; background:linear-gradient(135deg, #f5f7fa 0%, #c3cfe266 100%); border-radius: 8px; border: 1px solid #ddd;">';
+
+            echo '<div style="display: flex; flex-direction: column; gap: 8px;">';
+
+            echo '<div style="display: flex; align-items: center; gap: 10px;">';
+            echo '<strong style="color: #2d3748; font-size: 14px;">🚀 تعداد تسک های اجرایی در دقیقه: </strong>';
+            echo '<span style="color: #ff5c35; font-size: 16px; font-weight: bold;">' . esc_html($optimal) . ' تسک در دقیقه</span>';
+            echo '</div>';
+
+            echo '<div style="display: flex; align-items: center; gap: 10px;">';
+            echo '<strong style="color: #2d3748; font-size: 14px;">📦 تعداد آیتم در هر بروزرسانی: </strong>';
+            echo '<span style="color: #00a884; font-size: 16px; font-weight: bold;">' . esc_html($batch_size) . ' محصول</span>';
+            echo '<span style="color: #718096; font-size: 12px;">(بروزرسانی فوری)</span>';
+            echo '</div>';
+
+            echo '</div>';
+
+            echo '</div>';
+            echo '</div>';
+        }
     }
     public static function render_prefix_product_title()
     {
@@ -353,7 +406,7 @@ class Sync_basalam_Admin_UI
     }
 
 
-    // Render the input field for basalam developer mode
+
     public static function render_developer_mode()
     {
         $current_value = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::DEVELOPER_MODE);

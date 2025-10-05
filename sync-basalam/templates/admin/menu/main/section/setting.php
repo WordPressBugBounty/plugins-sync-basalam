@@ -142,7 +142,21 @@ $shipping_methods = $get_shipping_methods->get_woo_shipping_methods();
                     ); ?>
                     <?php sync_basalam_Admin_UI::render_product_discount_duration(); ?>
                 </div>
-
+                <div class="basalam-form-group basalam-p">
+                    <?php echo sync_basalam_Admin_UI::render_label_with_tooltip(
+                        'تشخیص خودکار سرعت',
+                        'فعال کردن تشخیص خودکار: سیستم بر اساس منابع سرور (رم، CPU، دیسک، شبکه) به طور خودکار بهترین سرعت را تعیین می‌کند. غیرفعال کردن: شما مقدار را دستی تنظیم کنید.'
+                    ); ?>
+                    <?php sync_basalam_Admin_UI::render_tasks_per_minute_auto_toggle(); ?>
+                </div>
+                <div class="basalam-form-group basalam-p basalam-tasks-manual-container">
+                    <?php echo sync_basalam_Admin_UI::render_label_with_tooltip(
+                        'تعداد تسک در دقیقه (دستی)',
+                        'تعداد تسک‌هایی که در هر دقیقه اجرا می‌شوند. این تنظیم بر سرعت پردازش محصولات و عملیات‌های پس‌زمینه تأثیر می‌گذارد. مقدار بالاتر = سرعت بیشتر (بین 1 تا 60)'
+                    ); ?>
+                    <?php sync_basalam_Admin_UI::render_tasks_per_minute(); ?>
+                </div>
+                <?php sync_basalam_Admin_UI::render_tasks_per_minute_info(); ?>
             </div>
             <div id="Basalam-custom-fields" style="display:none; margin-top:15px;margin-bottom: 20px;">
                 <label class="basalam-label basalam-p">فیلدهایی که هنگام آپدیت محصول به باسلام ارسال میشوند </label><br>
