@@ -4,11 +4,11 @@ Tags: woocommerce, basalam, woosalam, integration
 Requires at least: 6.0  
 Tested up to: 6.8
 Requires PHP: 7.4 
-Stable tag: 1.5.0
+Stable tag: 1.7.6
 License: GPL-2.0-or-later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
-اتصال و همگام سازی ووکامرس و باسلام و اضافه کردن و به روزرسانی محصولات از ووکامرس به باسلام و همگام سازی اتوماتیک آن و مدیریت سفارشات باسلام در ووکامرس
+اتصال و همگام سازی ووکامرس و باسلام و اضافه کردن و بروزرسانی محصولات از ووکامرس به باسلام و همگام سازی اتوماتیک آن و مدیریت سفارشات باسلام در ووکامرس
 
 == توضیحات فارسی ==
 

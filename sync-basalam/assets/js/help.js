@@ -1,29 +1,22 @@
 jQuery(document).ready(function ($) {
-  // Category switching
   $(".basalam-category-tab").click(function () {
     $(".basalam-category-tab").removeClass("active");
     $(this).addClass("active");
 
-    // Get the category from data attribute
     const category = $(this).data("category");
 
-    // Hide all FAQ sections first
     $(".basalam-faq-section").hide();
 
-    // Show the selected category's FAQ section
     $(`.basalam-faq-section[data-category="${category}"]`).show();
 
-    // Clear search results when switching categories
     $("#basalam-search-results").empty().hide();
     $("#basalam-faq-search").val("");
   });
 
-  // FAQ toggle
   $(".basalam-faq-question").click(function () {
     const $answer = $(this).next(".basalam-faq-answer");
     const $toggle = $(this).find(".basalam-faq-toggle");
 
-    // Close other open answers
     $(".basalam-faq-answer").not($answer).slideUp();
     $(".basalam-faq-toggle").not($toggle).text("+");
 
@@ -39,7 +32,6 @@ jQuery(document).ready(function ($) {
   $('.basalam-faq-section[data-category="عمومی"]').show();
   $(".basalam-faq-section").not('[data-category="عمومی"]').hide();
 
-  // AJAX Search
   let searchTimeout;
   $("#basalam-faq-search").on("input", function () {
     const query = $(this).val();
@@ -74,7 +66,9 @@ jQuery(document).ready(function ($) {
     $resultsDiv.empty();
 
     if (results.length === 0) {
-      $resultsDiv.append('<p class="basalam--no-results">نتیجه‌ای یافت نشد</p>');
+      $resultsDiv.append(
+        '<p class="basalam--no-results">نتیجه‌ای یافت نشد</p>'
+      );
     } else {
       results.forEach((result) => {
         $resultsDiv.append(`

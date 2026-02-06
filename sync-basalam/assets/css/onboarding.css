@@ -1,5 +1,3 @@
-/* Onboarding Wrapper */
-
 .basalam-onboarding-wrapper {
     position: fixed;
     top: 0;
@@ -9,7 +7,7 @@
     background: var(--basalam-gray-100, #f8f9fa);
     z-index: 99999;
     margin-left: -20px;
-    font-family: IRANSans, Tahoma, Arial, sans-serif;
+    font-family: "pelakfa";
     direction: rtl;
     overflow-y: auto;
 }
@@ -24,7 +22,6 @@
     position: relative;
 }
 
-/* Step Indicator */
 .step-indicator {
     display: flex;
     justify-content: space-between;
@@ -90,7 +87,6 @@
     font-weight: bold;
 }
 
-/* Step Content */
 .step-content-wrapper {
     background: #fff;
     max-height: 450px;
@@ -99,6 +95,11 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     flex-grow: 1;
     overflow-y: auto;
+}
+
+/* No scroll for step 3 */
+.step-content-wrapper:has(.step-complete) {
+    overflow: hidden;
 }
 
 .step-content-wrapper h1 {
@@ -111,7 +112,6 @@
     font-family: Morabba, IRANSans;
 }
 
-/* Welcome Screen */
 .welcome-content {
     text-align: center;
     max-width: 800px;
@@ -153,7 +153,6 @@
     font-weight: bold;
 }
 
-/* Step Content */
 .step-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -199,7 +198,6 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Existing Credentials Display */
 .existing-credentials {
     background: #f8f9fa;
     border-radius: 8px;
@@ -237,7 +235,6 @@
     gap: 8px;
 }
 
-/* Finish Screen */
 .finish-content {
     text-align: center;
     max-width: 600px;
@@ -263,7 +260,6 @@
     transition: all 0.2s ease;
 }
 
-/* Navigation */
 .step-navigation {
     display: flex;
     justify-content: flex-end;
@@ -308,7 +304,6 @@
     font-size: 14px;
 }
 
-/* Navigation Links */
 .basalam-nav-link {
     text-decoration: none;
     padding: 9px 16px;
@@ -324,7 +319,6 @@
     background-color: var(--basalam-primary-color);
 }
 
-/* Success and Error Messages */
 .basalam-success-message {
     background-color: #e8f5e9;
     border: 1px solid #4caf50;
@@ -352,13 +346,17 @@
     background-color: #ffebee;
     border: 1px solid #ef5350;
     border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
     display: flex;
-    width: 50%;
+    width: fit-content;
+    padding: 10px;
     justify-content: center;
+    align-items: center;
     gap: 5px;
     margin: auto;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    -ms-border-radius: 8px;
+    -o-border-radius: 8px;
 }
 
 
@@ -387,7 +385,6 @@
     margin-bottom: 0;
 }
 
-/* Responsive Design */
 @media screen and (max-width: 1024px) {
     .basalam-onboarding {
         padding: 20px;
@@ -453,8 +450,75 @@
     }
 }
 
-.basalam-skip-onboarding {
+/* Step 3 - Celebration/Success Page Styles */
+.step-complete {
+    text-align: center;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    font-size: 12px;
+    justify-content: center;
+    position: relative;
+}
+
+.success-icon-img {
+    width: 90px;
+    height: 90px;
+}
+
+.celebration-title {
+    font-family: Morabba, IRANSans;
+    font-size: 24px;
+    margin: 0;
+    font-weight: bolder;
+}
+
+.success-subtitle {
+    font-family: PelakFA, IRANSans;
+    font-size: 24px;
+    color: var(--basalam-gray-800, #343a40);
+    margin: 0 0 20px 0;
+}
+
+.success-description {
+    font-family: PelakFA, IRANSans;
+    font-size: 16px;
+    color: var(--basalam-gray-600, #6c757d);
+    margin: 0 0 40px 0;
+    max-width: 400px;
+}
+
+.celebration-button {
+    font-weight: bold !important;
+}
+
+.celebration-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.celebration-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 182, 122, 0.5);
+}
+
+.celebration-button:hover::before {
+    left: 100%;
+}
+
+.celebration-button span {
+    color: #fff;
+}
+
+.celebration-button svg {
+    transition: transform 0.3s ease;
+}
+
+.celebration-button:hover svg {
+    transform: translateX(-3px);
 }

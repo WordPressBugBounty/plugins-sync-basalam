@@ -4,18 +4,33 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit4461b79edf4c59a4993188568720bbef
+class ComposerStaticInit531fc75810f8dc83a186865b83c2c53f
 {
+    public static $prefixLengthsPsr4 = array (
+        'S' => 
+        array (
+            'SyncBasalam\\' => 12,
+        ),
+    );
+
+    public static $prefixDirsPsr4 = array (
+        'SyncBasalam\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/includes',
+            1 => __DIR__ . '/../..' . '/',
+        ),
+    );
+
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
-        'WP_Async_Request' => __DIR__ . '/..' . '/deliciousbrains/wp-background-processing/classes/wp-async-request.php',
-        'WP_Background_Process' => __DIR__ . '/..' . '/deliciousbrains/wp-background-processing/classes/wp-background-process.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->classMap = ComposerStaticInit4461b79edf4c59a4993188568720bbef::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit531fc75810f8dc83a186865b83c2c53f::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit531fc75810f8dc83a186865b83c2c53f::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit531fc75810f8dc83a186865b83c2c53f::$classMap;
 
         }, null, ClassLoader::class);
     }

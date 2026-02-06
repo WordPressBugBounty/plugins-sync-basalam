@@ -1,5 +1,15 @@
 {
-    "require": {
-        "deliciousbrains/wp-background-processing": "^1.4"
-    }
+    "name": "woosalam/includes",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "SyncBasalam\\": ["includes/", ""]
+        }
+    },
+    "authors": [
+        {
+            "name": "Ali Beheshti",
+            "email": "abeheshti127@gmail.com"
+        }
+    ]
 }

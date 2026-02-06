@@ -20,38 +20,33 @@ jQuery(document).ready(function ($) {
           var html = "";
           if (
             res.success &&
-            res.data.length &&
-            res.data[0].attributes[0].attributes.length
+            res.data.attributes
           ) {
-            html += `
-              <div style="margin-bottom: 10px; font-weight: bold;">ویژگی‌های دسته‌بندی:</div>
-              <div style="display:flex; flex-wrap:wrap; gap:6px;">
-            `;
-            res.data[0].attributes[0].attributes.forEach(function (attr) {
+            var attributesData = JSON.parse(res.data.attributes);
+            if (attributesData.data && attributesData.data.length && attributesData.data[0].attributes.length) {
               html += `
-                <div class="copy-attr" style="
-                  color: white;
-                  cursor: pointer;
-                  padding: 4px 10px;
-                  background: var(--basalam-primary-color);
-                  border-radius: 3px;
-                  font-size: 10px;
-                  display: flex;
-                  align-items: center;
-                ">
-                  ${attr.title}
-                </div>
+                <div class="basalam-attributes-header">ویژگی‌های دسته‌بندی:</div>
+                <div class="basalam-attributes-container">
               `;
-            });
+              attributesData.data[0].attributes.forEach(function (attr) {
+                html += `
+                  <div class="basalam-copy-attr">
+                    ${attr.title}
+                  </div>
+                `;
+              });
 
-            html += "</div>";
+              html += "</div>";
+            } else {
+              html = "ویژگی‌ای برای این دسته‌بندی پیدا نشد.";
+            }
           } else {
             html = "ویژگی‌ای برای این دسته‌بندی پیدا نشد.";
           }
 
           $("#sync_basalam_category_attributes").html(html);
 
-          $(".copy-attr").on("click", function () {
+          $(".basalam-copy-attr").on("click", function () {
             const text = $(this).text().trim();
 
             if (navigator.clipboard) {
@@ -83,11 +78,22 @@ jQuery(document).ready(function ($) {
     }
   });
 
-  $("#title").on("blur", function () {
+  $("#basalam_fetch_categories_btn").on("click", function () {
     var productTitle = $("#title").val();
+
+    if (!productTitle || productTitle.trim() === "") {
+      alert("لطفاً ابتدا عنوان محصول را وارد کنید.");
+      $("#title").focus();
+      return;
+    }
+
     var nonce = $("#basalam_get_category_ids_nonce").val();
+    var $btn = $(this);
+    var originalText = $btn.text();
+
+    $btn.prop("disabled", true).text("در حال دریافت...");
     $("#sync_basalam_category_id")
-      .html("در حال دریافت دسته‌بندی...")
+      .html("")
       .removeClass("basalam--hidden");
 
     $.ajax({
@@ -102,17 +108,14 @@ jQuery(document).ready(function ($) {
         if (res.success) {
           var categories = res.data;
           var html = `
-              <div style="margin-bottom: 10px; font-weight: bold;">دسته‌بندی‌های باسلام:</div>
-              <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+              <div class="basalam-categories-header">دسته‌بندی‌های باسلام:</div>
+              <div class="basalam-categories-container">
             `;
 
           categories.forEach(function (category) {
             html += `
-                <label for="cat_${category.cat_id}" style="    border: 1px solid #00000036;
-      padding: 7px;
-      border-radius: 6px;
-      width: -webkit-fill-available;              ">
-                  <input type="radio" class="category-option" name="selected_category" value="${category.cat_id}" id="cat_${category.cat_id}" style="accent-color: var(--basalam-primary-color);" />
+                <label for="cat_${category.cat_id}" class="basalam-category-label">
+                  <input type="radio" class="category-option basalam-category-option" name="selected_category" value="${category.cat_id}" id="cat_${category.cat_id}" />
                   ${category.cat_title}
                 </label>
               `;
@@ -123,9 +126,11 @@ jQuery(document).ready(function ($) {
         } else {
           $("#sync_basalam_category_id").html("خطا در دریافت دسته بندی ها");
         }
+        $btn.prop("disabled", false).text(originalText);
       },
       error: function (xhr, status, error) {
         $("#sync_basalam_category_id").html("خطایی در ارتباط رخ داد: " + error);
+        $btn.prop("disabled", false).text(originalText);
       },
     });
   });

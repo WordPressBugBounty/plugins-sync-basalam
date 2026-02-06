@@ -1,112 +1,97 @@
 <?php
-if (! defined('ABSPATH')) exit;
+
+use SyncBasalam\Plugin;
+use SyncBasalam\Admin\Settings\SettingsContainer;
+use SyncBasalam\Activator;
+use SyncBasalam\JobsRunner;
+
+defined('ABSPATH') || exit;
 
 /**
  * Plugin Name: sync basalam | ووسلام
  * Description: با استفاده از پلاگین ووسلام  میتوایند تمامی محصولات ووکامرس را با یک کلیک به غرفه باسلامی خود اضافه کنید‌، همچنین تمامی سفارش باسلامی شما به سایت شما اضافه میگردد.
- * Version: 1.5.0
+ * Version: 1.7.6
  * Author: Woosalam Dev
- * Author URI: https://wp.hamsalam.ir/help
+ * Author URI: https://wp.hamsalam.ir/
  * Plugin URI: https://wp.hamsalam.ir
  * Text Domain: sync-basalam
- * WC requires at least: 8.0.0
+ * WC requires at least: 10.0.0
  * WC tested up to: 9.9.5
  * Requires Plugins: woocommerce
  * License: GPL-2.0-or-later
- * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html.
  */
 
+require_once __DIR__ . '/vendor/autoload.php';
 
-// Declare HPOS compatibility
+register_activation_hook(__FILE__, 'syncBasalamActivatePlugin');
+
 add_action('before_woocommerce_init', function () {
     if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
         \Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility('custom_order_tables', __FILE__, true);
     }
 });
 
+Plugin::checkForceUpdateByVersion();
 
-add_filter('plugin_row_meta', 'sync_basalam_add_row_meta', 10, 2);
-
-function sync_basalam_add_row_meta($links, $file)
-{
-    if ($file === plugin_basename(__FILE__)) {
-        $links[] = '<a href="https://wp.hamsalam.ir/help" target="_blank">مستندات</a>';
-    }
-    return $links;
+if (get_option('sync_basalam_force_update')) {
+    add_action('admin_notices', function () {
+        $template = __DIR__ . '/templates/notifications/ForceUpdateAlert.php';
+        require_once $template;
+    });
+    return;
 }
 
-add_action('init', 'sync_basalam_init');
+add_action('init', 'syncBasalamInit');
 
-function sync_basalam_init()
+//  Singleton instance of the main plugin class.
+function syncBasalamPlugin()
 {
-    require_once __DIR__ . '/includes/class-sync-basalam-plugin.php';
-    sync_basalam_configure();
-    if (!get_option('sync_basalam_like')) {
-        add_action('admin_notices', function () {
-            $template = sync_basalam_configure()->template_path("admin/utilities/like-alert.php");
-            require_once($template);
-        });
-    }
-
-    if (!sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::TOKEN)) {
-        add_action('admin_notices', function () {
-            $template = sync_basalam_configure()->template_path("admin/utilities/access-alert.php");
-            require_once($template);
-        });
-    }
-
-    if (get_option('sync_basalam_version') != sync_basalam_configure()::VERSION) {
-        sync_basalam_run_activation();
-    }
+    return Plugin::getInstance();
 }
 
-function sync_basalam_redirect_after_activation()
+// Singleton instance of the woosalam Settings container.
+function syncBasalamSettings()
 {
-    $token = sync_basalam_Admin_Settings::get_settings(sync_basalam_Admin_Settings::TOKEN);
-    if ($token) return;
-    if (get_transient('sync_basalam_do_activation_redirect')) {
-        delete_transient('sync_basalam_do_activation_redirect');
+    return SettingsContainer::getInstance();
+}
 
-        if (sanitize_text_field(!isset($_GET['activate-multi']))) {
-            wp_safe_redirect(admin_url('admin.php?page=basalam-onboarding'));
-            exit;
+function syncBasalamInit()
+{
+    syncBasalamPlugin();
+
+    // Handle activation redirect
+    if (get_transient('sync_basalam_just_activated')) {
+        delete_transient('sync_basalam_just_activated');
+        if (!syncBasalamSettings()->hasToken()) {
+            wp_redirect(admin_url('admin.php?page=basalam-onboarding'));
+            exit();
         }
     }
-}
-add_action('admin_init', 'sync_basalam_redirect_after_activation');
 
-function sync_basalam_configure()
+    syncBasalamNotices();
+}
+
+function syncBasalamNotices()
 {
-    require_once __DIR__ . '/includes/class-sync-basalam-plugin.php';
-    return Sync_Basalam_Plugin::instance();
+    if (!get_option('sync_basalam_like')) {
+        add_action('admin_notices', function () {
+            $template = syncBasalamPlugin()->templatePath("notifications/LikeAlert.php");
+            require_once $template;
+        });
+    }
+
+    if (!syncBasalamSettings()->hasToken()) {
+        add_action('admin_notices', function () {
+            $template = syncBasalamPlugin()->templatePath("notifications/AccessAlert.php");
+            require_once($template);
+        });
+    }
 }
 
-
-
-register_activation_hook(__FILE__, 'Sync_basalam_handle_plugin_activation');
-function Sync_basalam_run_activation()
+function syncBasalamActivatePlugin()
 {
-    require_once __DIR__ . '/includes/class-sync-basalam-plugin-activator.php';
-    Sync_basalam_Plugin_Activator::activate();
+    Activator::activate();
+    set_transient('sync_basalam_just_activated', true, 10);
 }
-
-function Sync_Basalam_handle_plugin_activation()
-{
-    Sync_basalam_run_activation();
-    set_transient('sync_basalam_do_activation_redirect', true, 30);
-}
-
-
-
-register_deactivation_hook(__FILE__, 'Sync_basalam_on_deactivation');
-function Sync_basalam_on_deactivation()
-{
-    
-}
-
-require_once plugin_dir_path(__FILE__)  . 'wp-bg-procces.php';
-require_once plugin_dir_path(__FILE__)  . 'sync-basalam-jobs-runner.php';
-require_once plugin_dir_path(__FILE__)  . 'class-sync-basalam-job-manager.php';
-
-SyncBasalamJobManager::get_instance();
-new SyncBasalamJobsRunner();
+JobsRunner::getInstance();

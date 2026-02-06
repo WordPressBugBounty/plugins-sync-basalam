@@ -66,7 +66,7 @@ jQuery(document).ready(function ($) {
           <td>${wooName}</td>
           <td>${BasalamName}</td>
           <td>
-            <button class="Basalam-delete-option basalam-primary-button" onclick="return confirm('آیا مطمئن هستید؟')" style="width:auto">حذف</button>
+            <button class="Basalam-delete-option basalam-primary-button basalam-delete-option-auto" onclick="return confirm('آیا مطمئن هستید؟')">حذف</button>
           </td>
         </tr>
       `;

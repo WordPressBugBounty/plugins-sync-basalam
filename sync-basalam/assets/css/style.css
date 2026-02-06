@@ -15,7 +15,6 @@
   --basalam-gray-800: #2d3748;
 }
 
-/* Main Container */
 .basalam-container {
   max-width: 1060px;
   margin: 20px auto;
@@ -27,11 +26,10 @@
   align-items: center;
 }
 
-/* Header */
 .basalam-header {
-  width: 100%;
-  max-width: 1005px;
-  margin-bottom: 24px;
+  width: 90%;
+  max-width: 1080px;
+  margin: 0 auto 24px;
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -45,11 +43,25 @@
   padding: 20px;
 }
 
-/* Typography */
+.basalam-section {
+  width: 100%;
+  max-width: 965px;
+  margin-bottom: 24px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 20px;
+}
+
 .basalam-h {
   color: var(--basalam-gray-800);
   margin: 0 !important;
-  font-family: IRANSans, Tahoma, Arial, sans-serif;
+  font-family: PelakFA;
+
   font-weight: 600;
   font-size: 1.25rem;
   font-family: Morabba !important;
@@ -59,9 +71,10 @@
 .basalam-p {
   color: var(--basalam-gray-700);
   line-height: 1.6;
-  font-family: IRANSans, Tahoma, Arial, sans-serif;
+  font-family: PelakFA;
   margin: 0 !important;
-  font-size: 0.95rem;
+  font-size: 12px !important;
+  font-weight: bold !important;
   font-size: 1rem;
   text-align: center;
   font-family: PelakFA;
@@ -76,16 +89,13 @@
   color: red;
 }
 
-/* Setup Wizard */
 .basalam-setup-wizard {
   background: white;
   border-radius: 12px;
-  border-bottom-right-radius: 0;
-  border-top-right-radius: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   overflow: hidden;
   margin-bottom: 30px;
-  max-width: 1015px;
+  max-width: 1080px;
   width: 100%;
 }
 
@@ -142,16 +152,19 @@
   color: white;
 }
 
-/* Dashboard */
 .basalam-dashboard {
-  max-width: 1005px;
+  max-width: 1200px;
   width: 100%;
-  display: grid;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 24px;
 }
 
 .basalam-status-card {
-  width: 956px;
+  width: 100%;
+  max-width: 1080px;
   background: white;
   border-radius: 12px;
   padding: 24px;
@@ -166,6 +179,8 @@
   margin-bottom: 20px;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--basalam-gray-200);
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
 .basalam-badge {
@@ -185,8 +200,12 @@
 
 .basalam-action-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 24px;
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  justify-content: center;
 }
 
 .basalam-a:hover,
@@ -218,10 +237,17 @@
 }
 
 #toplevel_page_sync_basalam {
-  font-family: 'PelakFA';
+  font-family: "PelakFA";
 }
 
-#wpbody-content>div.basalam-container>div.basalam-dashboard>div.basalam-action-cards>div:nth-child(3)>form>div.basalam-form-group.basalam-p>label::before {
+#wpbody-content
+  > div.basalam-container
+  > div.basalam-dashboard
+  > div.basalam-action-cards
+  > div:nth-child(3)
+  > form
+  > div.basalam-form-group.basalam-p
+  > label::before {
   width: 4px;
   height: 4px;
 }
@@ -248,7 +274,6 @@
 }
 
 .basalam-product-action-button {
-  margin-bottom: 20px !important;
   width: -webkit-fill-available !important;
 }
 
@@ -306,13 +331,14 @@
 
 .basalam-p__small {
   font-size: 10px;
-  font-family: 'pelakFA';
+  font-family: "pelakFA";
   padding-top: 10px;
-
 }
 
-.basalam-action-card .basalam-input[type="number"]:hover::-webkit-outer-spin-button,
-.basalam-action-card .basalam-input[type="number"]:hover::-webkit-inner-spin-button {
+.basalam-action-card
+  .basalam-input[type="number"]:hover::-webkit-outer-spin-button,
+.basalam-action-card
+  .basalam-input[type="number"]:hover::-webkit-inner-spin-button {
   opacity: 1;
 }
 
@@ -328,14 +354,8 @@
 
 .basalam-action-card .basalam-select {
   height: 40px;
-  background: white;
   border: 1px solid var(--basalam-gray-300);
   border-radius: 6px;
-  padding: 0px 8px !important;
-  width: 80% !important;
-  color: var(--basalam-gray-700);
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .basalam-action-card .basalam-select:hover {
@@ -391,6 +411,10 @@
   border: 1px solid var(--basalam-gray-300);
   border-radius: 8px;
   transition: all 0.2s ease;
+  -webkit-transition: all 0.2s ease;
+  -moz-transition: all 0.2s ease;
+  -ms-transition: all 0.2s ease;
+  -o-transition: all 0.2s ease;
 }
 
 .basalam-input:focus {
@@ -408,7 +432,6 @@
   padding: 10px 14px;
   border: 1px solid var(--basalam-gray-300);
   border-radius: 8px;
-  background: var(--basalam-gray-100);
   font-size: 14px;
   cursor: pointer;
 }
@@ -417,10 +440,8 @@
   border-color: var(--basalam-primary-color);
   box-shadow: 0 0 0 3px rgba(255, 92, 53, 0.15);
   outline: none;
-  background: white;
 }
 
-/* Buttons */
 .basalam-button {
   background-color: var(--basalam-primary-color);
   color: white;
@@ -442,10 +463,15 @@
   justify-content: center;
   gap: 8px;
   padding: 0 16px;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  -ms-border-radius: 8px;
+  -o-border-radius: 8px;
 }
 
 .basalam-button:hover {
   opacity: 0.9;
+  color: white !important;
 }
 
 .basalam-button:disabled {
@@ -483,20 +509,24 @@
 
 .basalam-primary-button,
 .basalam-secondary-button,
-.basalam-danger-button {
+.basalam-danger-button,
+.basalam-access-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  font-size: 11px !important;
   padding: 10px 16px;
   border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
   cursor: pointer;
   border: none;
   transition: all 0.2s;
   text-decoration: none;
   width: 100%;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  -ms-border-radius: 8px;
+  -o-border-radius: 8px;
 }
 
 .basalam-primary-button {
@@ -524,6 +554,25 @@
   -moz-transform: translateY(-1px);
   -ms-transform: translateY(-1px);
   -o-transform: translateY(-1px);
+  color: #ffffff;
+  background-color: var(--basalam-primary-hover);
+  border: none;
+}
+
+.basalam-primary-button:active {
+  transform: scale(0.95);
+  -webkit-transform: scale(0.95);
+  -moz-transform: scale(0.95);
+  -ms-transform: scale(0.95);
+  -o-transform: scale(0.95);
+  border: none;
+}
+
+.basalam-primary-button:focus {
+  border: none;
+  box-shadow: none;
+  color: #ffffff;
+  background-color: var(--basalam-primary-hover);
 }
 
 .basalam-secondary-button {
@@ -549,6 +598,19 @@
   background: var(--basalam-danger-color);
   color: white;
   transform: translateY(-1px);
+  -webkit-transform: translateY(-1px);
+  -moz-transform: translateY(-1px);
+  -ms-transform: translateY(-1px);
+  -o-transform: translateY(-1px);
+}
+.basalam-access-button:hover {
+  background: var(--basalam-primary-hover);
+  color: white;
+  transform: translateY(-1px);
+  -webkit-transform: translateY(-1px);
+  -moz-transform: translateY(-1px);
+  -ms-transform: translateY(-1px);
+  -o-transform: translateY(-1px);
 }
 
 .basalam-button-disabled {
@@ -557,22 +619,43 @@
   pointer-events: none;
 }
 
-/* Form Actions */
 .basalam-form-actions {
   display: flex;
   justify-content: center;
   gap: 12px;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .basalam-container {
     padding: 16px;
     margin: 10px;
   }
 
+  .basalam-sync-status {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    gap: 16px;
+  }
+
+  .basalam-sync-status .basalam-p {
+    width: 100%;
+    text-align: justify;
+    margin-bottom: 10px;
+  }
+
+  .basalam-sync-status .Basalam-form {
+    width: 100%;
+  }
+
+  .basalam-sync-status .basalam-primary-button,
+  .basalam-sync-status .basalam-danger-button {
+    width: 100%;
+  }
+
   .basalam-action-cards {
     grid-template-columns: 1fr;
+    margin: 0 auto;
   }
 
   .basalam-form-row {
@@ -683,6 +766,10 @@
   color: #333;
   text-decoration: none;
   transition: all 0.3s ease;
+  -webkit-border-radius: ;
+  -moz-border-radius: ;
+  -ms-border-radius: ;
+  -o-border-radius: ;
 }
 
 .basalam-pagination .page-numbers.current {
@@ -721,7 +808,6 @@
   cursor: not-allowed !important;
 }
 
-/* Modern Admin UI Styles */
 .basalam-container {
   max-width: 1400px;
   margin: 2rem auto;
@@ -815,7 +901,7 @@
   font-size: 14px;
   border: #ccc;
   background-color: #ffffff;
-  border-color: #D1D9E4 !important;
+  border-color: #d1d9e4 !important;
   border-radius: 8px !important;
 
   outline: none;
@@ -826,7 +912,6 @@
   box-shadow: 0 0 0 1px var(--basalam-primary-color) !important;
   outline: none;
   transition: all 0.3s ease;
-
 }
 
 .basalam-actions {
@@ -838,11 +923,18 @@
 .basalam-sync-status {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 1rem;
   background: #f0f6fc;
-  border-radius: 4px;
+  border-radius: 8px;
   margin-bottom: 1rem;
   gap: 12px;
+  width: 100%;
+  flex-wrap: wrap;
+  -webkit-border-radius: ;
+  -moz-border-radius: ;
+  -ms-border-radius: ;
+  -o-border-radius: ;
 }
 
 .basalam-sync-status.active {
@@ -865,6 +957,11 @@
   }
 }
 
+#basalam-modal section#sep-section .basalam-form-row {
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 15px !important;
+}
+
 .basalam-modal {
   display: none;
   position: fixed;
@@ -877,12 +974,10 @@
   background: rgba(0, 0, 0, 0.4);
 }
 
-
 .basalam-modal-content {
   background-color: #fff;
   margin: 10% auto;
   padding: 20px;
-  padding-bottom: 0 !important;
   border: 1px solid #888;
   width: 80%;
   max-width: 400px;
@@ -891,7 +986,6 @@
   position: relative;
   overflow-y: auto;
 }
-
 
 .basalam-modal-close {
   float: right;
@@ -1055,10 +1149,9 @@
   cursor: not-allowed !important;
 }
 
-/* Help Page Styles */
 .basalam-help-search {
   width: 75%;
-  margin-bottom: 2rem;
+  margin: 0 auto 2rem;
 }
 
 .basalam-help-search .basalam-input {
@@ -1075,7 +1168,8 @@
 }
 
 .basalam-help-content {
-  width: 72%;
+  width: 75%;
+  margin: 0 auto;
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -1236,15 +1330,318 @@
   color: var(--basalam-gray-600);
 }
 
-/* Support Contact and Danger Zone */
-.basalam-danger-zone {
-  margin-top: 30px;
+@media screen and (max-width: 1200px) {
+  .basalam-help-search {
+    width: 90%;
+    margin: 0 auto 2rem;
+  }
+
+  .basalam-help-content {
+    width: 90% !important;
+    margin: 0 auto;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .basalam-header {
+    margin: 0 15px;
+    padding: 20px;
+    width: 86%;
+    box-sizing: border-box;
+  }
+
+  .basalam-header-data {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+
+  .basalam-header-data img {
+    margin-bottom: 20px;
+    width: 150px;
+  }
+
+  .basalam-header-data h1.basalam-h {
+    text-align: center !important;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+  }
+
+  .basalam-header-data .basalam-p {
+    text-align: center !important;
+    font-size: 0.9rem;
+  }
+
+  .basalam-help-search {
+    width: calc(100% - 30px);
+    margin: 0 15px 1.5rem;
+  }
+
+  .basalam-help-content {
+    width: calc(100% - 30px) !important;
+    margin: 0 15px;
+    padding: 20px;
+  }
+
+  .basalam-help-categories {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 8px;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .basalam-help-categories::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .basalam-help-categories::-webkit-scrollbar-track {
+    background: var(--basalam-gray-200);
+    border-radius: 2px;
+  }
+
+  .basalam-help-categories::-webkit-scrollbar-thumb {
+    background: var(--basalam-gray-400);
+    border-radius: 2px;
+  }
+
+  .basalam-category-tab {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 8px 14px;
+    font-size: 0.9rem;
+  }
+
+  .basalam-faq-question {
+    padding: 14px;
+  }
+
+  .basalam-faq-question h3 {
+    font-size: 0.95rem;
+  }
+
+  .basalam-faq-answer {
+    padding: 0 14px 14px;
+  }
+
+  .basalam-faq-answer p {
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .basalam-container {
+    padding: 10px;
+  }
+
+  .basalam-header {
+    margin: 0 10px;
+    padding: 16px;
+  }
+
+  .basalam-header-data img {
+    width: 120px;
+    margin-bottom: 15px;
+  }
+
+  .basalam-header-data h1.basalam-h {
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+  }
+
+  .basalam-header-data .basalam-p {
+    font-size: 0.85rem;
+    margin-top: 12px !important;
+  }
+
+  .basalam-help-search {
+    width: calc(100% - 20px);
+    margin: 0 10px 1.5rem;
+  }
+
+  #basalam-faq-search {
+    font-size: 0.9rem;
+    padding: 10px 12px !important;
+  }
+
+  .basalam-help-content {
+    width: calc(100% - 20px) !important;
+    margin: 0 10px;
+    padding: 16px;
+  }
+
+  .basalam-help-categories {
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .basalam-category-tab {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border-radius: 5px;
+  }
+
+  .basalam-faq-item {
+    padding: 6px 0;
+  }
+
+  .basalam-faq-question {
+    padding: 12px;
+  }
+
+  .basalam-faq-question h3 {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .basalam-faq-toggle {
+    font-size: 1.3rem;
+    width: 20px;
+  }
+
+  .basalam-faq-answer {
+    padding: 0 12px 12px;
+    margin-top: 8px;
+  }
+
+  .basalam-faq-answer p {
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  .basalam-search-result-item {
+    padding: 12px;
+  }
+
+  .basalam-search-result-item h4 {
+    font-size: 0.9rem;
+  }
+
+  .basalam-search-result-item p {
+    font-size: 0.85rem;
+  }
+
+  .basalam-result-category {
+    font-size: 0.75rem;
+    padding: 3px 6px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  #basalam-modal .basalam-action-card .basalam-form-row,
+  #basalam-modal section#sep-section .basalam-form-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  #basalam-modal .basalam-form-group {
+    width: 100% !important;
+  }
+
+  #basalam-modal .basalam-action-card {
+    padding: 10px !important;
+    padding-top: 30px !important;
+  }
+
+  #basalam-modal .options_mapping_section {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -10px;
+    padding: 0 10px;
+  }
+
+  #basalam-modal .basalam-table {
+    font-size: 9px !important;
+  }
+
+  #basalam-modal .basalam-table th,
+  #basalam-modal .basalam-table td {
+    padding: 5px !important;
+    font-size: 9px !important;
+  }
+
+  #basalam-modal .basalam-table .basalam-primary-button {
+    font-size: 9px !important;
+    padding: 3px 6px !important;
+  }
+
+  #Basalam-map-option-form {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 5px !important;
+    padding: 8px !important;
+    margin-bottom: 12px !important;
+  }
+
+  #Basalam-map-option-form label {
+    width: 100% !important;
+    text-align: right !important;
+    margin-bottom: 2px !important;
+    font-size: 10px !important;
+    font-weight: bold !important;
+  }
+
+  #Basalam-map-option-form input {
+    width: 100% !important;
+    margin-bottom: 6px !important;
+    font-size: 10px !important;
+    padding: 5px !important;
+    height: 28px !important;
+  }
+
+  #Basalam-map-option-form button {
+    width: 100% !important;
+    margin-top: 8px !important;
+    width: 190px !important;
+    font-size: 11px !important;
+    height: 32px !important;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .basalam-header-data img {
+    width: 100px;
+  }
+
+  .basalam-header-data h1.basalam-h {
+    font-size: 1.2rem;
+  }
+
+  .basalam-header-data .basalam-p {
+    font-size: 0.8rem;
+  }
+
+  .basalam-help-content {
+    padding: 14px;
+  }
+
+  .basalam-category-tab {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+  }
+
+  .basalam-faq-question {
+    padding: 10px;
+  }
+
+  .basalam-faq-question h3 {
+    font-size: 0.85rem;
+  }
+
+  .basalam-faq-answer {
+    padding: 0 10px 10px;
+  }
+
+  .basalam-faq-answer p {
+    font-size: 0.8rem;
+  }
 }
 
 .basalam-danger-zone {
   width: 362px;
   margin: auto;
-  margin-top: 20px !important;
 }
 
 .basalam-danger-zone p {
@@ -1264,8 +1661,8 @@
   font-family: "PelakFA";
 }
 
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
@@ -1313,7 +1710,7 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .info-label::before {
-  content: '';
+  content: "";
   position: absolute;
   right: 0;
   top: 50%;
@@ -1342,13 +1739,17 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .basalam-danger-zone .basalam-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   right: 0;
   width: 100px;
   height: 100px;
-  background: linear-gradient(135deg, var(--basalam-danger-color) 0%, transparent 60%);
+  background: linear-gradient(
+    135deg,
+    var(--basalam-danger-color) 0%,
+    transparent 60%
+  );
   opacity: 0.1;
   border-radius: 0 16px 0 100px;
 }
@@ -1385,6 +1786,29 @@ input[type=number]::-webkit-outer-spin-button {
   -moz-transition: all 0.2s ease;
   -ms-transition: all 0.2s ease;
   -o-transition: all 0.2s ease;
+}
+.basalam-access-button {
+  background: var(--basalam-primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  width: auto;
+  justify-content: center;
+  -webkit-transition: all 0.2s ease;
+  -moz-transition: all 0.2s ease;
+  -ms-transition: all 0.2s ease;
+  -o-transition: all 0.2s ease;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  -ms-border-radius: 8px;
+  -o-border-radius: 8px;
 }
 
 .basalam-danger-button:hover {
@@ -1446,13 +1870,17 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .vendor-info::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   right: 0;
   width: 150px;
   height: 150px;
-  background: linear-gradient(135deg, var(--basalam-primary-color) 0%, transparent 60%);
+  background: linear-gradient(
+    135deg,
+    var(--basalam-primary-color) 0%,
+    transparent 60%
+  );
   opacity: 0.1;
   border-radius: 0 16px 0 150px;
 }
@@ -1466,7 +1894,7 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .basalam-info-top-section::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -15px;
   right: 0;
@@ -1502,7 +1930,7 @@ input[type=number]::-webkit-outer-spin-button {
   align-items: start;
 }
 
-.column-basalam_status,
+.column-sync_basalam_status,
 .column-basalam_order {
   font-family: "PelakFa";
   font-size: 11px !important;
@@ -1510,11 +1938,11 @@ input[type=number]::-webkit-outer-spin-button {
   text-align: center !important;
 }
 
-.column-basalam_status .dashicons {
+.column-sync_basalam_status .dashicons {
   font-size: 20px;
 }
 
-.column-basalam_status {
+.column-sync_basalam_status {
   font-family: "PelakFa";
   font-size: 11px !important;
   width: 120px;
@@ -1526,7 +1954,7 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 #sync_basalam_single_product_manage_box .postbox-header h2 {
-  font-family: 'pelakFa' !important;
+  font-family: "pelakFa" !important;
 }
 
 .basalam-status-circle {
@@ -1551,17 +1979,23 @@ input[type=number]::-webkit-outer-spin-button {
   margin: auto !important;
   border-radius: 8px !important;
   margin-top: 10px !important;
-  -webkit-border-radius: 8px !important;
-  -moz-border-radius: 8px !important;
-  -ms-border-radius: 8px !important;
-  -o-border-radius: 8px !important;
+  -webkit-border-radius: ;
+  -moz-border-radius: ;
+  -ms-border-radius: ;
+  -o-border-radius: ;
 }
 
 .basalam_status_data_container {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  flex: 1;
 }
-
+.basalam_settings_options {
+  font-family: "PelakFA" !important;
+  font-weight: bold;
+}
 .basalam_status_data_item {
   display: flex;
   align-items: baseline;
@@ -1591,7 +2025,7 @@ input[type=number]::-webkit-outer-spin-button {
   direction: ltr;
 }
 
-#sync_basalam_single_product_manage_box>div.inside>button:nth-child(4) {
+#sync_basalam_single_product_manage_box > div.inside > button:nth-child(4) {
   background-color: var(--basalam-danger-hover);
 }
 
@@ -1607,30 +2041,153 @@ input[type=number]::-webkit-outer-spin-button {
   cursor: not-allowed !important;
 }
 
+@media screen and (min-width: 561px) and (max-width: 900px) {
+  .basalam_status_data_container {
+    flex-direction: row !important;
+    flex: 1 1 100%;
+    justify-content: center !important;
+    gap: 20px !important;
+  }
+
+  .basalam_status_data_item {
+    flex: 0 1 calc(50% - 10px);
+    min-width: 200px;
+  }
+}
+
 @media screen and (max-width: 600px) {
   #basalam-modal {
-    left: 30% !important;
+    left: 0 !important;
+    right: 0 !important;
+  }
+
+  #basalam-modal .basalam-action-card {
+    margin: 2% auto !important;
+    width: 95% !important;
+    max-width: 100% !important;
+    padding: 15px !important;
+    padding-top: 35px !important;
+  }
+
+  #basalam-modal .basalam-action-card .basalam-form-row,
+  #basalam-modal section#sep-section .basalam-form-row {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+  }
+
+  #basalam-modal .basalam-form-group {
+    width: 100% !important;
+    padding: 8px !important;
+  }
+
+  #basalam-modal .basalam-form-group .basalam-label {
+    font-size: 10px !important;
+  }
+
+  #basalam-modal .basalam-form-group input,
+  #basalam-modal .basalam-form-group select {
+    font-size: 11px !important;
+    padding: 6px !important;
+    height: 32px !important;
+  }
+
+  #basalam-modal .options_mapping_section {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #basalam-modal .basalam-table {
+    font-size: 10px !important;
+  }
+
+  #basalam-modal .basalam-table th,
+  #basalam-modal .basalam-table td {
+    padding: 6px !important;
+    font-size: 10px !important;
+  }
+
+  #basalam-modal .basalam-table .basalam-primary-button {
+    font-size: 10px !important;
+    padding: 4px 8px !important;
+    height: auto !important;
+    min-width: 50px !important;
+  }
+
+  #Basalam-map-option-form {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 8px !important;
+    padding: 10px !important;
+    margin-bottom: 15px !important;
+  }
+
+  #Basalam-map-option-form label {
+    width: 100% !important;
+    text-align: right !important;
+    margin-bottom: 2px !important;
+    font-size: 11px !important;
+  }
+
+  #Basalam-map-option-form input {
+    width: 100% !important;
+    margin-bottom: 8px !important;
+    font-size: 11px !important;
+    padding: 6px !important;
+  }
+
+  #Basalam-map-option-form button {
+    width: 100% !important;
+    margin-top: 8px !important;
+    width: 190px !important;
+    font-size: 11px !important;
+    height: 32px !important;
   }
 
   .basalam-dashboard {
     padding: 10px;
+    margin: 0 auto;
   }
 
   .basalam-status-header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .basalam-status-header .basalam-h {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 8px;
   }
 
   .basalam-badge {
-    margin-top: 10px;
+    margin: 0 auto;
+    display: inline-block;
   }
 
   .basalam_status_data_container {
     flex-direction: column;
+    width: 100%;
+    gap: 0px;
   }
 
   .basalam_status_data_item {
     width: 100%;
+    min-width: auto;
+    flex-direction: row;
+    padding: 7px;
+    font-size: 12px;
+  }
+
+  .basalam_status_data_item .basalam-p {
+    font-size: 11px !important;
+  }
+
+  .basalam-sync-status {
+    flex-direction: column;
+    padding: 12px;
+    gap: 12px;
   }
 
   .basalam-form-row {
@@ -1642,7 +2199,9 @@ input[type=number]::-webkit-outer-spin-button {
   }
 
   .basalam-action-cards {
-    flex-direction: column;
+    grid-template-columns: 1fr;
+
+    margin: 0 auto;
   }
 
   .basalam-action-card {
@@ -1668,13 +2227,44 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 @media screen and (min-width: 601px) and (max-width: 900px) {
-  .basalam-action-cards {
+  #basalam-modal .basalam-action-card {
+    width: 90% !important;
+    max-width: 650px !important;
+  }
+
+  #basalam-modal .basalam-action-card .basalam-form-row,
+  #basalam-modal section#sep-section .basalam-form-row {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
+
+  .basalam-dashboard {
+    margin-top: 20px;
+  }
+
+  .basalam-sync-status {
     flex-wrap: wrap;
+    justify-content: center;
+    padding: 16px;
+  }
+
+  .basalam-sync-status .basalam-p {
+    flex: 1 1 100%;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  .basalam-sync-status .Basalam-form {
+    flex: 0 1 auto;
+  }
+
+  .basalam-action-cards {
+    grid-template-columns: repeat(2, 1fr);
+    margin: 0 auto;
   }
 
   .basalam-action-card {
-    width: calc(50% - 10px);
-    flex: 0 0 auto;
+    width: 100%;
   }
 
   .basalam-form-row {
@@ -1686,17 +2276,48 @@ input[type=number]::-webkit-outer-spin-button {
     flex: 0 0 auto;
   }
 
+  .basalam-status-header {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .basalam-status-header .basalam-h {
+    flex: 1 1 100%;
+  }
+
   .basalam_status_data_container {
-    flex-wrap: wrap;
+    flex: 1 1 100%;
+    justify-content: space-around;
   }
 
   .basalam_status_data_item {
-    width: calc(50% - 10px);
-    flex: 0 0 auto;
+    flex: 0 1 calc(50% - 10px);
+    min-width: 200px;
   }
 
   .basalam-modal-content {
     width: 70%;
+  }
+}
+
+@media screen and (min-width: 901px) and (max-width: 1200px) {
+  .basalam-dashboard {
+    max-width: 900px;
+  }
+
+  .basalam-status-card,
+  .basalam-header {
+    max-width: 810px !important;
+  }
+
+  .basalam-action-cards {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .basalam-action-card {
+    width: 100%;
   }
 }
 
@@ -1762,6 +2383,15 @@ input[type=number]::-webkit-outer-spin-button {
   margin: 20px 0;
 }
 
+.options_mapping_section {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.options_mapping_section .basalam-table {
+  min-width: 400px;
+}
+
 .basalam-button-single-product-page,
 .basalam-action-button,
 .basalam-btn {
@@ -1770,6 +2400,10 @@ input[type=number]::-webkit-outer-spin-button {
   font-size: 10px;
   border-radius: 2px;
   background: var(--basalam-primary-color);
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -ms-border-radius: 2px;
+  -o-border-radius: 2px;
 }
 
 .basalam-table th,
@@ -1788,19 +2422,23 @@ input[type=number]::-webkit-outer-spin-button {
   font-weight: bold;
 }
 
-#wc_order_tracking_box>div.postbox-header>h2 {
-  font-family: 'PelakFA';
+#basalam_order_settings > div.postbox-header > h2,
+#basalam_order_info > div.postbox-header > h2 {
+  font-family: "PelakFA";
+}
+
+.basalam-order-info {
+  text-align: right !important;
 }
 
 .sync-checkbox-label {
   display: inline-block !important;
 }
 
-#toplevel_page_sync_basalam>a>div.wp-menu-image.dashicons-before>img {
+#toplevel_page_sync_basalam > a > div.wp-menu-image.dashicons-before > img {
   padding: 5px 0 0;
 }
 
-/* Info Modal Popup Styles */
 .basalam-info-trigger {
   display: inline-block;
   cursor: pointer;
@@ -1815,6 +2453,17 @@ input[type=number]::-webkit-outer-spin-button {
   transition: all 0.2s ease;
   vertical-align: middle;
   border-radius: 50%;
+  -webkit-transition: all 0.2s ease;
+  -moz-transition: all 0.2s ease;
+  -ms-transition: all 0.2s ease;
+  -o-transition: all 0.2s ease;
+  display: none;
+}
+
+@media screen and (min-width: 1025px) {
+  .basalam-info-icon {
+    display: inline-block;
+  }
 }
 
 .basalam-info-icon:hover {
@@ -1944,29 +2593,24 @@ input[type=number]::-webkit-outer-spin-button {
   background: var(--basalam-primary-hover);
 }
 
-/* Show modal animation */
 .basalam-info-modal.show {
   display: block !important;
   animation: basalam-modal-fade-in 0.3s ease-out;
 }
 
-/* Ensure modal appears above everything */
-body>.basalam-info-modal {
+body > .basalam-info-modal {
   position: fixed !important;
   z-index: 2147483647 !important;
-  /* Maximum z-index */
 }
 
-/* Override any parent container constraints */
 .basalam-info-modal {
   transform: none !important;
   clip: none !important;
   clip-path: none !important;
 }
 
-/* WordPress admin specific overrides */
 #wpwrap .basalam-info-modal,
-#wpadminbar~* .basalam-info-modal,
+#wpadminbar ~ * .basalam-info-modal,
 .wp-admin .basalam-info-modal {
   position: fixed !important;
   top: 0 !important;
@@ -1976,7 +2620,6 @@ body>.basalam-info-modal {
   z-index: 999999 !important;
 }
 
-/* Ensure modal content stays centered even in WordPress admin */
 #wpwrap .basalam-info-modal-content,
 .wp-admin .basalam-info-modal-content {
   position: absolute !important;
@@ -1995,7 +2638,6 @@ body>.basalam-info-modal {
   }
 }
 
-/* Label container with tooltip */
 .basalam-label-container {
   display: flex;
   align-items: center;
@@ -2019,7 +2661,6 @@ body>.basalam-info-modal {
   order: 1;
 }
 
-/* Mobile responsive modal */
 @media (max-width: 768px) {
   .basalam-info-modal-content {
     width: 95% !important;
@@ -2044,11 +2685,6 @@ body>.basalam-info-modal {
     font-size: 13px !important;
   }
 
-  .basalam-info-icon {
-    width: 18px;
-    height: 18px;
-  }
-
   .basalam-label-container {
     flex-direction: row;
     justify-content: space-between;
@@ -2064,20 +2700,905 @@ body>.basalam-info-modal {
   }
 }
 
-/* Touch device optimization */
 @media (pointer: coarse) {
   .basalam-info-trigger {
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
   }
+}
 
-  .basalam-info-icon {
-    width: 20px;
-    height: 20px;
-    padding: 4px;
+@media screen and (max-width: 768px) {
+  .basalam-info-container {
+    padding: 15px;
+  }
+
+  .vendor-info {
+    margin-bottom: 20px;
+  }
+
+  .vendor-info-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    align-items: center;
+  }
+
+  .info-label {
+    font-weight: 600;
+    color: #666;
+    margin-left: 10px;
+  }
+
+  .info-value {
+    text-align: left;
+    color: #333;
+  }
+
+  .basalam-danger-zone {
+    width: 100%;
+    padding: 0 15px;
+  }
+
+  .basalam-card {
+    padding: 20px;
+    margin: 0;
+  }
+
+  .basalam-p {
+    font-size: 11px;
+  }
+
+  .basalam-p__small {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .basalam-danger-button {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .basalam-contact-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .basalam-contact-btn {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .basalam-contact-btn img {
+    max-width: 35px !important;
+    height: auto;
   }
 }
 
-/* Toggle Switch Styles */
+@media screen and (max-width: 480px) {
+  .basalam-info-container {
+    padding: 10px;
+  }
+
+  .vendor-info {
+    margin-bottom: 15px;
+  }
+
+  .vendor-info-grid {
+    gap: 10px;
+  }
+
+  .info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
+  }
+
+  .info-label {
+    margin-bottom: 5px;
+    margin-left: 0;
+    font-size: 13px;
+  }
+
+  .info-value {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .basalam-danger-zone {
+    padding: 0 10px;
+  }
+
+  .basalam-card {
+    padding: 15px;
+    border-radius: 8px;
+  }
+
+  .basalam-p {
+    font-size: 12px;
+    margin-bottom: 10px !important;
+  }
+
+  .basalam-p__small {
+    font-size: 10px;
+    line-height: 1.5;
+    margin: 12px 5px !important;
+  }
+
+  .basalam-danger-button {
+    padding: 10px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .basalam-danger-button img {
+    width: 16px;
+    height: 16px;
+  }
+
+  .Basalam-contact-us-section {
+    margin-top: 15px;
+  }
+
+  .basalam-contact-container {
+    padding-top: 10px !important;
+    gap: 10px;
+  }
+
+  .basalam-contact-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+  }
+
+  .basalam-contact-btn img {
+    max-width: 30px !important;
+  }
+
+  .basalam-contact-btn img[alt="help page"] {
+    max-width: 50px !important;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .basalam-info-container {
+    padding: 8px;
+  }
+
+  .info-item {
+    padding: 8px;
+  }
+
+  .info-label {
+    font-size: 12px;
+  }
+
+  .info-value {
+    font-size: 13px;
+  }
+
+  .basalam-card {
+    padding: 12px;
+  }
+
+  .basalam-px {
+    font-size: 11px;
+  }
+
+  .basalam-p__small {
+    font-size: 10px;
+  }
+
+  .basalam-danger-button {
+    padding: 8px;
+    font-size: 12px;
+  }
+
+  .basalam-contact-btn {
+    width: 45px;
+    height: 45px;
+  }
+
+  .basalam-contact-btn img {
+    max-width: 25px !important;
+  }
+
+  .basalam-contact-btn img[alt="help page"] {
+    max-width: 40px !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .basalam-info-container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .vendor-info {
+    width: 100%;
+    margin-bottom: 25px;
+  }
+
+  .vendor-info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+  }
+
+  .info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .info-label {
+    font-weight: 600;
+    color: #6c757d;
+    font-size: 14px;
+  }
+
+  .info-value {
+    color: #212529;
+    font-weight: 500;
+    text-align: right;
+  }
+
+  .basalam-danger-zone {
+    width: 100%;
+    padding: 0;
+  }
+
+  .basalam-card {
+    padding: 25px;
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .basalam-p__small {
+    font-size: 10px;
+    line-height: 1.7;
+  }
+
+  .basalam-danger-button {
+    width: 100%;
+    padding: 10px 16px;
+  }
+
+  .basalam-contact-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: nowrap;
+    padding: 15px 0;
+  }
+
+  .basalam-contact-btn {
+    width: 65px;
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+  }
+
+  .basalam-contact-btn img {
+    max-width: 35px !important;
+    height: auto;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .basalam-info-container {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    width: 100%;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+
+  .vendor-info {
+    width: 100%;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .vendor-info > .basalam-p {
+    font-size: 18px;
+    margin-bottom: 15px !important;
+    text-align: center !important;
+  }
+
+  .vendor-info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .info-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .info-label {
+    font-size: 13px;
+    color: #6c757d;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .info-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #212529;
+    text-align: right;
+  }
+
+  .basalam-danger-zone {
+    width: 100%;
+    padding: 0;
+    margin-top: auto;
+  }
+
+  .basalam-card {
+    padding: 20px;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .basalam-card > .basalam-p:first-child {
+    font-size: 16px;
+    margin-bottom: 12px !important;
+    text-align: center;
+  }
+
+  .basalam-p__small {
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 12px 0 !important;
+    text-align: center !important;
+  }
+
+  .Basalam-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .basalam-danger-button {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 8px;
+    margin-top: 10px;
+  }
+
+  .basalam-danger-button img {
+    width: 18px;
+    height: 18px;
+  }
+
+  .Basalam-contact-us-section {
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  .basalam-contact-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding-top: 0 !important;
+    width: 100%;
+  }
+
+  .basalam-contact-btn {
+    width: 55px;
+    height: 55px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+  }
+
+  .basalam-contact-btn:active {
+    transform: scale(0.95);
+  }
+
+  .basalam-contact-btn img {
+    max-width: 30px !important;
+    height: auto;
+  }
+
+  .basalam-contact-btn img[alt="help page"] {
+    max-width: 45px !important;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .basalam-info-container {
+    padding: 12px;
+  }
+
+  .vendor-info-grid {
+    gap: 10px;
+  }
+
+  .info-item {
+    padding: 10px 12px;
+  }
+
+  .info-label {
+    font-size: 12px;
+  }
+
+  .info-value {
+    font-size: 13px;
+  }
+
+  .basalam-card {
+    padding: 15px;
+  }
+
+  .basalam-card > .basalam-p:first-child {
+    font-size: 15px;
+  }
+
+  .basalam-p__small {
+    font-size: 12px;
+  }
+
+  .basalam-danger-button {
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  .basalam-danger-button img {
+    width: 16px;
+    height: 16px;
+  }
+
+  .basalam-contact-container {
+    gap: 12px;
+  }
+
+  .basalam-contact-btn {
+    width: 48px;
+    height: 48px;
+  }
+
+  .basalam-contact-btn img {
+    max-width: 25px !important;
+  }
+
+  .basalam-contact-btn img[alt="help page"] {
+    max-width: 38px !important;
+  }
+}
+
+.basalam-info-container {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  max-width: 1400px;
+  margin: 20px auto;
+  padding: 20px;
+  align-items: stretch;
+}
+
+.vendor-info {
+  flex: 1;
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--basalam-gray-200);
+  margin: 0;
+  min-height: 100%;
+}
+
+.vendor-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.info-item {
+  padding: 14px;
+  background: var(--basalam-gray-100);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.info-label {
+  color: var(--basalam-gray-600);
+  font-size: 13px;
+  margin-bottom: 8px;
+  font-weight: 500;
+  position: relative;
+  padding-right: 12px;
+}
+
+.info-value {
+  color: var(--basalam-gray-800);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.basalam-danger-zone {
+  width: 380px;
+  margin: 0;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.basalam-card {
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--basalam-danger-color);
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.basalam-contact-container {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  padding: 12px 0;
+}
+
+.basalam-contact-btn {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  transition: transform 0.2s ease;
+}
+
+.basalam-btn-contact__blue {
+  background: #0088cc;
+}
+
+.basalam-btn-contact__red {
+  background: #e74c3c;
+}
+
+.basalam-contact-btn:hover {
+  transform: scale(1.05);
+}
+
+@media screen and (max-width: 1024px) {
+  .basalam-info-container {
+    flex-direction: column;
+    max-width: 100%;
+    padding: 20px;
+    align-items: center;
+  }
+
+  .vendor-info {
+    width: 100%;
+    max-width: 700px;
+    margin-bottom: 20px;
+    min-height: auto;
+  }
+
+  .basalam-danger-zone {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    min-height: auto;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .basalam-info-container {
+    padding: 15px;
+    margin: 10px auto;
+    align-items: stretch;
+  }
+
+  .vendor-info {
+    padding: 20px;
+    width: 100%;
+    max-width: none;
+  }
+
+  .vendor-info-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+  }
+
+  .info-label {
+    margin-bottom: 0;
+    font-size: 13px;
+  }
+
+  .info-value {
+    text-align: right;
+    font-size: 14px;
+  }
+
+  .basalam-danger-zone {
+    width: 100%;
+    max-width: none;
+  }
+
+  .basalam-card {
+    padding: 20px;
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .basalam-info-container {
+    padding: 10px;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .vendor-info {
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .vendor-info > .basalam-p {
+    font-size: 16px;
+    margin-bottom: 12px !important;
+    text-align: center !important;
+    font-weight: bold;
+  }
+
+  .vendor-info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .info-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: linear-gradient(to right, #f8f9fa, #ffffff);
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+  }
+
+  .info-label {
+    font-size: 12px;
+    color: #6c757d;
+    padding-right: 8px;
+  }
+
+  .info-label::before {
+    width: 3px;
+    height: 3px;
+  }
+
+  .info-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: #212529;
+  }
+
+  .basalam-danger-zone {
+    width: 100%;
+    margin-top: auto;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .basalam-card {
+    padding: 15px;
+    border-radius: 10px;
+    height: auto;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .basalam-card > .basalam-p:first-child {
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 10px !important;
+  }
+
+  .basalam-p__small {
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: justify !important;
+    margin: 10px 0 !important;
+  }
+
+  .basalam-danger-button {
+    width: 100%;
+    padding: 10px;
+    font-size: 13px;
+    margin-top: 10px;
+  }
+
+  .basalam-danger-button img {
+    width: 16px;
+    height: 16px;
+  }
+
+  .Basalam-contact-us-section {
+    margin-top: 15px;
+  }
+
+  .basalam-contact-container {
+    gap: 0px;
+    padding: 10px 0;
+  }
+
+  .basalam-contact-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+  }
+
+  .basalam-contact-btn img {
+    max-width: 28px !important;
+    height: auto;
+  }
+
+  .basalam-contact-btn img[alt="help page"] {
+    max-width: 40px !important;
+  }
+
+  center {
+    display: block;
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .basalam-info-container {
+    padding: 8px;
+    align-items: stretch;
+  }
+
+  .vendor-info {
+    padding: 12px;
+    width: 100%;
+  }
+
+  .vendor-info > .basalam-p {
+    font-size: 15px;
+  }
+
+  .info-item {
+    padding: 8px 10px;
+  }
+
+  .info-label {
+    font-size: 11px;
+  }
+
+  .info-value {
+    font-size: 12px;
+  }
+
+  .basalam-card {
+    padding: 12px;
+    width: 100%;
+  }
+
+  .basalam-danger-zone {
+    width: 100%;
+  }
+
+  .basalam-card > .basalam-p:first-child {
+    font-size: 13px;
+  }
+
+  .basalam-p__small {
+    font-size: 11px;
+  }
+
+  .basalam-danger-button {
+    padding: 8px;
+    font-size: 12px;
+  }
+
+  .basalam-contact-btn {
+    width: 45px;
+    height: 45px;
+  }
+
+  .basalam-contact-btn img {
+    max-width: 24px !important;
+  }
+
+  .basalam-contact-btn img[alt="help page"] {
+    max-width: 35px !important;
+  }
+}
+
+.basalam-info-container,
+.basalam-info-container * {
+  box-sizing: border-box;
+}
+
+.admin-bar .basalam-info-container {
+  margin-top: 32px;
+}
+
+@media screen and (max-width: 782px) {
+  .admin-bar .basalam-info-container {
+    margin-top: 46px;
+  }
+}
+
 .basalam-switch {
   position: relative;
   display: inline-block;
@@ -2135,4 +3656,2722 @@ body>.basalam-info-modal {
 
 .basalam-tasks-info {
   transition: all 0.3s ease;
+}
+
+#quick-update-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 168, 132, 0.3);
+}
+
+#full-update-btn:hover {
+  background: #34495e !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(44, 62, 80, 0.3);
+}
+
+/* Utility classes for common inline styles */
+.basalam-flex {
+  display: flex;
+}
+
+.basalam-flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.basalam-flex-start {
+  display: flex;
+  align-items: flex-start;
+}
+
+.basalam-flex-end {
+  display: flex;
+  align-items: flex-end;
+}
+
+.basalam-flex-between {
+  display: flex;
+  justify-content: space-between;
+}
+
+.basalam-flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.basalam-gap-10 {
+  gap: 10px;
+}
+
+.basalam-gap-20 {
+  gap: 20px;
+}
+
+.basalam-gap-small {
+  gap: 5px;
+}
+
+.basalam-text-center {
+  text-align: center;
+}
+
+.basalam-text-right {
+  text-align: right;
+}
+
+.basalam-text-justify {
+  text-align: justify;
+}
+
+.basalam-relative {
+  position: relative;
+}
+
+.basalam-absolute {
+  position: absolute;
+}
+
+.basalam-fixed {
+  position: fixed;
+}
+
+.basalam-hidden {
+  display: none;
+}
+
+.basalam-block {
+  display: block;
+}
+
+.basalam-cursor-pointer {
+  cursor: pointer;
+}
+
+.basalam-cursor-not-allowed {
+  cursor: not-allowed;
+}
+
+.basalam-width-full {
+  width: 100%;
+}
+
+.basalam-width-fill {
+  width: -webkit-fill-available;
+}
+
+.basalam-max-width-400 {
+  max-width: 400px;
+}
+
+.basalam-max-width-500 {
+  max-width: 500px;
+}
+
+.basalam-margin-top-0 {
+  margin-top: 0 !important;
+}
+
+.basalam-margin-top-10 {
+  margin-top: 10px;
+}
+
+.basalam-margin-top-15 {
+  margin-top: 15px;
+}
+
+.basalam-margin-top-20 {
+  margin-top: 20px;
+}
+
+.basalam-margin-bottom-0 {
+  margin-bottom: 0 !important;
+}
+
+.basalam-margin-bottom-10 {
+  margin-bottom: 10px;
+}
+
+.basalam-margin-bottom-15 {
+  margin-bottom: 15px;
+}
+
+.basalam-margin-bottom-20 {
+  margin-bottom: 20px;
+}
+
+.basalam-padding-0 {
+  padding: 0 !important;
+}
+
+.basalam-padding-10 {
+  padding: 10px;
+}
+
+.basalam-padding-15 {
+  padding: 15px;
+}
+
+.basalam-padding-20 {
+  padding: 20px;
+}
+
+.basalam-bg-light {
+  background-color: #f5f5f5;
+}
+
+.basalam-bg-warning {
+  background-color: #fff3cd;
+}
+
+.basalam-bg-white {
+  background-color: #fff;
+}
+
+.basalam-bg-disabled {
+  background-color: #ccc !important;
+}
+
+.basalam-border-warning {
+  border: 1px solid #ffc107;
+}
+
+.basalam-border-radius {
+  border-radius: 8px;
+}
+
+.basalam-border-circle {
+  border-radius: 50%;
+}
+
+.basalam-font-small {
+  font-size: 11px !important;
+}
+
+.basalam-font-normal {
+  font-size: 14px;
+}
+
+.basalam-font-large {
+  font-size: 20px;
+}
+
+.basalam-font-bold {
+  font-weight: bold;
+}
+
+.basalam-text-warning {
+  color: #856404;
+}
+
+.basalam-text-danger {
+  color: var(--basalam-danger-color);
+}
+
+.basalam-text-muted {
+  color: #666;
+}
+
+.basalam-opacity-60 {
+  opacity: 0.6;
+}
+
+.basalam-transition {
+  transition: all 0.3s ease;
+}
+
+.basalam-shadow {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Specific positioning utilities */
+.basalam-top-10 {
+  top: 10px;
+}
+
+.basalam-left-10 {
+  left: 10px;
+}
+
+.basalam-right-15 {
+  right: 15px;
+}
+
+.basalam-z-index-high {
+  z-index: 9999;
+}
+
+/* Overflow utilities */
+.basalam-overflow-y-auto {
+  overflow-y: auto;
+}
+
+.basalam-overflow-hidden {
+  overflow: hidden;
+}
+
+/* Height utilities */
+.basalam-height-20 {
+  height: 20px;
+}
+
+.basalam-height-22 {
+  height: 22px;
+}
+
+.basalam-min-height-100 {
+  min-height: 100%;
+}
+
+/* Width utilities */
+.basalam-width-22 {
+  width: 22px;
+}
+
+.basalam-width-33 {
+  width: 33%;
+}
+
+.basalam-max-height-400 {
+  max-height: 400px;
+}
+
+.basalam-max-height-570 {
+  max-height: 570px;
+}
+
+/* Info icon styling */
+.basalam-info-icon-small {
+  border: 1px solid;
+  border-radius: 70%;
+  width: 22px;
+  height: 22px;
+  top: 10px;
+  left: 10px;
+}
+
+/* Modal backdrop */
+.basalam-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Flex container utilities */
+.basalam-flex-fill {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  height: 90%;
+  width: -webkit-fill-available;
+}
+
+.basalam-action-buttons-col {
+  flex-direction: column;
+  width: -webkit-fill-available;
+}
+
+/* Grid utilities */
+.basalam-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  width: 100%;
+  max-width: 1080px;
+}
+
+.basalam-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 15px;
+  align-items: center;
+}
+
+/* Form utilities */
+.basalam-form-margin-0 {
+  margin: 0;
+}
+
+.basalam-form-no-margin {
+  margin-bottom: 0px !important;
+}
+
+/* Badge styling */
+.basalam-badge-warning {
+  background: #ffc107;
+  color: #000;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+/* Background variations */
+.basalam-bg-modal {
+  background: #fff;
+  margin: 5% auto;
+  padding: 20px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 570px;
+  position: relative;
+  overflow-y: auto;
+  padding-top: 40px;
+}
+
+.basalam-bg-modal-white {
+  background: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Pagination centering */
+.basalam-pagination-center {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Notice flex styling */
+.basalam-notice-flex {
+  display: flex;
+  gap: 10px;
+}
+
+.basalam-notice-flex-small {
+  display: flex;
+  gap: 10px;
+}
+
+/* Center element styling */
+.basalam-center {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.basalam-center-margin {
+  margin-top: 10px;
+}
+
+/* Color specific utilities */
+.basalam-blue-link {
+  color: #0770d9 !important;
+}
+
+.basalam-gray-text {
+  color: var(--basalam-gray-500);
+}
+
+/* Display with margin */
+.basalam-display-block-margin {
+  display: block;
+  margin: 10px 0;
+}
+
+/* Disabled cursor styling */
+.basalam-disabled-cursor {
+  cursor: not-allowed;
+  margin-bottom: 0 !important;
+}
+
+/* Responsive flex */
+.basalam-flex-responsive {
+  display: flex;
+  margin-top: 13px !important;
+}
+
+.basalam-flex-align-center {
+  display: flex;
+  align-items: center;
+}
+
+.basalam-flex-align-center-width {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.basalam-flex-align-center-33 {
+  display: flex;
+  align-items: center;
+  width: 33%;
+}
+
+.basalam-flex-align-start-gap {
+  display: flex;
+  align-items: start;
+  gap: 10px;
+}
+
+/* Hidden elements */
+.basalam-element-hidden {
+  display: none;
+  margin-top: 15px;
+  margin-bottom: 20px;
+}
+
+/* Modal close button */
+.basalam-modal-close-abs {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  cursor: pointer;
+}
+
+/* Image sizing */
+.basalam-img-20 {
+  width: 20px;
+}
+
+.basalam-img-22 {
+  width: 22px;
+  height: 20px;
+}
+
+.basalam-img-20-margin {
+  width: 20px;
+  margin-left: 5px;
+}
+
+/* Button width utilities */
+.basalam-btn-unset {
+  width: unset;
+  margin: 24px !important;
+}
+
+.basalam-btn-danger {
+  width: 100%;
+  background-color: #dc3545;
+  margin-bottom: 10px !important;
+}
+
+.basalam-btn-no-margin {
+  margin-bottom: 0px !important;
+}
+
+.basalam-btn-fill {
+  width: -webkit-fill-available;
+}
+
+.basalam-btn-auto {
+  width: auto;
+}
+
+.basalam-btn-auto-margin {
+  margin: 16px !important;
+  text-align: justify;
+  text-align: right !important;
+}
+
+.basalam-btn-no-margin-bottom {
+  margin-bottom: 0 !important;
+}
+
+/* Button sizing */
+.basalam-btn-small {
+  font-size: 11px !important;
+}
+
+.basalam-btn-justify {
+  text-align: justify;
+  margin-top: 16px !important;
+}
+
+/* Input utilities */
+.basalam-input-fill {
+  max-width: -webkit-fill-available;
+  margin-bottom: 10px;
+}
+
+/* Center alignment utilities */
+.basalam-center-block {
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.basalam-center-margin-top {
+  margin-top: 20px;
+}
+
+/* Flex layout utilities */
+.basalam-layout-center {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.basalam-layout-between {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 15px;
+  margin-top: 15px;
+}
+
+.basalam-layout-end {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 15px;
+  gap: 10px;
+}
+
+/* Padding utilities */
+.basalam-padding-vertical {
+  padding: 10px 0;
+  font-size: 14px;
+  text-align: justify;
+}
+
+.basalam-padding-top {
+  padding-top: 15px;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: justify;
+}
+
+.basalam-padding-top-normal {
+  padding-top: 15px;
+  font-size: 14px;
+  text-align: justify;
+}
+
+.basalam-padding-top-12 {
+  padding-top: 12px;
+}
+
+.basalam-padding-top-20 {
+  padding-top: 20px;
+  font-size: 24px;
+  color: var(--basalam-gray-500);
+}
+
+.basalam-padding-box {
+  padding: 15px;
+  background: var(--basalam-gray-100);
+  border-radius: 8px;
+  text-align: center;
+  font-family: PelakFA;
+}
+
+.basalam-padding-justify {
+  padding: 0;
+  margin: 16px !important;
+  text-align: justify;
+}
+
+.basalam-padding-small {
+  padding: 7px 5px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Opacity utilities */
+.basalam-opacity-1 {
+  opacity: 1;
+}
+
+.basalam-opacity-1-padding {
+  opacity: 1;
+  padding: 20px;
+}
+
+/* Margin utilities */
+.basalam-margin-0 {
+  margin: 0;
+}
+
+.basalam-margin-0-8-0 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #2c3e50;
+}
+
+.basalam-margin-primary {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: var(--basalam-primary-color);
+}
+
+.basalam-margin-warning {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: #856404;
+}
+
+.basalam-margin-warning-header {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  color: #856404;
+}
+
+.basalam-margin-warning-text {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #856404;
+}
+
+.basalam-margin-warning-justify {
+  margin: 0;
+  color: #856404;
+  font-size: 13px;
+  text-align: justify;
+  line-height: 1.8;
+}
+
+.basalam-margin-muted {
+  margin: 0;
+  font-size: 12px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.basalam-margin-10-0 {
+  margin: 10px 0;
+}
+
+.basalam-margin-20-0 {
+  margin: 20px 0;
+}
+
+.basalam-margin-bottom-16 {
+  margin-bottom: 16px !important;
+  text-align: right;
+}
+
+.basalam-margin-bottom-8 {
+  margin-bottom: 8px !important;
+}
+
+.basalam-margin-left-10 {
+  margin-left: 10px;
+  padding: 0px 20px;
+}
+
+.basalam-margin-left-8 {
+  margin-left: 8px;
+}
+
+.basalam-margin-right-10 {
+  margin-right: 10px;
+  padding: 0px 20px;
+}
+
+.basalam-margin-top-0-family {
+  margin-top: 0;
+  font-family: "PelakFA" !important;
+}
+
+#sync_basalam_comment {
+  font-family: "PelakFA" !important;
+}
+
+.basalam-margin-top-10-justify {
+  margin-top: 10px;
+}
+
+.basalam-margin-top-15-flex {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.basalam-margin-top-17 {
+  margin-top: 17px !important;
+  text-align: right !important;
+}
+
+.basalam-margin-top-25-bottom-10 {
+  margin-top: 25px;
+  margin-bottom: 10px !important;
+}
+
+/* Font size utilities */
+.basalam-font-15 {
+  font-size: 15px;
+}
+
+.basalam-font-16 {
+  font-size: 16px;
+  color: white;
+  font-weight: bold;
+}
+
+.basalam-font-20 {
+  font-size: 20px;
+  margin-top: 15px !important;
+}
+
+.basalam-font-24 {
+  font-size: 24px;
+  color: var(--basalam-gray-500);
+}
+
+.basalam-font-24-top {
+  font-size: 20px;
+  margin-top: 2px;
+  color: #856404;
+}
+
+.basalam-font-13-underline {
+  color: #856404;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+/* Description utilities */
+.basalam-description-justify {
+  text-align: justify !important;
+}
+
+.basalam-description-margin {
+  margin-bottom: 20px;
+  text-align: right;
+  font-weight: bold;
+}
+
+/* Background utilities */
+.basalam-bg-light-warning {
+  background: #f5f5f5;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+.basalam-bg-warning-section {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  width: 90%;
+  max-width: 1080px;
+}
+
+.basalam-bg-warning-info {
+  background: #fff3cd;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 15px;
+  border: 1px solid #ffc107;
+}
+
+.basalam-bg-warning-block {
+  display: block;
+  margin: 10px 0px 10px 0px;
+}
+
+.basalam-bg-warning-gap {
+  display: flex;
+  gap: 10px;
+}
+
+.basalam-bg-warning-gap-block {
+  display: block;
+  margin: 10px;
+}
+
+/* Status styling */
+.basalam-status-info {
+  padding: 0;
+  font-size: 15px;
+}
+
+.basalam-status-auto {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: #f0f6fc;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  gap: 12px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.basalam-status-auto-active {
+  background: #edfaef;
+}
+
+/* Modal utilities */
+.basalam-modal-settings {
+  background: #fff;
+  margin: 5% auto;
+  padding: 20px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 570px;
+  position: relative;
+  overflow-y: auto;
+  padding-top: 40px;
+}
+
+.basalam-modal-settings-form {
+  margin-bottom: 20px;
+}
+
+/* Product image styling */
+.basalam-product-image-size {
+  width: 22px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.basalam-product-image-info {
+  width: 22px;
+  height: 20px;
+  cursor: pointer;
+}
+
+/* Pagination styling */
+.basalam-pagination-flex {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Onboarding step */
+.basalam-step-intro-opacity {
+  opacity: 1;
+}
+
+/* Step intro centering */
+.basalam-step-center {
+  text-align: center;
+}
+
+/* Onboarding description */
+.basalam-onboarding-desc {
+  text-align: center;
+  padding-top: 15px;
+  font-size: 14px;
+  text-align: justify;
+}
+
+/* Additional utility classes for all inline styles found in templates */
+
+/* More width utilities */
+.basalam-width-20 {
+  width: 20px;
+}
+
+.basalam-width-40 {
+  width: 40px;
+}
+
+.basalam-width-70 {
+  width: 70px;
+}
+
+.basalam-width-75 {
+  width: 75%;
+}
+
+/* More height utilities */
+.basalam-height-20-flex {
+  height: 20px;
+  flex: 1;
+  padding: 20px 15px;
+  background: #2c3e50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.basalam-height-20-flex-primary {
+  height: 20px;
+  flex: 1;
+  padding: 20px 15px;
+  background: var(--basalam-primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+/* More text alignment utilities */
+.basalam-text-center-margin {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.basalam-text-center-padding {
+  text-align: center;
+  padding: 20px;
+  font-family: PelakFA;
+}
+
+.basalam-text-right-flex {
+  text-align: right;
+  flex: 1;
+}
+
+.basalam-text-right-bold {
+  text-align: right;
+  font-weight: bold;
+}
+
+.basalam-text-right-margin {
+  text-align: right;
+  margin-bottom: 20px !important;
+}
+
+/* More display utilities */
+.basalam-display-flex-center-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.basalam-display-flex-gap-20 {
+  display: flex;
+  gap: 20px;
+}
+
+.basalam-display-flex-gap-10-margin {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* More margin utilities */
+.basalam-margin-warning-justify-10 {
+  margin: 10px 0 0 0;
+  font-size: 13px;
+  color: #856404;
+}
+
+.basalam-margin-primary-color {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: var(--basalam-primary-color);
+}
+
+.basalam-margin-dark-color {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #2c3e50;
+}
+
+/* More font utilities */
+.basalam-font-15-white {
+  font-weight: bold;
+  font-size: 15px;
+  color: white;
+}
+
+.basalam-font-20-important {
+  font-size: 20px;
+  margin-top: 15px !important;
+}
+
+.basalam-font-24-important {
+  font-size: 20px;
+  margin-top: 15px !important;
+}
+
+.basalam-font-11-important {
+  font-size: 11px !important;
+}
+
+/* More background utilities */
+.basalam-bg-light-warning-margin {
+  background: #f5f5f5;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 10px !important;
+}
+
+.basalam-bg-warning-info-margin {
+  background: #fff3cd;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 15px;
+  border: 1px solid #ffc107;
+}
+
+/* More positioning utilities */
+.basalam-absolute-info {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  border: 1px solid;
+  border-radius: 70%;
+  width: 22px;
+  height: 22px;
+}
+
+/* More cursor utilities */
+.basalam-cursor-pointer-margin {
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.basalam-cursor-disabled-bg {
+  cursor: not-allowed;
+  background-color: #ccc !important;
+}
+
+/* More max width utilities */
+.basalam-max-width-none {
+  max-width: none;
+}
+
+/* More display utilities */
+.basalam-display-flex-center {
+  display: flex;
+  align-items: center;
+}
+
+.basalam-display-flex-start {
+  display: flex;
+  align-items: start;
+  gap: 10px;
+}
+
+/* Flex with width utilities */
+.basalam-flex-width-100 {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.basalam-flex-width-33 {
+  display: flex;
+  align-items: center;
+  width: 33%;
+}
+
+/* More opacity utilities */
+.basalam-opacity-1-20 {
+  opacity: 1;
+  padding: 20px;
+}
+
+/* More padding utilities */
+.basalam-padding-0-15 {
+  padding: 0;
+  font-size: 15px;
+}
+
+.basalam-padding-justify-16 {
+  padding: 0;
+  margin: 16px !important;
+  text-align: justify;
+}
+
+.basalam-padding-10-0 {
+  padding: 10px 0;
+  font-size: 14px;
+  text-align: justify;
+}
+
+.basalam-padding-top-12 {
+  padding-top: 12px;
+}
+
+.basalam-padding-top-bold {
+  padding-top: 15px;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: justify;
+}
+
+.basalam-padding-top-normal {
+  padding-top: 15px;
+  font-size: 14px;
+  text-align: justify;
+}
+
+/* Dynamic padding right */
+.basalam-padding-right-dynamic {
+  padding-right: var(--paddingRight);
+}
+
+/* Special display utilities */
+.basalam-display-block-10 {
+  display: block;
+  margin: 10px;
+}
+
+.basalam-display-block-10-0 {
+  display: block;
+  margin: 10px 0px 10px 0px;
+}
+
+/* Height utilities */
+.basalam-height-400-scroll {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid var(--basalam-gray-300);
+  border-radius: 6px;
+}
+
+/* Width with background utilities */
+.basalam-width-danger {
+  width: 100%;
+  background-color: #dc3545 !important;
+}
+
+.basalam-width-danger-margin {
+  width: 100%;
+  background-color: #dc3545 !important;
+  margin-top: 10px !important;
+}
+
+.basalam-width-red-bg {
+  width: -webkit-fill-available;
+  background-color: red !important;
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
+}
+
+.basalam-width-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--basalam-gray-300);
+  border-radius: 6px;
+  font-family: PelakFA;
+}
+
+/* Image width utilities */
+.basalam-img-20-inline {
+  width: 20px;
+  display: inline-block;
+}
+
+.basalam-img-20-vertical {
+  width: 20px;
+  vertical-align: middle;
+  margin-left: 5px;
+}
+
+/* Button width utilities */
+.basalam-width-unset {
+  width: unset;
+  margin: 24px !important;
+}
+
+.basalam-width-fill-no-margin {
+  width: -webkit-fill-available;
+  margin-bottom: 0px !important;
+}
+
+/* Transform utilities */
+.basalam-transform-scale {
+  transform: scale(1.2);
+}
+
+/* Dynamic cursor utility */
+.basalam-dynamic-cursor {
+  margin-bottom: 0 !important;
+}
+
+/* Warning text styling */
+.basalam-warning-20 {
+  color: #856404;
+  font-size: 20px;
+  margin-top: 2px;
+}
+
+.basalam-warning-underline {
+  color: #856404;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+/* Additional utility classes for all remaining inline styles */
+
+/* Accent color */
+.basalam-accent-primary {
+  accent-color: var(--basalam-primary-color);
+}
+
+/* More display utilities */
+.basalam-flex-center-gap-10 {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.basalam-flex-center-gap-4 {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: center;
+}
+
+.basalam-flex-col-gap-8 {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.basalam-flex-wrap-gap-6 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.basalam-flex-wrap-gap-8 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.basalam-flex-gap-10 {
+  display: flex;
+  gap: 10px;
+}
+
+.basalam-flex-margin-13 {
+  display: flex;
+  margin-top: 13px !important;
+}
+
+/* Grid utilities */
+.basalam-grid-full {
+  grid-column: 1 / -1;
+}
+
+/* Color utilities */
+.basalam-color-success-bold {
+  color: #00a884;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.basalam-color-success {
+  color: #00b67a;
+}
+
+.basalam-color-danger-dark {
+  color: #dc3232;
+}
+
+.basalam-color-warning-dark {
+  color: #f7a700;
+}
+
+.basalam-color-brand {
+  color: #ff5c35;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.basalam-color-gray-dark {
+  color: #2d3748;
+  font-size: 14px;
+}
+
+.basalam-color-gray-medium {
+  color: #718096;
+  font-size: 12px;
+}
+
+.basalam-color-white {
+  color: #fff;
+}
+
+/* Font utilities */
+.basalam-font-10 {
+  font-size: 10px;
+}
+
+.basalam-font-12 {
+  font-size: 12px;
+}
+
+.basalam-font-pelak-12 {
+  font-family: PelakFa;
+  font-size: 12px !important;
+}
+
+.basalam-font-17 {
+  font-size: 17px;
+  vertical-align: middle;
+}
+
+/* Height utilities */
+.basalam-height-32 {
+  height: 32px;
+}
+
+.basalam-height-35 {
+  height: 35px;
+}
+
+/* More margin utilities */
+.basalam-margin-bottom-5 {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.basalam-margin-bottom-5-width {
+  margin-bottom: 5px;
+  width: 100%;
+}
+
+.basalam-margin-top-8-flex {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.basalam-margin-top-10-gradient {
+  margin-top: 10px;
+  padding: 15px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe266 100%);
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+/* Width utilities */
+.basalam-width-15 {
+  width: 15px;
+}
+
+.basalam-width-auto {
+  width: auto;
+}
+
+.basalam-width-full-margin-10 {
+  width: 100%;
+  margin: 10px 0;
+  font-family: "PelakFA";
+}
+
+.basalam-width-full-pelak {
+  width: 100%;
+  margin: 10px 0;
+  font-family: "PelakFA";
+}
+
+.basalam-width-full-pelak-no-margin {
+  width: 100%;
+  margin: 10px 0;
+  font-family: "PelakFA";
+}
+
+.basalam-width-full-margin-bottom-15 {
+  width: 100%;
+  margin-bottom: 15px !important;
+}
+
+.basalam-width-full-margin-top-10 {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.basalam-width-full-margin-top-5 {
+  width: 100%;
+  margin-top: 5px;
+}
+
+.basalam-width-full-primary {
+  width: 100%;
+  background: var(--basalam-primary-color);
+  border: none;
+  color: white;
+  padding: 0px !important;
+  cursor: pointer;
+}
+
+.basalam-width-32 {
+  width: 32%;
+  text-align: right;
+  margin-bottom: 10px;
+}
+
+.basalam-width-max-80 {
+  max-width: 80% !important;
+  font-size: 12px;
+}
+
+.basalam-min-width-0 {
+  min-width: 0px;
+  font-size: 13px;
+}
+
+/* More display utilities */
+.basalam-display-block-margin-5 {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 12px;
+  text-align: justify;
+  margin-bottom: 5px !important;
+}
+
+.basalam-display-block-margin-5-top {
+  display: block;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  font-size: 12px;
+  text-align: justify;
+  margin-bottom: 5px !important;
+  margin-top: 5px !important;
+}
+
+.basalam-display-none-shadow {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border: 1px solid #ccc;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Dynamic display utilities */
+.basalam-display-dynamic-checked {
+  display: var(--display-checked);
+}
+
+.basalam-display-dynamic-yes {
+  display: var(--display-yes);
+}
+
+/* Text alignment with font size */
+.basalam-text-center-12 {
+  text-align: center;
+  font-size: 12px;
+}
+
+.basalam-text-justify-12 {
+  text-align: justify;
+  font-size: 12px;
+}
+
+/* Modal section styling */
+.basalam-modal-section {
+  background: #fff;
+  margin: 5% auto;
+  padding: 20px;
+  width: 90%;
+  max-width: 800px;
+  max-height: 570px;
+  position: relative;
+  overflow-y: auto;
+  padding-top: 40px;
+}
+
+/* Badge for status */
+.basalam-status-badge {
+  background: #ffc107;
+  color: #000;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+/* Additional utility classes for inline styles found in templates */
+.basalam-skip-link {
+  color: #0770d9 !important;
+  display: flex;
+  align-items: center;
+}
+
+.basalam-input-max-width {
+  max-width: -webkit-fill-available;
+  margin-bottom: 10px;
+}
+
+.basalam-token-paragraph {
+  text-align: justify;
+  margin-top: 16px !important;
+}
+
+.basalam-token-button {
+  width: unset;
+  margin: 24px !important;
+}
+
+.basalam-description-justify-important {
+  text-align: justify !important;
+}
+
+.basalam-action-card-relative {
+  position: relative;
+}
+
+.basalam-info-icon-absolute {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  border: 1px solid;
+  border-radius: 70%;
+  width: 22px;
+  height: 22px;
+}
+
+.basalam-info-cursor {
+  width: 22px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.basalam-form-margin-0 {
+  margin: 0;
+}
+
+.basalam-width-fill-available {
+  width: -webkit-fill-available;
+}
+
+.basalam-btn-img-20 {
+  width: 20px;
+}
+
+.basalam-btn-img-20-vertical {
+  width: 20px;
+  vertical-align: middle;
+  margin-left: 5px;
+}
+
+.basalam-modal-hidden {
+  display: none;
+}
+
+.basalam-modal-max-width-400 {
+  max-width: 400px;
+}
+
+.basalam-modal-img-20 {
+  width: 20px;
+}
+
+.basalam-modal-font-20 {
+  font-size: 20px;
+  margin-top: 15px !important;
+}
+
+.basalam-job-info-block {
+  display: block;
+  margin: 10px 0px 10px 0px;
+}
+
+.basalam-warning-bg {
+  background: #fff3cd;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 15px;
+  border: 1px solid #ffc107;
+  -webkit-border-radius: ;
+  -moz-border-radius: ;
+  -ms-border-radius: ;
+  -o-border-radius: ;
+}
+
+.basalam-warning-header {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  color: #856404;
+}
+
+.basalam-warning-text {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: #856404;
+}
+
+.basalam-warning-badge {
+  background: #ffc107;
+  color: #000;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.basalam-warning-justify-10 {
+  margin: 10px 0 0 0;
+  font-size: 13px;
+  color: #856404;
+}
+
+.basalam-onboarding-paragraph {
+  padding-top: 15px;
+  font-size: 14px;
+  text-align: justify;
+}
+
+.basalam-form-group-margin {
+  margin: 10px 0;
+}
+
+.basalam-checkbox-scale {
+  transform: scale(1.2);
+}
+
+.basalam-button-disabled-bg {
+  cursor: not-allowed;
+  background-color: #ccc !important;
+}
+
+.basalam-danger-button-full {
+  width: 100%;
+  background-color: #dc3545 !important;
+  margin-bottom: 10px !important;
+}
+
+.basalam-danger-button-img {
+  width: 20px;
+  vertical-align: middle;
+  margin-left: 5px;
+}
+
+.basalam-modal-display-none {
+  display: none;
+}
+
+.basalam-margin-top-15-flex-end {
+  margin-top: 15px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.basalam-info-text-right {
+  text-align: right;
+  font-weight: bold;
+}
+
+.basalam-danger-text {
+  color: var(--basalam-danger-color);
+}
+
+.basalam-contact-padding-top {
+  padding-top: 12px;
+}
+
+.basalam-contact-img-40 {
+  width: 40px;
+}
+
+.basalam-contact-img-70 {
+  width: 70px;
+}
+
+.basalam-vendor-info-padding {
+  padding-top: 10px !important;
+}
+
+.basalam-page-description {
+  text-align: justify !important;
+}
+
+.basalam-accent-color {
+  accent-color: var(--basalam-primary-color);
+}
+
+/* Additional utility classes for category mapping page */
+.basalam-padding-box-center {
+  padding: 15px;
+  background: var(--basalam-gray-100);
+  border-radius: 8px;
+  text-align: center;
+  font-family: PelakFA;
+}
+
+.basalam-arrow-large {
+  font-size: 24px;
+  color: var(--basalam-gray-500);
+}
+
+.basalam-margin-left-10 {
+  margin-left: 10px;
+}
+
+.basalam-margin-right-10 {
+  margin-right: 10px;
+}
+
+.basalam-padding-0-20 {
+  padding: 0px 20px;
+}
+
+.basalam-input-search {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--basalam-gray-300);
+  border-radius: 6px;
+  font-family: PelakFA;
+}
+
+.basalam-height-400-scroll {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid var(--basalam-gray-300);
+  border-radius: 6px;
+}
+
+.basalam-text-center-padding {
+  text-align: center;
+  padding: 20px;
+  font-family: PelakFA;
+}
+
+.basalam-margin-left-8 {
+  margin-left: 8px;
+}
+
+.basalam-margin-bottom-15 {
+  margin-bottom: 15px;
+}
+
+.basalam-padding-20 {
+  padding: 20px;
+}
+
+.basalam-margin-top-20 {
+  margin-top: 20px;
+}
+
+.basalam-cursor-pointer-margin {
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.basalam-width-20-block {
+  width: 20px;
+  display: inline-block;
+}
+
+.basalam-dynamic-padding-right {
+  padding-right: var(--paddingRight);
+}
+
+.basalam-opacity-1-padding {
+  opacity: 1;
+  padding: 20px;
+}
+
+/* JavaScript template utility classes */
+.basalam-cursor-pointer-small {
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.basalam-flex-1 {
+  flex: 1;
+}
+
+.basalam-display-none {
+  display: none;
+}
+
+/* Order tracking box utility classes */
+.basalam-font-12 {
+  font-size: 12px;
+}
+
+.basalam-text-justify-12 {
+  text-align: justify;
+  font-size: 12px;
+}
+
+.basalam-margin-top-15 {
+  margin-top: 15px;
+}
+
+.basalam-margin-bottom-5 {
+  margin-bottom: 5px;
+}
+
+.basalam-margin-bottom-5-width {
+  margin-bottom: 5px;
+  width: 100%;
+}
+
+.basalam-margin-top-5 {
+  margin-top: 5px;
+}
+
+.basalam-margin-top-10 {
+  margin-top: 10px;
+}
+
+.basalam-margin-10-0 {
+  margin: 10px 0;
+}
+
+.basalam-margin-bottom-15 {
+  margin-bottom: 15px;
+}
+
+.basalam-height-35 {
+  height: 35px;
+}
+
+.basalam-modal-popup {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border: 1px solid #ccc;
+  z-index: 1000;
+}
+
+.basalam-modal-center-gap {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Additional utility classes for AdminUI inline styles */
+
+/* Icon sizing */
+.basalom-icon-medium {
+  font-size: 17px;
+  vertical-align: middle;
+}
+
+/* Modal display control */
+.basalam-modal-display-none {
+  display: none;
+}
+
+/* Modal header text */
+.basalam-modal-header-text {
+  color: #fff;
+}
+
+/* Flex containers with specific alignment */
+.basalam-input-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: center;
+}
+
+.basalam-flex-center-gap-4 {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: center;
+}
+
+.basalam-flex-center-vertical {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.basalam-flex-end-gap-4 {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+/* Font sizes */
+.basalam-font-10 {
+  font-size: 10px;
+}
+
+.basalam-font-12 {
+  font-size: 12px;
+}
+
+.basalam-font-13 {
+  font-size: 13px;
+}
+
+.basalam-font-14 {
+  font-size: 14px;
+}
+
+.basalam-font-16 {
+  font-size: 16px;
+}
+
+.basalam-font-17 {
+  font-size: 17px;
+}
+
+/* Text alignment for selects */
+.basalam-select-center {
+  text-align: center;
+  font-size: 12px;
+}
+
+/* Width utilities */
+.basalam-width-auto {
+  width: auto;
+}
+
+.basalam-max-width-80 {
+  max-width: 80% !important;
+}
+
+/* Margin utilities */
+.basalam-margin-top-8 {
+  margin-top: 8px;
+}
+
+/* Status icon colors */
+.basalam-status-success {
+  color: #00b67a;
+}
+
+.basalam-status-warning {
+  color: #f7a700;
+}
+
+.basalam-status-error {
+  color: #dc3232;
+}
+
+/* Button height utilities */
+.basalam-height-32 {
+  height: 32px;
+}
+
+/* Button width utilities */
+.basalam-button-auto {
+  width: auto;
+}
+
+.basalam-margin-auto {
+  margin: auto !important;
+}
+
+/* Table styling for unsync products */
+.basalam-table-unsync {
+  border-collapse: collapse;
+  max-width: 1005px;
+  width: 100%;
+}
+
+.basalam-table-header {
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+.basalam-table-padding {
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+}
+
+.basalam-table-cell-center {
+  text-align: center;
+}
+
+/* Product image in table */
+.basalam-product-img-table {
+  border-radius: 4px;
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+}
+
+/* Button inside table */
+.basalam-button-table {
+  width: unset;
+  margin: auto !important;
+  height: 35px;
+}
+
+/* Link inside button */
+.basalam-link-small {
+  font-size: 10px;
+}
+
+/* Checkbox styling */
+.basalam-checkbox-custom {
+  accent-color: var(--basalam-primary-color);
+}
+
+/* Tasks info styling */
+.basalam-tasks-info-container {
+  margin-top: 10px;
+  padding: 15px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe266 100%);
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.basalam-tasks-info-flex {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.basalam-tasks-info-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.basalam-tasks-info-label {
+  color: #2d3748;
+  font-size: 14px;
+}
+
+.basalam-tasks-info-value-primary {
+  color: #ff5c35;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.basalam-tasks-info-value-success {
+  color: #00a884;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.basalam-tasks-info-value-muted {
+  color: #718096;
+  font-size: 12px;
+}
+
+/* Input width with font size */
+.basalam-input-max-width-80 {
+  max-width: 80% !important;
+  font-size: 12px;
+}
+
+/* Form display control */
+.basalam-form-group-full {
+  grid-column: 1 / -1;
+}
+
+/* Checkbox label styling */
+.basalam-checkbox-label {
+  width: 32%;
+  text-align: right;
+  margin-bottom: 10px;
+}
+
+/* Min width utility */
+.basalam-min-width-0 {
+  min-width: 0px;
+}
+
+/* Margin top 8px utility */
+.basalam-margin-top-8 {
+  margin-top: 8px;
+}
+
+/* Font utilities */
+.basalam-font-bold {
+  font-weight: bold;
+  font-family: PelakFA !important;
+}
+
+/* Flex column utility */
+.basalam-flex-col {
+  flex-direction: column;
+}
+
+/* Table row styling */
+.basalam-table-row {
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Margin bottom 15px utility */
+.basalam-margin-bottom-15 {
+  margin-bottom: 15px !important;
+}
+
+/* Order tracking box specific styles */
+.basalam-label-block {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 12px;
+  text-align: justify;
+  margin-bottom: 5px !important;
+}
+
+.basalam-label-block-margin {
+  display: block;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  font-size: 12px;
+  text-align: justify;
+  margin-bottom: 5px !important;
+  margin-top: 5px !important;
+}
+
+.basalam-input-full {
+  width: -webkit-fill-available !important;
+}
+
+.basalam-input-full-margin {
+  width: -webkit-fill-available !important;
+  margin-bottom: 15px !important;
+}
+
+.basalam-textarea-full {
+  width: -webkit-fill-available !important;
+  margin: 10px 0;
+  font-family: "PelakFA";
+}
+
+.basalam-input-number {
+  width: -webkit-fill-available !important;
+  margin: 10px 0;
+  font-family: "PelakFA";
+}
+
+.basalam-select-full {
+  width: 100%;
+  margin: 10px 0;
+  font-family: "PelakFA";
+}
+
+.basalam-select-full-margin {
+  width: 100%;
+  margin: 10px 0;
+  font-family: "PelakFA";
+}
+
+.basalam-popup-modal {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border: 1px solid #ccc;
+  z-index: 1000;
+}
+
+.basalam-popup-center-gap {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.basalam-img-15 {
+  width: 15px;
+}
+
+.basalam-button-full-primary {
+  width: 100%;
+  background: var(--basalam-primary-color);
+  border: none;
+  color: white;
+  padding: 0px !important;
+  cursor: pointer;
+}
+
+.basalam-font-pelak-12 {
+  font-family: "PelakFA";
+  font-size: 12px;
+}
+
+.basalam-mobile-fields {
+  display: none;
+}
+
+.basalam-mobile-fields.show {
+  display: block;
+}
+
+/* Inline styles moved from JavaScript files */
+.basalam-loading-text {
+  color: white;
+}
+
+.basalam-attributes-header {
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.basalam-attributes-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.basalam-copy-attr {
+  color: white;
+  cursor: pointer;
+  background-color: var(--basalam-primary-color);
+  border: none;
+  padding: 4px 10px;
+  border-radius: 3px;
+  margin: 2px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.basalam-categories-header {
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.basalam-categories-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.basalam-category-label {
+  border: 1px solid #00000036;
+  padding: 7px;
+  border-radius: 6px;
+  width: -webkit-fill-available;
+}
+
+.basalam-category-option {
+  accent-color: var(--basalam-primary-color);
+}
+
+.basalam-delete-option-auto {
+  width: auto;
+}
+
+.basalam-flex-gap-10 {
+  display: flex;
+  gap: 10px;
+}
+
+/* Product Actions Container */
+.basalam-product-actions {
+  align-items: center;
+}
+
+/* View Button */
+.basalam-view-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 63px;
+  height: 25px;
+  background-color: var(--basalam-gray-200);
+  color: var(--basalam-gray-700);
+  border-radius: 2px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  -ms-border-radius: 2px;
+  -o-border-radius: 2px;
+}
+
+.basalam-view-btn:hover {
+  background-color: var(--basalam-gray-300);
+  color: var(--basalam-gray-800);
+  transform: translateY(-1px);
+}
+
+.basalam-view-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.basalam-order-complete-status {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.basalam-status-message {
+  text-align: right !important;
+  margin: 0;
+}
+
+/* Tickets */
+.ticket-header-data {
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  flex-direction: column;
+}
+
+.ticket-header-information {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 16px;
+  text-align: center;
+}
+
+.ticket-header-data-heading {
+  text-align: center !important;
+}
+
+.ticket-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  width: 100%;
+  max-width: 1080px !important;
+}
+
+.ticket-card {
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  -webkit-border-radius: 16px;
+  -moz-border-radius: 16px;
+  -ms-border-radius: 16px;
+  -o-border-radius: 16px;
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  padding: 12px;
+}
+
+.ticket-card__field {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 4px;
+}
+
+.ticket-card__field-label {
+  font-weight: 600;
+  color: var(--basalam-gray-800);
+  font-size: 12px;
+}
+
+.ticket-card__field-value {
+  color: var(--basalam-gray-700);
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.ticket-card__field-status {
+  border-radius: 8px;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  -ms-border-radius: 8px;
+  -o-border-radius: 8px;
+  padding: 4px;
+}
+
+.ticket-card__field-status--pending {
+  background-color: #fff7e7;
+}
+
+.ticket-card__field-status--closed {
+  background-color: #faeff1;
+}
+
+.ticket-card__field-status--answered {
+  background-color: #ebf3e6;
+}
+
+.ticket-card__field-status--review {
+  background-color: #eaf3fa;
+}
+
+.ticket-card__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .ticket-header-data {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .ticket-header-information {
+    flex-direction: row;
+  }
+
+  .ticket-header-data-heading {
+    text-align: justify !important;
+  }
+  .ticket-list {
+    gap: 12px;
+  }
+  .ticket-card {
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    gap: 12px;
+    padding: 16px;
+  }
+  .ticket-card__field {
+    align-items: center;
+  }
+  .ticket-card__field-label {
+    display: none;
+  }
+  .ticket-card__field-value {
+    font-size: 14px !important;
+  }
+  .ticket-card__field-status {
+    padding: 8px;
+  }
+}
+
+/* Ticket pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 8px;
+}
+
+.pagination-link {
+  background-color: var(--basalam-primary-color);
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 8px;
+  color: #ffff;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  -ms-border-radius: 8px;
+  -o-border-radius: 8px;
+  font-size: 14px;
+  width: 78px !important;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.pagination-link:hover {
+  transform: translateY(-1px);
+  -webkit-transform: translateY(-1px);
+  -moz-transform: translateY(-1px);
+  -ms-transform: translateY(-1px);
+  -o-transform: translateY(-1px);
+  color: #ffffff;
+  background-color: var(--basalam-primary-hover);
+  border: none;
+}
+
+/* Create Ticket */
+.create-ticket {
+  background-color: #ffffff;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  -webkit-border-radius: 16px;
+  -moz-border-radius: 16px;
+  -ms-border-radius: 16px;
+  -o-border-radius: 16px;
+  width: 100%;
+
+  max-width: 768px;
+}
+
+.create-ticket__form-container {
+  margin-top: 24px;
+}
+
+.create-ticket__inputs {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.create-ticket__control {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.create-ticket__input {
+  font-weight: 600;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.create-ticket__label {
+  color: var(--basalam-gray-800);
+  margin-bottom: 4px !important;
+}
+
+.create-ticket__textarea {
+  min-height: 102px;
+}
+
+.create-ticket__submit {
+  margin-top: 16px;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .create-ticket__submit {
+    width: 128px;
+  }
+}
+
+/* Ticket items */
+
+.ticket-items__answer {
+  max-width: 768px;
+  width: 100%;
+  padding: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  -webkit-border-radius: 16px;
+  -moz-border-radius: 16px;
+  -ms-border-radius: 16px;
+  -o-border-radius: 16px;
+}
+
+.ticket-items__answer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.ticket-items__answer-control {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.ticket-items__answer-actions {
+  margin-top: 12px;
+}
+
+.ticket-items__answer-control-label {
+  font-weight: 600;
+  color: var(--basalam-gray-800);
+  margin-bottom: 4px !important;
+}
+
+.ticket-items__answer-input {
+  font-weight: 600;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 104px;
+}
+.ticket-items {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 16px;
+  margin: 36px 0;
+  max-width: 768px;
+  width: 100%;
+}
+
+.ticket-items__item {
+  padding: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  border-radius: 16px;
+  -webkit-border-radius: 16px;
+  -moz-border-radius: 16px;
+  -ms-border-radius: 16px;
+  -o-border-radius: 16px;
+}
+
+.ticket-items__item--admin {
+  background-color: #fff3ef;
+  box-shadow: 0 2px 8px rgba(255, 93, 40, 0.2);
+}
+
+.ticket-items__item-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ticket-items__item-name {
+  font-size: 14px !important;
+  font-weight: 600;
+  text-align: right;
+  color: var(--basalam-gray-800);
+}
+
+.ticket-items__item-date {
+  font-size: 12px !important;
+  color: var(--basalam-gray-600);
+}
+
+.ticket-items__item-content-wrapper {
+  margin-top: 8px;
+}
+
+.ticket-items__item-content {
+  text-align: right;
+  color: var(--basalam-gray-700);
+}
+
+.ticket-items__item-actions {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 8px;
+}
+
+.ticket-items__answer-submit {
+  font-weight: 600;
+}
+
+@media (min-width: 786px) {
+  .ticket-items__answer {
+    padding: 20px;
+  }
+  .ticket-items__item {
+    padding: 20px;
+  }
+
+  .ticket-items__item-name {
+    font-size: 16px !important;
+  }
+
+  .ticket-items__item-content {
+    font-size: 14px !important;
+  }
+}
+
+.basalam-error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 15px;
+  border-radius: 5px;
+  margin: 20px auto;
+  text-align: center;
+  max-width: fit-content;
+  display: block;
 }

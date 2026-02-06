@@ -26,7 +26,7 @@ jQuery(document).ready(function ($) {
           $("#basalam-product-results").html(response);
         },
         error: function () {
-          $("#basalam-product-results").html("<p>خطا در دریافت اطلاعات!</p>");
+          $("#basalam-product-results").html(error);
         },
       });
     } else {
@@ -44,7 +44,7 @@ jQuery(document).ready(function ($) {
       return;
     }
 
-    $btn.text("در حال اتصال...").prop("disabled", true);
+    $btn.text("اتصال...").prop("disabled", true);
 
     $.ajax({
       url: ajaxurl,

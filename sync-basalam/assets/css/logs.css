@@ -1,16 +1,33 @@
 .basalam-container {
     margin-top: 20px !important;
-    width: 100% !important;
-    max-width: 100% !important;
+    width: calc(100% - 40px) !important;
+    max-width: calc(100% - 40px) !important;
     box-sizing: border-box;
-    padding: 0 20px;
+    padding: 0;
+    margin-left: 20px !important;
+    margin-right: 20px !important;
 }
 
-/* Header Section Styles */
+.basalam-container * {
+    box-sizing: border-box;
+}
+
+.basalam-container.basalam-p {
+    padding: 0;
+}
+
 .log-basalam-header-section {
     padding: 24px;
     margin-bottom: 24px;
+    margin-left: 0;
+    margin-right: 0;
     color: var(--basalam-gray-800);
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--basalam-gray-200);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .log-basalam-header-content {
@@ -101,11 +118,12 @@
     filter: brightness(0) invert(1);
 }
 
-/* Modern Tabs Styles */
 .log-basalam-tabs-modern {
     display: flex;
     margin-bottom: 24px;
-    flex-wrap: wrap;
+    margin-left: 0;
+    margin-right: 0;
+    flex-wrap: nowrap;
     width: 100%;
     gap: 8px;
     background: white;
@@ -113,6 +131,8 @@
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     border: 1px solid var(--basalam-gray-200);
+    overflow-x: auto;
+    box-sizing: border-box;
 }
 
 .log-basalam-tab-button-modern {
@@ -121,18 +141,19 @@
     border: 1px solid var(--basalam-gray-200);
     cursor: pointer;
     border-radius: 8px;
-    flex: 1;
+    flex: 1 1 0;
+    min-width: 0;
     text-align: center;
     transition: all 0.3s ease;
     text-decoration: none;
     color: var(--basalam-gray-700);
-    min-width: 140px;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     font-weight: 500;
     font-family: PelakFA;
+    white-space: nowrap;
 }
 
 .log-basalam-tab-button-modern:hover {
@@ -198,21 +219,29 @@
 .log-basalam-tab-content {
     display: none;
     width: 100%;
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
 }
 
 .log-basalam-tab-content.log-basalam-active {
     display: block;
+    width: 100%;
+    padding: 0;
+    margin: 0;
 }
 
-/* Empty State */
 .log-basalam-empty-state {
     text-align: center;
     padding: 60px 20px;
+    margin: 0;
     background: white;
     border-radius: 12px;
     color: var(--basalam-gray-600);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     border: 1px solid var(--basalam-gray-200);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .log-basalam-empty-icon {
@@ -234,12 +263,12 @@
     font-family: PelakFA;
 }
 
-/* Modern Log List Styles */
 .log-basalam-log-list-modern {
     list-style: none;
     padding: 0;
     width: 100%;
     margin: 0;
+    box-sizing: border-box;
 }
 
 .log-basalam-log-item-modern {
@@ -289,8 +318,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 96%;
+    width: 100%;
     margin-bottom: 12px;
+    gap: 12px;
 }
 
 .log-basalam-log-meta {
@@ -465,9 +495,10 @@
     border-radius: 6px;
     border: 1px solid var(--basalam-gray-200);
     font-family: PelakFA;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-/* Modern Pagination */
 .log-basalam-pagination-modern {
     display: flex;
     justify-content: center;
@@ -508,7 +539,6 @@
     font-weight: 600;
 }
 
-/* Modal Styles */
 .log-basalam-modal {
     display: none;
     position: fixed;
@@ -538,6 +568,7 @@
         opacity: 0;
         transform: translateY(-50px) scale(0.9);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -632,83 +663,230 @@
     background-color: var(--basalam-danger-hover);
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
+    .basalam-container {
+        width: calc(100% - 20px) !important;
+        max-width: calc(100% - 20px) !important;
+        margin-left: 10px !important;
+        margin-right: 10px !important;
+        padding: 0;
+    }
+
+    .log-basalam-header-section {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
     .log-basalam-header-content {
         flex-direction: column;
         gap: 16px;
+        align-items: stretch;
     }
-    
+
+    .log-basalam-header-left {
+        width: 100%;
+    }
+
+    .log-basalam-heading {
+        font-size: 1.3em;
+        text-align: center;
+    }
+
+    .log-basalam-header-actions {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .log-basalam-clear-logs-button {
+        width: 100%;
+        justify-content: center;
+    }
+
     .log-basalam-stat-item {
         min-width: 80px;
         padding: 8px 12px;
     }
-    
+
     .log-basalam-stat-number {
         font-size: 1.2em;
     }
-    
+
     .log-basalam-tabs-modern {
-        flex-direction: column;
-        gap: 4px;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 6px;
     }
-    
+
     .log-basalam-tab-button-modern {
-        min-width: auto;
-        padding: 10px 16px;
+        flex: 1 1 calc(50% - 3px);
+        min-width: calc(50% - 3px);
+        padding: 10px 12px;
+        font-size: 13px;
     }
-    
+
+    .log-basalam-tab-label {
+        font-size: 13px;
+    }
+
+    .log-basalam-tab-icon {
+        width: 14px;
+        height: 14px;
+    }
+
     .log-basalam-modal-content {
         width: 95%;
         margin: 10% auto;
     }
-    
+
     .log-basalam-modal-footer {
         flex-direction: column;
     }
-    
+
     .log-basalam-product-actions-modern {
         flex-direction: column;
+        width: 100%;
     }
-    
+
+    .log-basalam-product-actions-modern .log-basalam-btn-modern {
+        width: 100%;
+        justify-content: center;
+    }
+
     .log-basalam-log-meta {
-        flex-direction: column;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .log-basalam-log-header-modern {
+        flex-direction: row;
+        justify-content: space-between;
         align-items: flex-start;
         gap: 8px;
+        width: 100%;
     }
-    
-    .log-basalam-log-header-modern {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
+
+    .log-basalam-context-toggle-modern {
+        font-size: 0.8em;
+        padding: 4px 8px;
+    }
+
+    .log-basalam-empty-state {
+        padding: 40px 16px;
+    }
+
+    .log-basalam-empty-icon {
+        font-size: 2.5em;
+    }
+
+    .log-basalam-empty-state h3 {
+        font-size: 1em;
+    }
+
+    .log-basalam-empty-state p {
+        font-size: 0.85em;
     }
 }
 
 @media (max-width: 480px) {
+    .basalam-container {
+        width: calc(100% - 16px) !important;
+        max-width: calc(100% - 16px) !important;
+        margin-left: 8px !important;
+        margin-right: 8px !important;
+        padding: 0;
+    }
+
+    .log-basalam-header-section {
+        padding: 12px;
+        border-radius: 8px;
+    }
+
+    .log-basalam-heading {
+        font-size: 1.1em;
+        margin-bottom: 12px;
+    }
+
     .log-basalam-stat-item {
         width: 100%;
         max-width: 200px;
     }
-    
-    .log-basalam-tab-button-modern {
-        padding: 8px 12px;
-        font-size: 13px;
+
+    .log-basalam-tabs-modern {
+        flex-direction: column;
+        gap: 4px;
+        padding: 4px;
     }
-    
+
+    .log-basalam-tab-button-modern {
+        flex: 1 1 100%;
+        min-width: 100%;
+        padding: 10px 12px;
+        font-size: 12px;
+    }
+
+    .log-basalam-tab-count-modern {
+        font-size: 0.75em;
+        padding: 2px 6px;
+    }
+
     .log-basalam-log-item-modern {
         padding: 12px;
+        margin-bottom: 8px;
+        border-radius: 6px;
     }
-    
+
+    .log-basalam-log-message-modern {
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .log-basalam-log-date-modern {
+        font-size: 0.8em;
+    }
+
+    .log-basalam-log-level-badge {
+        font-size: 0.7em;
+        padding: 3px 6px;
+    }
+
+    .log-basalam-log-count-modern {
+        font-size: 0.85em;
+        padding: 6px 10px;
+        margin-bottom: 12px;
+    }
+
+    .log-basalam-pagination-modern {
+        padding: 16px 0;
+        margin-top: 16px;
+        gap: 2px;
+    }
+
+    .log-basalam-page-link-modern {
+        padding: 6px 10px;
+        font-size: 12px;
+        min-width: 32px;
+    }
+
+    .log-basalam-page-link-modern.basalam-first,
+    .log-basalam-page-link-modern.basalam-last,
+    .log-basalam-page-link-modern.basalam-prev,
+    .log-basalam-page-link-modern.basalam-next {
+        padding: 6px 8px;
+        min-width: 28px;
+    }
+
     .log-basalam-modal-body {
         padding: 16px;
     }
-    
+
     .log-basalam-modal-footer {
         padding: 16px;
     }
 }
 
-/* Legacy styles for backward compatibility */
 .basalam-tabs {
     display: flex;
     margin-bottom: 15px;
