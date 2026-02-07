@@ -33,7 +33,6 @@ class FetchOrders
 
         if (!isset($response['body'])) return $collected;
 
-        // Decode JSON response body
         $bodyData = json_decode($response['body'], true);
 
         if (!isset($bodyData['data'])) return $collected;

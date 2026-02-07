@@ -10,7 +10,7 @@ class UpdateProductStrategy implements DataStrategyInterface
 {
     public function collect($product, ProductDataHandlerInterface $handler): array
     {
-        return [
+        $data = [
             'name' => $handler->getName($product),
             'description' => $handler->getDescription($product),
             'primary_price' => $handler->getPrice($product),
@@ -26,5 +26,7 @@ class UpdateProductStrategy implements DataStrategyInterface
             'is_wholesale' => $handler->isWholesale($product),
             'variants' => $handler->getVariants($product),
         ];
+
+        return array_filter($data, fn($value) => $value !== null);
     }
 }

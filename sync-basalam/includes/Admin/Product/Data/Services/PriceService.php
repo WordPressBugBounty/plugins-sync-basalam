@@ -12,7 +12,7 @@ class PriceService
     public function calculateFinalPrice($product): ?int
     {
         $price = $this->getBasePrice($product);
-        if (!$price) return 999999;
+        if (!$price) return null;
 
         $categoryIds = $this->getCategoryIds($product);
         return $this->applyPriceCalculations($price, $categoryIds);

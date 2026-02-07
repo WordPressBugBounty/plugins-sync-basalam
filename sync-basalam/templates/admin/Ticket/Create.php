@@ -37,12 +37,12 @@ $TicketSubjects = isset($fetchTicketSubjects['body']) ? json_decode($fetchTicket
                 <div class="create-ticket__inputs">
                     <div class="create-ticket__control">
                         <label for="ticket-title" class="create-ticket__label basalam-p">عنوان</label>
-                        <input type="text" name="title" id="ticket-title" class="basalam-input create-ticket__input">
+                        <input type="text" name="title" id="ticket-title" class="basalam-input create-ticket__input" minlength="3" maxlength="255" required>
                     </div>
 
                     <div class="create-ticket__control">
                         <label class="create-ticket__label basalam-p">موضوع</label>
-                        <select name="subject" id="subject" class="basalam-select basalam-input create-ticket__input">
+                        <select name="subject" id="subject" class="basalam-select basalam-input create-ticket__input" required>
                             <?php foreach ($TicketSubjects['data'] as $subject): ?>
                                 <option value="<?= esc_html($subject) ?>"><?= esc_html($subject) ?></option>
                             <?php endforeach; ?>
@@ -50,8 +50,8 @@ $TicketSubjects = isset($fetchTicketSubjects['body']) ? json_decode($fetchTicket
                     </div>
 
                     <div class="create-ticket__control">
-                        <label for="" class="create-ticket__label basalam-p ">توضیحات</label>
-                        <textarea name="content" id="" content class="basalam-input create-ticket__input create-ticket__textarea"></textarea>
+                        <label for="content" class="create-ticket__label basalam-p ">توضیحات</label>
+                        <textarea name="content" id="content" minlength="10" required class="basalam-input create-ticket__input create-ticket__textarea"></textarea>
                     </div>
                 </div>
                 <div class="create-ticket__actions">

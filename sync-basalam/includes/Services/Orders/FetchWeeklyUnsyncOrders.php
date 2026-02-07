@@ -21,7 +21,6 @@ class FetchWeeklyUnsyncOrders
         $table_name_payments = $wpdb->prefix . 'sync_basalam_payments';
 
         $orders = $this->getOrdersService->getWeeklyOrders();
-        $orders = $orders;
 
         if (!$orders) {
             return [

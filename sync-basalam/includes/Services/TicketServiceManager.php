@@ -98,6 +98,15 @@ class TicketServiceManager
 
     public function createTicket($title, $subject, $content)
     {
+        if (
+            !isset($title, $subject, $content) ||
+            mb_strlen(trim($title)) < 3 ||
+            mb_strlen(trim($title)) > 255 ||
+            mb_strlen(trim($content)) < 10
+        ) {
+            wp_die('اطلاعات وارد شده معتبر نیست');
+        }
+
         $service = new CreateTicket();
 
         $data = [

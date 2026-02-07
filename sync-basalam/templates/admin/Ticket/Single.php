@@ -3,7 +3,7 @@
 use SyncBasalam\Services\TicketServiceManager;
 use SyncBasalam\Utilities\DateConverter;
 use SyncBasalam\Admin\Components;
-
+use SyncBasalam\Utilities\TicketUserResolver;
 defined('ABSPATH') || exit;
 
 $ticket_id = $_GET['ticket_id'] ?? 0;
@@ -48,26 +48,23 @@ if (empty($ticket)) {
     <div class="ticket-items">
         <?php
         foreach ($ticket['data']['items'] as $ticketItem) {
+            if ($ticketItem['type'] != 'content') continue;
             $isAdmin = $ticketItem['user']['is_admin'];
-            $creatorUser = '';
-            if ($ticketItem['user']['id'] == 6) $creatorUser = 'پیام سیستمی';
-            elseif ($ticketItem['user']['id'] == 7) $creatorUser = 'ربات هوش مصنوعی';
-            elseif ($isAdmin) $creatorUser = 'ادمین';
-            else $creatorUser = 'شما';
+            $creatorUser = TicketUserResolver::getLabel($ticketItem['user']);
         ?>
             <div class="ticket-items__item-wrapper">
                 <div class="ticket-items__item <?php if ($isAdmin) echo 'ticket-items__item--admin' ?>">
                     <div class="ticket-items__item-stats">
-                        <p class="ticket-items__item-name basalam-p"><?php echo $creatorUser;?></p>
+                        <p class="ticket-items__item-name basalam-p"><?php echo esc_html($creatorUser);?></p>
 
                         <p class="ticket-items__item-date basalam-p">
-                            <?php echo DateConverter::utcToJalaliDateTime($ticketItem['created_at']) ?>
+                            <?php echo esc_html(DateConverter::utcToJalaliDateTime($ticketItem['created_at'])) ?>
                         </p>
                     </div>
 
                     <div class="ticket-items__item-content-wrapper">
                         <p class="ticket-items__item-content basalam-p">
-                            <?php echo $ticketItem['content'] ?>
+                            <?php echo esc_html($ticketItem['content']) ?>
                         </p>
                     </div>
                 </div>

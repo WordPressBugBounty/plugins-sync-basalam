@@ -52,7 +52,7 @@ class CustomUpdateProductStrategy implements DataStrategyInterface
 
         if (!isset($data['variants'])) $data['variants'] = [];
 
-        return $data;
+        return array_filter($data, fn($value) => $value !== null);
     }
 
     private function shouldSyncField(string $fieldKey): bool

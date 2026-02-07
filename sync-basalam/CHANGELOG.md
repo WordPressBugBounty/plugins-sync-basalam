@@ -2,6 +2,18 @@
 
 <details>
 
+<summary>1.7.7 - 2026-02-07</summary>
+
+### Changed / Improved
+
+- Enhanced Performance and Security in Ticket Logics
+- Don't send null value in update product at basalam
+
+</details>
+
+
+<details>
+
 <summary>1.7.6 - 2026-02-01</summary>
 
 ### Fix

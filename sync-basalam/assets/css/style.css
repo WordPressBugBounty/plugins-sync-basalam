@@ -6161,9 +6161,18 @@ body > .basalam-info-modal {
   -ms-border-radius: 8px;
   -o-border-radius: 8px;
   font-size: 14px;
-  width: 78px !important;
+  width: 25px !important;
   text-align: center;
   transition: all 0.2s;
+}
+
+.pagination-link--active{
+    background: var(--basalam-gray-800);
+    color: #fff !important;
+    border-color: var(--basalam-gray-800);
+    font-weight: 600;
+    cursor: default;
+    pointer-events: none;
 }
 
 .pagination-link:hover {
