@@ -5,6 +5,7 @@ namespace SyncBasalam\Admin\Settings;
 use SyncBasalam\Queue\Tasks\Debug;
 use SyncBasalam\Actions\Controller\ProductActions\CancelDebug;
 use SyncBasalam\Services\WebhookService;
+use SyncBasalam\Services\VendorInfoService;
 
 defined('ABSPATH') || exit;
 
@@ -32,7 +33,8 @@ class SettingsPageHandler
 
     private static function redirectToOAuth()
     {
-        $oauthUrls = OAuthManager::getOAuthUrls();
+        $OAuthManger = new OAuthManager();
+        $oauthUrls = $OAuthManger->getOAuthUrls();
 
         wp_redirect($oauthUrls['url_req_token']);
         exit();
@@ -45,6 +47,8 @@ class SettingsPageHandler
         if ($oauthSaved) {
             $webhookService = new WebhookService();
             $webhookService->setupWebhook();
+            $vendorInfoService = new VendorInfoService();
+            $vendorInfoService->FetchVendorInfo();
         }
 
         $onboardingCompleted = get_option('sync_basalam_onboarding_completed');

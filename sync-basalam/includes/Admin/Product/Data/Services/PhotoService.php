@@ -8,6 +8,12 @@ defined('ABSPATH') || exit;
 
 class PhotoService
 {
+    private $fileUploader;
+
+    public function __construct()
+    {
+        $this->fileUploader = new FileUploader();
+    }
     public function getMainPhotoId($product): ?int
     {
         $mainImageId = $product->get_image_id();
@@ -34,8 +40,8 @@ class PhotoService
 
         // Limit to 10 photos maximum
         $galleryImageIds = array_slice($galleryImageIds, 0, 10);
+        foreach ($galleryImageIds as $index => $imageId) {
 
-        foreach ($galleryImageIds as $imageId) {
             $existingPhoto = $this->getExistingPhoto($imageId);
 
             if ($existingPhoto) {
@@ -58,7 +64,7 @@ class PhotoService
         if (!$imagePathOrUrl) return null;
 
         try {
-            $data = FileUploader::upload($imagePathOrUrl);
+            $data = $this->fileUploader->upload($imagePathOrUrl);
             return $data;
         } catch (\Exception $e) {
             return null;
@@ -94,7 +100,9 @@ class PhotoService
         $now = current_time('timestamp');
         $fourteenDays = 14 * DAY_IN_SECONDS;
 
-        if (($now - $createdAt) >= $fourteenDays) {
+        $age = $now - $createdAt;
+
+        if ($age >= $fourteenDays) {
             $wpdb->delete($tableName, ['woo_photo_id' => $wooPhotoId], ['%d']);
             return null;
         }
@@ -107,11 +115,13 @@ class PhotoService
         global $wpdb;
         $tableName = $wpdb->prefix . 'sync_basalam_uploaded_photo';
 
-        $wpdb->insert($tableName, [
+        $insertData = [
             'woo_photo_id' => $wooPhotoId,
             'sync_basalam_photo_id' => $basalamPhoto['file_id'],
             'sync_basalam_photo_url' => $basalamPhoto['url'],
             'created_at' => current_time('mysql'),
-        ], ['%d', '%d', '%s', '%s']);
+        ];
+
+        $wpdb->insert($tableName, $insertData, ['%d', '%d', '%s', '%s']);
     }
 }

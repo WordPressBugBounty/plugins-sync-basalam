@@ -4,6 +4,7 @@ namespace SyncBasalam\Services;
 
 use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Admin\Settings;
+use SyncBasalam\Logger\Logger;
 
 defined('ABSPATH') || exit;
 class WebhookService
@@ -20,7 +21,7 @@ class WebhookService
         $this->apiService = new ApiServiceManager();
         $this->basalamToken = Settings::getSettings(SettingsConfig::TOKEN);
         $this->webhookToken = Settings::getSettings(SettingsConfig::WEBHOOK_HEADER_TOKEN);
-        
+
         if (!$this->webhookToken) {
             $newToken = Settings::generateToken();
             Settings::updateSettings([SettingsConfig::WEBHOOK_HEADER_TOKEN => $newToken]);
@@ -30,6 +31,8 @@ class WebhookService
 
     public function setupWebhook()
     {
+        if (!$this->canCreateWebhook()) return false;
+        
         $existingWebhooks = $this->fetchWebhooks();
         $existingWebhooks = json_decode($existingWebhooks, true);
 
@@ -129,5 +132,17 @@ class WebhookService
 
         if ($response && ($response['status_code'] == 200 || $response['status_code'] == 204)) return true;
         else return false;
+    }
+
+    private function canCreateWebhook(): bool
+    {
+        $siteUrl = get_site_url();
+
+        if (str_contains($siteUrl, 'localhost')) {
+            Logger::error("وبهوک برای محیط لوکال تنظیم نمی‌شود.");
+            return false;
+        }
+
+        return true;
     }
 }

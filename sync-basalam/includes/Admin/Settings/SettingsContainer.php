@@ -35,15 +35,6 @@ class SettingsContainer
         return $this->settings[$setting] ?? null;
     }
 
-    public function getOauthData($forceRefresh = false): array
-    {
-        if ($forceRefresh || empty($this->oauthData)) {
-            $this->oauthData = Settings::getOauthData($forceRefresh);
-        }
-
-        return $this->oauthData;
-    }
-
     public function hasToken(): bool
     {
         $token = ($this->getSettings(SettingsConfig::TOKEN));

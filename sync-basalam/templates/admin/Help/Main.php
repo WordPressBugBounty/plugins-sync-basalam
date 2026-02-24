@@ -1,7 +1,7 @@
 <?php
 
 use SyncBasalam\Admin\Faq;
-use SyncBasalam\Admin\Components;
+use SyncBasalam\Admin\Components\CommonComponents;
 
 defined('ABSPATH') || exit;
 ?>
@@ -30,7 +30,7 @@ defined('ABSPATH') || exit;
         </div>
 
         <div class="basalam-faq-sections">
-            <?php Components::renderFaqByCategory(Faq::getCategories()) ?>
+            <?php CommonComponents::renderFaqByCategory(Faq::getCategories()) ?>
         </div>
     </div>
 

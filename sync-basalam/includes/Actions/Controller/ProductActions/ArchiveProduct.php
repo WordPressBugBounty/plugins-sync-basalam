@@ -15,7 +15,11 @@ class ArchiveProduct extends ActionController
         $productId = isset($_POST['product_id']) ? sanitize_text_field(wp_unslash($_POST['product_id'])) : null;
 
         if ($productId) {
-            $result = $productOperations->archiveExistProduct($productId);
+            try {
+                $result = $productOperations->archiveExistProduct($productId);
+            } catch (\Exception $e) {
+                wp_send_json_error(['message' => $e->getMessage()], 500);
+            }
         }
 
         if (!$result['success']) {

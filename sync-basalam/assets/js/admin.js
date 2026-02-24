@@ -217,6 +217,496 @@ document.addEventListener("DOMContentLoaded", function () {
     select.addEventListener("change", (e) => toggleFields(e.target.value));
   }
 
+  // Tab functionality for settings modal
+  const initTabs = () => {
+    const tabBtns = document.querySelectorAll(".basalam-tab-btn");
+    const tabContents = document.querySelectorAll(".basalam-tab-content");
+
+    tabBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const tabId = btn.getAttribute("data-tab");
+
+        // Remove active class from all buttons and contents
+        tabBtns.forEach((b) => b.classList.remove("active"));
+        tabContents.forEach((c) => c.classList.remove("active"));
+
+        // Add active class to clicked button and corresponding content
+        btn.classList.add("active");
+        const content = document.getElementById(tabId);
+        if (content) {
+          content.classList.add("active");
+        }
+      });
+    });
+  };
+
+  initTabs();
+
+  const initPointerOnboarding = () => {
+    const pointerTour = window.basalamPointerTour;
+
+    if (
+      !pointerTour ||
+      !Array.isArray(pointerTour.steps) ||
+      pointerTour.steps.length === 0
+    ) {
+      return;
+    }
+
+    if (
+      typeof window.jQuery === "undefined" ||
+      typeof window.jQuery.fn.pointer !== "function"
+    ) {
+      return;
+    }
+
+    const steps = pointerTour.steps.filter(
+      (step) =>
+        step &&
+        typeof step.selector === "string" &&
+        document.querySelector(step.selector)
+    );
+
+    if (steps.length === 0) {
+      return;
+    }
+
+    let completionRequested = false;
+
+    const markTourCompleted = () => {
+      if (completionRequested) {
+        return;
+      }
+
+      completionRequested = true;
+
+      if (!pointerTour.completeAction || !pointerTour.nonce) {
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("action", pointerTour.completeAction);
+      formData.append("nonce", pointerTour.nonce);
+
+      fetch(ajaxurl, {
+        method: "POST",
+        body: formData,
+      }).catch(() => {});
+    };
+
+    const openStep = (index) => {
+      if (index >= steps.length) {
+        markTourCompleted();
+        return;
+      }
+
+      const step = steps[index];
+      const $target = window.jQuery(step.selector).first();
+
+      if (!$target.length) {
+        openStep(index + 1);
+        return;
+      }
+
+      const targetElement = $target.get(0);
+      if (targetElement && typeof targetElement.scrollIntoView === "function") {
+        targetElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+
+      let shouldAdvance = false;
+      let shouldStop = false;
+
+      $target
+        .pointer({
+          pointerClass: "sync-basalam-pointer",
+          content: step.content || "",
+          position: step.position || { edge: "right", align: "middle" },
+          buttons: function (event, t) {
+            const isLastStep = index === steps.length - 1;
+            const skipLabel = step.skipLabel || "بستن";
+            const nextLabel = isLastStep
+              ? step.doneLabel || "اتمام"
+              : step.nextLabel || "بعدی";
+
+            const $skipButton = window.jQuery(
+              '<button type="button" class="button button-secondary"></button>'
+            ).text(skipLabel);
+
+            const $nextButton = window.jQuery(
+              '<button type="button" class="button button-primary"></button>'
+            ).text(nextLabel);
+
+            $skipButton.on("click", function () {
+              shouldStop = true;
+              t.element.pointer("close");
+            });
+
+            $nextButton.on("click", function () {
+              shouldAdvance = true;
+              t.element.pointer("close");
+            });
+
+            return window.jQuery('<div class="wp-pointer-buttons" />')
+              .append($skipButton)
+              .append($nextButton);
+          },
+          close: function () {
+            if (shouldStop) {
+              markTourCompleted();
+              return;
+            }
+
+            if (shouldAdvance) {
+              openStep(index + 1);
+              return;
+            }
+
+            markTourCompleted();
+          },
+        })
+        .pointer("open");
+    };
+
+    openStep(0);
+  };
+
+  initPointerOnboarding();
+
+  const initAnnouncementsPanel = () => {
+    const announcementsConfig = window.basalamAnnouncements;
+
+    if (
+      !announcementsConfig ||
+      !Array.isArray(announcementsConfig.items) ||
+      announcementsConfig.items.length === 0
+    ) {
+      return;
+    }
+
+    const root = document.getElementById("sync-basalam-announcement-root");
+    const trigger = document.getElementById("sync-basalam-announcement-trigger");
+    const panel = document.getElementById("sync-basalam-announcement-panel");
+    const overlay = document.getElementById("sync-basalam-announcement-overlay");
+    const closeBtn = document.getElementById("sync-basalam-announcement-close");
+    const counter = document.getElementById("sync-basalam-announcement-counter");
+    const list = document.getElementById("sync-basalam-announcement-list");
+    const pageIndicator = document.getElementById("sync-basalam-announcement-page");
+    const prevBtn = document.getElementById("sync-basalam-announcement-prev");
+    const nextBtn = document.getElementById("sync-basalam-announcement-next");
+
+    if (
+      !root ||
+      !trigger ||
+      !panel ||
+      !overlay ||
+      !closeBtn ||
+      !counter ||
+      !list ||
+      !pageIndicator ||
+      !prevBtn ||
+      !nextBtn
+    ) {
+      return;
+    }
+
+    const normalizeItems = (rawItems) =>
+      rawItems
+        .map((item) => {
+          const files = Array.isArray(item?.files) ? item.files : [];
+          const imageFile = files.find((f) => f?.url && /\.(png|jpe?g|gif|webp|svg)/i.test(f.url));
+
+          return {
+            id: String(item?.id || ""),
+            description: String(item?.description || ""),
+            link: String(item?.link || "#"),
+            linkText: String(item?.linkText || "ادامه"),
+            image: imageFile ? String(imageFile.url) : (item?.image ? String(item.image) : ""),
+          };
+        })
+        .filter((item) => item.id && item.description);
+
+    let items = normalizeItems(announcementsConfig.items);
+
+    if (items.length === 0) {
+      root.remove();
+      return;
+    }
+
+    let currentPage = 1;
+    let totalPages = Math.max(parseInt(announcementsConfig.totalPage, 10) || 1, 1);
+    let isFetching = false;
+
+    let seenIds = new Set(
+      Array.isArray(announcementsConfig.seenIds)
+        ? announcementsConfig.seenIds.map((id) => String(id))
+        : []
+    );
+    let seenRequested = false;
+
+    const getUnreadCount = () =>
+      items.reduce((total, item) => total + (seenIds.has(item.id) ? 0 : 1), 0);
+
+    const updateCounter = () => {
+      const unreadCount = getUnreadCount();
+      counter.textContent = String(unreadCount);
+      counter.classList.toggle(
+        "sync-basalam-announcement-counter-hidden",
+        unreadCount === 0
+      );
+    };
+
+    const renderItems = (pageItems) => {
+      list.innerHTML = "";
+
+      pageItems.forEach((item) => {
+        const card = document.createElement("article");
+        card.className =
+          "sync-basalam-announcement-card" +
+          (item.image ? "" : " sync-basalam-announcement-card-no-image") +
+          (seenIds.has(item.id) ? " is-seen" : " is-unread");
+
+        if (item.image) {
+          const imageWrapper = document.createElement("div");
+          imageWrapper.className = "sync-basalam-announcement-image-wrap";
+
+          const image = document.createElement("img");
+          image.className = "sync-basalam-announcement-image";
+          image.src = item.image;
+          image.alt = "خبر ووسلام";
+          image.loading = "lazy";
+
+          imageWrapper.appendChild(image);
+          card.appendChild(imageWrapper);
+        }
+
+        const content = document.createElement("div");
+        content.className = "sync-basalam-announcement-content";
+
+        const description = document.createElement("p");
+        description.className = "sync-basalam-announcement-text";
+        description.textContent = item.description;
+
+        const link = document.createElement("a");
+        link.className = "sync-basalam-announcement-link";
+        link.href = item.link;
+        link.textContent = item.linkText || "ادامه";
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+
+        content.appendChild(description);
+        if (item.link && item.link !== "#") {
+          content.appendChild(link);
+        }
+        card.appendChild(content);
+        list.appendChild(card);
+      });
+    };
+
+    const updatePagination = () => {
+      pageIndicator.textContent = `${currentPage} / ${totalPages}`;
+      prevBtn.disabled = currentPage <= 1 || isFetching;
+      nextBtn.disabled = currentPage >= totalPages || isFetching;
+    };
+
+    const renderPage = () => {
+      renderItems(items);
+      updatePagination();
+    };
+
+    const fetchPage = (page) => {
+      if (isFetching) {
+        return;
+      }
+
+      isFetching = true;
+      prevBtn.disabled = true;
+      nextBtn.disabled = true;
+      list.innerHTML = '<div class="sync-basalam-announcement-loading">در حال بارگذاری...</div>';
+
+      const formData = new FormData();
+      formData.append("action", announcementsConfig.fetchPageAction || "");
+      formData.append("nonce", announcementsConfig.fetchPageNonce || "");
+      formData.append("page", String(page));
+
+      fetch(ajaxurl, {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (!data?.success) {
+            return;
+          }
+
+          const newItems = normalizeItems(data.data.items || []);
+          items = newItems;
+          currentPage = parseInt(data.data.page, 10) || page;
+          totalPages = parseInt(data.data.totalPage, 10) || totalPages;
+
+          renderPage();
+        })
+        .catch(() => {
+          updatePagination();
+        })
+        .finally(() => {
+          isFetching = false;
+          updatePagination();
+        });
+    };
+
+    const markAllSeen = () => {
+      if (seenRequested || getUnreadCount() === 0) {
+        return;
+      }
+
+      seenRequested = true;
+
+      const formData = new FormData();
+      formData.append("action", announcementsConfig.markSeenAction || "");
+      formData.append("nonce", announcementsConfig.nonce || "");
+
+      fetch(ajaxurl, {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (!data?.success) {
+            return;
+          }
+
+          seenIds = new Set(items.map((item) => item.id));
+          updateCounter();
+          renderPage();
+        })
+        .catch(() => {})
+        .finally(() => {
+          seenRequested = false;
+        });
+    };
+
+    const openPanel = () => {
+      root.classList.add("is-open");
+      panel.setAttribute("aria-hidden", "false");
+      document.body.classList.add("sync-basalam-announcement-open");
+      markAllSeen();
+    };
+
+    const closePanel = () => {
+      root.classList.remove("is-open");
+      panel.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("sync-basalam-announcement-open");
+    };
+
+    trigger.addEventListener("click", openPanel);
+    closeBtn.addEventListener("click", closePanel);
+    overlay.addEventListener("click", closePanel);
+
+    document.addEventListener("mousedown", (event) => {
+      if (!root.classList.contains("is-open")) {
+        return;
+      }
+
+      const target = event.target;
+      if (!(target instanceof Node)) {
+        return;
+      }
+
+      if (panel.contains(target) || trigger.contains(target)) {
+        return;
+      }
+
+      closePanel();
+    });
+
+    prevBtn.addEventListener("click", () => {
+      if (currentPage <= 1 || isFetching) {
+        return;
+      }
+      fetchPage(currentPage - 1);
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (currentPage >= totalPages || isFetching) {
+        return;
+      }
+      fetchPage(currentPage + 1);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && root.classList.contains("is-open")) {
+        closePanel();
+      }
+    });
+
+    updateCounter();
+    renderPage();
+  };
+
+  initAnnouncementsPanel();
+
+  const advancedSettingsForm = document.getElementById(
+    "basalam-advanced-settings-form"
+  );
+  const advancedSubmitSection = document.getElementById(
+    "basalam-advanced-submit-section"
+  );
+
+  const isTrackedAdvancedSettingField = (fieldName) =>
+    typeof fieldName === "string" &&
+    fieldName.startsWith("sync_basalam_settings[");
+
+  if (advancedSettingsForm && advancedSubmitSection) {
+    const serializeAdvancedSettings = () => {
+      const formData = new FormData(advancedSettingsForm);
+      const entries = [];
+
+      formData.forEach((value, key) => {
+        if (isTrackedAdvancedSettingField(key)) {
+          entries.push(`${key}=${String(value)}`);
+        }
+      });
+
+      return entries.join("&");
+    };
+
+    let initialSettingsSnapshot = "";
+
+    const toggleAdvancedSubmitVisibility = () => {
+      const currentSnapshot = serializeAdvancedSettings();
+      const hasChanges = currentSnapshot !== initialSettingsSnapshot;
+
+      advancedSubmitSection.classList.toggle(
+        "basalam-submit-section-hidden",
+        !hasChanges
+      );
+    };
+
+    const captureInitialSnapshot = () => {
+      initialSettingsSnapshot = serializeAdvancedSettings();
+      toggleAdvancedSubmitVisibility();
+    };
+
+    const handleSettingsFieldMutation = (event) => {
+      const fieldName = event.target?.name || "";
+
+      if (!isTrackedAdvancedSettingField(fieldName)) {
+        return;
+      }
+
+      window.requestAnimationFrame(toggleAdvancedSubmitVisibility);
+    };
+
+    advancedSettingsForm.addEventListener("input", handleSettingsFieldMutation);
+    advancedSettingsForm.addEventListener(
+      "change",
+      handleSettingsFieldMutation
+    );
+
+    captureInitialSnapshot();
+    window.requestAnimationFrame(captureInitialSnapshot);
+  }
+
   const infoTriggers = document.querySelectorAll(".basalam-info-trigger");
 
   const moveModalsToBody = () => {
@@ -386,6 +876,113 @@ document.addEventListener("DOMContentLoaded", function () {
       if (e.target === modal) {
         modal.style.display = "none";
       }
+    });
+  }
+
+  // Star rating functionality
+  var currentRating = 5;
+
+  function updateStars(rating) {
+    var stars = document.querySelectorAll('#basalam_rating_stars .basalam-star');
+    stars.forEach(function(star) {
+      var starRating = parseInt(star.getAttribute('data-rating'));
+      if (starRating <= rating) {
+        star.style.color = '#f5a623';
+      } else {
+        star.style.color = '#ddd';
+      }
+    });
+  }
+
+  updateStars(5);
+
+  var starsContainer = document.getElementById('basalam_rating_stars');
+  if (starsContainer) {
+    starsContainer.addEventListener('mouseover', function(e) {
+      if (e.target.classList.contains('basalam-star')) {
+        var hoverRating = parseInt(e.target.getAttribute('data-rating'));
+        updateStars(hoverRating);
+      }
+    });
+
+    starsContainer.addEventListener('mouseout', function() {
+      updateStars(currentRating);
+    });
+
+    starsContainer.addEventListener('click', function(e) {
+      if (e.target.classList.contains('basalam-star')) {
+        currentRating = parseInt(e.target.getAttribute('data-rating'));
+        document.getElementById('sync_basalam_rating').value = currentRating;
+        updateStars(currentRating);
+      }
+    });
+  }
+
+  // Remind Later button
+  var remindLaterBtn = document.getElementById('sync_basalam_remind_later_review_btn');
+  if (remindLaterBtn) {
+    remindLaterBtn.addEventListener('click', function() {
+      var nonceEl = document.getElementById('sync_basalam_remind_later_review_nonce');
+      jQuery.ajax({
+        url: ajaxurl,
+        type: 'POST',
+        data: {
+          action: 'sync_basalam_remind_later_review',
+          _wpnonce: nonceEl ? nonceEl.value : ''
+        },
+        success: function() {
+          document.getElementById('sync_basalam_like_alert').style.display = 'none';
+        }
+      });
+    });
+  }
+
+  // Never Remind button
+  var neverRemindBtn = document.getElementById('sync_basalam_never_remind_review_btn');
+  if (neverRemindBtn) {
+    neverRemindBtn.addEventListener('click', function() {
+      var nonceEl = document.getElementById('sync_basalam_never_remind_review_nonce');
+      jQuery.ajax({
+        url: ajaxurl,
+        type: 'POST',
+        data: {
+          action: 'sync_basalam_never_remind_review',
+          _wpnonce: nonceEl ? nonceEl.value : ''
+        },
+        success: function() {
+          document.getElementById('sync_basalam_like_alert').style.display = 'none';
+        }
+      });
+    });
+  }
+
+  // Submit Review form
+  var supportForm = document.getElementById('sync_basalam_support_form');
+  if (supportForm) {
+    supportForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var nonceEl = document.getElementById('sync_basalam_submit_review_nonce');
+      var ratingEl = document.getElementById('sync_basalam_rating');
+      var commentEl = document.getElementById('sync_basalam_comment');
+
+      jQuery.ajax({
+        url: ajaxurl,
+        type: 'POST',
+        data: {
+          action: 'sync_basalam_submit_review',
+          _wpnonce: nonceEl ? nonceEl.value : '',
+          sync_basalam_rating: ratingEl ? ratingEl.value : '5',
+          sync_basalam_comment: commentEl ? commentEl.value : ''
+        },
+        success: function(response) {
+          if (response.success) {
+            document.getElementById('sync_basalam_like_alert').style.display = 'none';
+            if (modal) modal.style.display = 'none';
+          } else {
+            alert(response.data && response.data.message ? response.data.message : 'خطا در ارسال نظر');
+          }
+        }
+      });
     });
   }
 });

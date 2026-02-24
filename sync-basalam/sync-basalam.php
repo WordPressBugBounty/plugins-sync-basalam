@@ -10,7 +10,7 @@ defined('ABSPATH') || exit;
 /**
  * Plugin Name: sync basalam | ووسلام
  * Description: با استفاده از پلاگین ووسلام  میتوایند تمامی محصولات ووکامرس را با یک کلیک به غرفه باسلامی خود اضافه کنید‌، همچنین تمامی سفارش باسلامی شما به سایت شما اضافه میگردد.
- * Version: 1.7.7
+ * Version: 1.7.8
  * Author: Woosalam Dev
  * Author URI: https://wp.hamsalam.ir/
  * Plugin URI: https://wp.hamsalam.ir
@@ -32,8 +32,6 @@ add_action('before_woocommerce_init', function () {
     }
 });
 
-Plugin::checkForceUpdateByVersion();
-
 if (get_option('sync_basalam_force_update')) {
     add_action('admin_notices', function () {
         $template = __DIR__ . '/templates/notifications/ForceUpdateAlert.php';
@@ -42,7 +40,7 @@ if (get_option('sync_basalam_force_update')) {
     return;
 }
 
-add_action('init', 'syncBasalamInit');
+add_action('init', 'syncBasalamPlugin');
 
 //  Singleton instance of the main plugin class.
 function syncBasalamPlugin()
@@ -56,42 +54,10 @@ function syncBasalamSettings()
     return SettingsContainer::getInstance();
 }
 
-function syncBasalamInit()
-{
-    syncBasalamPlugin();
-
-    // Handle activation redirect
-    if (get_transient('sync_basalam_just_activated')) {
-        delete_transient('sync_basalam_just_activated');
-        if (!syncBasalamSettings()->hasToken()) {
-            wp_redirect(admin_url('admin.php?page=basalam-onboarding'));
-            exit();
-        }
-    }
-
-    syncBasalamNotices();
-}
-
-function syncBasalamNotices()
-{
-    if (!get_option('sync_basalam_like')) {
-        add_action('admin_notices', function () {
-            $template = syncBasalamPlugin()->templatePath("notifications/LikeAlert.php");
-            require_once $template;
-        });
-    }
-
-    if (!syncBasalamSettings()->hasToken()) {
-        add_action('admin_notices', function () {
-            $template = syncBasalamPlugin()->templatePath("notifications/AccessAlert.php");
-            require_once($template);
-        });
-    }
-}
-
 function syncBasalamActivatePlugin()
 {
     Activator::activate();
     set_transient('sync_basalam_just_activated', true, 10);
 }
+
 JobsRunner::getInstance();

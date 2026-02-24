@@ -11,6 +11,7 @@ class PostApiService extends AbstractApiService
         return wp_remote_post($request['url'], [
             'body'    => $request['data'],
             'headers' => $request['headers'],
+            'timeout' => 10,
         ]);
     }
 

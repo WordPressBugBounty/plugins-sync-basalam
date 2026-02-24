@@ -11,7 +11,16 @@ class GetCategoryAttr
     {
         $url = "https://openapi.basalam.com/v1/categories/$categoryId/attributes?exclude_multi_selects=true";
         $apiservice = new ApiServiceManager();
-        $data = $apiservice->sendGetRequest($url, []);
+
+        try {
+            $data = $apiservice->sendGetRequest($url, []);
+        } catch (\Exception $e) {
+            return [
+                'body' => null,
+                'status_code' => 500,
+                'error' => 'خطا در دریافت ویژگی‌های دسته‌بندی: ' . $e->getMessage()
+            ];
+        }
 
         return $data;
     }

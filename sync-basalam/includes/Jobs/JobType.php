@@ -10,7 +10,7 @@ interface JobType
 
     public function getPriority(): int;
 
-    public function execute(array $payload): void;
+    public function execute(array $payload);
 
     public function canRun(): bool;
 }

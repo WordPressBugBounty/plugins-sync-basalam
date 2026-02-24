@@ -28,7 +28,15 @@ class PostAutoConfirmOrder
             ],
         ];
 
-        $response = $this->apisevice->sendPutRequest($this->url, $data);
+        try {
+            $response = $this->apisevice->sendPutRequest($this->url, $data);
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'message' => 'خطا در تنظیم تایید خودکار: ' . $e->getMessage(),
+                'status_code' => 500,
+            ];
+        }
 
         if ($response['status_code'] == 200) {
             return [

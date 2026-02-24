@@ -15,29 +15,17 @@ class BasalamAppStoreReview
         $this->apiService = new ApiServiceManager();
     }
 
-    public function createReview($comment = null)
+    public function createReview($comment, $rating = 5)
     {
-        if (!$this->verify()) {
-            return;
-        }
+        $rating = intval($rating);
+        if ($rating < 1) $rating = 1;
+        if ($rating > 5) $rating = 5;
 
         $body = [
-            "comment" => $comment ?? "ممنونم از تیم شما.",
-            "rating"  => 5,
+            "comment" => $comment,
+            "rating"  => $rating,
         ];
 
-        $response = $this->apiService->sendPostRequest($this->BasalamAppReviewUrl, $body);
-
-        if ($response['status_code'] == 200) {
-            update_option('sync_basalam_like', true);
-        }
-    }
-
-    private function verify(): bool
-    {
-        return isset($_POST['sync_basalam_support'])
-            && $_POST['sync_basalam_support'] == 1
-            && isset($_POST['sync_basalam_support_nonce'])
-            && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['sync_basalam_support_nonce'])), 'sync_basalam_support_action');
+        return $this->apiService->sendPostRequest($this->BasalamAppReviewUrl, $body);
     }
 }

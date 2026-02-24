@@ -3,7 +3,11 @@
 namespace SyncBasalam\Jobs\Types;
 
 use SyncBasalam\Jobs\AbstractJobType;
+use SyncBasalam\Jobs\JobResult;
+use SyncBasalam\Jobs\Exceptions\RetryableException;
+use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 use SyncBasalam\Services\Products\AutoConnectProducts;
+use SyncBasalam\Logger\Logger;
 
 defined('ABSPATH') || exit;
 
@@ -19,22 +23,39 @@ class AutoConnectProductsJob extends AbstractJobType
         return 6;
     }
 
-    public function execute(array $payload): void
+    public function execute(array $payload): JobResult
     {
-        $page = $payload['page'] ?? 1;
+        $cursor = $payload['cursor'] ?? null;
 
-        $autoConnect = new AutoConnectProducts();
-        $result = $autoConnect->checkSameProduct(null, $page);
+        try {
+            $autoConnect = new AutoConnectProducts();
+            $result = $autoConnect->checkSameProduct(null, $cursor);
 
-        if (isset($result['has_more']) && $result['has_more']) {
-            $totalPage = $result['total_page'] ?? $page + 1;
-            $next = min($page + 1, $totalPage);
+            if (!empty($result['has_more']) && !empty($result['next_cursor'])) {
+                $this->jobManager->createJob(
+                    'sync_basalam_auto_connect_products',
+                    'pending',
+                    json_encode(['cursor' => $result['next_cursor']])
+                );
+            }
 
-            $this->jobManager->createJob(
-                'sync_basalam_auto_connect_products',
-                'pending',
-                json_encode(['page' => $next])
-            );
+            return $this->success(['cursor' => $cursor, 'processed' => true]);
+        } catch (RetryableException $e) {
+            Logger::error("خطا در اتصال خودکار محصولات: " . $e->getMessage(), [
+                'operation' => 'اتصال خودکار محصولات',
+            ]);
+            throw $e;
+        } catch (NonRetryableException $e) {
+            Logger::error("خطا در اتصال خودکار محصولات: " . $e->getMessage(), [
+                'operation' => 'اتصال خودکار محصولات',
+            ]);
+            throw $e;
+        }
+         catch (\Exception $e) {
+            Logger::error("خطا در اتصال خودکار محصولات: " . $e->getMessage(), [
+                'operation' => 'اتصال خودکار محصولات',
+            ]);
+            throw $e;
         }
     }
 }

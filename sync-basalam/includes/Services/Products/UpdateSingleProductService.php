@@ -3,8 +3,10 @@
 namespace SyncBasalam\Services\Products;
 
 use SyncBasalam\Services\ApiServiceManager;
+use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 
 defined('ABSPATH') || exit;
+
 class UpdateSingleProductService
 {
     private $apiservice;
@@ -16,51 +18,48 @@ class UpdateSingleProductService
 
     public function updateProductInBasalam($productData, $productId)
     {
-        if (!get_post_type($productId) === 'product') throw new \Exception('نوع post محصول نیست.');
+        if (!get_post_type($productId) === 'product') throw NonRetryableException::invalidData('نوع post محصول نیست.');
+
+        $productData = apply_filters('sync_basalam_product_data_before_update', $productData, $productId);
+
+        do_action('sync_basalam_before_update_product_api', $productId, $productData);
 
         $syncBasalamProductId = get_post_meta($productId, 'sync_basalam_product_id', true);
 
         $url = 'https://openapi.basalam.com/v1/products/' . $syncBasalamProductId;
 
-        $request = $this->apiservice->sendPatchRequest($url, $productData);
+        try {
+            $request = $this->apiservice->sendPatchRequest($url, $productData);
+        } catch (\Exception $e) {
+            throw new \Exception('خطا در ارتباط با API باسلام: ' . $e->getMessage());
+        }
 
         $body = $request['body'] ?? '';
 
         if (is_string($body)) $body = json_decode($body, true);
 
         if ($request['status_code'] != 200) {
-            if ($request['status_code'] == 403) throw new \Exception("این محصول متعلق به غرفه فعلی نیست.");
+            if ($request['status_code'] == 403) throw NonRetryableException::unauthorized("این محصول متعلق به غرفه فعلی نیست.");
 
             if (!is_array($body)) $body = [];
 
-            if (isset($body['messages'][0]['message'])) {
-                $message = $body['messages'][0]['message'];
-            } elseif (isset($body[0]['message'])) {
-                $message = $body[0]['message'];
-            } else {
-                $message = '';
-            }
+            if (isset($body['messages'][0]['message'])) $message = $body['messages'][0]['message'];
+            elseif (isset($body[0]['message'])) $message = $body[0]['message'];
+            else $message = '';
 
-            if (isset($body['messages'][0]['fields'][0])) {
-                $field = $body['messages'][0]['fields'][0];
-            } elseif (isset($body[0]['fields'][0])) {
-                $field = $body[0]['fields'][0];
-            } else {
-                $field = '';
-            }
+            if (isset($body['messages'][0]['fields'][0])) $field = $body['messages'][0]['fields'][0];
+            elseif (isset($body[0]['fields'][0])) $field = $body[0]['fields'][0];
+            else $field = '';
 
-            $errorMessage = $message ? esc_html($message) : 'خطایی در بروزرسانی محصول رخ داد.';
+            $errorMessage = $message ? esc_html($message) : 'درخواست با خطا مواجه شد.';
             if ($field) $errorMessage .= ' (فیلد: ' . esc_html($field) . ')';
 
-            throw new \Exception($errorMessage);
+            throw NonRetryableException::permanent($errorMessage);
         }
 
-        if (is_wp_error($request)) {
-            $errorMessage = isset($request['body'][0]['message']) ? $request['body'][0]['message'] : 'خطایی در ارتباط با سرور رخ داد.';
-            throw new \Exception(esc_html($errorMessage));
-        }
+        if (is_wp_error($request)) throw NonRetryableException::permanent('خطایی در ارتباط با سرور رخ داد.');
 
-        $product = wc_get_product($productId);
+        $product = \wc_get_product($productId);
         if ($product && $product->is_type('variable')) {
             $variations = $product->get_children();
             if (isset($body['variants'])) {
@@ -68,7 +67,7 @@ class UpdateSingleProductService
                 $attributes = $product->get_attributes();
 
                 foreach ($variations as $variationId) {
-                    $variation = wc_get_product($variationId);
+                    $variation = \wc_get_product($variationId);
                     $attributeValues = [];
 
                     foreach ($attributes as $attributeName => $attribute) {
@@ -83,9 +82,7 @@ class UpdateSingleProductService
                             $value = str_replace(['-', '_', '–', '—'], ' ', $value);
                             $value = preg_replace('/\s+/', ' ', $value);
 
-                            if (!empty($value)) {
-                                $attributeValues[] = $value;
-                            }
+                            if (!empty($value)) $attributeValues[] = $value;
                         }
                     }
 
@@ -128,11 +125,15 @@ class UpdateSingleProductService
 
         update_post_meta($productId, 'sync_basalam_product_sync_status', 'synced');
 
-        return [
+        $result = [
             'success'     => true,
             'message'     => 'فرایند بروزرسانی محصول با موفقیت انجام شد.',
             'status_code' => 200,
         ];
+
+        do_action('sync_basalam_after_update_product_api', $productId, $body, $result);
+
+        return $result;
     }
 
     public function updateProductStatus($productId, $status)
@@ -142,19 +143,31 @@ class UpdateSingleProductService
 
         $data = ["status" => $status];
 
-        $request = $this->apiservice->sendPatchRequest($url, $data);
+        $data = apply_filters('sync_basalam_product_status_data_before_update', $data, $productId, $status);
+
+        do_action('sync_basalam_before_update_product_status', $productId, $status, $data);
+
+        try {
+            $request = $this->apiservice->sendPatchRequest($url, $data);
+        } catch (\Exception $e) {
+            throw NonRetryableException::permanent($e->getMessage());
+        }
 
         if (!is_wp_error($request)) {
             update_post_meta($productId, 'sync_basalam_product_sync_status', 'synced');
             update_post_meta($productId, 'sync_basalam_product_status', $status);
 
-            return [
+            $result = [
                 'success'     => true,
                 'message'     => 'وضعیت محصول با موفقیت در باسلام تغییر کرد.',
                 'status_code' => 200,
             ];
+
+            do_action('sync_basalam_after_update_product_status', $productId, $status, $result);
+
+            return $result;
         }
 
-        throw new \Exception("تغییر وضعیت محصول در باسلام ناموفق بود.");
+        throw NonRetryableException::permanent("تغییر وضعیت محصول در باسلام ناموفق بود.");
     }
 }

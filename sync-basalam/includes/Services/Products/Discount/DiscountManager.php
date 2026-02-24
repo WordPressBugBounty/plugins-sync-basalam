@@ -31,7 +31,15 @@ class DiscountManager
             'active_days'      => $activeDays,
         ];
 
-        return $this->apiService->sendPostRequest($this->url, $data);
+        try {
+            return $this->apiService->sendPostRequest($this->url, $data);
+        } catch (\Exception $e) {
+            return [
+                'status_code' => 500,
+                'error' => 'خطا در اعمال تخفیف: ' . $e->getMessage(),
+                'body' => null
+            ];
+        }
     }
 
     public function remove($productIds, $variationIds)
@@ -43,7 +51,15 @@ class DiscountManager
             ],
         ];
 
-        return $this->apiService->sendDeleteRequest($this->url, [], $data);
+        try {
+            return $this->apiService->sendDeleteRequest($this->url, [], $data);
+        } catch (\Exception $e) {
+            return [
+                'status_code' => 500,
+                'error' => 'خطا در حذف تخفیف: ' . $e->getMessage(),
+                'body' => null
+            ];
+        }
     }
 
     public static function calculateDiscountPercent($primaryPrice, $discountedPrice)

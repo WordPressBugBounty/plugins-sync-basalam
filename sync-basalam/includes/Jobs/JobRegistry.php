@@ -8,6 +8,7 @@ use SyncBasalam\Jobs\Types\UpdateSingleProductJob;
 use SyncBasalam\Jobs\Types\CreateSingleProductJob;
 use SyncBasalam\Jobs\Types\CreateAllProductsJob;
 use SyncBasalam\Jobs\Types\AutoConnectProductsJob;
+use SyncBasalam\Jobs\Types\FetchOrdersJob;
 
 defined('ABSPATH') || exit;
 
@@ -35,6 +36,7 @@ class JobRegistry
         $this->register(new CreateSingleProductJob());
         $this->register(new CreateAllProductsJob());
         $this->register(new AutoConnectProductsJob());
+        $this->register(new FetchOrdersJob());
     }
 
     public function register(JobType $jobType): void

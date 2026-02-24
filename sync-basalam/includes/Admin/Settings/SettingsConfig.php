@@ -42,13 +42,16 @@ class SettingsConfig
     public const ADD_SHORT_DESC_TO_DESC_PRODUCT = "add_short_desc_to_desc_product";
     public const PRODUCT_PRICE_FIELD = "product_price_field";
     public const ORDER_STATUES_TYPE = "order_statues_type";
-    public const PRODUCT_OPERATION_TYPE = "product_operation_type";
     public const DISCOUNT_DURATION = "discount_duration";
+    public const DISCOUNT_REDUCTION_PERCENT = "discount_reduction_percent";
     public const TASKS_PER_MINUTE = "tasks_per_minute";
     public const TASKS_PER_MINUTE_AUTO = "tasks_per_minute_auto";
     public const PRODUCT_ATTRIBUTE_SUFFIX_ENABLED = "product_attribute_suffix_enabled";
     public const PRODUCT_ATTRIBUTE_SUFFIX_PRIORITY = "product_attribute_suffix_priority";
     public const SAFE_STOCK = "safe_stock";
+    public const ORDER_SHIPPING_METHOD = "order_shipping_method";
+    public const CUSTOMER_PREFIX_NAME = "customer_prefix_name";
+    public const CUSTOMER_SUFFIX_NAME = "customer_suffix_name";
 
     public static function getDefaultSettings(): array
     {
@@ -87,13 +90,16 @@ class SettingsConfig
             self::ADD_SHORT_DESC_TO_DESC_PRODUCT    => false,
             self::PRODUCT_PRICE_FIELD               => 'original_price',
             self::ORDER_STATUES_TYPE                => 'woosalam_statuses',
-            self::PRODUCT_OPERATION_TYPE            => 'optimized',
             self::DISCOUNT_DURATION                 => 20,
+            self::DISCOUNT_REDUCTION_PERCENT        => 0,
             self::TASKS_PER_MINUTE                  => 20,
             self::TASKS_PER_MINUTE_AUTO             => true,
             self::PRODUCT_ATTRIBUTE_SUFFIX_ENABLED  => false,
             self::PRODUCT_ATTRIBUTE_SUFFIX_PRIORITY => '',
             self::SAFE_STOCK                        => 0,
+            self::ORDER_SHIPPING_METHOD             => 'basalam',
+            self::CUSTOMER_PREFIX_NAME              => null,
+            self::CUSTOMER_SUFFIX_NAME              => null,
         ];
     }
 }

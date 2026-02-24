@@ -1,5 +1,5 @@
 <?php
-if (! defined('ABSPATH')) exit;
+defined('ABSPATH') || exit;
 ?>
 <div class="basalam-onboarding-wrapper">
     <div class="basalam-onboarding">
@@ -27,10 +27,7 @@ if (! defined('ABSPATH')) exit;
 
             <?php
             if (is_callable($steps[$current_step]['content'])) {
-                $output = call_user_func($steps[$current_step]['content']);
-                $allowed_tags = Sync_basalam_Admin_UI::allowed_html();
-
-                echo wp_kses($output, $allowed_tags);
+                echo call_user_func($steps[$current_step]['content']);
             } else {
                 echo esc_html($steps[$current_step]['content']);
             }
@@ -41,7 +38,7 @@ if (! defined('ABSPATH')) exit;
         <div class="step-navigation">
             <?php if ($current_step == 1) : ?>
                 <a href="<?php echo esc_url(admin_url() . "admin.php?page=sync_basalam"); ?>"
-                    class="basalam-p basalam-a basalam-skip-onboarding" style="color: #0770d9 !important;">
+                    class="basalam-p basalam-skip-link">
                     گذر از مراحل
                 </a>
                 <a href="<?php echo esc_url(admin_url('admin.php?page=basalam-onboarding&step=' . ($current_step + 1))); ?>"

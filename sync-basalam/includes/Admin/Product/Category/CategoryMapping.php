@@ -97,33 +97,6 @@ class CategoryMapping
         return $formatted;
     }
 
-    private static function formatBasalamCategories($categories, $parentName = null)
-    {
-        $formatted = [];
-
-        if (!is_array($categories)) return $formatted;
-
-        foreach ($categories as $category) {
-            if (!is_array($category) || !isset($category['id']) || !isset($category['title'])) {
-                continue;
-            }
-
-            $formatted[] = [
-                'id'          => $category['id'],
-                'name'        => $category['title'],
-                'parent_name' => $parentName,
-                'slug'        => isset($category['slug']) ? $category['slug'] : '',
-            ];
-
-            if (isset($category['children']) && is_array($category['children']) && !empty($category['children'])) {
-                $children = self::formatBasalamCategories($category['children'], $category['title']);
-                $formatted = array_merge($formatted, $children);
-            }
-        }
-
-        return $formatted;
-    }
-
     public static function getCategoryMappings()
     {
         global $wpdb;

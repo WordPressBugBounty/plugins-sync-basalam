@@ -2,7 +2,7 @@
 
 namespace SyncBasalam\Admin\Product\elements\ProductList;
 
-use SyncBasalam\Admin\Components;
+use SyncBasalam\Admin\Components\ProductListComponents;
 
 defined('ABSPATH') || exit;
 class StatusColumn
@@ -25,11 +25,11 @@ class StatusColumn
         if ($column === 'sync_basalam_status') {
             $product = get_post_meta($productId, 'sync_basalam_product_sync_status', true);
             if ($product && $product == 'synced') {
-                Components::renderSyncProductStatusSynced();
+                ProductListComponents::renderSyncProductStatusSynced();
             } elseif ($product == 'pending') {
-                Components::renderSyncProductStatusPending();
+                ProductListComponents::renderSyncProductStatusPending();
             } else {
-                Components::renderSyncProductStatusUnsync();
+                ProductListComponents::renderSyncProductStatusUnsync();
             }
         }
     }

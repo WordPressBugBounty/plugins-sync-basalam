@@ -27,7 +27,11 @@ class FetchCommission
 
         $url = "https://core.basalam.com/api_v2/commission/get_percent?" . implode("&", $queryParams);
 
-        $result = $apiservice->sendGetRequest($url);
+        try {
+            $result = $apiservice->sendGetRequest($url);
+        } catch (\Exception $e) {
+            return 0;
+        }
 
         $decodedBody = json_decode($result['body'], true);
 

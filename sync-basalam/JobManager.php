@@ -23,21 +23,21 @@ class JobManager
         $this->jobManagerTableName = $wpdb->prefix . 'sync_basalam_job_manager';
     }
 
-    public function createJob($jobType, $status = 'pending', $payload = null)
+    public function createJob($jobType, $status = 'pending', $payload = null, $maxAttempts = 3)
     {
         global $wpdb;
 
-        $wpdb->insert(
+        return $wpdb->insert(
             $this->jobManagerTableName,
             array(
                 'job_type'      => $jobType,
                 'status'        => $status,
                 'payload'       => $payload,
+                'attempts'      => 0,
+                'max_attempts'  => $maxAttempts,
                 'created_at'    => time(),
             )
         );
-
-        return $wpdb;
     }
 
     public function getJob($where = array())
@@ -132,13 +132,6 @@ class JobManager
         return $wpdb->query($sql);
     }
 
-    /**
-     * Check if a product job is already in progress
-     *
-     * @param int $productId
-     * @param string $jobType
-     * @return bool
-     */
     public function hasProductJobInProgress(int $productId, string $jobType): bool
     {
         global $wpdb;
@@ -167,4 +160,69 @@ class JobManager
 
         return false;
     }
+
+    public function retryJob(int $jobId, ?string $errorMessage = null): bool
+    {
+        global $wpdb;
+
+        $job = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$this->jobManagerTableName} WHERE id = %d",
+            $jobId
+        ));
+
+        if (!$job) return false;
+
+        $newAttempts = intval($job->attempts) + 1;
+
+
+        $errorMessages = [];
+        if (!empty($job->error_message)) {
+            $decoded = json_decode($job->error_message, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) $errorMessages = $decoded;
+        }
+
+        if ($errorMessage) $errorMessages[$newAttempts] = $errorMessage;
+
+        $encodedErrors = json_encode($errorMessages, JSON_UNESCAPED_UNICODE);
+
+        if ($newAttempts >= intval($job->max_attempts)) {
+            $this->updateJob(
+                [
+                    'status' => 'failed',
+                    'error_message' => $encodedErrors,
+                    'failed_at' => time(),
+                    'started_at' => null,
+                    'attempts' => $newAttempts,
+                ],
+                ['id' => $jobId]
+            );
+            return false;
+        }
+
+        $this->updateJob(
+            [
+                'status' => 'pending',
+                'attempts' => $newAttempts,
+                'error_message' => $encodedErrors,
+                'started_at' => null,
+            ],
+            ['id' => $jobId]
+        );
+
+        return true;
+    }
+
+    public function failJob(int $jobId, ?string $errorMessage = null): bool
+    {
+        return $this->updateJob(
+            [
+                'status' => 'failed',
+                'error_message' => $errorMessage,
+                'failed_at' => time(),
+                'started_at' => null,
+            ],
+            ['id' => $jobId]
+        );
+    }
+
 }

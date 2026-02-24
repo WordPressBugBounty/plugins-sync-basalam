@@ -20,7 +20,11 @@ class CreateSingleProduct extends ActionController
         $catId = !empty($catId) ? explode(',', $catId) : [];
 
         if ($productId) {
-            $result = $productOperations->createNewProduct($productId, $catId);
+            try {
+                 $result = $productOperations->createNewProduct($productId, $catId);
+            } catch (\Exception $e) {
+                wp_send_json_error(['message' => $e->getMessage()], 500);
+            }
         }
         if (!$result['success']) {
             wp_send_json_error(['message' => $result['message']], $result['status_code'] ?? 500);

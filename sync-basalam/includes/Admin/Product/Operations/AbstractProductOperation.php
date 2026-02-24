@@ -4,6 +4,8 @@ namespace SyncBasalam\Admin\Product\Operations;
 
 use SyncBasalam\Admin\Product\Operations\ProductOperationInterface;
 use SyncBasalam\Admin\Product\Validators\ProductStatusValidator;
+use SyncBasalam\Jobs\Exceptions\RetryableException;
+use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 use SyncBasalam\Logger\Logger;
 
 defined('ABSPATH') || exit;
@@ -19,18 +21,45 @@ abstract class AbstractProductOperation implements ProductOperationInterface
 
     final public function execute(int $product_id, array $args = []): array
     {
+        $operationName = $this->getOperationNameFromClass();
+
+        do_action('sync_basalam_before_product_operation', $product_id, $args, $operationName);
+
+        do_action("sync_basalam_before_{$operationName}", $product_id, $args);
+
         try {
             $validation = $this->validate($product_id);
-            
-            if (!$validation) return $this->buildValidationErrorResult($product_id);
+
+            if (!$validation) {
+                $result = $this->buildValidationErrorResult($product_id);
+
+                $result = apply_filters('sync_basalam_product_operation_validation_error', $result, $product_id, $operationName);
+
+                return $result;
+            }
 
             $result = $this->run($product_id, $args);
 
             $this->logSuccess($product_id, $result);
 
+            $result = apply_filters('sync_basalam_product_operation_result', $result, $product_id, $args, $operationName);
+
+            $result = apply_filters("sync_basalam_{$operationName}_result", $result, $product_id, $args);
+
+            do_action('sync_basalam_after_product_operation', $result, $product_id, $args, $operationName);
+
+            do_action("sync_basalam_after_{$operationName}", $result, $product_id, $args);
+
             return $result;
+
+        } catch (RetryableException $e) {
+            throw $e;
+        } catch (NonRetryableException $e) {
+            throw $e;
         } catch (\Throwable $th) {
-            return $this->handleException($th, $product_id);
+            $result = $this->handleException($th, $product_id);
+
+            return apply_filters('sync_basalam_product_operation_exception', $result, $product_id, $operationName);
         }
     }
 

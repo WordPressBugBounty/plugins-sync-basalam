@@ -17,7 +17,7 @@ class FetchTicketSubjects
         $apiService = new ApiServiceManager();
         $headers = [
             'Authorization' => 'Bearer ' . $hamsalamToken,
-            'App-name' => 'woosalam'
+            'X-App-Name' => 'woosalam'
         ];
 
         return $apiService->sendGetRequest($this->url, $headers);

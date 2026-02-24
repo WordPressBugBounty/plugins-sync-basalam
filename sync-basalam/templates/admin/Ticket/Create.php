@@ -3,13 +3,13 @@
 defined('ABSPATH') || exit;
 
 use SyncBasalam\Services\TicketServiceManager;
-use SyncBasalam\Admin\Components;
+use SyncBasalam\Admin\Components\CommonComponents;
 
 $ticketManager = new TicketServiceManager();
 $fetchTicketSubjects = $ticketManager->fetchTicketSubjects();
 
 if (TicketServiceManager::isUnauthorized($fetchTicketSubjects)) {
-    Components::renderUnauthorizedError();
+    CommonComponents::renderUnauthorizedError();
     return;
 }
 
@@ -50,8 +50,20 @@ $TicketSubjects = isset($fetchTicketSubjects['body']) ? json_decode($fetchTicket
                     </div>
 
                     <div class="create-ticket__control">
-                        <label for="content" class="create-ticket__label basalam-p ">توضیحات</label>
+                        <label for="content" class="create-ticket__label basalam-p">توضیحات</label>
                         <textarea name="content" id="content" minlength="10" required class="basalam-input create-ticket__input create-ticket__textarea"></textarea>
+                    </div>
+
+                    <div class="create-ticket__control">
+                        <label class="create-ticket__label basalam-p">پیوست تصویر (اختیاری)</label>
+                        <div class="ticket-file-upload" id="ticket-file-upload-create">
+                            <label for="ticket-file-create" class="ticket-file-upload__label">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                انتخاب تصویر
+                            </label>
+                            <input type="file" name="_ticket_file" id="ticket-file-create" class="ticket-file-upload__input" accept="image/jpeg,image/png,image/webp,image/bmp,image/avif">
+                            <div class="ticket-file-upload__previews"></div>
+                        </div>
                     </div>
                 </div>
                 <div class="create-ticket__actions">
@@ -62,3 +74,6 @@ $TicketSubjects = isset($fetchTicketSubjects['body']) ? json_decode($fetchTicket
         <?php endif; ?>
     </div>
 </div>
+<script>
+ticketFileUpload('ticket-file-create', '<?php echo wp_create_nonce('upload_ticket_media_nonce'); ?>');
+</script>

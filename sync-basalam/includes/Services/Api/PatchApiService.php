@@ -12,6 +12,7 @@ class PatchApiService extends AbstractApiService
             'method'  => 'PATCH',
             'body'    => $request['data'],
             'headers' => $request['headers'],
+            'timeout' => 10,
         ]);
     }
 

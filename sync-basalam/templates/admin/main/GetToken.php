@@ -3,7 +3,8 @@ defined('ABSPATH') || exit;
 
 use SyncBasalam\Admin\Settings\OAuthManager;
 
-$oauthUrls = OAuthManager::getOAuthUrls();
+$OAuthManger = new OAuthManager();
+$oauthUrls = $OAuthManger->getOAuthUrls();
 
 ?>
 <div class="basalam-setup-wizard">

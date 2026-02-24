@@ -3,6 +3,8 @@
 namespace SyncBasalam\Jobs;
 
 use SyncBasalam\JobManager;
+use SyncBasalam\Jobs\Exceptions\RetryableException;
+use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 
 defined('ABSPATH') || exit;
 
@@ -19,11 +21,26 @@ abstract class AbstractJobType implements JobType
 
     abstract public function getPriority(): int;
 
-    abstract public function execute(array $payload): void;
+    abstract public function execute(array $payload);
 
     public function canRun(): bool
     {
         return true;
+    }
+
+    protected function success(array $data = []): JobResult
+    {
+        return JobResult::success($data);
+    }
+
+    protected function retryable(string $message, int $code = 0, array $data = []): JobResult
+    {
+        return JobResult::failed(new RetryableException($message, $code), $data);
+    }
+
+    protected function nonRetryable(string $message, int $code = 0, array $data = []): JobResult
+    {
+        return JobResult::failed(new NonRetryableException($message, $code), $data);
     }
 
     protected function hasProductJobInProgress(int $productId, string $jobType): bool

@@ -13,11 +13,13 @@ class CreateTicketItem extends ActionController
     {
         $ticketManager = new TicketServiceManager();
 
-        $content = isset($_POST['content']) ? \sanitize_text_field(\wp_unslash($_POST['content'])) : null;
-        $ticketId = isset($_POST['ticket_id']) ? \sanitize_text_field(\wp_unslash($_POST['ticket_id'])) : null;
+        $content  = isset($_POST['content'])   ? (\wp_unslash($_POST['content']))   : null;
+        $ticketId = isset($_POST['ticket_id']) ? (\wp_unslash($_POST['ticket_id'])) : null;
 
+        $fileIds = isset($_POST['file_ids']) && is_array($_POST['file_ids'])
+            ? array_map('intval', $_POST['file_ids'])
+            : [];
 
-        $result = $ticketManager->CreateTicketItem($ticketId,$content);
-        // if (isset($result['body'])) $ticket = json_decode($result['body'], true);
+        $ticketManager->createTicketItem($ticketId, $content, $fileIds);
     }
 }

@@ -3,14 +3,11 @@
 use SyncBasalam\Admin\Settings\SettingsConfig;
 
 $settings = syncBasalamSettings()->getSettings();
-$current_default_weight = $settings[SettingsConfig::DEFAULT_WEIGHT];
-$current_preparation_time = $settings[SettingsConfig::DEFAULT_PREPARATION];
 $BasalamAccessToken = $settings[SettingsConfig::TOKEN];
 $BasalamRefreshToken = $settings[SettingsConfig::REFRESH_TOKEN];
 $syncStatusProduct = $settings[SettingsConfig::SYNC_STATUS_PRODUCT];
 $syncStatusOrder = $settings[SettingsConfig::SYNC_STATUS_ORDER];
 $autoConfirmOrder = $settings[SettingsConfig::AUTO_CONFIRM_ORDER];
-
 defined('ABSPATH') || exit;
 ?>
 <div class="basalam-container">
@@ -24,10 +21,13 @@ defined('ABSPATH') || exit;
     </div>
 
     <?php
-    if (!$BasalamAccessToken || !$BasalamRefreshToken):
+    $tokenTemplate = apply_filters('sync_basalam_token_template', null);
+    if ($tokenTemplate) {
+        require_once($tokenTemplate);
+    } elseif (!$BasalamAccessToken || !$BasalamRefreshToken) {
         require_once(syncBasalamPlugin()->templatePath() . "/admin/main/GetToken.php");
-    else:
+    } else {
         require_once(syncBasalamPlugin()->templatePath() . "/admin/main/Connected.php");
-    endif; ?>
-
+    }
+    ?>
 </div>

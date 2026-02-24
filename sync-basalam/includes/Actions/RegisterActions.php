@@ -9,6 +9,7 @@ use SyncBasalam\Actions\Controller\ProductActions\CancelUpdateProducts;
 use SyncBasalam\Actions\Controller\ProductActions\ConnectAllProducts;
 use SyncBasalam\Actions\Controller\ProductActions\CancelConnectAllProducts;
 use SyncBasalam\Actions\Controller\OrderActions\FetchUnsyncOrders;
+use SyncBasalam\Actions\Controller\OrderActions\CancelFetchOrders;
 use SyncBasalam\Actions\Controller\OrderActions\ConfirmOrder;
 use SyncBasalam\Actions\Controller\OrderActions\CancelOrder;
 use SyncBasalam\Actions\Controller\OrderActions\RequestCancelOrder;
@@ -17,6 +18,9 @@ use SyncBasalam\Actions\Controller\OrderActions\TrackingCodeOrder;
 use SyncBasalam\Actions\Controller\OrderActions\AutoConfirmOrders;
 use SyncBasalam\Actions\Controller\OptionActions\CreateMapOption;
 use SyncBasalam\Actions\Controller\OptionActions\RemoveMapOption;
+use SyncBasalam\Actions\Controller\ReviewActions\RemindLaterReview;
+use SyncBasalam\Actions\Controller\ReviewActions\NeverRemindReview;
+use SyncBasalam\Actions\Controller\ReviewActions\SubmitReview;
 use SyncBasalam\Actions\Controller\ProductActions\CreateSingleProduct;
 use SyncBasalam\Actions\Controller\ProductActions\UpdateSingleProduct;
 use SyncBasalam\Actions\Controller\ProductActions\RestoreProduct;
@@ -35,6 +39,7 @@ use SyncBasalam\Actions\Controller\CategoryActions\RemoveCategoryMap;
 use SyncBasalam\Actions\Controller\CategoryActions\GetMappingStats;
 use SyncBasalam\Actions\Controller\TicketActions\CreateTicket;
 use SyncBasalam\Actions\Controller\TicketActions\CreateTicketItem;
+use SyncBasalam\Actions\Controller\TicketActions\UploadTicketMediaAjax;
 
 defined('ABSPATH') || exit;
 
@@ -55,6 +60,7 @@ class RegisterActions
         ActionHandler::postAjax('connect_products_with_basalam', ConnectAllProducts::class);
         ActionHandler::postAction('cancel_connect_products_with_basalam', CancelConnectAllProducts::class);
         ActionHandler::postAjax('add_unsync_orders_from_basalam', FetchUnsyncOrders::class);
+        ActionHandler::postAjax('cancel_fetch_orders', CancelFetchOrders::class);
         ActionHandler::postAjax('basalam_add_map_option', CreateMapOption::class);
         ActionHandler::postAjax('basalam_delete_mapped_option', RemoveMapOption::class);
         ActionHandler::postAction('create_product_basalam', CreateSingleProduct::class);
@@ -81,5 +87,9 @@ class RegisterActions
         ActionHandler::postAction('auto_confirm_order_in_basalam', AutoConfirmOrders::class);
         ActionHandler::postAction('create_ticket', CreateTicket::class);
         ActionHandler::postAction('create_ticket_item', CreateTicketItem::class);
+        ActionHandler::postAjax('upload_ticket_media', UploadTicketMediaAjax::class);
+        ActionHandler::postAjax('sync_basalam_remind_later_review', RemindLaterReview::class);
+        ActionHandler::postAjax('sync_basalam_never_remind_review', NeverRemindReview::class);
+        ActionHandler::postAjax('sync_basalam_submit_review', SubmitReview::class);
     }
 }

@@ -2,6 +2,35 @@
 
 <details>
 
+<summary>1.7.8 - 2026-02-21</summary>
+
+### Added
+- retry system for jobs
+- Added announcements section
+- Added file upload capability in tickets
+- Added discount reduction percentage setting
+- Added ability to fetch and sync Basalam orders up to the last 30 days
+- Added customer name prefix/suffix settings for Basalam orders
+- Added onboarding section to Woosalam
+
+### Changed / Improved
+
+- Remove Product Operation type
+- change fetch unsync orders structure
+- Switched product list fetching from paginate-based API to cursor-based API
+- Skip webhook creation when the site domain is localhost
+- Made Woosalam addonable/extensible
+- Categorized plugin settings
+
+### Fix
+- Fixed ticket links issues
+- Fixed duplicated products issue
+- Fixed null value being sent to Basalam on duplicated product disconnect/update flow
+
+</details>
+
+<details>
+
 <summary>1.7.7 - 2026-02-07</summary>
 
 ### Changed / Improved

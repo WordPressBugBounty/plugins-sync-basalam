@@ -9,7 +9,7 @@ class GetApiService extends AbstractApiService
     protected function executeRequest(array $request)
     {
         return wp_remote_get($request['url'], [
-            'timeout' => 30,
+            'timeout' => 10,
             'headers' => $request['headers'],
         ]);
     }

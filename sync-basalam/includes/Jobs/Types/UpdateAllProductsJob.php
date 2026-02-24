@@ -3,7 +3,11 @@
 namespace SyncBasalam\Jobs\Types;
 
 use SyncBasalam\Jobs\AbstractJobType;
+use SyncBasalam\Jobs\JobResult;
+use SyncBasalam\Jobs\Exceptions\RetryableException;
+use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 use SyncBasalam\Admin\ProductService;
+use SyncBasalam\Logger\Logger;
 
 defined('ABSPATH') || exit;
 
@@ -24,35 +28,46 @@ class UpdateAllProductsJob extends AbstractJobType
         return $this->areAllSingleJobsCompleted('sync_basalam_update_single_product');
     }
 
-    public function execute(array $payload): void
+    public function execute(array $payload): JobResult
     {
         $lastId = $payload['last_updatable_product_id'] ?? 0;
 
-        $batchData = [
-            'posts_per_page' => 100,
-            'last_updatable_product_id' => $lastId,
-        ];
+        try {
+            $batchData = [
+                'posts_per_page' => 100,
+                'last_updatable_product_id' => $lastId,
+            ];
 
-        $productIds = ProductService::getUpdatableProducts($batchData);
+            $productIds = ProductService::getUpdatableProducts($batchData);
 
-        if (!$productIds) return;
-
-        foreach ($productIds as $productId) {
-            if (!$this->hasProductJobInProgress($productId, 'sync_basalam_update_single_product')) {
-                $this->jobManager->createJob(
-                    'sync_basalam_update_single_product',
-                    'pending',
-                    json_encode(['product_id' => $productId])
-                );
+            if (!$productIds) {
+                return $this->success(['completed' => true, 'message' => 'All products updated']);
             }
+
+            foreach ($productIds as $productId) {
+                if (!$this->hasProductJobInProgress($productId, 'sync_basalam_update_single_product')) {
+                    $this->jobManager->createJob(
+                        'sync_basalam_update_single_product',
+                        'pending',
+                        json_encode(['product_id' => $productId])
+                    );
+                }
+            }
+
+            $newLastId = max($productIds);
+
+            $this->jobManager->createJob(
+                'sync_basalam_update_all_products',
+                'pending',
+                json_encode(['last_updatable_product_id' => $newLastId])
+            );
+
+            return $this->success(['last_id' => $newLastId, 'count' => count($productIds)]);
+        } catch (\Exception $e) {
+            Logger::error("خطا در ایجاد تسک های بروزرسانی محصولات: " . $e->getMessage(), [
+                'operation' => 'ایجاد تسک های بروزرسانی محصولات',
+            ]);
+            throw $e;
         }
-
-        $newLastId = max($productIds);
-
-        $this->jobManager->createJob(
-            'sync_basalam_update_all_products',
-            'pending',
-            json_encode(['last_updatable_product_id' => $newLastId])
-        );
     }
 }

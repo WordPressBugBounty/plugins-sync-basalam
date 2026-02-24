@@ -1,5 +1,5 @@
 <?php defined('ABSPATH') || exit; ?>
-<div class="basalam--no-token" style="width: 450px; height: 300px; display: flex; align-items: center; justify-content: center; margin: 50px auto;">
+<div class="basalam--no-token" style="height: 300px; display: flex; align-items: center; justify-content: center; margin: 50px auto;">
     <div class="basalam--no-token-content" style="text-align: center; padding: 40px;">
         <div class="basalam-error-message" style="width: max-content;">
             <div class="basalam-error-icon">

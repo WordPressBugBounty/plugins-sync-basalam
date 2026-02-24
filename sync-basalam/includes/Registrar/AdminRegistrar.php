@@ -12,10 +12,12 @@ use SyncBasalam\Admin\Product\elements\ProductList\Filter;
 use SyncBasalam\Admin\Product\elements\ProductList\Actions;
 use SyncBasalam\Admin\Order\OrderColumn;
 use SyncBasalam\Admin\Order\OrderMetaBox;
-use SyncBasalam\Admin\Components;
+use SyncBasalam\Admin\Components\OrderPageComponents;
 use SyncBasalam\Admin\Order\OrderStatuses;
 use SyncBasalam\Admin\Product\ProductOperations;
 use SyncBasalam\Admin\Product\Operations\ConnectProduct;
+use SyncBasalam\Admin\Announcement\AnnouncementCenter;
+use SyncBasalam\Admin\Onboarding\PointerTour;
 use SyncBasalam\Services\SystemResourceMonitor;
 
 defined("ABSPATH") || exit;
@@ -33,6 +35,7 @@ class AdminRegistrar implements RegistrarInterface
         // Admin Scripts & Styles
         \add_action("admin_enqueue_scripts", [self::class, "adminEnqueueStyles"]);
         \add_action("admin_enqueue_scripts", [self::class, "adminEnqueueScripts"]);
+        \add_action("admin_footer", [AnnouncementCenter::class, 'renderPanel']);
 
         // Product Columns
         \add_filter("manage_edit-product_columns", [StatusColumn::class, "registerStatusColumn"]);
@@ -78,21 +81,23 @@ class AdminRegistrar implements RegistrarInterface
         \add_filter("handle_bulk_actions-edit-product", [new Actions(), "handleBulkAction"], 10, 3);
 
         // Product Duplicate
-        \add_action("woocommerce_product_duplicate", function ($newProductId, $oldProduct) {
-            if (!is_object($oldProduct) || $oldProduct->post_type !== "product") return;
-            ProductOperations::disconnectProduct($newProductId);
-        }, 10, 2);
+        \add_action("woocommerce_product_duplicate", function ($newProduct) {
+            ProductOperations::disconnectProduct($newProduct->get_id());
+        }, 10, 1);
 
         // Order Check Buttons (HPOS)
-        \add_action("woocommerce_order_list_table_extra_tablenav", [Components::class, "renderCheckOrdersButton"], 20, 1);
+        \add_action("woocommerce_order_list_table_extra_tablenav", [OrderPageComponents::class, "renderCheckOrdersButton"], 20, 1);
 
         // Order Check Buttons (Traditional CPT - uses same hook as product filter)
-        \add_action("restrict_manage_posts", [Components::class, "renderCheckOrdersButtonTraditional"]);
+        \add_action("restrict_manage_posts", [OrderPageComponents::class, "renderCheckOrdersButtonTraditional"]);
 
         // Initialize AJAX handlers
         $connectProduct = new ConnectProduct();
         add_action('wp_ajax_sync_basalam_connect_product', [$connectProduct, 'handleConnectProduct']);
         add_action('wp_ajax_basalam_search_products', [$connectProduct, 'handleSearchProducts']);
+        add_action('wp_ajax_sync_basalam_mark_pointer_onboarding_completed', [PointerTour::class, 'markPointerOnboardingCompleted']);
+        add_action('wp_ajax_' . AnnouncementCenter::MARK_SEEN_ACTION, [AnnouncementCenter::class, 'markAllSeen']);
+        add_action('wp_ajax_' . AnnouncementCenter::FETCH_PAGE_ACTION, [AnnouncementCenter::class, 'fetchPage']);
 
         // Tasks per minute calculation handler
         add_action('wp_ajax_basalam_calculate_tasks_per_minute', function () {
@@ -113,7 +118,7 @@ class AdminRegistrar implements RegistrarInterface
         return plugin_dir_url(dirname(__FILE__, 2)) . "assets/" . $path;
     }
 
-    public static function adminEnqueueStyles()
+    public static function adminEnqueueStyles($hook = '')
     {
         wp_enqueue_style(
             "basalam-admin-style",
@@ -135,10 +140,20 @@ class AdminRegistrar implements RegistrarInterface
             "basalam-admin-onboarding-style",
             self::assetsUrl("css/onboarding.css"),
         );
+
+        if (PointerTour::shouldLoadPointerTour((string) $hook)) {
+            wp_enqueue_style('wp-pointer');
+        }
     }
 
-    public static function adminEnqueueScripts()
+    public static function adminEnqueueScripts($hook = '')
     {
+        $shouldLoadPointerTour = PointerTour::shouldLoadPointerTour((string) $hook);
+
+        if ($shouldLoadPointerTour) {
+            wp_enqueue_script('wp-pointer');
+        }
+
         wp_enqueue_script(
             "basalam-admin-logs-script",
             self::assetsUrl("js/logs.js"),
@@ -190,7 +205,7 @@ class AdminRegistrar implements RegistrarInterface
         wp_enqueue_script(
             "basalam-admin-script",
             self::assetsUrl("js/admin.js"),
-            ["jquery"],
+            $shouldLoadPointerTour ? ["jquery", "wp-pointer"] : ["jquery"],
             true
         );
         wp_enqueue_script(
@@ -212,5 +227,20 @@ class AdminRegistrar implements RegistrarInterface
             ["jquery"],
             true
         );
+
+        wp_enqueue_script(
+            "basalam-ticket-script",
+            self::assetsUrl("js/ticket.js"),
+            [],
+            true
+        );
+
+        if ($shouldLoadPointerTour) {
+            wp_localize_script('basalam-admin-script', 'basalamPointerTour', PointerTour::getPointerTourConfig());
+        }
+
+        if (AnnouncementCenter::shouldLoadOnCurrentPage()) {
+            wp_localize_script('basalam-admin-script', 'basalamAnnouncements', AnnouncementCenter::getConfig());
+        }
     }
 }

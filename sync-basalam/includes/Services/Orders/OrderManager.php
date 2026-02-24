@@ -186,6 +186,12 @@ class OrderManager
                     }
                 }
 
+                $prefix = syncBasalamSettings()->getSettings(SettingsConfig::CUSTOMER_PREFIX_NAME);
+                $suffix = syncBasalamSettings()->getSettings(SettingsConfig::CUSTOMER_SUFFIX_NAME);
+
+                if (!empty($prefix)) $first_name = $prefix . ' ' . $first_name;
+                if (!empty($suffix)) $last_name = $last_name . ' ' . $suffix;
+
                 // Set basic billing info
                 $order->set_billing_first_name($first_name);
                 $order->set_billing_last_name($last_name);
@@ -210,9 +216,10 @@ class OrderManager
                 GetProvincesData::setOrderAddress($order, $addressData, 'billing');
                 GetProvincesData::setOrderAddress($order, $addressData, 'shipping');
 
-                // Add shipping method from Basalam API
-                if (isset($data['parcel_detail']['shipping_method']['title']) && isset($data['parcel_detail']['shipping_cost'])) {
-                    $shipping_method_title = $data['parcel_detail']['shipping_method']['title'];
+                // Add shipping method based on settings
+                $shipping_method_setting = syncBasalamSettings()->getSettings(SettingsConfig::ORDER_SHIPPING_METHOD);
+
+                if (isset($data['parcel_detail']['shipping_cost'])) {
                     $shipping_cost = $data['parcel_detail']['shipping_cost'];
 
                     $currency = get_woocommerce_currency();
@@ -225,8 +232,35 @@ class OrderManager
                     }
 
                     $shipping_item = new \WC_Order_Item_Shipping();
-                    $shipping_item->set_method_title($shipping_method_title);
-                    $shipping_item->set_method_id('basalam_shipping');
+
+                    if ($shipping_method_setting === 'basalam') {
+                        // Use Basalam shipping method title from API
+                        if (isset($data['parcel_detail']['shipping_method']['title'])) {
+                            $shipping_method_title = $data['parcel_detail']['shipping_method']['title'];
+                            $shipping_item->set_method_title($shipping_method_title);
+                        }
+                        $shipping_item->set_method_id('basalam_shipping');
+                    } elseif (strpos($shipping_method_setting, 'wc_') === 0) {
+                        // Use WooCommerce shipping method
+                        $wc_method_id = substr($shipping_method_setting, 3); // Remove 'wc_' prefix
+
+                        // Find the shipping method instance
+                        $method_instance_id = self::findShippingMethodInstanceId($wc_method_id);
+                        if ($method_instance_id) {
+                            $shipping_item->set_method_id($wc_method_id . ':' . $method_instance_id);
+
+                            // Get the method title from WooCommerce
+                            $method_title = self::getShippingMethodTitle($wc_method_id, $method_instance_id);
+                            if ($method_title) {
+                                $shipping_item->set_method_title($method_title);
+                            }
+                        } else {
+                            // Fallback to method id without instance
+                            $shipping_item->set_method_id($wc_method_id);
+                            $shipping_item->set_method_title($wc_method_id);
+                        }
+                    }
+
                     $shipping_item->set_total(floatval($shipping_cost));
                     $shipping_item->set_taxes([]);
                     $order->add_item($shipping_item);
@@ -484,5 +518,51 @@ class OrderManager
                 $order_item->save();
             }
         }
+    }
+
+    private static function findShippingMethodInstanceId($method_id)
+    {
+        if (!class_exists('WC_Shipping_Zones')) {
+            return null;
+        }
+
+        $shipping_zones = \WC_Shipping_Zones::get_zones();
+
+        foreach ($shipping_zones as $zone) {
+            $zone_id = $zone['id'] ?? 0;
+            $shipping_zone = new \WC_Shipping_Zone($zone_id);
+            $methods = $shipping_zone->get_shipping_methods(true);
+
+            foreach ($methods as $method) {
+                if ($method->id === $method_id) {
+                    return $method->instance_id;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static function getShippingMethodTitle($method_id, $instance_id)
+    {
+        if (!class_exists('WC_Shipping_Zones')) {
+            return null;
+        }
+
+        $shipping_zones = \WC_Shipping_Zones::get_zones();
+
+        foreach ($shipping_zones as $zone) {
+            $zone_id = $zone['id'] ?? 0;
+            $shipping_zone = new \WC_Shipping_Zone($zone_id);
+            $methods = $shipping_zone->get_shipping_methods(true);
+
+            foreach ($methods as $method) {
+                if ($method->id === $method_id && $method->instance_id == $instance_id) {
+                    return $method->get_title() ?: $method->get_method_title();
+                }
+            }
+        }
+
+        return null;
     }
 }

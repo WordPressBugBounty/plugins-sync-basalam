@@ -4,7 +4,6 @@ namespace SyncBasalam\Services\Products;
 
 use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Services\ApiServiceManager;
-use SyncBasalam\Logger\Logger;
 
 defined('ABSPATH') || exit;
 
@@ -21,19 +20,28 @@ class CreateSingleProductService
     {
         if (!get_post_type($productId) === 'product') {
             throw new \Exception('نوع post محصول نیست.');
-            return false;
         }
+
+        $productData = apply_filters('sync_basalam_product_data_before_create', $productData, $productId);
+
+        do_action('sync_basalam_before_create_product_api', $productId, $productData);
+
         $vendorId = syncBasalamSettings()->getSettings(SettingsConfig::VENDOR_ID);
 
         $url = "https://openapi.basalam.com/v1/vendors/$vendorId/products";
 
-        $request = $this->apiservice->sendPostRequest($url, $productData);
+        try {
+            $request = $this->apiservice->sendPostRequest($url, $productData);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+
         if ($request['status_code'] != 201 && isset($request['status_code'])) {
 
             $body = $request['body'] ?? '';
 
             if (is_string($body))
-            $responseData = json_decode($body, true);
+                $responseData = json_decode($body, true);
             else $responseData = $body;
 
             if (!is_array($responseData)) $responseData = [];
@@ -42,7 +50,7 @@ class CreateSingleProductService
                 $message = $responseData['messages'][0]['message'] ?? 'خطای نامشخص';
                 $field = $responseData['messages'][0]['fields'][0] ?? '';
             } else {
-                $message = 'خطای نامشخص';
+                $message = 'درخواست با تایم اوت مواجه شد.';
                 $field = '';
             }
 
@@ -56,7 +64,7 @@ class CreateSingleProductService
             $body = $request['body'] ?? '';
 
             if (is_string($body))
-            $responseData = json_decode($body, true);
+                $responseData = json_decode($body, true);
             else $responseData = $body;
 
             $message = $responseData[0]['message'] ?? 'خطای نامشخص';
@@ -136,15 +144,18 @@ class CreateSingleProductService
             update_post_meta($productId, 'sync_basalam_product_status', 2976);
             update_post_meta($productId, 'sync_basalam_product_sync_status', 'synced');
 
-            return [
+            $result = [
                 'success'     => true,
                 'message'     => 'محصول با موفقیت به باسلام اضافه شد.',
                 'status_code' => 200,
+                'basalam_id'  => $responseData['id'],
             ];
+
+            do_action('sync_basalam_after_create_product_api', $productId, $responseData, $result);
+
+            return $result;
         }
 
         throw new \Exception("فرایند اضافه کردن محصول ناموفق بود");
-
-        return false;
     }
 }

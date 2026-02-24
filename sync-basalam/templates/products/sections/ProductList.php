@@ -1,5 +1,5 @@
 <?php defined('ABSPATH') || exit; ?>
-<div class="basalam-action-card basalam-relative">
+<div id="sync-basalam-onboarding-products" class="basalam-action-card basalam-relative">
     <div class="basalam-info-icon basalam-info-icon-small">
         <a href="https://www.aparat.com/playlist/20965637" target="_blank">
             <img src="<?php echo esc_url(syncBasalamPlugin()->assetsUrl() . "/icons/info-black.svg"); ?>" alt="اطلاعات" class="basalam-product-image-size">

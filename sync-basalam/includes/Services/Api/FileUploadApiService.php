@@ -24,13 +24,7 @@ class FileUploadApiService
 
         $headers = array_merge($headers, ['content-type' => 'multipart/form-data; boundary=' . $boundary]);
 
-        $response = wp_remote_post(
-            $url,
-            [
-                'headers' => $headers,
-                'body'    => $payload,
-            ]
-        );
+        $response = wp_remote_post($url, ['headers' => $headers, 'body' => $payload]);
 
         return $this->handleResponse($response);
     }
@@ -50,7 +44,7 @@ class FileUploadApiService
         $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
 
         if (!in_array($extension, $allowedExtensions)) {
-            return ['valid' => false, 'message' => 'فرمت تصویر متغیر نیست ، فرمت های معتبر : ' . $allowedExtensions];
+            return ['valid' => false, 'message' => 'فرمت تصویر متغیر نیست ، فرمت های معتبر : ' . implode(', ', $allowedExtensions)];
         }
 
         return ['valid' => true, 'message' => 'فایل متعبر است'];

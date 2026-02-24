@@ -4,48 +4,57 @@ namespace SyncBasalam\Services\Products;
 
 use SyncBasalam\Services\ApiServiceManager;
 use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Logger\Logger;
 
 defined('ABSPATH') || exit;
 
 class FetchProductsData
 {
-    private $url;
+    private $baseUrl;
+    private $vendorId;
+
     public function __construct()
     {
-        $vendorId = syncBasalamSettings()->getSettings(SettingsConfig::VENDOR_ID);
-        $this->url = "https://openapi.basalam.com/v1/vendors/$vendorId/products";
+        $this->vendorId = syncBasalamSettings()->getSettings(SettingsConfig::VENDOR_ID);
+        $this->baseUrl = 'https://core.basalam.com/v4/products';
     }
 
-    public function getProductData($title = null, $page = 1, $perPage = 100)
+    public function getProductData($title = null, $cursor = null)
     {
-        if ($title) {
-            $this->url .= '?title=' . $title;
-        } else {
-            $this->url .= '?page=' . $page;
-            $this->url .= '&per_page=' . $perPage;
-        }
+        $query = ['per_page' => 30];
+
+        if (!empty($this->vendorId)) $query['vendor_ids'] = $this->vendorId;
+        if (!empty($title)) $query['product_title'] = $title;
+
+        if ($cursor !== null) $query['cursor'] = $cursor;
+
+        $url = $this->baseUrl . '?' . http_build_query($query);
 
         $apiservice = new ApiServiceManager();
-        $response = $apiservice->sendGetRequest($this->url);
 
-        $products = [];
+        try {
+            $response = $apiservice->sendGetRequest($url);
+        } catch (\Exception $e) {
+            Logger::error('خطا در دریافت اطلاعات محصولات از باسلام: ' . $e->getMessage());
+            return [
+                'data'        => [],
+                'has_more'    => false,
+                'next_cursor' => null,
+            ];
+        }
+
+        $bodyData = [];
 
         if (!empty($response['body'])) $bodyData = json_decode($response['body'], true);
 
-        if (isset($bodyData['data'])) {
-            foreach ($bodyData['data'] as $product) {
-                $products[] = [
-                    'id'    => $product['id'],
-                    'title' => $product['title'],
-                    'photo' => $product['photo']['md'],
-                    'price' => $product['price'],
-                ];
-            }
-        }
+        $data = isset($bodyData['data']) && is_array($bodyData['data']) ? $bodyData['data'] : [];
+
+        $nextCursor = $bodyData['next_cursor'];
 
         return [
-            'total_page' => $bodyData['total_page'] ?? 1,
-            'products'   => $products,
+            'data'        => $data,
+            'has_more'    => $nextCursor !== null,
+            'next_cursor' => $nextCursor,
         ];
     }
 }

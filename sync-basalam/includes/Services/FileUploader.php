@@ -7,43 +7,26 @@ use SyncBasalam\Admin\Settings\SettingsConfig;
 defined('ABSPATH') || exit;
 class FileUploader
 {
-    public static function upload($filePath)
+    public function upload($filePath)
     {
-        if (filter_var($filePath, FILTER_VALIDATE_URL)) {
-            $tmpFile = \wp_tempnam($filePath);
-            $fileContents = file_get_contents($filePath);
+        $preparedFile = $this->prepare($filePath);
 
-            if ($fileContents === false) return false;
-
-            file_put_contents($tmpFile, $fileContents);
-            $pathToUpload = $tmpFile;
-            $isTemp = true;
-        } else {
-            $pathToUpload = $filePath;
-            $isTemp = false;
-        }
-
-        if (!self::checkFileSize($pathToUpload)) {
-            if (!empty($isTemp)) {
-                unlink($tmpFile);
-            }
-
+        if ($preparedFile === false) {
             return false;
         }
 
-        if (!self::checkExtensionFromPath($pathToUpload)) {
-            if (!empty($isTemp)) {
-                unlink($tmpFile);
-            }
+        $pathToUpload = $preparedFile['path'];
+        $isTemp = $preparedFile['isTemp'];
+        $tmpFile = $preparedFile['tmpFile'] ?? null;
 
+        if (!$this->checkFileSize($pathToUpload)) {
+            if ($isTemp && $tmpFile) unlink($tmpFile);
             return false;
         }
 
-        $response = self::uploadFileToBasalam($pathToUpload);
+        $response = $this->uploadFileToBasalam($pathToUpload);
 
-        if (!empty($isTemp)) {
-            unlink($tmpFile);
-        }
+        if ($isTemp && $tmpFile) unlink($tmpFile);
 
         if ($response && $response['status_code'] == 200 && $response['body']) {
             return [
@@ -55,7 +38,44 @@ class FileUploader
         return false;
     }
 
-    public static function checkFileSize($path)
+    private function prepare($filePath)
+    {
+        if (filter_var($filePath, FILTER_VALIDATE_URL)) {
+            $parsedUrl = parse_url($filePath);
+            $path = $parsedUrl['path'] ?? $filePath;
+            $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+
+            if (!$this->FileExtensionValidator($extension)) return false;
+
+            $tmpFile = sys_get_temp_dir() . '/' . uniqid('upload_', true) . '.' . $extension;
+
+            $fileContents = file_get_contents($filePath);
+
+            if ($fileContents === false) return false;
+
+            file_put_contents($tmpFile, $fileContents);
+
+            return [
+                'path' => $tmpFile,
+                'isTemp' => true,
+                'tmpFile' => $tmpFile
+            ];
+        } else {
+            if (!file_exists($filePath)) return false;
+
+            $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+
+            if (!$this->FileExtensionValidator($extension)) return false;
+
+            return [
+                'path' => $filePath,
+                'isTemp' => false,
+                'tmpFile' => null
+            ];
+        }
+    }
+
+    public function checkFileSize($path)
     {
         if (!file_exists($path)) return false;
 
@@ -66,18 +86,13 @@ class FileUploader
         return true;
     }
 
-    public static function checkExtensionFromPath($filePath)
+    public function FileExtensionValidator($extension)
     {
         $allowedExtensions = ['jpg', 'png', 'webp', 'bmp', 'jfif', 'jpeg', 'avif'];
-
-        if (!file_exists($filePath)) return false;
-
-        $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
-
         return in_array($extension, $allowedExtensions);
     }
 
-    public static function uploadFileToBasalam($filePath)
+    public function uploadFileToBasalam($filePath)
     {
         $apiService = new ApiServiceManager();
 

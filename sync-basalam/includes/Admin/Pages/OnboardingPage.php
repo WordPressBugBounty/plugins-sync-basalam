@@ -2,7 +2,7 @@
 
 namespace SyncBasalam\Admin\Pages;
 
-use SyncBasalam\Admin\OnboardingManager;
+use SyncBasalam\Admin\Onboarding\OnboardingManager;
 
 defined('ABSPATH') || exit;
 class OnboardingPage extends AdminPageAbstract
@@ -18,6 +18,6 @@ class OnboardingPage extends AdminPageAbstract
 
         if ($current_step === $total_steps) update_option('sync_basalam_onboarding_completed', true);
 
-        require_once syncBasalamPlugin()->templatePath('/onboarding/template-onboarding-page.php');
+        require_once syncBasalamPlugin()->templatePath('/admin/onboarding/template-onboarding-page.php');
     }
 }

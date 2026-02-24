@@ -22,23 +22,27 @@ class FetchHamsalamToken
 
     public function fetch()
     {
-        $apiService = new ApiServiceManager();
+        try {
+            $apiService = new ApiServiceManager();
 
-        $body = ['basalam_token' => $this->basalamToken];
+            $body = ['basalam_token' => $this->basalamToken];
 
-        $response = $apiService->sendPostRequest($this->url, $body);
+            $response = $apiService->sendPostRequest($this->url, $body);
 
-        if (!$response || !isset($response['body'])) return ('خطا در دریافت توکن همسلام');
+            if (!$response || !isset($response['body'])) return ('خطا در دریافت توکن همسلام');
 
-        $body = json_decode($response['body'], true);
+            $body = json_decode($response['body'], true);
 
-        if (!$response || !isset($body['access_token'])) return ('خطا در دریافت access_token همسلام');
+            if (!$response || !isset($body['access_token'])) return ('خطا در دریافت access_token همسلام');
 
-        $data = [
-            SettingsConfig::HAMSALAM_TOKEN => $body['access_token'],
-        ];
+            $data = [
+                SettingsConfig::HAMSALAM_TOKEN => $body['access_token'],
+            ];
 
-        SettingsManager::updateSettings($data);
-        return $body['access_token'];
+            SettingsManager::updateSettings($data);
+            return $body['access_token'];
+        } catch (\Exception $e) {
+            return 'خطا در دریافت توکن همسلام: ' . $e->getMessage();
+        }
     }
 }

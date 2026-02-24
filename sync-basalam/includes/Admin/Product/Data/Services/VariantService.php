@@ -24,15 +24,17 @@ class VariantService
         $variants = [];
         $variationIds = $product->get_children();
 
+        $parentManagesStock = $product->get_manage_stock();
+
         foreach ($variationIds as $variationId) {
-            $variant = $this->createVariant($variationId, $product);
+            $variant = $this->createVariant($variationId, $product, $parentManagesStock);
             if ($variant) $variants[] = $variant;
         }
 
         return $variants;
     }
 
-    private function createVariant(int $variationId, $parentProduct): ?array
+    private function createVariant(int $variationId, $parentProduct, bool $parentManagesStock = false): ?array
     {
         $variation = wc_get_product($variationId);
         if (!$variation) return null;
@@ -44,7 +46,7 @@ class VariantService
 
         $variantData = [
             'primary_price' => $price,
-            'stock' => $this->getVariantStock($variation),
+            'stock' => $this->getVariantStock($variation, $parentProduct, $parentManagesStock),
             'properties' => $this->getVariantProperties($variation, $parentProduct),
         ];
 
@@ -56,12 +58,19 @@ class VariantService
         return $variantData;
     }
 
-    private function getVariantStock($variation): int
+    private function getVariantStock($variation, $parentProduct, bool $parentManagesStock = false): int
     {
         $defaultStock = $this->settings[SettingsConfig::DEFAULT_STOCK_QUANTITY];
         $safeStock = $this->settings[SettingsConfig::SAFE_STOCK];
-        $stock = $variation->get_stock_quantity();
-        $stockStatus = $variation->get_stock_status();
+
+        // If parent manages stock, use parent's stock quantity
+        if ($parentManagesStock) {
+            $stock = $parentProduct->get_stock_quantity();
+            $stockStatus = $parentProduct->get_stock_status();
+        } else {
+            $stock = $variation->get_stock_quantity();
+            $stockStatus = $variation->get_stock_status();
+        }
 
         $calculatedStock = $stockStatus === 'instock' ? $stock ?? $defaultStock : 0;
 

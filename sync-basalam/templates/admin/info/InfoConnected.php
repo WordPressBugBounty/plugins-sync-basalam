@@ -1,5 +1,8 @@
 <?php
-use SyncBasalam\Admin\Components;
+use SyncBasalam\Admin\Components\SettingPageComponents;
+use SyncBasalam\Services\VendorInfoService;
+
+$vendorInfo = (new VendorInfoService())->getVendorInfo();
 
 defined('ABSPATH') || exit;
 ?>
@@ -9,27 +12,27 @@ defined('ABSPATH') || exit;
         <div class="vendor-info-grid">
             <div class="info-item">
                 <div class="info-label">نام غرفه</div>
-                <div class="info-value"><?php echo esc_html($response['title'] ?? ''); ?></div>
+                <div class="info-value"><?php echo esc_html($vendorInfo['title'] ?? ''); ?></div>
             </div>
             <div class="info-item">
                 <div class="info-label">شناسه غرفه</div>
-                <div class="info-value"><?php echo esc_html($syncBasalamVendorId); ?></div>
+                <div class="info-value"><?php echo esc_html($vendorInfo['id'] ?? ''); ?></div>
             </div>
             <div class="info-item">
                 <div class="info-label">صاحب غرفه</div>
-                <div class="info-value"><?php echo esc_html($response['user']['name'] ?? ''); ?></div>
+                <div class="info-value"><?php echo esc_html($vendorInfo['user']['name'] ?? ''); ?></div>
             </div>
             <div class="info-item">
                 <div class="info-label">شهر غرفه</div>
-                <div class="info-value"><?php echo esc_html($response['city']['name'] ?? ''); ?></div>
+                <div class="info-value"><?php echo esc_html($vendorInfo['city']['name'] ?? ''); ?></div>
             </div>
             <div class="info-item">
                 <div class="info-label">وضعیت غرفه</div>
-                <div class="info-value"><?php echo esc_html($response['status']['name'] ?? ''); ?></div>
+                <div class="info-value"><?php echo esc_html($vendorInfo['status']['name'] ?? ''); ?></div>
             </div>
             <div class="info-item">
                 <div class="info-label">محصولات فعال غرفه</div>
-                <div class="info-value"><?php echo esc_html($response['product_count'] ?? ''); ?></div>
+                <div class="info-value"><?php echo esc_html($vendorInfo['product_count'] ?? ''); ?></div>
             </div>
         </div>
     </div>
@@ -40,7 +43,7 @@ defined('ABSPATH') || exit;
                 <p class="basalam-p basalam-p__small basalam-padding-justify">با حذف دسترسی اتصال شما به باسلام قطع خواهد شد و نیاز به تنظیم مجدد خواهید داشت.</p>
                 <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" class="Basalam-form">
                     <?php wp_nonce_field('basalam_update_setting_nonce', '_wpnonce'); ?>
-                    <?php esc_html(Components::renderDeleteAccess()); ?>
+                    <?php esc_html(SettingPageComponents::renderDeleteAccess()); ?>
                     <input type="hidden" name="action" value="basalam_update_setting">
                     <button type="submit" class="basalam-p basalam-danger-button">
                         <img src="<?php echo esc_url(syncBasalamPlugin()->assetsUrl() . '/icons/trash.svg'); ?>" alt="">

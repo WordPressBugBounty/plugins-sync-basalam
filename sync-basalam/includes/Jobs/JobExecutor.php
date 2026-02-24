@@ -3,6 +3,7 @@
 namespace SyncBasalam\Jobs;
 
 use SyncBasalam\JobManager;
+use SyncBasalam\Jobs\Exceptions\JobException;
 
 defined('ABSPATH') || exit;
 
@@ -23,9 +24,7 @@ class JobExecutor
     {
         $jobExecutor = $this->jobRegistry->get($jobType);
 
-        if (!$jobExecutor) {
-            return false;
-        }
+        if (!$jobExecutor) return false;
 
         $payload = json_decode($job->payload, true);
 
@@ -33,10 +32,47 @@ class JobExecutor
             $payload = $this->normalizeLegacyPayload($jobType, $payload);
         }
 
-        $jobExecutor->execute($payload);
-        $this->jobManager->deleteJob(['id' => $job->id]);
+        try {
+            $result = $jobExecutor->execute($payload);
 
-        return true;
+            if ($result instanceof JobResult) return $this->handleJobResult($job, $result);
+            $this->jobManager->deleteJob(['id' => $job->id]);
+            return true;
+        } catch (JobException $e) {
+            return $this->handleJobException($job, $e);
+        } catch (\Exception $e) {
+            $this->jobManager->failJob($job->id, $e->getMessage());
+            return false;
+        }
+    }
+
+    private function handleJobResult(object $job, JobResult $result): bool
+    {
+        if ($result->isSuccessful()) {
+            $this->jobManager->deleteJob(['id' => $job->id]);
+            return true;
+        }
+
+        if ($result->shouldRetry()) {
+            $retried = $this->jobManager->retryJob($job->id, $result->getErrorMessage());
+
+            return $retried;
+        }
+
+        $this->jobManager->failJob($job->id, $result->getErrorMessage());
+        return false;
+    }
+
+    private function handleJobException(object $job, JobException $exception): bool
+    {
+        if ($exception->shouldRetry()) {
+            $retried = $this->jobManager->retryJob($job->id, $exception->getMessage());
+
+            return $retried;
+        }
+
+        $this->jobManager->failJob($job->id, $exception->getMessage());
+        return false;
     }
 
     private function normalizeLegacyPayload(string $jobType, $legacyPayload): array
@@ -52,9 +88,6 @@ class JobExecutor
 
             case 'sync_basalam_create_all_products':
                 return ['include_out_of_stock' => false, 'posts_per_page' => 100];
-
-            case 'sync_basalam_auto_connect_products':
-                return ['page' => $legacyPayload];
 
             default:
                 return [];

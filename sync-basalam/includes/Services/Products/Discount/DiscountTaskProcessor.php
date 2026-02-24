@@ -91,7 +91,7 @@ class DiscountTaskProcessor
         }
 
         if ($result && isset($result['status_code']) && $result['status_code'] === 202) {
-            $this->taskModel->updateMultipleStatus($taskIds, DiscountTaskModel::STATUS_COMPLETED);
+            $this->taskModel->deleteMultipleTasks($taskIds);
         } else {
             $errorMessage = 'خطای ناشناخته';
             if ($result) {
@@ -112,6 +112,7 @@ class DiscountTaskProcessor
     public function addDiscountTasks($items)
     {
         $jobExists = $this->jobManager->getCountJobs(['job_type' => 'sync_basalam_discount_tasks', 'status' => ['pending', 'processing']]);
+        $discountReductionPercent = absint(syncBasalamSettings()->getSettings(SettingsConfig::DISCOUNT_REDUCTION_PERCENT));
 
         if ($jobExists === 0) $this->jobManager->createJob('sync_basalam_discount_tasks', 'pending');
 
@@ -121,6 +122,11 @@ class DiscountTaskProcessor
             $wcVariationId = $item['variation_id'] ?? null;
             $action = $item['action'] ?? 'apply';
             $discountPercent = $item['discount_percent'] ?? 0;
+
+            if ($action === 'apply') {
+                $discountPercent = $this->getAdjustedDiscountPercent($discountPercent, $discountReductionPercent);
+            }
+
             $activeDays = $item['active_days'] ?? syncBasalamSettings()->getSettings(SettingsConfig::DISCOUNT_DURATION) ?? 7;
 
             $basalamProductId = null;
@@ -149,6 +155,17 @@ class DiscountTaskProcessor
         }
 
         return $createdCount > 0;
+    }
+
+    private function getAdjustedDiscountPercent($discountPercent, int $discountReductionPercent): float
+    {
+        $discountPercent = (float) $discountPercent;
+
+        if ($discountReductionPercent > 0 && $discountPercent > $discountReductionPercent) {
+            return $discountPercent - $discountReductionPercent;
+        }
+
+        return $discountPercent;
     }
 
     public function handleProductDiscount($productId)

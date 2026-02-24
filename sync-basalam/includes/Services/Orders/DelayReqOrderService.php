@@ -101,6 +101,13 @@ class DelayReqOrderService
 
         $apiService = new ApiServiceManager();
 
-        return $apiService->sendPostRequest($apiUrl, $body);
+        try {
+            return $apiService->sendPostRequest($apiUrl, $body);
+        } catch (\Exception $e) {
+            return [
+                'status_code' => 500,
+                'body' => 'خطا در ارسال درخواست تاخیر: ' . $e->getMessage(),
+            ];
+        }
     }
 }

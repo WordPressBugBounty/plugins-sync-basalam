@@ -4,7 +4,6 @@ namespace SyncBasalam\Admin;
 
 use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Admin\Settings\SettingsManager;
-use SyncBasalam\Admin\Settings\OAuthManager;
 use SyncBasalam\Admin\Settings\SettingsPageHandler;
 
 defined('ABSPATH') || exit;
@@ -29,11 +28,6 @@ class Settings
     public static function updateSettings($data)
     {
         return SettingsManager::updateSettings($data);
-    }
-
-    public static function getOauthData($forceRefresh = false)
-    {
-        return OAuthManager::getOauthData($forceRefresh);
     }
 
     public static function saveSettings()

@@ -173,15 +173,16 @@ class DiscountTaskModel
         return $this->wpdb->query($sql);
     }
 
-    public function deleteOldCompletedTasks($days = 30)
+    public function deleteMultipleTasks($ids)
     {
+        if (empty($ids)) return false;
+
+        $idsPlaceholders = implode(',', array_fill(0, count($ids), '%d'));
+
         $sql = $this->wpdb->prepare(
-            "DELETE FROM {$this->tableName} 
-             WHERE status IN (%s, %s) 
-             AND processed_at < DATE_SUB(NOW(), INTERVAL %d DAY)",
-            self::STATUS_COMPLETED,
-            self::STATUS_FAILED,
-            $days
+            "DELETE FROM {$this->tableName}
+             WHERE id IN ($idsPlaceholders)",
+            $ids
         );
 
         return $this->wpdb->query($sql);

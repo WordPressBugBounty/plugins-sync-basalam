@@ -40,8 +40,8 @@ class ProductService
         return (new ProductQueryService())->getUpdatableProducts($args);
     }
 
-    public static function autoConnectAllProducts($page = 1): void
+    public static function autoConnectAllProducts($cursor = null): void
     {
-        (new ProductSyncService())->enqueueAutoConnect($page);
+        (new ProductSyncService())->enqueueAutoConnect($cursor);
     }
 }

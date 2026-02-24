@@ -19,7 +19,6 @@ class UpdateProductStrategy implements DataStrategyInterface
             'package_weight' => $handler->getPackageWeight($product),
             'photo' => $handler->getMainPhoto($product),
             'photos' => $handler->getGalleryPhotos($product),
-            'status' => 2976,
             'preparation_days' => $handler->getPreparationDays($product),
             'unit_type' => $handler->getUnitType($product),
             'unit_quantity' => $handler->getUnitQuantity($product),

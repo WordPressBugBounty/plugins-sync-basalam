@@ -41,6 +41,7 @@ class SettingsManager
 
         $input[SettingsConfig::DEFAULT_WEIGHT] = absint($input[SettingsConfig::DEFAULT_WEIGHT]);
         $input[SettingsConfig::DEFAULT_PREPARATION] = absint($input[SettingsConfig::DEFAULT_PREPARATION]);
+        $input[SettingsConfig::DISCOUNT_REDUCTION_PERCENT] = min(100, absint($input[SettingsConfig::DISCOUNT_REDUCTION_PERCENT]));
 
         return $input;
     }

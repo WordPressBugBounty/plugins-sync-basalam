@@ -3,7 +3,7 @@
 namespace SyncBasalam\Admin\Product\elements\ProductList;
 
 use SyncBasalam\Admin\Settings\SettingsConfig;
-use SyncBasalam\Admin\Components;
+use SyncBasalam\Admin\Components\CommonComponents;
 
 defined('ABSPATH') || exit;
 
@@ -64,17 +64,17 @@ class MetaBox
             } else {
                 if ($basalamProductStatus) {
                     $syncBasalamProductId = get_post_meta($productId, 'sync_basalam_product_id', true);
-                    Components::renderBtn('بروزسانی محصول در باسلام', false, 'update_product_in_basalam', $post->ID, 'update_product_in_basalam_nonce');
+                    CommonComponents::renderBtn('بروزسانی محصول در باسلام', 'update_product_in_basalam', $post->ID, 'update_product_in_basalam_nonce');
                     if ($basalamProductStatus == 2976) {
-                        Components::renderBtn('آرشیو کردن محصول در باسلام', false, 'archive_exist_product_on_basalam', $post->ID, 'archive_exist_product_on_basalam_nonce');
+                        CommonComponents::renderBtn('آرشیو کردن محصول در باسلام', 'archive_exist_product_on_basalam', $post->ID, 'archive_exist_product_on_basalam_nonce');
                     } else {
-                        Components::renderBtn('بازگردانی محصول در باسلام', false, 'restore_exist_product_on_basalam', $post->ID, 'restore_exist_product_on_basalam_nonce');
+                        CommonComponents::renderBtn('بازگردانی محصول در باسلام', 'restore_exist_product_on_basalam', $post->ID, 'restore_exist_product_on_basalam_nonce');
                     }
                     $link = "https://basalam.com/p/" . $syncBasalamProductId;
-                    Components::renderBtn('مشاهده محصول در باسلام', $link);
-                    Components::renderBtn('قطع اتصال محصول', false, 'disconnect_exist_product_on_basalam', $post->ID, 'disconnect_exist_product_on_basalam_nonce');
+                    CommonComponents::renderLink('مشاهده محصول در باسلام', $link);
+                    CommonComponents::renderBtn('قطع اتصال محصول', 'disconnect_exist_product_on_basalam', $post->ID, 'disconnect_exist_product_on_basalam_nonce');
                 } else {
-                    Components::renderBtn('اضافه کردن محصول در باسلام', false, 'create_product_basalam', $post->ID, 'create_product_basalam_nonce');
+                    CommonComponents::renderBtn('اضافه کردن محصول در باسلام', 'create_product_basalam', $post->ID, 'create_product_basalam_nonce');
                     require_once syncBasalamPlugin()->templatePath("products/ConnectButton.php");
                 }
             }

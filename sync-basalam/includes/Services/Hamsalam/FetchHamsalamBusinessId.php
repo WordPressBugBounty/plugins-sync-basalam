@@ -23,35 +23,39 @@ class FetchHamsalamBusinessId
 
     public function fetch()
     {
-        $apiService = new ApiServiceManager();
+        try {
+            $apiService = new ApiServiceManager();
 
-        $header = ['Authorization' => 'Bearer ' . $this->hamsalmToken];
+            $header = ['Authorization' => 'Bearer ' . $this->hamsalmToken];
 
-        $response = $apiService->sendGetRequest($this->url, $header);
+            $response = $apiService->sendGetRequest($this->url, $header);
 
-        if (!$response || !isset($response['body'])) return ('خطا در دریافت اطلاعات از همسلام');
+            if (!$response || !isset($response['body'])) return ('خطا در دریافت اطلاعات از همسلام');
 
-        $businesses = json_decode($response['body'], true);
+            $businesses = json_decode($response['body'], true);
 
-        $domain = get_site_url();
-        $vendorId = $this->settings[SettingsConfig::VENDOR_ID];
-        $businessId = null;
+            $domain = get_site_url();
+            $vendorId = $this->settings[SettingsConfig::VENDOR_ID];
+            $businessId = null;
 
-        if (!isset($businesses['data']) || !is_array($businesses['data'])) return null;
+            if (!isset($businesses['data']) || !is_array($businesses['data'])) return null;
 
-        foreach ($businesses['data'] as $business) {
-            if ($business['platform'] == 'wordpress'  && $domain == $business['domain'] && $vendorId == $business['vendor_id']) {
-                $businessId = $business['id'];
-                break;
+            foreach ($businesses['data'] as $business) {
+                if ($business['platform'] == 'wordpress'  && $domain == $business['domain'] && $vendorId == $business['vendor_id']) {
+                    $businessId = $business['id'];
+                    break;
+                }
             }
-        }
-        if ($businessId) {
-            $data = [SettingsConfig::HAMSALAM_BUSINESS_ID => $businessId];
+            if ($businessId) {
+                $data = [SettingsConfig::HAMSALAM_BUSINESS_ID => $businessId];
 
-            SettingsManager::updateSettings($data);
-            return $businessId;
-        }
+                SettingsManager::updateSettings($data);
+                return $businessId;
+            }
 
-        return null;
+            return null;
+        } catch (\Exception) {
+            return null;
+        }
     }
 }

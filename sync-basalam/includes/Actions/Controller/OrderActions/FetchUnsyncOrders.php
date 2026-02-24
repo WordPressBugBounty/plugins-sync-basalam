@@ -2,8 +2,8 @@
 
 namespace SyncBasalam\Actions\Controller\OrderActions;
 
-use SyncBasalam\Services\Orders\FetchWeeklyUnsyncOrders;
 use SyncBasalam\Actions\Controller\ActionController;
+use SyncBasalam\JobManager;
 
 defined('ABSPATH') || exit;
 
@@ -11,14 +11,36 @@ class FetchUnsyncOrders extends ActionController
 {
     public function __invoke()
     {
-        $getUnsyncOrdersService = new FetchWeeklyUnsyncOrders();
+        $jobManager = JobManager::getInstance();
 
-        $result = $getUnsyncOrdersService->addUnsyncBasalamOrderToWoo();
+        $hasRunningJob = $jobManager->getCountJobs([
+            'job_type' => 'sync_basalam_fetch_orders',
+            'status' => ['pending', 'processing']
+        ]) > 0;
 
-        if (!$result['success']) {
-            wp_send_json_error(['message' => $result['message']], $result['status_code'] ?? 500);
+        if ($hasRunningJob) {
+            wp_send_json_error([
+                'message' => 'یک فرآیند دریافت سفارشات در حال اجرا است. لطفاً صبر کنید.'
+            ], 400);
+            return;
         }
 
-        wp_send_json_success(['message' => $result['message']], $result['status_code'] ?? 200);
+        $day = isset($_POST['days']) ? intval($_POST['days']) : 7;
+
+        if ($day < 1 || $day > 30) $day = 7;
+
+        $jobManager->createJob(
+            'sync_basalam_fetch_orders',
+            'pending',
+            json_encode([
+                'cursor' => null,
+                'day' => $day
+            ])
+        );
+
+        wp_send_json_success([
+            'message' => "فرآیند دریافت سفارشات {$day} روز اخیر شروع شد.",
+            'day' => $day
+        ]);
     }
 }

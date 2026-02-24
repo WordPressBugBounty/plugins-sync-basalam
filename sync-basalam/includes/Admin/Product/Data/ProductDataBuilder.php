@@ -78,7 +78,6 @@ class ProductDataBuilder
             'package_weight' => null,
             'photo' => null,
             'photos' => [],
-            'status' => 2976,
             'preparation_days' => null,
             'unit_type' => 6304,
             'unit_quantity' => 1,

@@ -2,30 +2,44 @@
 
 namespace SyncBasalam\Services\Products;
 
-use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Logger\Logger;
-use SyncBasalam\JobManager;
+use SyncBasalam\Jobs\Exceptions\RetryableException;
+use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 
 defined('ABSPATH') || exit;
 
 class AutoConnectProducts
 {
-    public function checkSameProduct($title = null, $page = 1)
+    public function checkSameProduct($title = null, $cursor = null)
     {
         try {
             $getProductData = new FetchProductsData();
             if ($title) {
                 $title = mb_substr($title, 0, 120);
                 $syncBasalamProducts = $getProductData->getProductData($title);
-            } else $syncBasalamProducts = $getProductData->getProductData(null, $page);
+            } else {
+                $syncBasalamProducts = $getProductData->getProductData(null, $cursor);
+            }
 
-            if ($title) return $syncBasalamProducts['products'];
+            if (!is_array($syncBasalamProducts) || !isset($syncBasalamProducts['data'])) {
+                return $title ? [] : [
+                    'error' => true,
+                    'message' => 'خطا در دریافت اطلاعات محصولات',
+                    'status_code' => 400,
+                    'has_more' => false,
+                    'next_cursor' => null,
+                ];
+            }
+
+            if ($title) {
+                return $syncBasalamProducts['data'];
+            }
 
             global $wpdb;
 
             $matchedProducts = [];
 
-            foreach ($syncBasalamProducts['products'] as $syncBasalamProduct) {
+            foreach ($syncBasalamProducts['data'] as $syncBasalamProduct) {
                 $normalizedTitle = trim($syncBasalamProduct['title']);
 
                 if (mb_strlen($normalizedTitle) >= 120) {
@@ -62,16 +76,16 @@ class AutoConnectProducts
                 }
             }
 
-            if (!empty($syncBasalamProducts['total_page']) && is_numeric($syncBasalamProducts['total_page'])) $totalPage = $syncBasalamProducts['total_page'];
-            else $totalPage = 0;
+            $hasMore = !empty($syncBasalamProducts['has_more']);
+            $nextCursor = $syncBasalamProducts['next_cursor'] ?? null;
 
-            if ($page < $totalPage) {
+            if ($hasMore && !empty($nextCursor)) {
                 return [
                     'success'     => true,
                     'message'     => 'محصولات با موفقیت به صف اتصال افزوده شدند.',
                     'status_code' => 200,
                     'has_more'    => true,
-                    'total_page'  => $totalPage,
+                    'next_cursor' => $nextCursor,
                 ];
             } else {
                 if (!empty($matchedProducts)) {
@@ -80,6 +94,7 @@ class AutoConnectProducts
                         'message'     => 'اتصال محصولات کامل شد.',
                         'status_code' => 200,
                         'has_more'    => false,
+                        'next_cursor' => null,
                     ];
                 } else {
                     return [
@@ -87,15 +102,25 @@ class AutoConnectProducts
                         'message'     => 'محصول مشابهی یافت نشد.',
                         'status_code' => 404,
                         'has_more'    => false,
+                        'next_cursor' => null,
                     ];
                 }
             }
+        } catch (RetryableException $e) {
+            Logger::error("خطا در اتصال خودکار محصولات: " . $e->getMessage(), [
+                'operation' => 'اتصال خودکار محصولات',
+            ]);
+            throw $e;
+        } catch (NonRetryableException $e) {
+            Logger::error("خطا در اتصال خودکار محصولات: " . $e->getMessage(), [
+                'operation' => 'اتصال خودکار محصولات',
+            ]);
+            throw $e;
         } catch (\Exception $e) {
-            return [
-                'error'       => true,
-                'message'     => $e->getMessage(),
-                'status_code' => 400,
-            ];
+            Logger::error("خطا در اتصال خودکار محصولات: " . $e->getMessage(), [
+                'operation' => 'اتصال خودکار محصولات',
+            ]);
+            throw $e;
         }
     }
 }

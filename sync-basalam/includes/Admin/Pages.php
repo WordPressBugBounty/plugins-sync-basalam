@@ -13,13 +13,15 @@ use SyncBasalam\Admin\Pages\TicketListPage;
 use SyncBasalam\Admin\Pages\CreateTicketPage;
 use SyncBasalam\Admin\Pages\SingleTicketPage;
 use SyncBasalam\Admin\Settings;
+use SyncBasalam\Admin\Components\CommonComponents;
+
 class Pages
 {
     private $renderUi;
 
     public function __construct()
     {
-        $this->renderUi = new Components();
+        $this->renderUi = new CommonComponents();
     }
 
     public function registerMenus()
@@ -136,5 +138,6 @@ class Pages
             'sync_basalam_new_ticket',
             [new CreateTicketPage(), 'render']
         );
+        do_action('sync_basalam_after_register_menus');
     }
 }

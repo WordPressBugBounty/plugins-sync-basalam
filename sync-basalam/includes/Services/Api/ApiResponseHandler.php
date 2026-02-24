@@ -2,9 +2,8 @@
 
 namespace SyncBasalam\Services\Api;
 
-use SyncBasalam\Admin\Settings\SettingsConfig;
-use SyncBasalam\Admin\Settings\SettingsManager;
-use SyncBasalam\Queue\QueueManager;
+use SyncBasalam\Jobs\Exceptions\RetryableException;
+use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 
 defined('ABSPATH') || exit;
 
@@ -30,26 +29,18 @@ class ApiResponseHandler
         $errorMessage = $response->get_error_message();
 
         if ($this->isTimeoutError($errorCode, $errorMessage)) {
-            return [
-                'body'          => null,
-                'status_code'   => 408,
-                'timeout_error' => true,
-                'error'         => 'درخواست با تایم‌اوت مواجه شد.',
-                'success'       => false
-            ];
+            throw RetryableException::apiTimeout('درخواست با تایم‌اوت مواجه شد: ' . $errorMessage);
         }
 
-        return [
-            'body'        => null,
-            'status_code' => 500,
-            'error'       => $errorMessage,
-            'error_code'  => $errorCode
-        ];
+        if ($this->isNetworkError($errorCode, $errorMessage)) {
+            throw RetryableException::networkError('خطای شبکه: ' . $errorMessage);
+        }
+
+        throw RetryableException::temporary('خطای موقت در درخواست: ' . $errorMessage);
     }
 
     private function isTimeoutError(string $errorCode, string $errorMessage): bool
     {
-        // Common timeout error codes and messages
         $timeoutIndicators = [
             'http_request_failed',
             'timeout',
@@ -71,61 +62,88 @@ class ApiResponseHandler
         return false;
     }
 
+    private function isNetworkError(string $errorCode, string $errorMessage): bool
+    {
+        $networkIndicators = [
+            'network',
+            'connection',
+            'curl error',
+            'dns',
+            'socket',
+            'ssl',
+        ];
+
+        $errorCodeLower = strtolower($errorCode);
+        $errorMessageLower = strtolower($errorMessage);
+
+        foreach ($networkIndicators as $indicator) {
+            if (strpos($errorCodeLower, $indicator) !== false || strpos($errorMessageLower, $indicator) !== false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private function handleHttpStatusCode(int $statusCode, $body): array
     {
-        if (in_array($statusCode, [200, 201], true)) {
+        if (in_array($statusCode, [200, 201, 202], true)) {
             return $this->successResponse($body, $statusCode);
         }
 
-        if ($statusCode === 401) return $this->handleUnauthorized($body);
-
-        // Handle timeout status codes
         if (in_array($statusCode, [408, 504], true)) {
-            return [
-                'body'          => $body,
-                'status_code'   => $statusCode,
-                'timeout_error' => true,
-                'error'         => 'درخواست با تایم‌اوت مواجه شد.',
-                'success'       => false
-            ];
+            throw RetryableException::apiTimeout('درخواست با تایم‌اوت مواجه شد');
         }
 
-        $errors = [
-            400 => ['درخواست نامعتبر به url', 'Bad Request'],
-            403 => ['دسترسی غیرمجاز به url', 'Forbidden'],
-            404 => ['منبع مورد نظر یافت نشد در url', 'Not Found'],
-            422 => ['خطا در پردازش داده‌ها در url', 'Unprocessable Entity'],
-            429 => ['محدودیت تعداد درخواست‌ها برای url', 'Rate Limit Exceeded'],
-            500 => ['خطای سمت سرور در url', 'Server Error'],
-            502 => ['خطای سمت سرور در url', 'Server Error'],
-            503 => ['خطای سمت سرور در url', 'Server Error'],
+        if ($statusCode === 429) {
+            throw RetryableException::rateLimit('محدودیت تعداد درخواست‌ها - لطفا کمی صبر کنید');
+        }
+
+        if (in_array($statusCode, [500, 502, 503], true)) {
+            throw RetryableException::serverError('خطای سمت سرور (کد ' . $statusCode . ')');
+        }
+
+        if ($statusCode === 401) {
+            throw NonRetryableException::unauthorized('دسترسی غیرمجاز - لطفا دوباره وارد شوید');
+        }
+
+        $clientErrors = [
+            400 => 'درخواست نامعتبر',
+            403 => 'دسترسی غیرمجاز',
+            404 => 'منبع مورد نظر یافت نشد',
+            422 => 'خطا در پردازش داده‌ها',
         ];
 
-        if (isset($errors[$statusCode])) {
-            [$logMessage, $title] = $errors[$statusCode];
-
-            return $this->errorResponse($body, $statusCode, $title);
+        if (isset($clientErrors[$statusCode])) {
+            $errorMessage = $this->extractErrorMessageFromBody($body) ?: $clientErrors[$statusCode];
+            throw NonRetryableException::permanent($errorMessage . ' (کد ' . $statusCode . ')');
         }
 
-        return $this->errorResponse($body, $statusCode, 'خطای غیرمنتظره');
+        // Unknown error - treat as retryable
+        throw RetryableException::temporary('خطای غیرمنتظره (کد ' . $statusCode . ')');
     }
 
-
-    private function handleUnauthorized($body): array
+    private function extractErrorMessageFromBody($body): ?string
     {
+        if (empty($body)) return null;
 
-        // $data = [
-        //     SettingsConfig::TOKEN         => '',
-        //     SettingsConfig::REFRESH_TOKEN => '',
-        // ];
-        // SettingsManager::updateSettings($data);
+        if (is_string($body)) {
+            $decoded = json_decode($body, true);
+            if (is_array($decoded)) {
+                $body = $decoded;
+            }
+        }
 
-        // QueueManager::cancelAllTasksGroup('sync_basalam_plugin_create_product');
-        // QueueManager::cancelAllTasksGroup('sync_basalam_plugin_update_product');
-        // QueueManager::cancelAllTasksGroup('sync_basalam_plugin_connect_auto_product');
+        if (is_array($body)) {
+            if (isset($body['messages'][0]['message'])) return $body['messages'][0]['message'];
+            if (isset($body['message'])) return $body['message'];
 
-        return $this->errorResponse($body, 401, 'دسترسی غیرمجاز');
+            if (isset($body['error'])) return $body['error'];
+        }
+
+        return null;
     }
+
 
     private function successResponse($body, int $statusCode): array
     {
@@ -136,26 +154,8 @@ class ApiResponseHandler
         ];
     }
 
-
-    private function errorResponse($body, int $statusCode, string $defaultMessage): array
-    {
-        return [
-            'body'        => $body,
-            'status_code' => $statusCode,
-            'success'     => false,
-            'error'       => $defaultMessage
-        ];
-    }
-
     public function handleTimeout(string $url): array
     {
-
-        return [
-            'data'          => null,
-            'status_code'   => 500,
-            'timeout_error' => true,
-            'error'         => 'درخواست تایم‌اوت شد.',
-            'success'       => false
-        ];
+        throw RetryableException::apiTimeout('درخواست تایم‌اوت شد');
     }
 }

@@ -13,10 +13,10 @@ class QuickUpdateProductStrategy implements DataStrategyInterface
         $variants = $handler->getVariants($product);
         $data = [
             'id' => get_post_meta($product->get_id(), 'sync_basalam_product_id', true),
-            'status' => 2976,
             'primary_price' => $handler->getPrice($product),
             'stock' => $handler->getStock($product),
             'variants' => $variants,
+            'type' => $product->get_type(),
         ];
 
         return array_filter($data, fn($value) => $value !== null);

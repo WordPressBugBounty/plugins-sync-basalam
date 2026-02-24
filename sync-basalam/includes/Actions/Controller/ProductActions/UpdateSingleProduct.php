@@ -27,7 +27,14 @@ class UpdateSingleProduct extends ActionController
             $categoryIds = null;
         }
 
-        if ($productId) $result = $productOperations->updateExistProduct($productId, $categoryIds);
+        if (!$productId) {
+            wp_send_json_error('آیدی محصول الزامی است.', 400);
+        }
+        try {
+            $result = $productOperations->updateExistProduct($productId, $categoryIds);
+        } catch (\Exception $e) {
+            wp_send_json_error($e->getMessage(), 500);
+        }
 
         if (!$result['success']) wp_send_json_error(['message' => $result['message']], $result['status_code'] ?? 500);
 

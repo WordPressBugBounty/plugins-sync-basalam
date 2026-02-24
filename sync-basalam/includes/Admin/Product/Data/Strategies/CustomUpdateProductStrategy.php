@@ -15,7 +15,6 @@ class CustomUpdateProductStrategy implements DataStrategyInterface
 
         $data = [
             'id' => $basalamProductId,
-            'status' => 2976,
         ];
 
         if ($this->shouldSyncField(SettingsConfig::SYNC_PRODUCT_FIELD_NAME)) {

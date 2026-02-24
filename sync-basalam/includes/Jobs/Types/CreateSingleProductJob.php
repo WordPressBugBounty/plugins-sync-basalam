@@ -3,7 +3,11 @@
 namespace SyncBasalam\Jobs\Types;
 
 use SyncBasalam\Jobs\AbstractJobType;
+use SyncBasalam\Jobs\JobResult;
+use SyncBasalam\Jobs\Exceptions\RetryableException;
+use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 use SyncBasalam\Admin\Product\ProductOperations;
+use SyncBasalam\Logger\Logger;
 
 defined('ABSPATH') || exit;
 
@@ -19,13 +23,41 @@ class CreateSingleProductJob extends AbstractJobType
         return 4;
     }
 
-    public function execute(array $payload): void
+    public function execute(array $payload): JobResult
     {
         $productId = $payload['product_id'] ?? $payload;
 
-        if ($productId) {
+        if (!$productId) {
+            throw NonRetryableException::invalidData('شناسه محصول الزامی است');
+        }
+
+        $product = \wc_get_product($productId);
+        if (!$product) {
+            throw NonRetryableException::productNotFound($productId);
+        }
+
+        try {
             $productOperations = new ProductOperations();
-            $productOperations->createNewProduct($productId, null);
+            $result = $productOperations->createNewProduct($productId, null);
+            return $this->success(['product_id' => $productId, 'result' => $result]);
+        } catch (RetryableException $e) {
+            Logger::error("خطا در اضافه کردن محصول به باسلام: " . $e->getMessage(), [
+                'product_id' => $productId,
+                'operation' => 'اضافه کردن محصول به باسلام',
+            ]);
+            throw $e;
+        } catch (NonRetryableException $e) {
+            Logger::error("خطا در اضافه کردن محصول به باسلام: " . $e->getMessage(), [
+                'product_id' => $productId,
+                'operation' => 'اضافه کردن محصول به باسلام',
+            ]);
+            throw $e;
+        } catch (\Exception $e) {
+            Logger::error("خطا در اضافه کردن محصول به باسلام: " . $e->getMessage(), [
+                'product_id' => $productId,
+                'operation' => 'اضافه کردن محصول به باسلام',
+            ]);
+            throw $e;
         }
     }
 }

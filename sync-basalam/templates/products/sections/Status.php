@@ -1,10 +1,10 @@
 <?php
 
-use SyncBasalam\Admin\Components;
+use SyncBasalam\Admin\Components\SettingPageComponents;
 
 defined('ABSPATH') || exit;
 ?>
-<div class="basalam-status-card">
+<div id="sync-basalam-onboarding-status" class="basalam-status-card">
     <div class="basalam-status-header">
         <h2 class="basalam-h">وضعیت اتصال</h2>
         <div class="basalam_status_data_container">
@@ -22,7 +22,7 @@ defined('ABSPATH') || exit;
         <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" class="Basalam-form basalam-form-margin-0">
             <input type="hidden" name="action" value="basalam_update_setting">
             <?php wp_nonce_field('basalam_update_setting_nonce', '_wpnonce'); ?>
-            <?php Components::syncStatusProduct(); ?>
+            <?php SettingPageComponents::syncStatusProduct(); ?>
             <?php if ($syncStatusProduct == true): ?>
                 <button type="submit" class="basalam-danger-button basalam-p">
                     <img class="basalam-img-20" src="<?php echo esc_url(syncBasalamPlugin()->assetsUrl() . '/icons/unsync.svg'); ?>">

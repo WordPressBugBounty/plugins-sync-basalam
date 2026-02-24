@@ -13,6 +13,7 @@ class PutApiService extends AbstractApiService
             'method'  => 'PUT',
             'body'    => $request['data'],
             'headers' => $request['headers'],
+            'timeout' => 10,
         ]);
     }
 

@@ -29,14 +29,8 @@ class DailyCheckForceUpdate extends QueueAbstract
 
     public function handle($args = null)
     {
-        $versionChecker = new FetchVersionDetail();
-
-        $response = $versionChecker->Fetch();
-        $response = json_decode($response['body'], true);
-
-        if ($response['force_update'] && $response['force_update'] == true) update_option('sync_basalam_force_update', true);
-
-        else delete_option('sync_basalam_force_update');
+        $versionChecker = new FetchVersionDetail(syncbasalamplugin()->getVersion());
+        $versionChecker->checkForceUpdate();
     }
 
     public function schedule()

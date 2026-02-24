@@ -15,6 +15,8 @@ class GetCategoryId
 
         $result = $apiservice->sendGetRequest($url, []);
 
+        if ($result['body'] === null) return false;        
+        
         $decodedBody = json_decode($result['body'], true);
 
         if ($mode == 'all') {

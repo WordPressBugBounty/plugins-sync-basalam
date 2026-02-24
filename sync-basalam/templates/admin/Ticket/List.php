@@ -2,7 +2,7 @@
 
 use SyncBasalam\Services\TicketServiceManager;
 use SyncBasalam\Utilities\DateConverter;
-use SyncBasalam\Admin\Components;
+use SyncBasalam\Admin\Components\CommonComponents;
 
 defined('ABSPATH') || exit;
 
@@ -13,7 +13,7 @@ $fetchTickets  = $ticketManager->fetchAllTickets($page);
 $statusMap     = TicketServiceManager::ticketStatuses();
 
 if (TicketServiceManager::isUnauthorized($fetchTickets)) {
-    Components::renderUnauthorizedError();
+    CommonComponents::renderUnauthorizedError();
     return;
 }
 
