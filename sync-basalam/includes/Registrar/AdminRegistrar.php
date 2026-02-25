@@ -120,25 +120,37 @@ class AdminRegistrar implements RegistrarInterface
 
     public static function adminEnqueueStyles($hook = '')
     {
+        $version = syncBasalamPlugin()::VERSION;
+
         wp_enqueue_style(
             "basalam-admin-style",
             self::assetsUrl("css/style.css"),
+            array(),
+            $version
         );
         wp_enqueue_style(
             "basalam-admin-font-style",
             self::assetsUrl("css/font.css"),
+            array(),
+            $version
         );
         wp_enqueue_style(
             "basalam-admin-social-style",
             self::assetsUrl("css/social.css"),
+            array(),
+            $version
         );
         wp_enqueue_style(
             "basalam-admin-logs-style",
             self::assetsUrl("css/logs.css"),
+            array(),
+            $version
         );
         wp_enqueue_style(
             "basalam-admin-onboarding-style",
             self::assetsUrl("css/onboarding.css"),
+            array(),
+            $version
         );
 
         if (PointerTour::shouldLoadPointerTour((string) $hook)) {
@@ -149,6 +161,7 @@ class AdminRegistrar implements RegistrarInterface
     public static function adminEnqueueScripts($hook = '')
     {
         $shouldLoadPointerTour = PointerTour::shouldLoadPointerTour((string) $hook);
+        $version = syncBasalamPlugin()::VERSION;
 
         if ($shouldLoadPointerTour) {
             wp_enqueue_script('wp-pointer');
@@ -158,66 +171,77 @@ class AdminRegistrar implements RegistrarInterface
             "basalam-admin-logs-script",
             self::assetsUrl("js/logs.js"),
             ["jquery"],
+            $version,
             true
         );
         wp_enqueue_script(
             "basalam-admin-help-script",
             self::assetsUrl("js/help.js"),
             ["jquery"],
+            $version,
             true
         );
         wp_enqueue_script(
             "basalam-admin-product-fields-script",
             self::assetsUrl("js/product-fields.js"),
             ["jquery"],
+            $version,
             true
         );
         wp_enqueue_script(
             "basalam-admin-manage-box-script",
             self::assetsUrl("js/manage-box.js"),
             ["jquery"],
+            $version,
             true
         );
         wp_enqueue_script(
             "basalam-admin-connect-modal-script",
             self::assetsUrl("js/connect-modal.js"),
             ["jquery"],
+            $version,
             true
         );
         wp_enqueue_script(
             "basalam-round-script",
             self::assetsUrl("js/round.js"),
             ["jquery"],
+            $version,
             true
         );
         wp_enqueue_script(
             "basalam-get-category-script",
             self::assetsUrl("js/get-category.js"),
             ["jquery"],
+            $version,
             true
         );
         wp_enqueue_script(
             "basalam-order-script",
             self::assetsUrl("js/order.js"),
             ["jquery"],
+            $version,
             true
         );
         wp_enqueue_script(
             "basalam-admin-script",
             self::assetsUrl("js/admin.js"),
             $shouldLoadPointerTour ? ["jquery", "wp-pointer"] : ["jquery"],
+            $version,
             true
         );
         wp_enqueue_script(
             "basalam-check-sync-script",
             self::assetsUrl("js/check-sync.js"),
             ["jquery"],
+            $version,
             true
         );
         wp_enqueue_script(
             "basalam-map-category-option-script",
             self::assetsUrl("js/map-category-option.js"),
             ["jquery"],
+            $version,
             true
         );
 
@@ -225,6 +249,7 @@ class AdminRegistrar implements RegistrarInterface
             "basalam-generate-product-variation-script",
             self::assetsUrl("js/generate-product-variation.js"),
             ["jquery"],
+            $version,
             true
         );
 
@@ -232,6 +257,7 @@ class AdminRegistrar implements RegistrarInterface
             "basalam-ticket-script",
             self::assetsUrl("js/ticket.js"),
             [],
+            $version,
             true
         );
 

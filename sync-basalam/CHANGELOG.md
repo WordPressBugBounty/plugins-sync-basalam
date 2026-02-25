@@ -2,6 +2,16 @@
 
 <details>
 
+<summary>1.7.9 - 2026-02-25</summary>
+
+### Changed / Improved
+- Added plugin version to all admin CSS/JS enqueue calls for proper cache busting
+
+</details>
+
+
+<details>
+
 <summary>1.7.8 - 2026-02-21</summary>
 
 ### Added
