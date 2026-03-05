@@ -3,6 +3,7 @@
 namespace SyncBasalam\Admin\Product\elements\ProductList;
 
 use SyncBasalam\Admin\Components\ProductListComponents;
+use SyncBasalam\Utilities\ProductMetaKey;
 
 defined('ABSPATH') || exit;
 class StatusColumn
@@ -23,7 +24,7 @@ class StatusColumn
     public static function renderStatusColumnContent($column, $productId)
     {
         if ($column === 'sync_basalam_status') {
-            $product = get_post_meta($productId, 'sync_basalam_product_sync_status', true);
+            $product = get_post_meta($productId, ProductMetaKey::basalamProductSyncStatus(), true);
             if ($product && $product == 'synced') {
                 ProductListComponents::renderSyncProductStatusSynced();
             } elseif ($product == 'pending') {

@@ -2,6 +2,8 @@
 
 namespace SyncBasalam\Services\Products;
 
+use SyncBasalam\Config\Endpoints;
+use SyncBasalam\Logger\Logger;
 use SyncBasalam\Services\ApiServiceManager;
 
 defined('ABSPATH') || exit;
@@ -9,18 +11,24 @@ class GetCategoryId
 {
     public static function getCategoryIdFromBasalam($productTitle, $mode = 'all')
     {
-        $apiservice = new ApiServiceManager();
+        $apiservice = syncBasalamContainer()->get(ApiServiceManager::class);
 
-        $url = "https://categorydetection.basalam.com/category_detection/api_v1.0/predict/?title=" . $productTitle;
+        $url = Endpoints::CATEGORY_DETECT . '?title=' . $productTitle;
 
-        $result = $apiservice->sendGetRequest($url, []);
+        try {
+            $result = $apiservice->get($url, []);
+        } catch (\Exception $e) {
+            Logger::error('خطا در دریافت دسته‌بندی خودکار محصول: ' . $e->getMessage());
+            return false;
+        }
 
-        if ($result['body'] === null) return false;        
-        
+        if (!is_array($result) || !isset($result['body']) || $result['body'] === null) return false;
+
         $decodedBody = json_decode($result['body'], true);
+        if (!is_array($decodedBody)) return false;
 
         if ($mode == 'all') {
-            if (isset($decodedBody['result']) && count($decodedBody['result']) > 0) {
+            if (isset($decodedBody['result']) && is_array($decodedBody['result']) && count($decodedBody['result']) > 0) {
                 $categories = [];
 
                 foreach ($decodedBody['result'] as $category) {
@@ -38,7 +46,7 @@ class GetCategoryId
                 return $categories;
             }
         } else {
-            if (isset($decodedBody['result']) && count($decodedBody['result']) > 0) {
+            if (isset($decodedBody['result']) && is_array($decodedBody['result']) && count($decodedBody['result']) > 0) {
                 $categoryIds = [];
 
                 self::extractCategoryIds([$decodedBody['result'][0]], $categoryIds);

@@ -126,6 +126,10 @@ defined('ABSPATH') || exit;
                         <?php SettingPageComponents::renderSafeStock(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
+                        <?php echo CommonComponents::renderLabelWithTooltip('اولویت موجودی محصولات متغیر', 'مشخص کنید در محصولات متغیر، اولویت محاسبه موجودی بر اساس موجودی خود محصول باشد یا موجودی هر متغیر. در صورتی که برای اولویت انتخاب‌شده موجودی ثبت نشده باشد، موجودی بر اساس اولویت بعدی محاسبه خواهد شد.'); ?>
+                        <?php SettingPageComponents::renderVariableProductStockSource(); ?>
+                    </div>
+                    <div class="basalam-form-group basalam-p">
                         <?php echo CommonComponents::renderLabelWithTooltip('فیلد های ارسالی هنگام آپدیت محصول', 'انتخاب کنید که هنگام آپدیت محصول چه اطلاعاتی به باسلام ارسال شود. حالت سفارشی امکان انتخاب دقیق اطلاعات را می‌دهد.'); ?>
                         <?php SettingPageComponents::renderSyncProduct(); ?>
                     </div>

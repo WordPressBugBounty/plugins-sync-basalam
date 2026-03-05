@@ -11,8 +11,11 @@ class UpdateAllProducts extends ActionController
 {
     public function __invoke()
     {
-        $updateType = isset($_POST['update_type']) ? $_POST['update_type'] : 'quick';
-        $jobManager = new JobManager();
+        $updateType = isset($_POST['update_type']) ? sanitize_text_field(wp_unslash($_POST['update_type'])) : null;
+        if (!$updateType) {
+            return wp_send_json_error(['message' => 'نوع بروزرسانی نامعتبر است.'], 400);
+        }
+        $jobManager = syncBasalamContainer()->get(JobManager::class);
 
         if ($updateType === 'full') {
             $existingJob = $jobManager->getJob([
@@ -38,7 +41,8 @@ class UpdateAllProducts extends ActionController
                 return wp_send_json_error(['message' => 'خطا در ایجاد فرایند بروزرسانی.'], 500);
             }
 
-            wp_send_json_success(['message' => 'بروزرسانی تمام اطلاعات محصول با موفقیت آغاز شد.',
+            wp_send_json_success([
+                'message' => 'بروزرسانی تمام اطلاعات محصول با موفقیت آغاز شد.',
             ], 200);
         } else {
             $existingJob = $jobManager->getJob([

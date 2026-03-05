@@ -8,6 +8,13 @@ defined('ABSPATH') || exit;
 
 class RestoreProduct extends ProductListenerAbstract
 {
+    private $productOperations;
+
+    public function __construct($productOperations = null)
+    {
+        $this->productOperations = $productOperations ?: syncBasalamContainer()->get(ProductOperations::class);
+    }
+
     public function handle($productId)
     {
         $product = wc_get_product($productId);
@@ -22,7 +29,6 @@ class RestoreProduct extends ProductListenerAbstract
             return;
         }
 
-        $productOperations = new ProductOperations();
-        $productOperations->restoreExistProduct($productId);
+        $this->productOperations->restoreExistProduct($productId);
     }
 }

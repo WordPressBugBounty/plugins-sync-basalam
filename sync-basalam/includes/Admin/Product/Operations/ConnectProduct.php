@@ -34,7 +34,7 @@ class ConnectProduct
 
         $connect_status = ConnectSingleProductService::connectProductById($woo_product_id, $sync_basalam_product_id);
 
-        $job_manager = new JobManager();
+        $job_manager = syncBasalamContainer()->get(JobManager::class);
         $job_manager->createJob(
             'sync_basalam_update_single_product',
             'pending',

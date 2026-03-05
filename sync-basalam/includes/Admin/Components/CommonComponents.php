@@ -56,11 +56,12 @@ class CommonComponents
         );
     }
 
-    public static function renderBtn($text, $name, $product_id, $nonce_name)
+    public static function renderBtn($text, $name, $product_id, $nonce_name, $ajax = false)
     {
         $nonce = wp_create_nonce($nonce_name);
+        $url   = $ajax ? admin_url('admin-ajax.php') : admin_url('admin-post.php');
         echo '<button class="basalam-button basalam-action-button basalam-p basalam-a"
-            data-url="' . esc_url(admin_url('admin-post.php')) . '"
+            data-url="' . esc_url($url) . '"
             data-action="' . esc_attr($name) . '"
             data-product-id="' . esc_attr($product_id) . '"
             data-_wpnonce="' . esc_attr($nonce) . '">' . esc_html($text) . '</button>';

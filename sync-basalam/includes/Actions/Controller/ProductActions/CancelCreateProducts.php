@@ -11,7 +11,7 @@ class CancelCreateProducts extends ActionController
 {
     public function __invoke()
     {
-        $jobManager = new JobManager();
+        $jobManager = syncBasalamContainer()->get(JobManager::class);
 
         $jobTypes = [
             'sync_basalam_create_single_product',

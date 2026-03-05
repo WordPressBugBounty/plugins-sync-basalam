@@ -2,17 +2,16 @@
 
 namespace SyncBasalam\Services\Orders;
 
-use SyncBasalam\Admin\Settings;
+use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Services\ApiServiceManager;
 use SyncBasalam\Utilities\OrderManagerUtilities;
 
 class ConfirmOrderService
 {
-    public function confirmOrderOnBasalam()
+    public function confirmOrderOnBasalam(int $orderId)
     {
         global $wpdb;
 
-        $orderId = isset($_POST['order_id']) ? sanitize_text_field(intval($_POST['order_id'])) : 0;
         if (!$orderId) {
             return [
                 'success'     => false,
@@ -21,20 +20,12 @@ class ConfirmOrderService
             ];
         }
 
-        
+
         $syncBasalamOrderId = OrderManagerUtilities::getInvoiceId($wpdb, $orderId);
         if (!$syncBasalamOrderId) {
             return [
                 'success'     => false,
                 'message'     => 'شناسه فاکتور سفارش یافت نشد.',
-                'status_code' => 400,
-            ];
-        }
-
-        if (!current_user_can('manage_woocommerce')) {
-            return [
-                'success'     => false,
-                'message'     => 'تنها مدیر کل امکان تغییر وضعیت سفارش را دارد.',
                 'status_code' => 400,
             ];
         }
@@ -83,15 +74,15 @@ class ConfirmOrderService
 
     private function sendConfirmOrderRequest($syncBasalamOrderId)
     {
-        $apiUrl = 'https://order-processing.basalam.com/v1/vendor/set-preparation-order';
+        $apiUrl = Endpoints::ORDER_CONFIRM;
         $body = [
             'order_id' => $syncBasalamOrderId,
         ];
 
-        $apiService = new ApiServiceManager();
+        $apiService = syncBasalamContainer()->get(ApiServiceManager::class);
 
         try {
-            return $apiService->sendPostRequest($apiUrl, $body);
+            return $apiService->post($apiUrl, $body);
         } catch (\Exception $e) {
             return [
                 'status_code' => 500,

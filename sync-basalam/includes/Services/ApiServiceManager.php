@@ -2,7 +2,6 @@
 
 namespace SyncBasalam\Services;
 
-use SyncBasalam\Logger\Logger;
 use SyncBasalam\Services\Api\PostApiService;
 use SyncBasalam\Services\Api\GetApiService;
 use SyncBasalam\Services\Api\PatchApiService;
@@ -14,56 +13,46 @@ defined('ABSPATH') || exit;
 
 class ApiServiceManager
 {
-    private PostApiService $postService;
-    private GetApiService $getService;
-    private PatchApiService $patchService;
-    private PutApiService $putService;
-    private DeleteApiService $deleteService;
-    private FileUploadApiService $fileUploadService;
+    private $postService = null;
+    private $getService = null;
+    private $patchService = null;
+    private $putService = null;
+    private $deleteService = null;
+    private $fileUploadService = null;
 
-    public function __construct()
+    public function post($url, $data, $headers = [])
     {
-        $this->postService = new PostApiService();
-        $this->getService = new GetApiService();
-        $this->patchService = new PatchApiService();
-        $this->putService = new PutApiService();
-        $this->deleteService = new DeleteApiService();
-        $this->fileUploadService = new FileUploadApiService();
+        if ($this->postService === null) $this->postService = new PostApiService();
+        return $this->postService->send($url, $data, $headers);
     }
 
-    public function sendPostRequest($url, $data, $headers = [])
+    public function get($url, $headers = [])
     {
-        $response = $this->postService->send($url, $data, $headers);
-        return $response;
+        if ($this->getService === null) $this->getService = new GetApiService();
+        return $this->getService->send($url, $headers);
     }
 
-    public function sendGetRequest($url, $headers = [])
+    public function patch($url, $data, $headers = [])
     {
-        $response = $this->getService->send($url, $headers);
-        return $response;
+        if ($this->patchService === null) $this->patchService = new PatchApiService();
+        return $this->patchService->send($url, $data, $headers);
     }
 
-    public function sendPatchRequest($url, $data, $headers = [])
+    public function put($url, $data, $headers = [])
     {
-        $response = $this->patchService->send($url, $data, $headers);
-        return $response;
+        if ($this->putService === null) $this->putService = new PutApiService();
+        return $this->putService->send($url, $data, $headers);
     }
 
-    public function sendPutRequest($url, $data, $headers = [])
+    public function delete($url, $headers = [], $data = null)
     {
-        $response = $this->putService->send($url, $data, $headers);
-        return $response;
+        if ($this->deleteService === null) $this->deleteService = new DeleteApiService();
+        return $this->deleteService->send($url, $headers, (array) $data);
     }
 
-    public function sendDeleteRequest($url, $headers = [], $data = null)
+    public function upload($url, $localFile, $data = [], $headers = [])
     {
-        $response = $this->deleteService->send($url, $headers, (array) $data);
-        return $response;
-    }
-
-    public function uploadFileRequest($url, $localFile, $data = [], $headers = [])
-    {
-        $response = $this->fileUploadService->upload($url, $localFile, $data, $headers);
-        return $response;
+        if ($this->fileUploadService === null) $this->fileUploadService = new FileUploadApiService();
+        return $this->fileUploadService->upload($url, $localFile, $data, $headers);
     }
 }

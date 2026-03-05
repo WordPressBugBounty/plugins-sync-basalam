@@ -13,7 +13,7 @@ class UpdateSingleProduct extends ActionController
     {
         $productId = isset($_POST['product_id']) ? sanitize_text_field(wp_unslash($_POST['product_id'])) : null;
 
-        $productOperations = new ProductOperations();
+        $productOperations = syncBasalamContainer()->get(ProductOperations::class);
 
         if (isset($_POST['cat_id'])) {
             $categoryIds = sanitize_text_field(wp_unslash($_POST['cat_id']));
@@ -33,7 +33,7 @@ class UpdateSingleProduct extends ActionController
         try {
             $result = $productOperations->updateExistProduct($productId, $categoryIds);
         } catch (\Exception $e) {
-            wp_send_json_error($e->getMessage(), 500);
+            wp_send_json_error(['message' => $e->getMessage()], 500);
         }
 
         if (!$result['success']) wp_send_json_error(['message' => $result['message']], $result['status_code'] ?? 500);

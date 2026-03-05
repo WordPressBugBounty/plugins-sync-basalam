@@ -12,7 +12,7 @@ class JobResult
     private $exception;
     private $data;
 
-    private function __construct(bool $success, ?JobException $exception = null, array $data = [])
+    private function __construct(bool $success, $exception = null, array $data = [])
     {
         $this->success = $success;
         $this->exception = $exception;

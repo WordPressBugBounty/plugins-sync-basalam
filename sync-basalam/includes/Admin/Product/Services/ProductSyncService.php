@@ -3,6 +3,7 @@
 namespace SyncBasalam\Admin\Product\Services;
 
 use SyncBasalam\JobManager;
+use SyncBasalam\Utilities\ProductMetaKey;
 
 defined('ABSPATH') || exit;
 
@@ -13,11 +14,11 @@ class ProductSyncService
     private const JOB_TYPE_UPDATE_SINGLE = 'sync_basalam_update_single_product';
     private const JOB_TYPE_AUTO_CONNECT = 'sync_basalam_auto_connect_products';
 
-    private JobManager $jobManager;
+    private $jobManager;
 
-    public function __construct()
+    public function __construct($jobManager = null)
     {
-        $this->jobManager = JobManager::getInstance();
+        $this->jobManager = $jobManager ?: syncBasalamContainer()->get(JobManager::class);
     }
 
     public function enqueueBulkCreate(bool $includeOutOfStock = false, int $postsPerPage = 100): array
@@ -60,7 +61,7 @@ class ProductSyncService
                 continue;
             }
 
-            $basalamProductId = get_post_meta($productId, 'sync_basalam_product_id', true);
+            $basalamProductId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
             if (empty($basalamProductId)) {
                 $this->jobManager->createJob(
                     self::JOB_TYPE_CREATE_SINGLE,
@@ -107,7 +108,7 @@ class ProductSyncService
         $validIds = [];
 
         foreach ($productIds as $productId) {
-            $basalamProductId = get_post_meta($productId, 'sync_basalam_product_id', true);
+            $basalamProductId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
             if (!empty($basalamProductId)) {
                 $validIds[] = $productId;
             }

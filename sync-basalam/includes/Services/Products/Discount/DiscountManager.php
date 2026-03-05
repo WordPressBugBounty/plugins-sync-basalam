@@ -3,23 +3,27 @@
 namespace SyncBasalam\Services\Products\Discount;
 
 use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Services\ApiServiceManager;
 
 class DiscountManager
 {
     private $apiService;
-    private $url;
+    private $settingsAccessor;
+    private string $url;
 
-    public function __construct()
-    {
-        $this->apiService = new ApiServiceManager();
-        $vendorId = syncBasalamSettings()->getSettings(SettingsConfig::VENDOR_ID);
-        $this->url = "https://openapi.basalam.com/v1/vendors/$vendorId/discounts";
+    public function __construct(
+        $apiService = null
+    ) {
+        $this->apiService = $apiService ?: syncBasalamContainer()->get(ApiServiceManager::class);
+        $this->settingsAccessor = syncBasalamSettings();
+        $vendorId = $this->settingsAccessor->getSettings(SettingsConfig::VENDOR_ID);
+        $this->url = sprintf(Endpoints::VENDOR_DISCOUNTS, $vendorId);
     }
 
     public function apply($discountPercent, $productIds, $variationIds, $activeDays = null)
     {
-        if (!$activeDays) $activeDays = syncBasalamSettings()->getSettings(SettingsConfig::DISCOUNT_DURATION) ?? 7;
+        if (!$activeDays) $activeDays = $this->settingsAccessor->getSettings(SettingsConfig::DISCOUNT_DURATION) ?? 7;
 
         $data = [
             'product_filter' => [
@@ -32,7 +36,7 @@ class DiscountManager
         ];
 
         try {
-            return $this->apiService->sendPostRequest($this->url, $data);
+            return $this->apiService->post($this->url, $data);
         } catch (\Exception $e) {
             return [
                 'status_code' => 500,
@@ -52,7 +56,7 @@ class DiscountManager
         ];
 
         try {
-            return $this->apiService->sendDeleteRequest($this->url, [], $data);
+            return $this->apiService->delete($this->url, [], $data);
         } catch (\Exception $e) {
             return [
                 'status_code' => 500,

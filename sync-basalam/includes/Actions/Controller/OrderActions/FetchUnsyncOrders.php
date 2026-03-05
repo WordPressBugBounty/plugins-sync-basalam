@@ -11,7 +11,7 @@ class FetchUnsyncOrders extends ActionController
 {
     public function __invoke()
     {
-        $jobManager = JobManager::getInstance();
+        $jobManager = syncBasalamContainer()->get(JobManager::class);
 
         $hasRunningJob = $jobManager->getCountJobs([
             'job_type' => 'sync_basalam_fetch_orders',

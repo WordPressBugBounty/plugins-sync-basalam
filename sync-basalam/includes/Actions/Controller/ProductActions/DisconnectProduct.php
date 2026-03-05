@@ -12,7 +12,7 @@ class DisconnectProduct extends ActionController
     {
         $productId = isset($_POST['product_id']) ? sanitize_text_field(wp_unslash($_POST['product_id'])) : null;
 
-        $productOperations = new ProductOperations();
+        $productOperations = syncBasalamContainer()->get(ProductOperations::class);
         
         if (isset($_POST['cat_id'])) {
             $categoryIds = sanitize_text_field(wp_unslash($_POST['cat_id']));

@@ -2,7 +2,7 @@
 
 namespace SyncBasalam\Services\Orders;
 
-use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Services\ApiServiceManager;
 
 defined('ABSPATH') || exit;
@@ -13,8 +13,8 @@ class PostAutoConfirmOrder
 
     public function __construct()
     {
-        $this->url = "https://order-processing.basalam.com/v1/vendor/automation-config";
-        $this->apisevice = new ApiServiceManager();
+        $this->url = Endpoints::ORDER_AUTO_CONFIRM_CONFIG;
+        $this->apisevice = syncBasalamContainer()->get(ApiServiceManager::class);
     }
 
     public function postAutoConfirmOrder($isActive = true, $key = 6392)
@@ -29,7 +29,7 @@ class PostAutoConfirmOrder
         ];
 
         try {
-            $response = $this->apisevice->sendPutRequest($this->url, $data);
+            $response = $this->apisevice->put($this->url, $data);
         } catch (\Exception $e) {
             return [
                 'success' => false,

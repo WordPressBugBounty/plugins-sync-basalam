@@ -31,7 +31,7 @@ class ProductOperationFactory
         }
 
         $operationClass = self::OPERATIONS[$type];
-        return new $operationClass();
+        return syncBasalamContainer()->get($operationClass);
     }
 
     public static function getAvailableOperations(): array

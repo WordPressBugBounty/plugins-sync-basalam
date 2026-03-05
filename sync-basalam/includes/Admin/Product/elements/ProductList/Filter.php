@@ -2,6 +2,8 @@
 
 namespace SyncBasalam\Admin\Product\elements\ProductList;
 
+use SyncBasalam\Utilities\ProductMetaKey;
+
 defined('ABSPATH') || exit;
 
 class Filter
@@ -36,14 +38,14 @@ class Filter
                 if ($filterValue === '1') {
                     $query->set('meta_query', [
                         [
-                            'key'     => 'sync_basalam_product_id',
+                            'key'     => ProductMetaKey::basalamProductId(),
                             'compare' => 'NOT EXISTS',
                         ],
                     ]);
                 } elseif ($filterValue === '0') {
                     $query->set('meta_query', [
                         [
-                            'key'     => 'sync_basalam_product_id',
+                            'key'     => ProductMetaKey::basalamProductId(),
                             'compare' => 'EXISTS',
                         ],
                     ]);

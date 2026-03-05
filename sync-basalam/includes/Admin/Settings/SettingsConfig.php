@@ -49,6 +49,7 @@ class SettingsConfig
     public const PRODUCT_ATTRIBUTE_SUFFIX_ENABLED = "product_attribute_suffix_enabled";
     public const PRODUCT_ATTRIBUTE_SUFFIX_PRIORITY = "product_attribute_suffix_priority";
     public const SAFE_STOCK = "safe_stock";
+    public const VARIABLE_PRODUCT_STOCK_SOURCE = "variable_product_stock_source";
     public const ORDER_SHIPPING_METHOD = "order_shipping_method";
     public const CUSTOMER_PREFIX_NAME = "customer_prefix_name";
     public const CUSTOMER_SUFFIX_NAME = "customer_suffix_name";
@@ -97,6 +98,7 @@ class SettingsConfig
             self::PRODUCT_ATTRIBUTE_SUFFIX_ENABLED  => false,
             self::PRODUCT_ATTRIBUTE_SUFFIX_PRIORITY => '',
             self::SAFE_STOCK                        => 0,
+            self::VARIABLE_PRODUCT_STOCK_SOURCE     => 'variation',
             self::ORDER_SHIPPING_METHOD             => 'basalam',
             self::CUSTOMER_PREFIX_NAME              => null,
             self::CUSTOMER_SUFFIX_NAME              => null,

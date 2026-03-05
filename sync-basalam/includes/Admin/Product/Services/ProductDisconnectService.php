@@ -2,6 +2,8 @@
 
 namespace SyncBasalam\Admin\Product\Services;
 
+use SyncBasalam\Utilities\ProductMetaKey;
+
 defined('ABSPATH') || exit;
 
 class ProductDisconnectService
@@ -16,9 +18,9 @@ class ProductDisconnectService
     private function disconnectSingle(int $productId): void
     {
         $metaKeysToRemove = [
-            'sync_basalam_product_id',
-            'sync_basalam_product_sync_status',
-            'sync_basalam_product_status',
+            ProductMetaKey::basalamProductId(),
+            ProductMetaKey::basalamProductSyncStatus(),
+            ProductMetaKey::basalamProductStatus(),
         ];
 
         foreach ($metaKeysToRemove as $metaKey) {

@@ -35,17 +35,26 @@ class OrderEndpoint
             $webhookService->setupWebhook();
             Logger::error("سفارش جدیدی در باسلام ثبت شد ، اما توکن ارسال نشد");
 
-            return false;
+            return new \WP_Error(
+                'sync_basalam_missing_webhook_token',
+                'توکن وب هوک ارسال نشده است.',
+                ['status' => 403]
+            );
         }
 
         $receive_token = sanitize_text_field($headers['token'][0]);
 
-        if ($receive_token === $webhook_token) return true; else {
+        if ($receive_token === $webhook_token) return true;
+        else {
             $webhookService = new WebhookService();
             $webhookService->setupWebhook();
             Logger::error("سفارش جدیدی در باسلام ایجاد شد اما توکن ارسالی معتبر نیست.");
 
-            return false;
+            return new \WP_Error(
+                'sync_basalam_invalid_webhook_token',
+                'توکن وب هوک معتبر نیست.',
+                ['status' => 403]
+            );
         }
     }
 }

@@ -6,13 +6,20 @@ use SyncBasalam\Jobs\AbstractJobType;
 use SyncBasalam\Jobs\JobResult;
 use SyncBasalam\Jobs\Exceptions\RetryableException;
 use SyncBasalam\Jobs\Exceptions\NonRetryableException;
-use SyncBasalam\Services\Products\AutoConnectProducts;
 use SyncBasalam\Logger\Logger;
 
 defined('ABSPATH') || exit;
 
 class AutoConnectProductsJob extends AbstractJobType
 {
+    private $autoConnect;
+
+    public function __construct($jobManager,$autoConnect)
+    {
+        parent::__construct($jobManager);
+        $this->autoConnect = $autoConnect;
+    }
+
     public function getType(): string
     {
         return 'sync_basalam_auto_connect_products';
@@ -28,8 +35,7 @@ class AutoConnectProductsJob extends AbstractJobType
         $cursor = $payload['cursor'] ?? null;
 
         try {
-            $autoConnect = new AutoConnectProducts();
-            $result = $autoConnect->checkSameProduct(null, $cursor);
+            $result = $this->autoConnect->checkSameProduct(null, $cursor);
 
             if (!empty($result['has_more']) && !empty($result['next_cursor'])) {
                 $this->jobManager->createJob(

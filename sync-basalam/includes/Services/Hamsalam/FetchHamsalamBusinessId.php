@@ -4,6 +4,7 @@ namespace SyncBasalam\Services\Hamsalam;
 
 use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Admin\Settings\SettingsManager;
+use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Services\ApiServiceManager;
 
 defined('ABSPATH') || exit;
@@ -17,18 +18,18 @@ class FetchHamsalamBusinessId
     public function __construct()
     {
         $this->settings = syncBasalamSettings()->getSettings();
-        $this->url = "https://api.hamsalam.ir/api/v1/all-businesses";
+        $this->url = Endpoints::HAMSALAM_BUSINESSES;
         $this->hamsalmToken = SettingsManager::getSettings(SettingsConfig::HAMSALAM_TOKEN);
     }
 
     public function fetch()
     {
         try {
-            $apiService = new ApiServiceManager();
+            $apiService = syncBasalamContainer()->get(ApiServiceManager::class);
 
             $header = ['Authorization' => 'Bearer ' . $this->hamsalmToken];
 
-            $response = $apiService->sendGetRequest($this->url, $header);
+            $response = $apiService->get($this->url, $header);
 
             if (!$response || !isset($response['body'])) return ('خطا در دریافت اطلاعات از همسلام');
 

@@ -2,19 +2,20 @@
 
 namespace SyncBasalam\Services\Ticket;
 
+use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Services\ApiServiceManager;
 
 defined('ABSPATH') || exit;
 
 class UploadTicketMedia
 {
-    private $url = 'https://api.hamsalam.ir/api/v1/media?type=ticket_item&collection=IMAGE';
+    private $url = Endpoints::TICKET_MEDIA_UPLOAD;
 
     public function execute($hamsalamToken, $filePath)
     {
-        $apiService = new ApiServiceManager();
+        $apiService = syncBasalamContainer()->get(ApiServiceManager::class);
         $header = ['Authorization' => 'Bearer ' . $hamsalamToken];
 
-        return $apiService->uploadFileRequest($this->url, $filePath, [], $header);
+        return $apiService->upload($this->url, $filePath, [], $header);
     }
 }

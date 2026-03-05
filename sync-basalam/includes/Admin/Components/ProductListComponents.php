@@ -36,7 +36,7 @@ class ProductListComponents
                     <th class='basalam-table-padding'>عنوان</th>
                     <th class='basalam-table-padding'>قیمت (تومان)</th>
                     <th class='basalam-table-padding'>آیدی باسلام</th>
-                    <th class='basalam-table-padding basalam-table-cell-center'>محصول در باسلام</th>
+                    <th class='basalam-table-padding basalam-table-cell-center' style='width: 14%;'>محصول در باسلام</th>
                 </tr>
               </thead>";
 
@@ -51,7 +51,7 @@ class ProductListComponents
             <td class='basalam-table-padding'>" . esc_html($product['id']) . "</td>
             <td class='basalam-table-padding basalam-table-cell-center'>
             <button class='basalam-button basalam-p basalam-button-table basalam-height-35 basalam-margin-auto'>
-                <a class='basalam-a basalam-link-small' href='https://basalam.com/p/" . esc_attr($product['id']) . "' target='_blank'>مشاهده محصول</a>
+                <a class='basalam-a' href='https://basalam.com/p/" . esc_attr($product['id']) . "' target='_blank'>مشاهده محصول</a>
             </button>
 
             </td>

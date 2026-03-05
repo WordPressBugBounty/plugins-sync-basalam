@@ -2,26 +2,29 @@
 
 namespace SyncBasalam\Jobs\Types;
 
+use SyncBasalam\JobManager;
 use SyncBasalam\Jobs\AbstractJobType;
 use SyncBasalam\Jobs\JobResult;
 use SyncBasalam\Jobs\Exceptions\RetryableException;
 use SyncBasalam\Jobs\Exceptions\NonRetryableException;
-use SyncBasalam\Services\Orders\FetchOrdersService;
-use SyncBasalam\Services\Orders\SyncOrderService;
 use SyncBasalam\Logger\Logger;
 
 defined('ABSPATH') || exit;
 
 class FetchOrdersJob extends AbstractJobType
 {
-    private FetchOrdersService $fetchOrdersService;
-    private SyncOrderService $syncOrderService;
+    private $fetchOrdersService;
+    private $syncOrderService;
 
-    public function __construct()
+    public function __construct(
+        JobManager $jobManager,
+        $fetchOrdersService,
+        $syncOrderService
+    )
     {
-        parent::__construct();
-        $this->fetchOrdersService = new FetchOrdersService();
-        $this->syncOrderService = new SyncOrderService();
+        parent::__construct($jobManager);
+        $this->fetchOrdersService = $fetchOrdersService;
+        $this->syncOrderService = $syncOrderService;
     }
 
     public function getType(): string

@@ -11,8 +11,8 @@ defined('ABSPATH') || exit;
 class ProductDataBuilder
 {
     private array $data = [];
-    private ?ValidatorChain $validator;
-    private ProductDataFactory $factory;
+    private $validator;
+    private $factory;
     private DataStrategyInterface $strategy;
 
     public function __construct(

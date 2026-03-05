@@ -11,7 +11,7 @@ class CancelFetchOrders extends ActionController
 {
     public function __invoke()
     {
-        $jobManager = JobManager::getInstance();
+        $jobManager = syncBasalamContainer()->get(JobManager::class);
 
         $jobManager->deleteJob(['job_type' => 'sync_basalam_fetch_orders', 'status' => 'pending']);
         $jobManager->deleteJob(['job_type' => 'sync_basalam_fetch_orders', 'status' => 'processing']);

@@ -2,8 +2,11 @@
 
 namespace SyncBasalam\Services\Products;
 
+use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Services\ApiServiceManager;
+use SyncBasalam\Jobs\Exceptions\RetryableException;
 use SyncBasalam\Jobs\Exceptions\NonRetryableException;
+use SyncBasalam\Utilities\ProductMetaKey;
 
 defined('ABSPATH') || exit;
 
@@ -13,7 +16,7 @@ class UpdateSingleProductService
 
     public function __construct()
     {
-        $this->apiservice = new ApiServiceManager();
+        $this->apiservice = syncBasalamContainer()->get(ApiServiceManager::class);
     }
 
     public function updateProductInBasalam($productData, $productId)
@@ -24,12 +27,16 @@ class UpdateSingleProductService
 
         do_action('sync_basalam_before_update_product_api', $productId, $productData);
 
-        $syncBasalamProductId = get_post_meta($productId, 'sync_basalam_product_id', true);
+        $syncBasalamProductId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
 
-        $url = 'https://openapi.basalam.com/v1/products/' . $syncBasalamProductId;
+        $url = sprintf(Endpoints::PRODUCT_UPDATE, $syncBasalamProductId);
 
         try {
-            $request = $this->apiservice->sendPatchRequest($url, $productData);
+            $request = $this->apiservice->patch($url, $productData);
+        } catch (RetryableException $e) {
+            throw $e;
+        } catch (NonRetryableException $e) {
+            throw $e;
         } catch (\Exception $e) {
             throw new \Exception('خطا در ارتباط با API باسلام: ' . $e->getMessage());
         }
@@ -123,7 +130,7 @@ class UpdateSingleProductService
             }
         }
 
-        update_post_meta($productId, 'sync_basalam_product_sync_status', 'synced');
+        update_post_meta($productId, ProductMetaKey::basalamProductSyncStatus(), 'synced');
 
         $result = [
             'success'     => true,
@@ -138,8 +145,8 @@ class UpdateSingleProductService
 
     public function updateProductStatus($productId, $status)
     {
-        $syncBasalamProductId = get_post_meta($productId, 'sync_basalam_product_id', true);
-        $url = 'https://openapi.basalam.com/v1/products/' . $syncBasalamProductId;
+        $syncBasalamProductId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
+        $url = sprintf(Endpoints::PRODUCT_UPDATE, $syncBasalamProductId);
 
         $data = ["status" => $status];
 
@@ -148,14 +155,18 @@ class UpdateSingleProductService
         do_action('sync_basalam_before_update_product_status', $productId, $status, $data);
 
         try {
-            $request = $this->apiservice->sendPatchRequest($url, $data);
+            $request = $this->apiservice->patch($url, $data);
+        } catch (RetryableException $e) {
+            throw $e;
+        } catch (NonRetryableException $e) {
+            throw $e;
         } catch (\Exception $e) {
             throw NonRetryableException::permanent($e->getMessage());
         }
 
         if (!is_wp_error($request)) {
-            update_post_meta($productId, 'sync_basalam_product_sync_status', 'synced');
-            update_post_meta($productId, 'sync_basalam_product_status', $status);
+            update_post_meta($productId, ProductMetaKey::basalamProductSyncStatus(), 'synced');
+            update_post_meta($productId, ProductMetaKey::basalamProductStatus(), $status);
 
             $result = [
                 'success'     => true,

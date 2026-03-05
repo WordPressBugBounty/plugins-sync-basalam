@@ -135,9 +135,9 @@ class ApiResponseHandler
         }
 
         if (is_array($body)) {
+            if (!empty($body['errors'][0]['message'])) return $body['errors'][0]['message'];
             if (isset($body['messages'][0]['message'])) return $body['messages'][0]['message'];
             if (isset($body['message'])) return $body['message'];
-
             if (isset($body['error'])) return $body['error'];
         }
 

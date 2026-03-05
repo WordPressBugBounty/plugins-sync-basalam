@@ -3,12 +3,13 @@
 namespace SyncBasalam\Services;
 
 use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Config\Endpoints;
 
 defined('ABSPATH') || exit;
 
 class FetchAnnouncements
 {
-    private string $url = 'https://api.hamsalam.ir/api/v1/announcements';
+    private string $url = Endpoints::HAMSALAM_ANNOUNCEMENTS;
 
     public function fetch(int $page = 1, int $perPage = 5): array
     {
@@ -31,10 +32,9 @@ class FetchAnnouncements
         $emptyResult = ['data' => [], 'total_page' => 1, 'page' => $page, 'per_page' => $perPage];
 
         try {
-            $apiService = new ApiServiceManager();
-            $response = $apiService->sendGetRequest($url, $headers);
+            $apiService = syncBasalamContainer()->get(ApiServiceManager::class);
+            $response = $apiService->get($url, $headers);
         } catch (\Exception $e) {
-            error_log('Error fetching announcements: ' . $e->getMessage());
             return $emptyResult;
         }
         if (empty($response['body'])) {

@@ -40,6 +40,22 @@ class TicketServiceManager
         ];
     }
 
+    public static function resolveTicketStatus(array $ticket): string
+    {
+        $status = $ticket['data']['status'] ?? $ticket['status'] ?? '';
+
+        if (is_array($status)) {
+            $status = $status['slug'] ?? $status['name'] ?? '';
+        }
+
+        return strtolower(trim((string) $status));
+    }
+
+    public static function isTicketClosed(array $ticket): bool
+    {
+        return in_array(self::resolveTicketStatus($ticket), ['closed', 'بسته شده'], true);
+    }
+
     public function __construct()
     {
         $settings = (array) syncBasalamSettings()->getSettings();

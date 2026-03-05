@@ -2,6 +2,7 @@
 
 namespace SyncBasalam\Services\Orders;
 
+use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Services\ApiServiceManager;
 use SyncBasalam\Logger\Logger;
 use SyncBasalam\Jobs\Exceptions\RetryableException;
@@ -12,12 +13,12 @@ defined('ABSPATH') || exit;
 class FetchOrdersService
 {
     private string $url;
-    private ApiServiceManager $apiService;
+    private $apiService;
 
     public function __construct()
     {
-        $this->url = "https://openapi.basalam.com/v1/vendor-parcels";
-        $this->apiService = new ApiServiceManager();
+        $this->url = Endpoints::VENDOR_PARCELS;
+        $this->apiService = syncBasalamContainer()->get(ApiServiceManager::class);
     }
 
     public function fetchPage(int $day = 7, $cursor = null): array
@@ -30,7 +31,7 @@ class FetchOrdersService
         if ($cursor) $url .= '&cursor=' . urlencode($cursor);
 
         try {
-            $response = $this->apiService->sendGetRequest($url);
+            $response = $this->apiService->get($url);
 
             if (!isset($response['body'])) {
                 return [

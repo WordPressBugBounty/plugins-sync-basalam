@@ -2,6 +2,8 @@
 
 namespace SyncBasalam\Services\Products\Discount;
 
+use SyncBasalam\Utilities\ProductMetaKey;
+
 defined('ABSPATH') || exit;
 
 class SimpleProductDiscount implements DiscountInterface
@@ -15,7 +17,7 @@ class SimpleProductDiscount implements DiscountInterface
 
     public function apply($product): void
     {
-        $basalam_id = get_post_meta($product->get_id(), 'sync_basalam_product_id', true);
+        $basalam_id = get_post_meta($product->get_id(), ProductMetaKey::basalamProductId(), true);
         if (!$basalam_id) return;
 
         $regular = $product->get_regular_price();
@@ -29,7 +31,7 @@ class SimpleProductDiscount implements DiscountInterface
 
     public function remove($product): void
     {
-        $basalam_id = get_post_meta($product->get_id(), 'sync_basalam_product_id', true);
+        $basalam_id = get_post_meta($product->get_id(), ProductMetaKey::basalamProductId(), true);
         if ($basalam_id) {
             $this->discountService->remove([$basalam_id], null);
         }

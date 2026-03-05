@@ -2,6 +2,7 @@
 
 namespace SyncBasalam\Services\Products;
 
+use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Services\ApiServiceManager;
 
 defined('ABSPATH') || exit;
@@ -9,11 +10,11 @@ class GetCategoryAttr
 {
     public static function getAttr($categoryId)
     {
-        $url = "https://openapi.basalam.com/v1/categories/$categoryId/attributes?exclude_multi_selects=true";
-        $apiservice = new ApiServiceManager();
+        $url = sprintf(Endpoints::CATEGORY_ATTRIBUTES, $categoryId);
+        $apiservice = syncBasalamContainer()->get(ApiServiceManager::class);
 
         try {
-            $data = $apiservice->sendGetRequest($url, []);
+            $data = $apiservice->get($url, []);
         } catch (\Exception $e) {
             return [
                 'body' => null,

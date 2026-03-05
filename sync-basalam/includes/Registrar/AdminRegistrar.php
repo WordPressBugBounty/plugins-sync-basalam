@@ -26,11 +26,19 @@ class AdminRegistrar implements RegistrarInterface
 {
     public static function register(): void
     {
+        $container = syncBasalamContainer();
+        $pages = $container->get(Pages::class);
+        $filter = $container->get(Filter::class);
+        $orderColumn = $container->get(OrderColumn::class);
+        $orderMetaBox = $container->get(OrderMetaBox::class);
+        $orderStatuses = $container->get(OrderStatuses::class);
+        $actions = $container->get(Actions::class);
+
         // Initialize Admin Actions
-        new RegisterActions();
+        $container->get(RegisterActions::class);
 
         // Admin Menu
-        \add_action("admin_menu", [new Pages(), "registerMenus"]);
+        \add_action("admin_menu", [$pages, "registerMenus"]);
 
         // Admin Scripts & Styles
         \add_action("admin_enqueue_scripts", [self::class, "adminEnqueueStyles"]);
@@ -50,25 +58,25 @@ class AdminRegistrar implements RegistrarInterface
         \add_action('woocommerce_process_product_meta', [Tab::class, 'saveTabData']);
 
         // Product Filter
-        \add_action("restrict_manage_posts", [new Filter(), "renderFilterDropdown"]);
-        \add_action("pre_get_posts", [new Filter(), "applyFilterToQuery"]);
+        \add_action("restrict_manage_posts", [$filter, "renderFilterDropdown"]);
+        \add_action("pre_get_posts", [$filter, "applyFilterToQuery"]);
 
         // Order Columns (HPOS)
-        \add_action("manage_woocommerce_page_wc-orders_custom_column", [new OrderColumn(), "renderColumn"], 10, 2);
-        \add_filter("manage_woocommerce_page_wc-orders_columns", [new OrderColumn(), "addColumn"]);
+        \add_action("manage_woocommerce_page_wc-orders_custom_column", [$orderColumn, "renderColumn"], 10, 2);
+        \add_filter("manage_woocommerce_page_wc-orders_columns", [$orderColumn, "addColumn"]);
 
         // Order Columns (Traditional CPT - non-HPOS)
-        \add_action("manage_shop_order_posts_custom_column", [new OrderColumn(), "renderColumn"], 10, 2);
-        \add_filter("manage_edit-shop_order_columns", [new OrderColumn(), "addColumn"]);
+        \add_action("manage_shop_order_posts_custom_column", [$orderColumn, "renderColumn"], 10, 2);
+        \add_filter("manage_edit-shop_order_columns", [$orderColumn, "addColumn"]);
 
         // Order Meta Boxes
-        \add_action("add_meta_boxes", [new OrderMetaBox(), "registerMetaBox"], 10);
+        \add_action("add_meta_boxes", [$orderMetaBox, "registerMetaBox"], 10);
 
         // Order Meta Boxes (Traditional CPT - non-HPOS)
-        \add_action("add_meta_boxes_shop_order", [new OrderMetaBox(), "registerMetaBox"], 10);
+        \add_action("add_meta_boxes_shop_order", [$orderMetaBox, "registerMetaBox"], 10);
 
         // Order Statuses
-        \add_filter("wc_order_statuses", [new OrderStatuses(), "registerorderStatuses"]);
+        \add_filter("wc_order_statuses", [$orderStatuses, "registerorderStatuses"]);
 
         // Order Stock Levels
         \add_action("woocommerce_order_status_bslm-rejected", "wc_maybe_increase_stock_levels");
@@ -77,8 +85,8 @@ class AdminRegistrar implements RegistrarInterface
         \add_action("woocommerce_order_status_bslm-completed", "wc_maybe_reduce_stock_levels");
 
         // Bulk Actions
-        \add_filter("bulk_actions-edit-product", [new Actions(), "registerBulkActions"]);
-        \add_filter("handle_bulk_actions-edit-product", [new Actions(), "handleBulkAction"], 10, 3);
+        \add_filter("bulk_actions-edit-product", [$actions, "registerBulkActions"]);
+        \add_filter("handle_bulk_actions-edit-product", [$actions, "handleBulkAction"], 10, 3);
 
         // Product Duplicate
         \add_action("woocommerce_product_duplicate", function ($newProduct) {
@@ -92,7 +100,7 @@ class AdminRegistrar implements RegistrarInterface
         \add_action("restrict_manage_posts", [OrderPageComponents::class, "renderCheckOrdersButtonTraditional"]);
 
         // Initialize AJAX handlers
-        $connectProduct = new ConnectProduct();
+        $connectProduct = $container->get(ConnectProduct::class);
         add_action('wp_ajax_sync_basalam_connect_product', [$connectProduct, 'handleConnectProduct']);
         add_action('wp_ajax_basalam_search_products', [$connectProduct, 'handleSearchProducts']);
         add_action('wp_ajax_sync_basalam_mark_pointer_onboarding_completed', [PointerTour::class, 'markPointerOnboardingCompleted']);
@@ -103,7 +111,7 @@ class AdminRegistrar implements RegistrarInterface
         add_action('wp_ajax_basalam_calculate_tasks_per_minute', function () {
             check_ajax_referer('basalam_update_setting_nonce', 'nonce', true);
 
-            $monitor = SystemResourceMonitor::getInstance();
+            $monitor = syncBasalamContainer()->get(SystemResourceMonitor::class);
             $optimal = $monitor->calculateOptimalTasksPerMinute();
 
             wp_send_json_success([
@@ -120,7 +128,7 @@ class AdminRegistrar implements RegistrarInterface
 
     public static function adminEnqueueStyles($hook = '')
     {
-        $version = syncBasalamPlugin()::VERSION;
+        $version = syncbasalamplugin()->getVersion();
 
         wp_enqueue_style(
             "basalam-admin-style",
@@ -161,7 +169,7 @@ class AdminRegistrar implements RegistrarInterface
     public static function adminEnqueueScripts($hook = '')
     {
         $shouldLoadPointerTour = PointerTour::shouldLoadPointerTour((string) $hook);
-        $version = syncBasalamPlugin()::VERSION;
+        $version = syncbasalamplugin()->getVersion();
 
         if ($shouldLoadPointerTour) {
             wp_enqueue_script('wp-pointer');

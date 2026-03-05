@@ -8,6 +8,12 @@ defined('ABSPATH') || exit;
 
 class ArchiveProduct extends ProductListenerAbstract
 {
+    private $productOperations;
+
+    public function __construct($productOperations = null)
+    {
+        $this->productOperations = $productOperations ?: syncBasalamContainer()->get(ProductOperations::class);
+    }
 
     public function handle($productId)
     {
@@ -23,7 +29,6 @@ class ArchiveProduct extends ProductListenerAbstract
             return;
         }
 
-        $productOperations = new ProductOperations();
-        $productOperations->archiveExistProduct($productId);
+        $this->productOperations->archiveExistProduct($productId);
     }
 }

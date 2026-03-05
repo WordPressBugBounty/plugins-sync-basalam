@@ -3,7 +3,11 @@
 namespace SyncBasalam\Services\Products;
 
 use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Services\ApiServiceManager;
+use SyncBasalam\Jobs\Exceptions\RetryableException;
+use SyncBasalam\Jobs\Exceptions\NonRetryableException;
+use SyncBasalam\Utilities\ProductMetaKey;
 
 defined('ABSPATH') || exit;
 
@@ -13,7 +17,7 @@ class CreateSingleProductService
 
     public function __construct()
     {
-        $this->apiservice = new ApiServiceManager();
+        $this->apiservice = syncBasalamContainer()->get(ApiServiceManager::class);
     }
 
     public function createProductInBasalam($productData, $productId)
@@ -28,10 +32,14 @@ class CreateSingleProductService
 
         $vendorId = syncBasalamSettings()->getSettings(SettingsConfig::VENDOR_ID);
 
-        $url = "https://openapi.basalam.com/v1/vendors/$vendorId/products";
+        $url = sprintf(Endpoints::PRODUCT_CREATE, $vendorId);
 
         try {
-            $request = $this->apiservice->sendPostRequest($url, $productData);
+            $request = $this->apiservice->post($url, $productData);
+        } catch (RetryableException $e) {
+            throw $e;
+        } catch (NonRetryableException $e) {
+            throw $e;
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
@@ -140,9 +148,9 @@ class CreateSingleProductService
                 }
             }
 
-            update_post_meta($productId, 'sync_basalam_product_id', $responseData['id']);
-            update_post_meta($productId, 'sync_basalam_product_status', 2976);
-            update_post_meta($productId, 'sync_basalam_product_sync_status', 'synced');
+            update_post_meta($productId, ProductMetaKey::basalamProductId(), $responseData['id']);
+            update_post_meta($productId, ProductMetaKey::basalamProductStatus(), 2976);
+            update_post_meta($productId, ProductMetaKey::basalamProductSyncStatus(), 'synced');
 
             $result = [
                 'success'     => true,

@@ -2,17 +2,14 @@
 
 namespace SyncBasalam\Services\Orders;
 
+use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Services\ApiServiceManager;
 use SyncBasalam\Utilities\OrderManagerUtilities;
 
 class CancelOrderService
 {
-    public function cancelOrderOnBasalam()
+    public function cancelOrderOnBasalam(int $orderId, string $description, int $reasonId = 3481)
     {
-        $orderId = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
-        $description = isset($_POST['description']) ? sanitize_text_field(wp_unslash($_POST['description'])) : '';
-        $reasonId = isset($_POST['reason_id']) ? intval($_POST['reason_id']) : 3481;
-
         if (empty($orderId)) {
             return [
                 'success'     => false,
@@ -92,7 +89,7 @@ class CancelOrderService
 
     private function sendCancelOrderRequest($itemIds, $description, $reasonId)
     {
-        $apiUrl = 'https://order-processing.basalam.com/v1/vendor/set-cancel';
+        $apiUrl = Endpoints::ORDER_CANCEL;
 
         $orderItems = [];
         foreach ($itemIds as $id) {
@@ -107,10 +104,10 @@ class CancelOrderService
             'order_items' => $orderItems,
         ];
 
-        $apiService = new ApiServiceManager();
+        $apiService = syncBasalamContainer()->get(ApiServiceManager::class);
 
         try {
-            return $apiService->sendPostRequest($apiUrl, $body);
+            return $apiService->post($apiUrl, $body);
         } catch (\Exception $e) {
             return [
                 'status_code' => 500,

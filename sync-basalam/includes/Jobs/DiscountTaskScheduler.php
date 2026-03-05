@@ -2,22 +2,16 @@
 
 namespace SyncBasalam\Jobs;
 
-use SyncBasalam\Services\Products\Discount\DiscountTaskProcessor;
 
 defined('ABSPATH') || exit;
 
 class DiscountTaskScheduler
 {
-    private static $instance = null;
+    private $discountProcessor;
 
-    private function __construct()
+    public function __construct($discountProcessor)
     {
-    }
-
-    public static function getInstance(): self
-    {
-        if (self::$instance === null) self::$instance = new self();
-        return self::$instance;
+        $this->discountProcessor = $discountProcessor;
     }
 
     public function process(): void
@@ -29,11 +23,8 @@ class DiscountTaskScheduler
         $now = microtime(true);
 
         if (($now - $lastRun) >= $cacheThreshold) {
-            
             update_option($cacheKey, microtime(true), false);
-
-            $discountProcessor = new DiscountTaskProcessor();
-            $discountProcessor->processDiscountTasks();
+            $this->discountProcessor->processDiscountTasks();
         }
     }
 }

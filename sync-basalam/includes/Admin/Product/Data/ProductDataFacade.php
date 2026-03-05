@@ -6,14 +6,15 @@ use SyncBasalam\Admin\Product\Data\Validators\ValidatorChain;
 use SyncBasalam\Admin\Product\Data\Validators\ProductExistenceValidator;
 use SyncBasalam\Admin\Product\Data\Validators\ProductStatusValidator;
 use SyncBasalam\Admin\Product\ProductDataFactory;
+use SyncBasalam\Utilities\ProductMetaKey;
 
 defined('ABSPATH') || exit;
 
 class ProductDataFacade
 {
-    private static ?ProductDataBuilder $builder = null;
-    private static ?ProductDataFactory $factory = null;
-    private static ?ValidatorChain $validator = null;
+    private static $builder = null;
+    private static $factory = null;
+    private static $validator = null;
 
     private static function initialize(): void
     {
@@ -34,7 +35,7 @@ class ProductDataFacade
         $product = wc_get_product($productId);
         if (!$product) throw new \InvalidArgumentException("Product with ID {$productId} not found");
 
-        $basalamProductId = get_post_meta($productId, 'sync_basalam_product_id', true);
+        $basalamProductId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
         $isUpdate = !empty($basalamProductId);
 
         $syncFields = syncBasalamSettings()->getSettings(\SyncBasalam\Admin\Settings\SettingsConfig::SYNC_PRODUCT_FIELDS);

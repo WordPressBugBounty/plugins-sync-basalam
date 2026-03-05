@@ -7,17 +7,31 @@ use SyncBasalam\Jobs\JobResult;
 use SyncBasalam\Jobs\Exceptions\RetryableException;
 use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 use SyncBasalam\Admin\ProductService;
-use SyncBasalam\Services\ApiServiceManager;
+use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Admin\Settings\SettingsConfig;
-use SyncBasalam\Admin\Product\ProductDataFactory;
 use SyncBasalam\Admin\Product\Data\ProductDataBuilder;
 use SyncBasalam\Logger\Logger;
-use SyncBasalam\JobManager;
 
 defined('ABSPATH') || exit;
 
 class BulkUpdateProductsJob extends AbstractJobType
 {
+    private $apiService;
+    private $factory;
+    private $settingsAccessor;
+
+    public function __construct(
+        $jobManager,
+        $apiService,
+        $factory,
+        $settingsAccessor
+    ) {
+        parent::__construct($jobManager);
+        $this->apiService = $apiService;
+        $this->factory = $factory;
+        $this->settingsAccessor = $settingsAccessor;
+    }
+
     public function getType(): string
     {
         return 'sync_basalam_bulk_update_products';
@@ -35,9 +49,8 @@ class BulkUpdateProductsJob extends AbstractJobType
         Logger::alert('شروع بروزرسانی دسته‌ای محصولات از آیدی: ' . $lastId);
 
         try {
-            $apiService = new ApiServiceManager();
-            $vendorId = syncBasalamSettings()->getSettings(SettingsConfig::VENDOR_ID);
-            $url = "https://openapi.basalam.com/v1/vendors/$vendorId/products/batch-updates?continue_on_error=true";
+            $vendorId = $this->settingsAccessor->getSettings(SettingsConfig::VENDOR_ID);
+            $url = sprintf(Endpoints::PRODUCT_BATCH_UPDATE, $vendorId);
 
             $batchData = [
                 'posts_per_page' => 10,
@@ -52,14 +65,13 @@ class BulkUpdateProductsJob extends AbstractJobType
                 return $this->success(['completed' => true, 'message' => 'All products bulk updated']);
             }
 
-            $factory = new ProductDataFactory();
-            $builder = new ProductDataBuilder(null, $factory);
+            $builder = new ProductDataBuilder(null, $this->factory);
             $productsData = [];
 
             foreach ($productIds as $productId) {
                 try {
                     $productData = $builder->reset()
-                        ->setStrategy($factory->createStrategy('quick_update'))
+                        ->setStrategy($this->factory->createStrategy('quick_update'))
                         ->fromWooProduct($productId)
                         ->build();
 
@@ -75,8 +87,7 @@ class BulkUpdateProductsJob extends AbstractJobType
                             }
 
                             if ($hasIncompleteVariants) {
-                                $job_manager = new JobManager();
-                                $job_manager->createJob(
+                                $this->jobManager->createJob(
                                     'sync_basalam_update_single_product',
                                     'pending',
                                     $productId,
@@ -94,7 +105,7 @@ class BulkUpdateProductsJob extends AbstractJobType
 
             if (empty($productsData)) return $this->success(['skipped' => true, 'message' => 'No products to update in this batch']);
 
-            $res = $apiService->sendPatchRequest($url, ['data' => $productsData]);
+            $res = $this->apiService->patch($url, ['data' => $productsData]);
 
             if ($res['status_code'] == 202) {
                 Logger::info('بروزرسانی دسته جمعی محصولات با موفقیت انجام شد.');

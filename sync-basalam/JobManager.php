@@ -6,16 +6,13 @@ defined('ABSPATH') || exit;
 
 class JobManager
 {
-    private static $instance = null;
     private $jobManagerTableName;
 
-    public static function getInstance()
-    {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
+    private const ALLOWED_COLUMNS = [
+        'id', 'job_type', 'status', 'payload',
+        'attempts', 'max_attempts', 'retry_after',
+        'started_at', 'created_at', 'failed_at', 'error_message',
+    ];
 
     function __construct()
     {
@@ -40,6 +37,22 @@ class JobManager
         );
     }
 
+    public function getNextEligibleJob(string $jobType): ?object
+    {
+        global $wpdb;
+
+        return $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$this->jobManagerTableName}
+             WHERE job_type = %s
+               AND status = 'pending'
+               AND (retry_after IS NULL OR retry_after <= %d)
+             ORDER BY id ASC
+             LIMIT 1",
+            $jobType,
+            time()
+        ));
+    }
+
     public function getJob($where = array())
     {
         global $wpdb;
@@ -50,6 +63,9 @@ class JobManager
         $values     = [];
 
         foreach ($where as $column => $value) {
+            if (!in_array($column, self::ALLOWED_COLUMNS, true)) {
+                throw new \InvalidArgumentException("Invalid column: {$column}");
+            }
             $conditions[] = "{$column} = %s";
             $values[]     = $value;
         }
@@ -69,6 +85,9 @@ class JobManager
         $values     = [];
 
         foreach ($where as $column => $value) {
+            if (!in_array($column, self::ALLOWED_COLUMNS, true)) {
+                throw new \InvalidArgumentException("Invalid column: {$column}");
+            }
             if (is_array($value)) {
                 $placeholders = array_fill(0, count($value), '%s');
                 $conditions[] = "{$column} IN (" . implode(',', $placeholders) . ")";
@@ -174,7 +193,6 @@ class JobManager
 
         $newAttempts = intval($job->attempts) + 1;
 
-
         $errorMessages = [];
         if (!empty($job->error_message)) {
             $decoded = json_decode($job->error_message, true);
@@ -188,26 +206,46 @@ class JobManager
         if ($newAttempts >= intval($job->max_attempts)) {
             $this->updateJob(
                 [
-                    'status' => 'failed',
+                    'status'        => 'failed',
                     'error_message' => $encodedErrors,
-                    'failed_at' => time(),
-                    'started_at' => null,
-                    'attempts' => $newAttempts,
+                    'failed_at'     => time(),
+                    'started_at'    => 0,
+                    'attempts'      => $newAttempts,
                 ],
                 ['id' => $jobId]
             );
             return false;
         }
 
-        $this->updateJob(
-            [
-                'status' => 'pending',
-                'attempts' => $newAttempts,
-                'error_message' => $encodedErrors,
-                'started_at' => null,
-            ],
-            ['id' => $jobId]
-        );
+        // Progressive exponential backoff: 30s, 60s, 120s, 240s, ...
+        $delaySeconds = 30 * (int) pow(2, $newAttempts - 1);
+        $retryAfter   = time() + $delaySeconds;
+
+        // Atomic DELETE + INSERT inside a transaction so a crash can't lose the job.
+        $wpdb->query('START TRANSACTION');
+        try {
+            $wpdb->delete($this->jobManagerTableName, ['id' => $jobId]);
+
+            $wpdb->insert(
+                $this->jobManagerTableName,
+                [
+                    'job_type'      => $job->job_type,
+                    'status'        => 'pending',
+                    'payload'       => $job->payload,
+                    'attempts'      => $newAttempts,
+                    'max_attempts'  => $job->max_attempts,
+                    'error_message' => $encodedErrors,
+                    'created_at'    => $job->created_at,
+                    'retry_after'   => $retryAfter,
+                    'started_at'    => 0,
+                ]
+            );
+
+            $wpdb->query('COMMIT');
+        } catch (\Exception $e) {
+            $wpdb->query('ROLLBACK');
+            throw $e;
+        }
 
         return true;
     }
@@ -219,7 +257,7 @@ class JobManager
                 'status' => 'failed',
                 'error_message' => $errorMessage,
                 'failed_at' => time(),
-                'started_at' => null,
+                'started_at' => 0,
             ],
             ['id' => $jobId]
         );

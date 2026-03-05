@@ -11,11 +11,17 @@ class CreateProduct extends AsyncBackgroundProcess
 {
     protected $action = 'CreateSingleProduct';
     protected $batch_size = 1;
+    private $operator;
+
+    public function __construct($operator = null)
+    {
+        parent::__construct();
+        $this->operator = $operator ?: syncBasalamContainer()->get(ProductOperations::class);
+    }
 
     protected function task($item)
     {
-        $operator = new ProductOperations();
-        $operator->createNewProduct($item['id'], null);
+        $this->operator->createNewProduct($item['id'], null);
 
         return false;
     }

@@ -4,13 +4,15 @@ use SyncBasalam\Plugin;
 use SyncBasalam\Admin\Settings\SettingsContainer;
 use SyncBasalam\Activator;
 use SyncBasalam\JobsRunner;
+use SyncBasalam\Infrastructure\Container\AppServiceProvider;
+use SyncBasalam\Infrastructure\Container\Container;
 
 defined('ABSPATH') || exit;
 
 /**
  * Plugin Name: sync basalam | ووسلام
  * Description: با استفاده از پلاگین ووسلام  میتوایند تمامی محصولات ووکامرس را با یک کلیک به غرفه باسلامی خود اضافه کنید‌، همچنین تمامی سفارش باسلامی شما به سایت شما اضافه میگردد.
- * Version: 1.7.9
+ * Version: 1.8.0
  * Author: Woosalam Dev
  * Author URI: https://wp.hamsalam.ir/
  * Plugin URI: https://wp.hamsalam.ir
@@ -42,16 +44,28 @@ if (get_option('sync_basalam_force_update')) {
 
 add_action('init', 'syncBasalamPlugin');
 
+function syncBasalamContainer()
+{
+    static $container = null;
+
+    if ($container === null) {
+        $container = new Container();
+        $container->provider(new AppServiceProvider());
+    }
+
+    return $container;
+}
+
 //  Singleton instance of the main plugin class.
 function syncBasalamPlugin()
 {
-    return Plugin::getInstance();
+    return syncBasalamContainer()->get(Plugin::class);
 }
 
 // Singleton instance of the woosalam Settings container.
 function syncBasalamSettings()
 {
-    return SettingsContainer::getInstance();
+    return syncBasalamContainer()->get(SettingsContainer::class);
 }
 
 function syncBasalamActivatePlugin()
@@ -60,4 +74,4 @@ function syncBasalamActivatePlugin()
     set_transient('sync_basalam_just_activated', true, 10);
 }
 
-JobsRunner::getInstance();
+syncBasalamContainer()->get(JobsRunner::class);

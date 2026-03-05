@@ -14,7 +14,7 @@ class ActionHandler
             if (!wp_verify_nonce($nonce, $actionName . '_nonce')) {
                 wp_die('دسترسی غیرمجاز!');
             }
-            $handler = new $className();
+            $handler = syncBasalamContainer()->get($className);
 
             do_action('before_' . $actionName, $_POST);
 
@@ -38,8 +38,14 @@ class ActionHandler
                 ]);
             }
 
+            if (!current_user_can('manage_woocommerce')) {
+                wp_send_json_error([
+                    'message' => 'شما مجاز به انجام این عملیات نیستید.',
+                ], 403);
+            }
+
             try {
-                $handler = new $className();
+                $handler = syncBasalamContainer()->get($className);
 
                 do_action('before_' . $actionName, $_POST);
 
@@ -54,26 +60,4 @@ class ActionHandler
         });
     }
 
-    public static function postAjaxNoAuth($actionName, $className)
-    {
-        add_action('wp_ajax_' . $actionName, function () use ($actionName, $className) {
-            $handler = new $className();
-
-            do_action('before_' . $actionName, $_POST);
-
-            $result = $handler();
-
-            do_action('after_' . $actionName, $result, $_POST);
-        });
-
-        add_action('wp_ajax_nopriv_' . $actionName, function () use ($actionName, $className) {
-            $handler = new $className();
-
-            do_action('before_' . $actionName, $_POST);
-
-            $result = $handler();
-
-            do_action('after_' . $actionName, $result, $_POST);
-        });
-    }
 }

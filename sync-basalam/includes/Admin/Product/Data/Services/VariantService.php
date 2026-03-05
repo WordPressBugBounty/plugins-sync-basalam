@@ -8,7 +8,7 @@ defined('ABSPATH') || exit;
 
 class VariantService
 {
-    private PriceService $priceService;
+    private $priceService;
     private array $settings;
 
     public function __construct()
@@ -24,17 +24,15 @@ class VariantService
         $variants = [];
         $variationIds = $product->get_children();
 
-        $parentManagesStock = $product->get_manage_stock();
-
         foreach ($variationIds as $variationId) {
-            $variant = $this->createVariant($variationId, $product, $parentManagesStock);
+            $variant = $this->createVariant($variationId, $product);
             if ($variant) $variants[] = $variant;
         }
 
         return $variants;
     }
 
-    private function createVariant(int $variationId, $parentProduct, bool $parentManagesStock = false): ?array
+    private function createVariant(int $variationId, $parentProduct): ?array
     {
         $variation = wc_get_product($variationId);
         if (!$variation) return null;
@@ -46,7 +44,7 @@ class VariantService
 
         $variantData = [
             'primary_price' => $price,
-            'stock' => $this->getVariantStock($variation, $parentProduct, $parentManagesStock),
+            'stock' => $this->getVariantStock($variation, $parentProduct),
             'properties' => $this->getVariantProperties($variation, $parentProduct),
         ];
 
@@ -58,25 +56,41 @@ class VariantService
         return $variantData;
     }
 
-    private function getVariantStock($variation, $parentProduct, bool $parentManagesStock = false): int
+    private function getVariantStock($variation, $parentProduct): int
     {
         $defaultStock = $this->settings[SettingsConfig::DEFAULT_STOCK_QUANTITY];
         $safeStock = $this->settings[SettingsConfig::SAFE_STOCK];
+        $stockSource = $this->settings[SettingsConfig::VARIABLE_PRODUCT_STOCK_SOURCE];
 
-        // If parent manages stock, use parent's stock quantity
-        if ($parentManagesStock) {
-            $stock = $parentProduct->get_stock_quantity();
-            $stockStatus = $parentProduct->get_stock_status();
-        } else {
-            $stock = $variation->get_stock_quantity();
-            $stockStatus = $variation->get_stock_status();
-        }
+        [$stock, $stockStatus] = $this->resolveStockByPriority($stockSource, $variation, $parentProduct);
 
         $calculatedStock = $stockStatus === 'instock' ? $stock ?? $defaultStock : 0;
 
         if ($safeStock > 0 && $calculatedStock <= $safeStock) return 0;
 
         return $calculatedStock;
+    }
+
+    private function resolveStockByPriority(string $stockSource, $variation, $parentProduct): array
+    {
+        $preferredProduct = $stockSource === 'product' ? $parentProduct : $variation;
+        $fallbackProduct = $stockSource === 'product' ? $variation : $parentProduct;
+
+        $stock = $preferredProduct->get_stock_quantity();
+        $stockStatus = $preferredProduct->get_stock_status();
+
+        // If preferred source has no numeric stock, fallback to the other source.
+        if ($stock === null && $stockStatus === 'instock') {
+            $fallbackStock = $fallbackProduct->get_stock_quantity();
+            $fallbackStockStatus = $fallbackProduct->get_stock_status();
+
+            if ($fallbackStock !== null || $fallbackStockStatus !== 'instock') {
+                $stock = $fallbackStock;
+                $stockStatus = $fallbackStockStatus;
+            }
+        }
+
+        return [$stock, $stockStatus];
     }
 
     private function getVariantProperties($variation, $parentProduct): array

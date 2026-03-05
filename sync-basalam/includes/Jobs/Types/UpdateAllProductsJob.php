@@ -4,8 +4,6 @@ namespace SyncBasalam\Jobs\Types;
 
 use SyncBasalam\Jobs\AbstractJobType;
 use SyncBasalam\Jobs\JobResult;
-use SyncBasalam\Jobs\Exceptions\RetryableException;
-use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 use SyncBasalam\Admin\ProductService;
 use SyncBasalam\Logger\Logger;
 
@@ -13,6 +11,11 @@ defined('ABSPATH') || exit;
 
 class UpdateAllProductsJob extends AbstractJobType
 {
+    public function __construct($jobManager)
+    {
+        parent::__construct($jobManager);
+    }
+
     public function getType(): string
     {
         return 'sync_basalam_update_all_products';

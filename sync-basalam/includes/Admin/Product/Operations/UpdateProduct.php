@@ -12,14 +12,17 @@ defined('ABSPATH') || exit;
 
 class UpdateProduct extends AbstractProductOperation
 {
-    private UpdateSingleProductService $updateProductService;
-    private DiscountTaskProcessor $discountProcessor;
+    private $updateProductService;
+    private $discountProcessor;
 
-    public function __construct()
+    public function __construct(
+        $updateProductService = null,
+        $discountProcessor = null
+    )
     {
         parent::__construct();
-        $this->updateProductService = new UpdateSingleProductService();
-        $this->discountProcessor = new DiscountTaskProcessor();
+        $this->updateProductService = $updateProductService ?: syncBasalamContainer()->get(UpdateSingleProductService::class);
+        $this->discountProcessor = $discountProcessor ?: syncBasalamContainer()->get(DiscountTaskProcessor::class);
     }
 
 

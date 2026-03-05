@@ -236,8 +236,13 @@ jQuery(document).ready(function ($) {
         }
         location.reload();
       },
-      error: function () {
-        alert("خطایی در ارسال درخواست رخ داد.");
+      error: function (xhr) {
+        let errorMsg = "خطایی در ارسال درخواست رخ داد.";
+        try {
+          const json = JSON.parse(xhr.responseText);
+          errorMsg = json.data?.message || errorMsg;
+        } catch (e) {}
+        alert(errorMsg);
         location.reload();
       },
     });

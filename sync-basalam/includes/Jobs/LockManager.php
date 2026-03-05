@@ -6,14 +6,6 @@ defined('ABSPATH') || exit;
 
 class LockManager
 {
-    private static $instance = null;
-
-    public static function getInstance(): self
-    {
-        if (self::$instance === null) self::$instance = new self();
-        return self::$instance;
-    }
-
     public function acquire(string $jobType, int $timeout = 0): bool
     {
         global $wpdb;

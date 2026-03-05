@@ -20,7 +20,7 @@ class FileUploadApiService
         }
 
         $boundary = wp_generate_password(24);
-        $payload = $this->makePayloadUploadFileRequest($data, $filePath, $boundary);
+        $payload = $this->makePayloadupload($data, $filePath, $boundary);
 
         $headers = array_merge($headers, ['content-type' => 'multipart/form-data; boundary=' . $boundary]);
 
@@ -72,7 +72,7 @@ class FileUploadApiService
         ];
     }
 
-    private function makePayloadUploadFileRequest(array $data, string $localFile, string $boundary): string
+    private function makePayloadupload(array $data, string $localFile, string $boundary): string
     {
         $payload = '';
         $eol = "\r\n";

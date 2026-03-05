@@ -113,6 +113,7 @@ class Activator
             error_message TEXT DEFAULT NULL,
             attempts TINYINT UNSIGNED NOT NULL DEFAULT 0,
             max_attempts TINYINT UNSIGNED NOT NULL DEFAULT 3,
+            retry_after BIGINT(20) NULL DEFAULT NULL,
             PRIMARY KEY (id),
             KEY idx_status (status),
             KEY idx_job_type (job_type(191)),

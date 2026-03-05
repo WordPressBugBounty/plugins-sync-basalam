@@ -62,24 +62,40 @@ class SettingPageComponents
         echo '<input type="number" name="sync_basalam_settings[' . esc_attr(SettingsConfig::SAFE_STOCK) . ']" min="0" value="' . esc_attr($current_value) . '" class="basalam-input basalam-p" required>';
     }
 
+    public static function renderVariableProductStockSource()
+    {
+        $current_value = syncBasalamSettings()->getSettings(SettingsConfig::VARIABLE_PRODUCT_STOCK_SOURCE);
+
+        echo '<select class="basalam-select basalam-select-center" name="sync_basalam_settings[' . esc_attr(SettingsConfig::VARIABLE_PRODUCT_STOCK_SOURCE) . ']">'
+            . '<option value="variation"' . selected($current_value, 'variation', false) . '>موجودی متغیرها</option>'
+            . '<option value="product"' . selected($current_value, 'product', false) . '>موجودی والد</option>'
+            . '</select>';
+    }
+
     public static function renderDefaultPercentage()
     {
+        static $increasePriceControlIndex = 0;
+        $increasePriceControlIndex++;
+
         $current_value = syncBasalamSettings()->getSettings(SettingsConfig::INCREASE_PRICE_VALUE);
         $is_checked = ($current_value == -1) ? 'checked' : '';
         $input_disabled = ($current_value == -1) ? 'disabled' : '';
         $input_value = ($current_value == -1) ? '' : number_format($current_value);
+        $checkbox_id = 'toggle-percentage-' . $increasePriceControlIndex;
+        $hidden_input_id =   'final-value-' . $increasePriceControlIndex;
+        $text_input_id = 'increase-price-input-' . $increasePriceControlIndex;
 
         echo '<div class="basalam-input-container">';
-        echo '<input type="text" id="percentage-input" name="sync_basalam_settings[' . esc_attr(SettingsConfig::INCREASE_PRICE_VALUE) . ']" min="0" value="' . esc_attr($input_value) . '" class="basalam-input basalam-p percentage-input" ' . esc_attr($input_disabled) . ' required>';
+        echo '<input type="text" id="' . esc_attr($text_input_id) . '" data-role="increase-price-input" name="sync_basalam_settings[' . esc_attr(SettingsConfig::INCREASE_PRICE_VALUE) . ']" min="0" value="' . esc_attr($input_value) . '" class="basalam-input basalam-p percentage-input" ' . esc_attr($input_disabled) . ' required>';
         echo '<span class="percentage-unit basalam-p basalam-min-width-0 basalam-font-13">' . ($current_value <= 100 ? 'درصد' : 'تومان') . '</span>';
         echo '</div>';
 
         echo '<div class="basalam-flex-end-gap-4 basalam-margin-top-8">';
-        echo '<input type="checkbox" id="toggle-percentage" name="toggle_percentage" class="Basalam-checkbox" ' . esc_attr($is_checked) . '>';
-        echo '<label class="basalam-font-10" for="toggle-percentage">کارمزد دسته‌بندی</label>';
+        echo '<input type="checkbox" id="' . esc_attr($checkbox_id) . '" class="toggle-percentage" name="toggle_percentage" ' . esc_attr($is_checked) . '>';
+        echo '<label class="basalam-font-10" for="' . esc_attr($checkbox_id) . '">کارمزد دسته‌بندی</label>';
         echo '</div>';
 
-        echo '<input type="hidden" id="final-value" name="sync_basalam_settings[' . esc_attr(SettingsConfig::INCREASE_PRICE_VALUE) . ']" value="' . esc_attr($current_value) . '">';
+        echo '<input type="hidden" id="' . esc_attr($hidden_input_id) . '" data-role="increase-price-hidden" name="sync_basalam_settings[' . esc_attr(SettingsConfig::INCREASE_PRICE_VALUE) . ']" value="' . esc_attr($current_value) . '">';
     }
 
     public static function renderDefaultRound()
@@ -152,7 +168,7 @@ class SettingPageComponents
     {
         $current_value = syncBasalamSettings()->getSettings(SettingsConfig::DISCOUNT_DURATION);
 
-        echo '<input type="number" id="percentage-input" name="sync_basalam_settings[' . esc_attr(SettingsConfig::DISCOUNT_DURATION) . ']" min="1" max="90" value="' . esc_attr($current_value) . '" class="basalam-input basalam-p percentage-input" required>';
+        echo '<input type="number" name="sync_basalam_settings[' . esc_attr(SettingsConfig::DISCOUNT_DURATION) . ']" min="1" max="90" value="' . esc_attr($current_value) . '" class="basalam-input basalam-p percentage-input" required>';
     }
 
     public static function renderDiscountReductionPercent()
@@ -188,7 +204,7 @@ class SettingPageComponents
         $is_auto = syncBasalamSettings()->getSettings(SettingsConfig::TASKS_PER_MINUTE_AUTO) == 'true';
         $display_style = $is_auto ? '' : 'display: none;';
 
-        $monitor = \SyncBasalam\Services\SystemResourceMonitor::getInstance();
+        $monitor = syncBasalamContainer()->get(\SyncBasalam\Services\SystemResourceMonitor::class);
         $optimal = $monitor->calculateOptimalTasksPerMinute();
 
         echo '<div class="basalam-p basalam-form-group-full" style="' . esc_attr($display_style) . '">';

@@ -3,20 +3,21 @@
 namespace SyncBasalam\Admin\Product\Operations;
 
 use SyncBasalam\Admin\Product\Operations\ProductOperationInterface;
-use SyncBasalam\Admin\Product\Validators\ProductStatusValidator;
+use SyncBasalam\Admin\Product\Validators\ProductOperationValidator;
 use SyncBasalam\Jobs\Exceptions\RetryableException;
 use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 use SyncBasalam\Logger\Logger;
+use SyncBasalam\Utilities\ProductMetaKey;
 
 defined('ABSPATH') || exit;
 
 abstract class AbstractProductOperation implements ProductOperationInterface
 {
-    protected ProductStatusValidator $validator;
+    protected $validator;
 
-    public function __construct()
+    public function __construct($validator = null)
     {
-        $this->validator = new ProductStatusValidator();
+        $this->validator = $validator ?: syncBasalamContainer()->get(ProductOperationValidator::class);
     }
 
     final public function execute(int $product_id, array $args = []): array
@@ -51,13 +52,12 @@ abstract class AbstractProductOperation implements ProductOperationInterface
             do_action("sync_basalam_after_{$operationName}", $result, $product_id, $args);
 
             return $result;
-
         } catch (RetryableException $e) {
             throw $e;
         } catch (NonRetryableException $e) {
             throw $e;
-        } catch (\Throwable $th) {
-            $result = $this->handleException($th, $product_id);
+        } catch (\Exception $e) {
+            $result = $this->handleException($e, $product_id);
 
             return apply_filters('sync_basalam_product_operation_exception', $result, $product_id, $operationName);
         }
@@ -76,7 +76,7 @@ abstract class AbstractProductOperation implements ProductOperationInterface
 
     protected function handleException(\Throwable $exception, int $product_id): array
     {
-        update_post_meta($product_id, 'sync_basalam_product_sync_status', 'no');
+        update_post_meta($product_id, ProductMetaKey::basalamProductSyncStatus(), 'no');
 
         Logger::error(sprintf("خطا در %s: %s", $this->getPersianOperationName(), $exception->getMessage()), [
             'product_id' => $product_id,

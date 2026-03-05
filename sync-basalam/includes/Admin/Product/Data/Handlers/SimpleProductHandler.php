@@ -12,10 +12,10 @@ defined('ABSPATH') || exit;
 
 class SimpleProductHandler implements ProductDataHandlerInterface
 {
-    private CategoryService $categoryService;
-    private PriceService $priceService;
-    private PhotoService $photoService;
-    private AttributeService $attributeService;
+    private $categoryService;
+    private $priceService;
+    private $photoService;
+    private $attributeService;
     private array $settings;
 
     public function __construct()

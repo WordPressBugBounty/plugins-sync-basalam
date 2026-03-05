@@ -6,17 +6,6 @@ defined('ABSPATH') || exit;
 
 class SystemResourceMonitor
 {
-    private static $instance = null;
-
-    public static function getInstance()
-    {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-
-        return self::$instance;
-    }
-
     private function getMemoryLimit()
     {
         $memoryLimit = ini_get('memory_limit');

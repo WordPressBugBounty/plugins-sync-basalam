@@ -6,28 +6,39 @@ use SyncBasalam\Admin\Product\Operations\UpdateProduct;
 use SyncBasalam\Admin\Product\Operations\CreateProduct;
 use SyncBasalam\Admin\Product\Operations\ArchiveProduct;
 use SyncBasalam\Admin\Product\Operations\RestoreProduct;
+use SyncBasalam\Jobs\Exceptions\RetryableException;
+use SyncBasalam\Jobs\Exceptions\NonRetryableException;
+use SyncBasalam\Utilities\ProductMetaKey;
 
 defined('ABSPATH') || exit;
 
 class ProductOperations
 {
-    private UpdateProduct $updateOperation;
-    private CreateProduct $createOperation;
-    private ArchiveProduct $archiveOperation;
-    private RestoreProduct $restoreOperation;
+    private $updateOperation;
+    private $createOperation;
+    private $archiveOperation;
+    private $restoreOperation;
 
-    public function __construct()
-    {
-        $this->updateOperation = new UpdateProduct();
-        $this->createOperation = new CreateProduct();
-        $this->archiveOperation = new ArchiveProduct();
-        $this->restoreOperation = new RestoreProduct();
+    public function __construct(
+        $updateOperation = null,
+        $createOperation = null,
+        $archiveOperation = null,
+        $restoreOperation = null
+    ) {
+        $this->updateOperation = $updateOperation ?: syncBasalamContainer()->get(UpdateProduct::class);
+        $this->createOperation = $createOperation ?: syncBasalamContainer()->get(CreateProduct::class);
+        $this->archiveOperation = $archiveOperation ?: syncBasalamContainer()->get(ArchiveProduct::class);
+        $this->restoreOperation = $restoreOperation ?: syncBasalamContainer()->get(RestoreProduct::class);
     }
 
     public function updateExistProduct($product_id, $category_ids = null)
     {
         try {
             return $this->updateOperation->execute($product_id, ['category_ids' => $category_ids]);
+        } catch (RetryableException $e) {
+            throw $e;
+        } catch (NonRetryableException $e) {
+            throw $e;
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
@@ -37,6 +48,10 @@ class ProductOperations
     {
         try {
             return $this->createOperation->execute($product_id, ['category_ids' => $category_ids]);
+        } catch (RetryableException $e) {
+            throw $e;
+        } catch (NonRetryableException $e) {
+            throw $e;
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
@@ -46,6 +61,10 @@ class ProductOperations
     {
         try {
             return $this->restoreOperation->execute($product_id);
+        } catch (RetryableException $e) {
+            throw $e;
+        } catch (NonRetryableException $e) {
+            throw $e;
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
@@ -55,6 +74,10 @@ class ProductOperations
     {
         try {
             return $this->archiveOperation->execute($product_id);
+        } catch (RetryableException $e) {
+            throw $e;
+        } catch (NonRetryableException $e) {
+            throw $e;
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
@@ -65,7 +88,7 @@ class ProductOperations
     {
         do_action('sync_basalam_before_disconnect_product', $product_id);
 
-        $metaKeysToRemove = ['sync_basalam_product_id', 'sync_basalam_product_sync_status', 'sync_basalam_product_status'];
+        $metaKeysToRemove = ProductMetaKey::basalamProductMetaKeys();
 
         foreach ($metaKeysToRemove as $metaKey) {
             delete_post_meta($product_id, $metaKey);

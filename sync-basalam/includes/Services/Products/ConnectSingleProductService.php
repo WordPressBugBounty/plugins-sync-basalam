@@ -2,6 +2,8 @@
 
 namespace SyncBasalam\Services\Products;
 
+use SyncBasalam\Utilities\ProductMetaKey;
+
 class ConnectSingleProductService
 {
     public static function connectProductById($wooProductId, $syncBasalamProductId)
@@ -10,7 +12,7 @@ class ConnectSingleProductService
             'post_type'  => 'product',
             'meta_query' => [
                 [
-                    'key'   => 'sync_basalam_product_id',
+                    'key'   => ProductMetaKey::basalamProductId(),
                     'value' => $syncBasalamProductId,
                 ],
             ],
@@ -19,9 +21,9 @@ class ConnectSingleProductService
         ]);
 
         if (!$existingPosts) {
-            update_post_meta($wooProductId, 'sync_basalam_product_id', $syncBasalamProductId);
-            update_post_meta($wooProductId, 'sync_basalam_product_status', 2976);
-            update_post_meta($wooProductId, 'sync_basalam_product_sync_status', 'synced');
+            update_post_meta($wooProductId, ProductMetaKey::basalamProductId(), $syncBasalamProductId);
+            update_post_meta($wooProductId, ProductMetaKey::basalamProductStatus(), 2976);
+            update_post_meta($wooProductId, ProductMetaKey::basalamProductSyncStatus(), 'synced');
 
             return true;
         } else return false;

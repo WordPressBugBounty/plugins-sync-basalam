@@ -4,6 +4,7 @@ namespace SyncBasalam\Jobs;
 
 use SyncBasalam\JobManager;
 use SyncBasalam\Jobs\Exceptions\JobException;
+use SyncBasalam\Services\Api\CircuitBreakerOpenException;
 
 defined('ABSPATH') || exit;
 
@@ -38,6 +39,9 @@ class JobExecutor
             if ($result instanceof JobResult) return $this->handleJobResult($job, $result);
             $this->jobManager->deleteJob(['id' => $job->id]);
             return true;
+        } catch (CircuitBreakerOpenException $e) {
+            // Circuit is open — reschedule without counting as a failure.
+            return $this->jobManager->retryJob($job->id, $e->getMessage());
         } catch (JobException $e) {
             return $this->handleJobException($job, $e);
         } catch (\Exception $e) {

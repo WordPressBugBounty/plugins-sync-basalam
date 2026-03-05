@@ -3,6 +3,7 @@
 namespace SyncBasalam\Services;
 
 use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Config\Endpoints;
 
 defined('ABSPATH') || exit;
 class FileUploader
@@ -94,16 +95,16 @@ class FileUploader
 
     public function uploadFileToBasalam($filePath)
     {
-        $apiService = new ApiServiceManager();
+        $apiService = syncBasalamContainer()->get(ApiServiceManager::class);
 
-        $url = "https://uploadio.basalam.com/v3/files";
+        $url = Endpoints::FILE_UPLOAD;
 
         $data = ['file_type' => 'product.photo'];
         $token = syncBasalamSettings()->getSettings(SettingsConfig::TOKEN);
 
         $headers = ['Authorization' => 'Bearer ' . $token];
 
-        $response = $apiService->uploadFileRequest($url, $filePath, $data, $headers);
+        $response = $apiService->upload($url, $filePath, $data, $headers);
 
         return $response;
     }

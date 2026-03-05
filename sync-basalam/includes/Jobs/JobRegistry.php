@@ -14,29 +14,32 @@ defined('ABSPATH') || exit;
 
 class JobRegistry
 {
-    private static $instance = null;
     private $jobTypes = [];
 
-    private function __construct()
+    public function __construct(array $jobTypes = [])
     {
-        $this->registerDefaultJobs();
-    }
+        if (empty($jobTypes)) {
+            $this->registerDefaultJobs();
+            return;
+        }
 
-    public static function getInstance(): self
-    {
-        if (self::$instance === null) self::$instance = new self();
-        return self::$instance;
+        foreach ($jobTypes as $jobType) {
+            if ($jobType instanceof JobType) {
+                $this->register($jobType);
+            }
+        }
     }
 
     private function registerDefaultJobs(): void
     {
-        $this->register(new BulkUpdateProductsJob());
-        $this->register(new UpdateAllProductsJob());
-        $this->register(new UpdateSingleProductJob());
-        $this->register(new CreateSingleProductJob());
-        $this->register(new CreateAllProductsJob());
-        $this->register(new AutoConnectProductsJob());
-        $this->register(new FetchOrdersJob());
+        $container = syncBasalamContainer();
+        $this->register($container->get(BulkUpdateProductsJob::class));
+        $this->register($container->get(UpdateAllProductsJob::class));
+        $this->register($container->get(UpdateSingleProductJob::class));
+        $this->register($container->get(CreateSingleProductJob::class));
+        $this->register($container->get(CreateAllProductsJob::class));
+        $this->register($container->get(AutoConnectProductsJob::class));
+        $this->register($container->get(FetchOrdersJob::class));
     }
 
     public function register(JobType $jobType): void

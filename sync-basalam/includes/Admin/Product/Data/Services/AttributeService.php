@@ -10,7 +10,7 @@ defined('ABSPATH') || exit;
 
 class AttributeService
 {
-    private MobileDataHandler $mobileDataHandler;
+    private $mobileDataHandler;
 
     public function __construct()
     {

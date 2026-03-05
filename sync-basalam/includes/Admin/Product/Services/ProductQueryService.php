@@ -2,6 +2,8 @@
 
 namespace SyncBasalam\Admin\Product\Services;
 
+use SyncBasalam\Utilities\ProductMetaKey;
+
 defined('ABSPATH') || exit;
 
 class ProductQueryService
@@ -16,6 +18,7 @@ class ProductQueryService
         $postsPerPage = $args['posts_per_page'] ?? 100;
         $includeOutOfStock = $args['include_out_of_stock'] ?? false;
         $lastId = intval($args['last_creatable_product_id'] ?? 0);
+        $productIdMetaKey = ProductMetaKey::basalamProductId();
 
         $stockCondition = $includeOutOfStock
             ? ""
@@ -29,7 +32,7 @@ class ProductQueryService
                 AND thumb.meta_key = '_thumbnail_id'
             LEFT JOIN {$metaTable} AS basalam
                 ON basalam.post_id = p.ID
-                AND basalam.meta_key = 'sync_basalam_product_id'
+                AND basalam.meta_key = %s
             LEFT JOIN {$metaTable} AS stock
                 ON stock.post_id = p.ID
                 AND stock.meta_key = '_stock_status'
@@ -46,7 +49,7 @@ class ProductQueryService
             {$stockCondition}
             ORDER BY p.ID ASC
             LIMIT %d
-        ", $lastId, $postsPerPage);
+        ", $productIdMetaKey, $lastId, $postsPerPage);
 
         $ids = $wpdb->get_col($query);
 
@@ -62,19 +65,20 @@ class ProductQueryService
 
         $postsPerPage = $args['posts_per_page'] ?? 100;
         $lastId = intval($args['last_updatable_product_id'] ?? 0);
+        $productIdMetaKey = ProductMetaKey::basalamProductId();
 
         $query = $wpdb->prepare("
         SELECT p.ID
         FROM {$postsTable} AS p
         INNER JOIN {$metaTable} AS basalam
             ON basalam.post_id = p.ID
-            AND basalam.meta_key = 'sync_basalam_product_id'
+            AND basalam.meta_key = %s
         WHERE p.post_type = 'product'
         AND p.post_status = 'publish'
         AND p.ID > %d
         ORDER BY p.ID ASC
         LIMIT %d
-        ", $lastId, $postsPerPage);
+        ", $productIdMetaKey, $lastId, $postsPerPage);
 
         $ids = $wpdb->get_col($query);
 

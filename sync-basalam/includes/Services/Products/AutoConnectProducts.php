@@ -5,6 +5,7 @@ namespace SyncBasalam\Services\Products;
 use SyncBasalam\Logger\Logger;
 use SyncBasalam\Jobs\Exceptions\RetryableException;
 use SyncBasalam\Jobs\Exceptions\NonRetryableException;
+use SyncBasalam\Utilities\ProductMetaKey;
 
 defined('ABSPATH') || exit;
 
@@ -38,6 +39,7 @@ class AutoConnectProducts
             global $wpdb;
 
             $matchedProducts = [];
+            $productIdMetaKey = ProductMetaKey::basalamProductId();
 
             foreach ($syncBasalamProducts['data'] as $syncBasalamProduct) {
                 $normalizedTitle = trim($syncBasalamProduct['title']);
@@ -52,13 +54,13 @@ class AutoConnectProducts
                     $wpdb->prepare("
                     SELECT p.ID
                     FROM {$wpdb->posts} p
-                    LEFT JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key = 'sync_basalam_product_id'
+                    LEFT JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id AND pm.meta_key = %s
                     WHERE p.post_type = 'product'
                     AND p.post_status = 'publish'
                     AND pm.post_id IS NULL
                     AND LOWER(p.post_title) LIKE LOWER(%s)
                     LIMIT 1
-                ", $likeTitle)
+                ", $productIdMetaKey, $likeTitle)
                 );
 
                 if ($productId) {

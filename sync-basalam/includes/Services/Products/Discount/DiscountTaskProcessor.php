@@ -4,6 +4,7 @@ namespace SyncBasalam\Services\Products\Discount;
 
 use SyncBasalam\JobManager;
 use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Utilities\ProductMetaKey;
 
 defined('ABSPATH') || exit;
 
@@ -12,12 +13,17 @@ class DiscountTaskProcessor
     private $discountManager;
     private $taskModel;
     private $jobManager;
+    private $settingsAccessor;
 
-    public function __construct()
-    {
-        $this->discountManager = new DiscountManager();
-        $this->taskModel = new DiscountTaskModel();
-        $this->jobManager = JobManager::getInstance();
+    public function __construct(
+        $discountManager = null,
+        $taskModel = null,
+        $jobManager = null
+    ) {
+        $this->discountManager = $discountManager ?: syncBasalamContainer()->get(DiscountManager::class);
+        $this->taskModel = $taskModel ?: syncBasalamContainer()->get(DiscountTaskModel::class);
+        $this->jobManager = $jobManager ?: syncBasalamContainer()->get(JobManager::class);
+        $this->settingsAccessor = syncBasalamSettings();
     }
 
     public function processDiscountTasks()
@@ -112,7 +118,7 @@ class DiscountTaskProcessor
     public function addDiscountTasks($items)
     {
         $jobExists = $this->jobManager->getCountJobs(['job_type' => 'sync_basalam_discount_tasks', 'status' => ['pending', 'processing']]);
-        $discountReductionPercent = absint(syncBasalamSettings()->getSettings(SettingsConfig::DISCOUNT_REDUCTION_PERCENT));
+        $discountReductionPercent = absint($this->settingsAccessor->getSettings(SettingsConfig::DISCOUNT_REDUCTION_PERCENT));
 
         if ($jobExists === 0) $this->jobManager->createJob('sync_basalam_discount_tasks', 'pending');
 
@@ -127,12 +133,12 @@ class DiscountTaskProcessor
                 $discountPercent = $this->getAdjustedDiscountPercent($discountPercent, $discountReductionPercent);
             }
 
-            $activeDays = $item['active_days'] ?? syncBasalamSettings()->getSettings(SettingsConfig::DISCOUNT_DURATION) ?? 7;
+            $activeDays = $item['active_days'] ?? $this->settingsAccessor->getSettings(SettingsConfig::DISCOUNT_DURATION) ?? 7;
 
             $basalamProductId = null;
             $basalamVariationId = null;
 
-            if ($wcProductId) $basalamProductId = get_post_meta($wcProductId, 'sync_basalam_product_id', true);
+            if ($wcProductId) $basalamProductId = get_post_meta($wcProductId, ProductMetaKey::basalamProductId(), true);
             if ($wcVariationId) $basalamVariationId = get_post_meta($wcVariationId, 'sync_basalam_variation_id', true);
 
             if ($basalamProductId || $basalamVariationId) {
@@ -170,10 +176,10 @@ class DiscountTaskProcessor
 
     public function handleProductDiscount($productId)
     {
-        $priceField = syncBasalamSettings()->getSettings(SettingsConfig::PRODUCT_PRICE_FIELD);
+        $priceField = $this->settingsAccessor->getSettings(SettingsConfig::PRODUCT_PRICE_FIELD);
 
         $product = wc_get_product($productId);
-        
+
         if (!$product) return;
 
         $items = [];
@@ -184,7 +190,7 @@ class DiscountTaskProcessor
         }
 
         if ($product->is_type('simple')) {
-            $basalamProductId = get_post_meta($productId, 'sync_basalam_product_id', true);
+            $basalamProductId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
 
             if (!$basalamProductId) return;
 
@@ -207,7 +213,7 @@ class DiscountTaskProcessor
                 ];
             }
         } elseif ($product->is_type('variable')) {
-            $basalamProductId = get_post_meta($productId, 'sync_basalam_product_id', true);
+            $basalamProductId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
             if (!$basalamProductId) return;
 
             foreach ($product->get_children() as $variationId) {
@@ -268,7 +274,7 @@ class DiscountTaskProcessor
         $items = [];
 
         if ($product->is_type('simple')) {
-            $basalamProductId = get_post_meta($productId, 'sync_basalam_product_id', true);
+            $basalamProductId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
             if (!$basalamProductId) return;
 
             $isDiscounted = get_post_meta($productId, 'sync_basalam_discounted', true);
@@ -280,7 +286,7 @@ class DiscountTaskProcessor
                 ];
             }
         } elseif ($product->is_type('variable')) {
-            $basalamProductId = get_post_meta($productId, 'sync_basalam_product_id', true);
+            $basalamProductId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
 
             if (!$basalamProductId) return;
 

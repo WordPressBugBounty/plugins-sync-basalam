@@ -2,6 +2,7 @@
 
 namespace SyncBasalam\Admin\Product\Category;
 
+use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Services\ApiServiceManager;
 
 class CategoryMapping
@@ -58,15 +59,20 @@ class CategoryMapping
 
     public static function getBasalamCategories()
     {
-        $apiService = new ApiServiceManager();
-        $response = $apiService->sendGetRequest('https://openapi.basalam.com/v1/categories');
+        $apiService = syncBasalamContainer()->get(ApiServiceManager::class);
+
+        try {
+            $response = $apiService->get(Endpoints::CATEGORIES);
+        } catch (\Exception $e) {
+            throw new \Exception('خطا در دریافت دسته‌بندی‌های باسلام: ' . $e->getMessage());
+        }
 
         if (!$response || !isset($response['body'])) throw new \Exception('خطا در دریافت دسته‌بندی‌های باسلام');
 
         $body = json_decode($response['body'], true);
 
 
-        if (!is_array($body['data'])) {
+        if (!is_array($body) || !isset($body['data']) || !is_array($body['data'])) {
             throw new \Exception('فرمت پاسخ API باسلام نامعتبر است');
         }
 

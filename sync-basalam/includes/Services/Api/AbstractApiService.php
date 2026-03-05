@@ -10,8 +10,9 @@ defined('ABSPATH') || exit;
 abstract class AbstractApiService
 {
     protected array $defaultHeaders;
-    protected ApiRequestValidator $validator;
-    protected ApiResponseHandler $responseHandler;
+    protected $validator;
+    protected $responseHandler;
+    protected $circuitBreaker;
 
     public function __construct()
     {
@@ -27,9 +28,10 @@ abstract class AbstractApiService
         if (!empty($token)) $this->defaultHeaders['Authorization'] = 'Bearer ' . $token;
 
 
-        $this->validator = new ApiRequestValidator();
+        $this->validator       = new ApiRequestValidator();
         $this->responseHandler = new ApiResponseHandler();
-    }
+        $this->circuitBreaker  = new CircuitBreaker();
+    } 
 
     public function run(string $url, $data, array $headers = []): array
     {
@@ -44,6 +46,9 @@ abstract class AbstractApiService
             ];
         }
 
+        // Check circuit breaker — throws CircuitBreakerOpenException when OPEN.
+        $this->circuitBreaker->isAllowed();
+
         $preparedRequest = $this->prepareRequest($url, $data, $headers);
 
         if (isset($preparedRequest['error'])) {
@@ -51,9 +56,15 @@ abstract class AbstractApiService
             return ['body' => null, 'status_code' => 401, 'error' => $preparedRequest['error']];
         }
 
-        $response = $this->executeRequest($preparedRequest);
-
-        return $this->responseHandler->handle($response);
+        try {
+            $response = $this->executeRequest($preparedRequest);
+            $result   = $this->responseHandler->handle($response);
+            $this->circuitBreaker->recordSuccess();
+            return $result;
+        } catch (\Exception $e) {
+            $this->circuitBreaker->recordFailure();
+            throw $e;
+        }
     }
 
     protected function prepareRequest(string $url,  $data, array $headers): array

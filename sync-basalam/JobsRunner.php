@@ -3,43 +3,37 @@
 namespace SyncBasalam;
 
 use SyncBasalam\Admin\Settings;
-use SyncBasalam\Jobs\JobExecutor;
-use SyncBasalam\Jobs\LockManager;
-use SyncBasalam\Jobs\JobRegistry;
-use SyncBasalam\Jobs\DiscountTaskScheduler;
+use SyncBasalam\Services\Api\CircuitBreaker;
 
 defined('ABSPATH') || exit;
 
 class JobsRunner
 {
-    private static $instance = null;
-
     private $jobExecutor;
     private $jobManager;
     private $discountScheduler;
 
-    public static function getInstance(): self
-    {
-        if (self::$instance === null) self::$instance = new self();
-        return self::$instance;
-    }
-
-    private function __construct()
+    public function __construct(
+        $jobManager,
+        $jobExecutor,
+        $discountScheduler
+    )
     {
         add_action('init', [$this, 'checkAndRunJobs']);
-
-        $this->jobManager = JobManager::getInstance();
-        $lockManager = LockManager::getInstance();
-        $jobRegistry = JobRegistry::getInstance();
-
-        $this->jobExecutor = new JobExecutor($this->jobManager, $lockManager, $jobRegistry);
-        $this->discountScheduler = DiscountTaskScheduler::getInstance();
+        $this->jobManager = $jobManager;
+        $this->jobExecutor = $jobExecutor;
+        $this->discountScheduler = $discountScheduler;
     }
 
     public function checkAndRunJobs(): void
     {
         $this->jobManager->deleteStaleProcessingJobs(120);
         $this->discountScheduler->process();
+
+        $circuitBreaker = new CircuitBreaker();
+        if ($circuitBreaker->getState() === CircuitBreaker::STATE_OPEN) {
+            return;
+        }
 
         $tasksPerMinute = max(1, intval(Settings::getEffectiveTasksPerMinute()));
         $thresholdSeconds = 60.0 / $tasksPerMinute;
@@ -57,7 +51,7 @@ class JobsRunner
                         continue;
                     }
 
-                    $job = $this->jobManager->getJob(['job_type' => $jobType, 'status' => 'pending']);
+                    $job = $this->jobManager->getNextEligibleJob($jobType);
                     $processingJob = $this->jobManager->getJob(['job_type' => $jobType, 'status' => 'processing']);
 
                     if ($job && !$processingJob) {

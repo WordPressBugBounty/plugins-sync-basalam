@@ -2,6 +2,7 @@
 
 namespace SyncBasalam\Admin\Settings;
 
+use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Services\ApiServiceManager;
 
 defined('ABSPATH') || exit;
@@ -10,13 +11,13 @@ class OAuthManager
 {
     public function getOauthData()
     {
-        $oauthDataUrl = apply_filters('sync_basalam_oauth_data_url', 'https://api.hamsalam.ir/api/v1/basalam-proxy/wp-oauth-data');
+        $oauthDataUrl = apply_filters('sync_basalam_oauth_data_url', Endpoints::HAMSALAM_OAUTH_DATA);
         $defaultClientId = apply_filters('sync_basalam_oauth_default_client_id', 779);
-        $defaultRedirectUri = apply_filters('sync_basalam_oauth_default_redirect_uri', 'https://api.hamsalam.ir/api/v1/basalam-proxy/wp-get-token');
+        $defaultRedirectUri = apply_filters('sync_basalam_oauth_default_redirect_uri', Endpoints::HAMSALAM_OAUTH_TOKEN);
 
         try {
-            $apiservice = new ApiServiceManager();
-            $request = $apiservice->sendGetRequest($oauthDataUrl);
+            $apiservice = syncBasalamContainer()->get(ApiServiceManager::class);
+            $request = $apiservice->get($oauthDataUrl);
             $clientId = $request['body']['client_id'] ?? $defaultClientId;
             $redirectUri = $request['body']['redirect_uri'] ?? $defaultRedirectUri;
         } catch (\Throwable $th) {
@@ -42,10 +43,10 @@ class OAuthManager
 
         // Allow pro version to handle custom fields
         $extraData = apply_filters('sync_basalam_oauth_save_extra_data', []);
-        
+
         if ($isVendor == 'false') {
             $data = [SettingsConfig::IS_VENDOR => false];
-            $data = apply_filters('sync_basalam_oauth_non_vendor_data', $data, $vendorId , $accessToken, $refreshToken, $extraData);
+            $data = apply_filters('sync_basalam_oauth_non_vendor_data', $data, $vendorId, $accessToken, $refreshToken, $extraData);
             SettingsManager::updateSettings($data);
             return true;
         }
@@ -76,7 +77,12 @@ class OAuthManager
 
         return [
             'redirect_uri' => $oauthData['redirect_uri'],
-            'url_req_token' => "https://basalam.com/accounts/sso?client_id={$oauthData['client_id']}&scope=$scopes&redirect_uri={$oauthData['redirect_uri']}&state=$siteUrl",
+            'url_req_token' => Endpoints::oauthLoginUrl(
+                $oauthData['client_id'],
+                $scopes,
+                $oauthData['redirect_uri'],
+                $siteUrl
+            ),
         ];
     }
 }

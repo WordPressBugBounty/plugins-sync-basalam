@@ -2,17 +2,20 @@
 
 namespace SyncBasalam\Services;
 
+use SyncBasalam\Config\Endpoints;
+use SyncBasalam\Logger\Logger;
+
 defined('ABSPATH') || exit;
 
 class BasalamAppStoreReview
 {
     private string $BasalamAppReviewUrl;
-    private ApiServiceManager $apiService;
+    private $apiService;
 
     public function __construct()
     {
-        $this->BasalamAppReviewUrl = "https://apps-api.basalam.com/v1/apps/13/reviews";
-        $this->apiService = new ApiServiceManager();
+        $this->BasalamAppReviewUrl = Endpoints::APP_REVIEW;
+        $this->apiService = syncBasalamContainer()->get(ApiServiceManager::class);
     }
 
     public function createReview($comment, $rating = 5)
@@ -26,6 +29,15 @@ class BasalamAppStoreReview
             "rating"  => $rating,
         ];
 
-        return $this->apiService->sendPostRequest($this->BasalamAppReviewUrl, $body);
+        try {
+            return $this->apiService->post($this->BasalamAppReviewUrl, $body);
+        } catch (\Exception $e) {
+            Logger::error('خطا در ثبت نظر افزونه: ' . $e->getMessage());
+            return [
+                'status_code' => 500,
+                'body' => null,
+                'error' => 'خطا در ثبت نظر: ' . $e->getMessage(),
+            ];
+        }
     }
 }

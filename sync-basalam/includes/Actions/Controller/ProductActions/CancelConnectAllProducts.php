@@ -11,7 +11,7 @@ class CancelConnectAllProducts extends ActionController
 {
     public function __invoke()
     {
-        $jobManager = new JobManager();
+        $jobManager = syncBasalamContainer()->get(JobManager::class);
 
         $jobManager->deleteJob(['job_type' => 'sync_basalam_connect_single_product']);
         $jobManager->deleteJob(['job_type' => 'sync_basalam_auto_connect_products']);

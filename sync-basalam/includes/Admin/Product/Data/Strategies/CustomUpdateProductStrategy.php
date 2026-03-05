@@ -4,6 +4,7 @@ namespace SyncBasalam\Admin\Product\Data\Strategies;
 
 use SyncBasalam\Admin\Product\Data\Handlers\ProductDataHandlerInterface;
 use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Utilities\ProductMetaKey;
 
 defined('ABSPATH') || exit;
 
@@ -11,7 +12,7 @@ class CustomUpdateProductStrategy implements DataStrategyInterface
 {
     public function collect($product, ProductDataHandlerInterface $handler): array
     {
-        $basalamProductId = get_post_meta($product->get_id(), 'sync_basalam_product_id', true);
+        $basalamProductId = get_post_meta($product->get_id(), ProductMetaKey::basalamProductId(), true);
 
         $data = [
             'id' => $basalamProductId,
@@ -27,7 +28,9 @@ class CustomUpdateProductStrategy implements DataStrategyInterface
         }
 
         if ($this->shouldSyncField(SettingsConfig::SYNC_PRODUCT_FIELD_PRICE)) {
-            $data['primary_price'] = $handler->getPrice($product);
+            if (!$product->is_type('variable')) {
+                $data['primary_price'] = $handler->getPrice($product);
+            }
             $data['variants'] = $handler->getVariants($product);
         }
 

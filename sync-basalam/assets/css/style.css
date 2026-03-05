@@ -5827,7 +5827,6 @@ body > .basalam-info-modal {
 }
 
 .basalam-table-padding {
-  padding: 6px 8px;
   border: 1px solid #ddd;
 }
 
@@ -6368,6 +6367,7 @@ body > .basalam-info-modal {
 
 .create-ticket__control {
   width: 100%;
+  margin-top: 20px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -6389,12 +6389,54 @@ body > .basalam-info-modal {
   min-height: 102px;
 }
 
+.create-ticket__extra-info {
+  width: 100%;
+}
+
+.create-ticket__extra-info-title {
+  color: var(--basalam-gray-800);
+  font-weight: 600;
+  margin: 20px 0 8px !important;
+}
+
+.ticket-access-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  width: 100%;
+}
+
+.ticket-access-card {
+  border: 1px solid var(--basalam-gray-300, #e5e7eb);
+  background: #fafafa;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.ticket-access-card__title {
+  font-weight: 700;
+  margin: 0 0 10px !important;
+  color: var(--basalam-gray-800);
+}
+
+.ticket-access-card .create-ticket__control {
+  margin-top: 10px;
+}
+
+.ticket-access-card .create-ticket__control:first-of-type {
+  margin-top: 0;
+}
+
 .create-ticket__submit {
   margin-top: 16px;
   width: 100%;
 }
 
 @media (min-width: 768px) {
+  .ticket-access-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
   .create-ticket__submit {
     width: 128px;
   }
@@ -6447,6 +6489,31 @@ body > .basalam-info-modal {
   max-width: 100% !important;
   min-height: 104px;
 }
+
+.ticket-items__answer-closed {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #f1d3c9;
+  background: #fff6f3;
+}
+
+.ticket-items__answer-closed-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--basalam-primary-color);
+  flex-shrink: 0;
+}
+
+.ticket-items__answer-closed-text {
+  margin: 0 !important;
+  color: var(--basalam-gray-800);
+  text-align: right !important;
+}
+
 .ticket-items {
   display: flex;
   flex-direction: column-reverse;
@@ -6499,6 +6566,7 @@ body > .basalam-info-modal {
   text-align: right;
   overflow-wrap: anywhere;
   color: var(--basalam-gray-700);
+  white-space: pre-line;
 }
 
 .ticket-items__item-actions {

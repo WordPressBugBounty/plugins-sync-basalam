@@ -6,13 +6,20 @@ use SyncBasalam\Jobs\AbstractJobType;
 use SyncBasalam\Jobs\JobResult;
 use SyncBasalam\Jobs\Exceptions\RetryableException;
 use SyncBasalam\Jobs\Exceptions\NonRetryableException;
-use SyncBasalam\Admin\Product\ProductOperations;
 use SyncBasalam\Logger\Logger;
 
 defined('ABSPATH') || exit;
 
 class CreateSingleProductJob extends AbstractJobType
 {
+    private $productOperations;
+
+    public function __construct($jobManager,$productOperations)
+    {
+        parent::__construct($jobManager);
+        $this->productOperations = $productOperations;
+    }
+
     public function getType(): string
     {
         return 'sync_basalam_create_single_product';
@@ -37,8 +44,7 @@ class CreateSingleProductJob extends AbstractJobType
         }
 
         try {
-            $productOperations = new ProductOperations();
-            $result = $productOperations->createNewProduct($productId, null);
+            $result = $this->productOperations->createNewProduct($productId, null);
             return $this->success(['product_id' => $productId, 'result' => $result]);
         } catch (RetryableException $e) {
             Logger::error("خطا در اضافه کردن محصول به باسلام: " . $e->getMessage(), [

@@ -2,6 +2,7 @@
 
 namespace SyncBasalam\Services\Orders;
 
+use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Services\ApiServiceManager;
 use SyncBasalam\Utilities\OrderManagerUtilities;
 
@@ -80,17 +81,17 @@ class CancelReqOrderService
 
     private function sendCancelRequestToBasalam($itemIds, $description, $syncBasalamOrderId)
     {
-        $apiUrl = "https://order-processing.basalam.com/v1/vendor/order/$syncBasalamOrderId/cancel-request";
+        $apiUrl = sprintf(Endpoints::ORDER_CANCEL_REQUEST, $syncBasalamOrderId);
 
         $body = [
             'item_ids'    => $itemIds,
             'description' => $description,
         ];
 
-        $apiService = new ApiServiceManager();
+        $apiService = syncBasalamContainer()->get(ApiServiceManager::class);
 
         try {
-            return $apiService->sendPostRequest($apiUrl, $body);
+            return $apiService->post($apiUrl, $body);
         } catch (\Exception $e) {
             return [
                 'status_code' => 500,

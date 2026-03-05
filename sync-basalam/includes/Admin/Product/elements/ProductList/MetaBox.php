@@ -4,6 +4,7 @@ namespace SyncBasalam\Admin\Product\elements\ProductList;
 
 use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Admin\Components\CommonComponents;
+use SyncBasalam\Utilities\ProductMetaKey;
 
 defined('ABSPATH') || exit;
 
@@ -13,7 +14,7 @@ class MetaBox
     {
         global $post;
         $productId = $post->ID;
-        $productStatus = get_post_meta($productId, 'sync_basalam_product_sync_status', true);
+        $productStatus = get_post_meta($productId, ProductMetaKey::basalamProductSyncStatus(), true);
 
         switch ($productStatus) {
             case 'synced':
@@ -50,11 +51,12 @@ class MetaBox
         $productId = $post->ID;
         $productStatus = get_post_status($productId);
 
-        $basalamProductStatus = get_post_meta($productId, 'sync_basalam_product_status', true);
-        $basalamProductSyncStatus = get_post_meta($productId, 'sync_basalam_product_sync_status', true);
+        $basalamProductStatus = get_post_meta($productId, ProductMetaKey::basalamProductStatus(), true);
+        $basalamProductSyncStatus = get_post_meta($productId, ProductMetaKey::basalamProductSyncStatus(), true);
 
-        $BasalamAccessToken = syncBasalamSettings()->getSettings(SettingsConfig::TOKEN);
-        $syncBasalamVendorId = syncBasalamSettings()->getSettings(SettingsConfig::VENDOR_ID);
+        $settings = syncBasalamSettings();
+        $BasalamAccessToken = $settings->getSettings(SettingsConfig::TOKEN);
+        $syncBasalamVendorId = $settings->getSettings(SettingsConfig::VENDOR_ID);
 
         if ($productStatus == 'publish') {
             if ($basalamProductSyncStatus == 'pending') {
@@ -63,18 +65,18 @@ class MetaBox
                 echo '<p class="basalam-p basalam-font-12">دسترسی های لازم دریافت نشده است ، ابتدا دسترسی ها را <a href="/wp-admin/admin.php?page=sync_basalam" target="_blank">دریافت</a> نمایید.</p>';
             } else {
                 if ($basalamProductStatus) {
-                    $syncBasalamProductId = get_post_meta($productId, 'sync_basalam_product_id', true);
-                    CommonComponents::renderBtn('بروزسانی محصول در باسلام', 'update_product_in_basalam', $post->ID, 'update_product_in_basalam_nonce');
+                    $syncBasalamProductId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
+                    CommonComponents::renderBtn('بروزسانی محصول در باسلام', 'update_product_in_basalam', $post->ID, 'update_product_in_basalam_nonce', true);
                     if ($basalamProductStatus == 2976) {
-                        CommonComponents::renderBtn('آرشیو کردن محصول در باسلام', 'archive_exist_product_on_basalam', $post->ID, 'archive_exist_product_on_basalam_nonce');
+                        CommonComponents::renderBtn('آرشیو کردن محصول در باسلام', 'archive_exist_product_on_basalam', $post->ID, 'archive_exist_product_on_basalam_nonce', true);
                     } else {
-                        CommonComponents::renderBtn('بازگردانی محصول در باسلام', 'restore_exist_product_on_basalam', $post->ID, 'restore_exist_product_on_basalam_nonce');
+                        CommonComponents::renderBtn('بازگردانی محصول در باسلام', 'restore_exist_product_on_basalam', $post->ID, 'restore_exist_product_on_basalam_nonce', true);
                     }
                     $link = "https://basalam.com/p/" . $syncBasalamProductId;
                     CommonComponents::renderLink('مشاهده محصول در باسلام', $link);
-                    CommonComponents::renderBtn('قطع اتصال محصول', 'disconnect_exist_product_on_basalam', $post->ID, 'disconnect_exist_product_on_basalam_nonce');
+                    CommonComponents::renderBtn('قطع اتصال محصول', 'disconnect_exist_product_on_basalam', $post->ID, 'disconnect_exist_product_on_basalam_nonce', true);
                 } else {
-                    CommonComponents::renderBtn('اضافه کردن محصول در باسلام', 'create_product_basalam', $post->ID, 'create_product_basalam_nonce');
+                    CommonComponents::renderBtn('اضافه کردن محصول در باسلام', 'create_product_basalam', $post->ID, 'create_product_basalam_nonce', true);
                     require_once syncBasalamPlugin()->templatePath("products/ConnectButton.php");
                 }
             }

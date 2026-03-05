@@ -4,8 +4,9 @@ use SyncBasalam\Admin\Settings\SettingsConfig;
 
 defined("ABSPATH") || exit;
 
-$BasalamAccessToken = syncBasalamSettings()->getSettings(SettingsConfig::TOKEN);
-$syncBasalamVendorId = syncBasalamSettings()->getSettings(SettingsConfig::VENDOR_ID);
+$settings = syncBasalamSettings();
+$BasalamAccessToken = $settings->getSettings(SettingsConfig::TOKEN);
+$syncBasalamVendorId = $settings->getSettings(SettingsConfig::VENDOR_ID);
 ?>
 
 <div class="order-tracking-box">

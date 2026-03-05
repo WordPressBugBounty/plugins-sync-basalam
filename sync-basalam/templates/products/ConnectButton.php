@@ -1,9 +1,4 @@
-<?php
-
-use SyncBasalam\Admin\Product\Operations\ConnectProduct;
-
-defined('ABSPATH') || exit;
-?>
+<?php defined('ABSPATH') || exit; ?>
 <a id="Basalam-connect-product-btn" class="basalam-button basalam-button-single-product-page basalam-p basalam-a" onclick="openModal()">اتصال به محصول موجود در باسلام</a>
 
 <div id="Basalam-connect-modal" class="basalam-modal">
@@ -20,17 +15,7 @@ defined('ABSPATH') || exit;
         <!-- Results -->
         <div class="basalam-modal-body basalam-p">
             <div id="basalam-product-results" class="basalam-modal-results">
-                <?php
-                $connectProduct = new ConnectProduct();
-                $current_product = get_post();
-                $productId = isset($_POST['woo_product_id']) ? intval($_POST['woo_product_id']) : ($current_product ? $current_product->ID : 0);
-
-                if ($productId > 0) {
-                    $connectProduct->renderProductsByTitle((string) get_the_title($productId), $productId);
-                } else {
-                    echo '<p class="basalam--no-match">محصول مشابهی یافت نشد.</p>';
-                }
-                ?>
+                <p class="basalam--no-match">روی دکمه «جستجو» کلیک کنید.</p>
             </div>
         </div>
     </div>

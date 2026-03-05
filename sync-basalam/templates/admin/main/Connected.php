@@ -1,13 +1,15 @@
 <?php
 
 use SyncBasalam\JobManager;
+use SyncBasalam\Utilities\ProductMetaKey;
 
 defined('ABSPATH') || exit;
 
 global $wpdb;
 
 $count_of_published_woocommerce_products = wp_count_posts('product')->publish;
-$count_of_synced_basalam_products = intval($wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = 'sync_basalam_product_id'"));
+$productIdMetaKey = ProductMetaKey::basalamProductId();
+$count_of_synced_basalam_products = intval($wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = %s", $productIdMetaKey)));
 
 $job_manager = new JobManager();
 

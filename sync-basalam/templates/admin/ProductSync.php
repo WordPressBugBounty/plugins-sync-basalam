@@ -32,8 +32,7 @@ $nextCursor = null;
 $unsync_products = $sync_basalam_sync_status_checker->getUnsyncBasalamProducts($cursor, $nextCursor);
 
 if (!empty($unsync_products)) {
-    $data = ProductListComponents::renderUnsyncBasalamProductsTable($unsync_products);
-    echo esc_html($data);
+    ProductListComponents::renderUnsyncBasalamProductsTable($unsync_products);
     ?>
 
     <div class="basalam-pagination basalam-pagination-flex">

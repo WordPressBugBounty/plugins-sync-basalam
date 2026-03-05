@@ -3,6 +3,7 @@
 namespace SyncBasalam\Services\Products;
 
 use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Services\ApiServiceManager;
 
 defined('ABSPATH') || exit;
@@ -10,7 +11,7 @@ class FetchCommission
 {
     public static function fetchCategoryCommission($categoryIds)
     {
-        $apiservice = new ApiServiceManager();
+        $apiservice = syncBasalamContainer()->get(ApiServiceManager::class);
         $queryParams = [];
 
         if (isset($categoryIds[0]) && is_numeric($categoryIds[0])) {
@@ -25,10 +26,10 @@ class FetchCommission
 
         if (empty($queryParams)) return false;
 
-        $url = "https://core.basalam.com/api_v2/commission/get_percent?" . implode("&", $queryParams);
+        $url = Endpoints::COMMISSION . '?' . implode("&", $queryParams);
 
         try {
-            $result = $apiservice->sendGetRequest($url);
+            $result = $apiservice->get($url);
         } catch (\Exception $e) {
             return 0;
         }

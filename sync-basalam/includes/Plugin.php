@@ -14,19 +14,9 @@ defined('ABSPATH') || exit;
 
 class Plugin
 {
-    public const VERSION = '1.7.9';
+    public const VERSION = '1.8.0';
 
-    private static $instance = null;
-
-    public static function getInstance()
-    {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
-
-    private function __construct()
+    public function __construct()
     {
         $this->onboarding();
         $this->handleVersionUpdate();
@@ -86,7 +76,7 @@ class Plugin
         ];
 
         foreach ($registrars as $registrarClass) {
-            $registrar = new $registrarClass();
+            $registrar = syncBasalamContainer()->get($registrarClass);
             $registrar->register();
         }
     }

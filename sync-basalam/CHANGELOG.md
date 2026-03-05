@@ -2,6 +2,34 @@
 
 <details>
 
+<summary>1.8.0 - 2026-03-05</summary>
+
+### Changed / Improved
+- Introduced an internal DI container (`ContainerInterface`, `Container`, `ServiceProviderInterface`) and centralized service provider wiring.
+- Added `syncBasalamContainer()` and migrated `syncBasalamPlugin()` / `syncBasalamSettings()` to container-backed access.
+- Migrated core hotspots from direct instantiation to container resolution:
+  - `ApiServiceManager`
+  - `ProductOperations`
+  - `JobManager`
+  - class-level settings access
+- Refactored job subsystem wiring for constructor-based dependencies (`AbstractJobType`, job types, `JobRegistry`, `JobsRunner`, `DiscountTaskScheduler`).
+- Updated action and registrar edges to resolve handlers/listeners via container.
+- Removed legacy singleton-style accessors in core services and standardized on container-first resolution.
+- add unInstall
+- Added dashboard data retrieval in tickets
+- Added `vendor_id` suffix to product `postmeta`
+- Added selectable stock priority for variable products
+- Added a Circuit Breaker mechanism
+
+
+
+### Added
+- Container-backed settings access via `SettingsContainer`.
+
+</details>
+
+<details>
+
 <summary>1.7.9 - 2026-02-25</summary>
 
 ### Changed / Improved

@@ -4,6 +4,7 @@ namespace SyncBasalam\Services\Products;
 
 use SyncBasalam\Services\ApiServiceManager;
 use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Logger\Logger;
 
 defined('ABSPATH') || exit;
@@ -16,7 +17,7 @@ class FetchProductsData
     public function __construct()
     {
         $this->vendorId = syncBasalamSettings()->getSettings(SettingsConfig::VENDOR_ID);
-        $this->baseUrl = 'https://core.basalam.com/v4/products';
+        $this->baseUrl = Endpoints::PRODUCTS_DATA;
     }
 
     public function getProductData($title = null, $cursor = null)
@@ -30,10 +31,10 @@ class FetchProductsData
 
         $url = $this->baseUrl . '?' . http_build_query($query);
 
-        $apiservice = new ApiServiceManager();
+        $apiservice = syncBasalamContainer()->get(ApiServiceManager::class);
 
         try {
-            $response = $apiservice->sendGetRequest($url);
+            $response = $apiservice->get($url);
         } catch (\Exception $e) {
             Logger::error('خطا در دریافت اطلاعات محصولات از باسلام: ' . $e->getMessage());
             return [
@@ -49,7 +50,7 @@ class FetchProductsData
 
         $data = isset($bodyData['data']) && is_array($bodyData['data']) ? $bodyData['data'] : [];
 
-        $nextCursor = $bodyData['next_cursor'];
+        $nextCursor = $bodyData['next_cursor'] ?? null;
 
         return [
             'data'        => $data,

@@ -4,6 +4,7 @@ namespace SyncBasalam\Services\Hamsalam;
 
 use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Admin\Settings\SettingsManager;
+use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Services\ApiServiceManager;
 
 defined('ABSPATH') || exit;
@@ -16,18 +17,18 @@ class FetchHamsalamToken
     public function __construct()
     {
         $settings = syncBasalamSettings()->getSettings();
-        $this->url = "https://api.hamsalam.ir/api/v1/auth/basalam/get-token";
+        $this->url = Endpoints::HAMSALAM_AUTH_TOKEN;
         $this->basalamToken = $settings[SettingsConfig::TOKEN];
     }
 
     public function fetch()
     {
         try {
-            $apiService = new ApiServiceManager();
+            $apiService = syncBasalamContainer()->get(ApiServiceManager::class);
 
             $body = ['basalam_token' => $this->basalamToken];
 
-            $response = $apiService->sendPostRequest($this->url, $body);
+            $response = $apiService->post($this->url, $body);
 
             if (!$response || !isset($response['body'])) return ('خطا در دریافت توکن همسلام');
 

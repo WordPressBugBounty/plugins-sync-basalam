@@ -2,6 +2,7 @@
 
 namespace SyncBasalam\Services\Ticket;
 
+use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Services\ApiServiceManager;
 
 class CreateTicketItem
@@ -10,13 +11,21 @@ class CreateTicketItem
 
     public function __construct($ticket_id)
     {
-        $this->url  = "https://api.hamsalam.ir/api/v1/tickets/$ticket_id/ticket-items";
+        $this->url  = sprintf(Endpoints::TICKET_ITEMS, $ticket_id);
     }
     public function execute($hamsalamToken, $data)
     {
-        $apiService = new ApiServiceManager();
+        $apiService = syncBasalamContainer()->get(ApiServiceManager::class);
         $header = ['Authorization' => 'Bearer ' . $hamsalamToken];
 
-        return $apiService->sendPostRequest($this->url, $data, $header);
+        try {
+            return $apiService->post($this->url, $data, $header);
+        } catch (\Exception $e) {
+            return [
+                'status_code' => 500,
+                'body' => null,
+                'error' => 'خطا در ثبت پاسخ تیکت: ' . $e->getMessage(),
+            ];
+        }
     }
 }

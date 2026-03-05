@@ -4,12 +4,13 @@ namespace SyncBasalam\Services;
 
 use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Admin\Settings;
+use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Logger\Logger;
 
 defined('ABSPATH') || exit;
 class WebhookService
 {
-    private ApiServiceManager $apiService;
+    private $apiService;
     private $basalamToken;
     private $webhookToken;
 
@@ -18,7 +19,7 @@ class WebhookService
 
     public function __construct()
     {
-        $this->apiService = new ApiServiceManager();
+        $this->apiService = syncBasalamContainer()->get(ApiServiceManager::class);
         $this->basalamToken = Settings::getSettings(SettingsConfig::TOKEN);
         $this->webhookToken = Settings::getSettings(SettingsConfig::WEBHOOK_HEADER_TOKEN);
 
@@ -32,52 +33,65 @@ class WebhookService
     public function setupWebhook()
     {
         if (!$this->canCreateWebhook()) return false;
-        
-        $existingWebhooks = $this->fetchWebhooks();
-        $existingWebhooks = json_decode($existingWebhooks, true);
 
-        $webhookUrl = get_site_url() . "/wp-json/sync-basalam/v1/order-manager";
+        try {
+            $existingWebhooks = $this->fetchWebhooks();
+            if (!$existingWebhooks) return false;
 
-        $correctWebhook = null;
-        $webhooksMarkedForDeletion = [];
+            $existingWebhooks = json_decode($existingWebhooks, true);
+            if (!is_array($existingWebhooks) || !isset($existingWebhooks['data']) || !is_array($existingWebhooks['data'])) {
+                Logger::error('پاسخ نامعتبر از API وبهوک دریافت شد.');
+                return false;
+            }
 
-        foreach ($existingWebhooks['data'] as $webhook) {
+            $webhookUrl = get_site_url() . "/wp-json/sync-basalam/v1/order-manager";
 
-            if (isset($webhook['events']) && is_array($webhook['events'])) {
-                $webhookEventIds = [];
-                foreach ($webhook['events'] as $event) {
-                    if (isset($event['id'])) {
-                        $webhookEventIds[] = $event['id'];
+            $correctWebhook = null;
+            $webhooksMarkedForDeletion = [];
+
+            foreach ($existingWebhooks['data'] as $webhook) {
+                if (isset($webhook['events']) && is_array($webhook['events'])) {
+                    $webhookEventIds = [];
+                    foreach ($webhook['events'] as $event) {
+                        if (isset($event['id'])) {
+                            $webhookEventIds[] = $event['id'];
+                        }
+                    }
+
+                    $hasTargetEvents = !empty(array_intersect($webhookEventIds, self::TARGET_EVENT_IDS));
+
+                    if ($hasTargetEvents) {
+                        $hasAllEvents = count(array_intersect($webhookEventIds, self::TARGET_EVENT_IDS)) == count(self::TARGET_EVENT_IDS);
+
+                        if ($hasAllEvents) $correctWebhook = $webhook['id'];
+                        else $webhooksMarkedForDeletion[] = $webhook['id'];
                     }
                 }
-
-                $hasTargetEvents = !empty(array_intersect($webhookEventIds, self::TARGET_EVENT_IDS));
-
-                if ($hasTargetEvents) {
-                    $hasAllEvents = count(array_intersect($webhookEventIds, self::TARGET_EVENT_IDS)) == count(self::TARGET_EVENT_IDS);
-
-                    if ($hasAllEvents) $correctWebhook = $webhook['id'];
-                    else $webhooksMarkedForDeletion[] = $webhook['id'];
-                }
             }
+
+            foreach (array_unique($webhooksMarkedForDeletion) as $webhookId) {
+                $this->removeCurrentWebhook($webhookId);
+            }
+
+            if ($correctWebhook) return $this->updateCurrentWebhook($correctWebhook, self::TARGET_EVENT_IDS, $webhookUrl);
+
+            return $this->createNewWebhook(self::TARGET_EVENT_IDS, $webhookUrl);
+        } catch (\Exception $e) {
+            Logger::error('خطا در تنظیم وبهوک: ' . $e->getMessage());
+            return false;
         }
-
-        foreach (array_unique($webhooksMarkedForDeletion) as $webhookId) {
-            $this->removeCurrentWebhook($webhookId);
-        }
-
-        if ($correctWebhook) $this->updateCurrentWebhook($correctWebhook, self::TARGET_EVENT_IDS, $webhookUrl);
-
-        else $this->createNewWebhook(self::TARGET_EVENT_IDS, $webhookUrl);
-
-        return true;
     }
 
     private function fetchWebhooks()
     {
         $header = ['Authorization' => 'Bearer ' . $this->basalamToken];
 
-        $response = $this->apiService->sendGetRequest('https://openapi.basalam.com/v1/webhooks', $header);
+        try {
+            $response = $this->apiService->get(Endpoints::WEBHOOKS, $header);
+        } catch (\Exception $e) {
+            Logger::error('خطا در دریافت لیست وبهوک‌ها: ' . $e->getMessage());
+            return null;
+        }
 
         if ($response && $response['status_code'] == 200) return $response['body'];
 
@@ -97,7 +111,12 @@ class WebhookService
             'register_me'     => true,
         ];
 
-        $response = $this->apiService->sendPostRequest('https://openapi.basalam.com/v1/webhooks', $data, $header);
+        try {
+            $response = $this->apiService->post(Endpoints::WEBHOOKS, $data, $header);
+        } catch (\Exception $e) {
+            Logger::error('خطا در ساخت وبهوک جدید: ' . $e->getMessage());
+            return false;
+        }
 
         if ($response && $response['status_code'] == 200) return true;
         else return false;
@@ -115,9 +134,14 @@ class WebhookService
             'is_active'       => true,
         ];
 
-        $updateWebhookUrl = 'https://openapi.basalam.com/v1/webhooks/' . $webhookId;
+        $updateWebhookUrl = Endpoints::WEBHOOKS . '/' . $webhookId;
 
-        $response = $this->apiService->sendPatchRequest($updateWebhookUrl, $data, $header);
+        try {
+            $response = $this->apiService->patch($updateWebhookUrl, $data, $header);
+        } catch (\Exception $e) {
+            Logger::error('خطا در بروزرسانی وبهوک: ' . $e->getMessage());
+            return false;
+        }
 
         if ($response && $response['status_code'] == 200) return true;
         else return false;
@@ -125,10 +149,15 @@ class WebhookService
 
     private function removeCurrentWebhook($webhookId)
     {
-        $deleteWebhookUrl = 'https://openapi.basalam.com/v1/webhooks/' . $webhookId;
+        $deleteWebhookUrl = Endpoints::WEBHOOKS . '/' . $webhookId;
         $header = ['Authorization' => 'Bearer ' . $this->basalamToken];
 
-        $response = $this->apiService->sendDeleteRequest($deleteWebhookUrl, $header);
+        try {
+            $response = $this->apiService->delete($deleteWebhookUrl, $header);
+        } catch (\Exception $e) {
+            Logger::error('خطا در حذف وبهوک: ' . $e->getMessage());
+            return false;
+        }
 
         if ($response && ($response['status_code'] == 200 || $response['status_code'] == 204)) return true;
         else return false;

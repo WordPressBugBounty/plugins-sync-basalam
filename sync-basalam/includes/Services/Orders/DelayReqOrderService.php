@@ -2,25 +2,14 @@
 
 namespace SyncBasalam\Services\Orders;
 
+use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Services\ApiServiceManager;
 use SyncBasalam\Utilities\OrderManagerUtilities;
 
 class DelayReqOrderService
 {
-    public function delayReqOnBasalam()
+    public function delayReqOnBasalam(int $orderId, string $description, int $postponeDays)
     {
-        if (!current_user_can('manage_woocommerce')) {
-            return [
-                'success'     => false,
-                'message'     => 'تنها مدیر کل امکان تغییر وضعیت سفارش را دارد.',
-                'status_code' => 400,
-            ];
-        }
-
-        $orderId = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
-        $description = isset($_POST['description']) ? sanitize_text_field(wp_unslash($_POST['description'])) : '';
-        $postponeDays = isset($_POST['postpone_days']) ? intval($_POST['postpone_days']) : 0;
-
         if (empty($orderId)) {
             return [
                 'success'     => false,
@@ -47,19 +36,16 @@ class DelayReqOrderService
 
         global $wpdb;
 
-        $itemIds = OrderManagerUtilities::getAllItemIdsFromMeta($wpdb, $orderId);
-
-        if (empty($itemIds)) {
+        $syncBasalamOrderId = OrderManagerUtilities::getInvoiceId($wpdb, $orderId);
+        if (!$syncBasalamOrderId) {
             return [
                 'success'     => false,
-                'message'     => 'هیچ شناسه آیتمی یافت نشد.',
+                'message'     => 'شناسه فاکتور سفارش یافت نشد.',
                 'status_code' => 400,
             ];
         }
 
-        foreach ($itemIds as $itemId) {
-            $response = $this->sendDelayRequestToBasalam($itemId, $description, $postponeDays);
-        }
+        $response = $this->sendDelayRequestToBasalam($syncBasalamOrderId, $description, $postponeDays);
 
         $statusCode = $response['status_code'];
         if ($statusCode !== 200 && $statusCode !== 201) {
@@ -89,24 +75,26 @@ class DelayReqOrderService
         ];
     }
 
-    private function sendDelayRequestToBasalam($itemId, $description, $postponeDays)
+    private function sendDelayRequestToBasalam($orderId, $description, $postponeDays)
     {
-        $apiUrl = 'https://order-processing.basalam.com/v1/vendor/set-overdue-agreement-request';
+        $apiUrl = sprintf(Endpoints::ORDER_DELAY, $orderId);
 
         $body = [
-            'item_id'       => $itemId,
-            'description'   => $description,
-            'postpone_days' => $postponeDays,
+            "topic"    => 5075,
+            "metadata" => [
+                "postpone_days" => $postponeDays,
+                "description"   => $description,
+            ],
         ];
 
-        $apiService = new ApiServiceManager();
+        $apiService = syncBasalamContainer()->get(ApiServiceManager::class);
 
         try {
-            return $apiService->sendPostRequest($apiUrl, $body);
+            return $apiService->put($apiUrl, $body);
         } catch (\Exception $e) {
             return [
                 'status_code' => 500,
-                'body' => 'خطا در ارسال درخواست تاخیر: ' . $e->getMessage(),
+                'body'        => $e->getMessage(),
             ];
         }
     }

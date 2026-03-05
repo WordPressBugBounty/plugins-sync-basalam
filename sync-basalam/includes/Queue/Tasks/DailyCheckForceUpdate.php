@@ -2,15 +2,14 @@
 
 namespace SyncBasalam\Queue\Tasks;
 
+use SyncBasalam\Logger\Logger;
 use SyncBasalam\Queue\QueueAbstract;
-use SyncBasalam\Services\ApiServiceManager;
 use SyncBasalam\Services\FetchVersionDetail;
 
 defined('ABSPATH') || exit;
 
 class DailyCheckForceUpdate extends QueueAbstract
 {
-    public $apiservice;
     public $tableName;
     public $taskName;
     public $NEED_SCHEDULE = true;
@@ -18,7 +17,6 @@ class DailyCheckForceUpdate extends QueueAbstract
     public function __construct()
     {
         parent::__construct();
-        $this->apiservice = new ApiServiceManager();
         $this->taskName = $this->getHookName();
     }
 
@@ -29,8 +27,12 @@ class DailyCheckForceUpdate extends QueueAbstract
 
     public function handle($args = null)
     {
-        $versionChecker = new FetchVersionDetail(syncbasalamplugin()->getVersion());
-        $versionChecker->checkForceUpdate();
+        try {
+            $versionChecker = new FetchVersionDetail(syncbasalamplugin()->getVersion());
+            $versionChecker->checkForceUpdate();
+        } catch (\Exception $e) {
+            Logger::error('خطا در اجرای تسک بررسی نسخه: ' . $e->getMessage());
+        }
     }
 
     public function schedule()

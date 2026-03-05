@@ -11,6 +11,11 @@ defined('ABSPATH') || exit;
 
 class CreateAllProductsJob extends AbstractJobType
 {
+    public function __construct($jobManager)
+    {
+        parent::__construct($jobManager);
+    }
+
     public function getType(): string
     {
         return 'sync_basalam_create_all_products';

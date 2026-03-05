@@ -8,7 +8,7 @@ defined('ABSPATH') || exit;
 
 class VariableProductHandler extends SimpleProductHandler
 {
-    private VariantService $variantService;
+    private $variantService;
 
     public function __construct()
     {
@@ -19,15 +19,5 @@ class VariableProductHandler extends SimpleProductHandler
     public function getVariants($product): array
     {
         return $this->variantService->getVariants($product);
-    }
-
-    public function getPrice($product): ?int
-    {
-        return null;
-    }
-
-    public function getStock($product): int
-    {
-        return 0;
     }
 }

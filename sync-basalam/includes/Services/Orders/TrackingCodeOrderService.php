@@ -2,26 +2,14 @@
 
 namespace SyncBasalam\Services\Orders;
 
+use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Services\ApiServiceManager;
 use SyncBasalam\Utilities\OrderManagerUtilities;
 
 class TrackingCodeOrderService
 {
-    public function trackingCodeOnBasalam()
+    public function trackingCodeOnBasalam(int $orderId, string $trackingCode, string $phoneNumber, int $shippingMethod)
     {
-        if (!current_user_can('manage_woocommerce')) {
-            return [
-                'success'     => false,
-                'message'     => 'تنها مدیر کل امکان تغییر وضعیت سفارش را دارد.',
-                'status_code' => 400,
-            ];
-        }
-
-        $orderId = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
-        $trackingCode = isset($_POST['tracking_code']) ? sanitize_text_field(wp_unslash($_POST['tracking_code'])) : '';
-        $phoneNumber = isset($_POST['phone_number']) ? sanitize_text_field(wp_unslash($_POST['phone_number'])) : '';
-        $shippingMethod = isset($_POST['shipping_method']) ? intval($_POST['shipping_method']) : 0;
-
         if (empty($orderId)) {
             return [
                 'success'     => false,
@@ -106,7 +94,7 @@ class TrackingCodeOrderService
             return new \WP_Error('no_invoice_id', 'شناسه فاکتور سفارش یافت نشد.');
         }
 
-        $apiUrl = 'https://order-processing.basalam.com/v2/vendor/set-posted-order';
+        $apiUrl = Endpoints::ORDER_TRACKING;
         $body = [
             'order_id'        => $syncBasalamOrderId,
             'shipping_method' => $shippingMethod,
@@ -114,10 +102,10 @@ class TrackingCodeOrderService
             'phone_number'    => $phoneNumber,
         ];
 
-        $apiService = new ApiServiceManager();
+        $apiService = syncBasalamContainer()->get(ApiServiceManager::class);
 
         try {
-            return $apiService->sendPostRequest($apiUrl, $body);
+            return $apiService->post($apiUrl, $body);
         } catch (\Exception $e) {
             return [
                 'status_code' => 500,

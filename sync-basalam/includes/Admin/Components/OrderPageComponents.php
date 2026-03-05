@@ -2,13 +2,14 @@
 
 namespace SyncBasalam\Admin\Components;
 
+use SyncBasalam\JobManager;
 defined('ABSPATH') || exit;
 
 class OrderPageComponents
 {
     public static function renderCheckOrdersButton()
     {
-        $jobManager = \SyncBasalam\JobManager::getInstance();
+        $jobManager = syncBasalamContainer()->get(JobManager::class);
         $hasRunningJob = $jobManager->getCountJobs([
             'job_type' => 'sync_basalam_fetch_orders',
             'status' => ['pending', 'processing']
@@ -79,7 +80,7 @@ class OrderPageComponents
             return;
         }
 
-        $jobManager = \SyncBasalam\JobManager::getInstance();
+        $jobManager = syncBasalamContainer()->get(JobManager::class);
         $hasRunningJob = $jobManager->getCountJobs([
             'job_type' => 'sync_basalam_fetch_orders',
             'status' => ['pending', 'processing']

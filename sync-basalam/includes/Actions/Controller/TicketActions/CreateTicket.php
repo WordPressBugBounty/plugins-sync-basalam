@@ -4,6 +4,7 @@ namespace SyncBasalam\Actions\Controller\TicketActions;
 
 use SyncBasalam\Actions\Controller\ActionController;
 use SyncBasalam\Services\TicketServiceManager;
+use SyncBasalam\Utilities\TicketExtraInfoFormatter;
 
 defined('ABSPATH') || exit;
 
@@ -15,7 +16,8 @@ class CreateTicket extends ActionController
 
         $title   = isset($_POST['title'])   ? \sanitize_text_field(\wp_unslash($_POST['title']))   : null;
         $subject = isset($_POST['subject']) ? \sanitize_text_field(\wp_unslash($_POST['subject'])) : null;
-        $content = isset($_POST['content']) ? \sanitize_text_field(\wp_unslash($_POST['content'])) : null;
+        $content = isset($_POST['content']) ? \sanitize_textarea_field(\wp_unslash($_POST['content'])) : '';
+        $content = TicketExtraInfoFormatter::appendFromRequest($content, $_POST);
 
         $fileIds = isset($_POST['file_ids']) && is_array($_POST['file_ids'])
             ? array_map('intval', $_POST['file_ids'])

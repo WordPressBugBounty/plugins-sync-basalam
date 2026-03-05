@@ -10,13 +10,11 @@ class CreateProductStrategy implements DataStrategyInterface
 {
     public function collect($product, ProductDataHandlerInterface $handler): array
     {
-        return [
+        $data = [
             'name' => $handler->getName($product),
             'description' => $handler->getDescription($product),
             'category_id' => $handler->getCategoryId($product),
             'category_ids' => $handler->getCategoryIds($product),
-            'primary_price' => $handler->getPrice($product),
-            'stock' => $handler->getStock($product),
             'weight' => $handler->getWeight($product),
             'package_weight' => $handler->getPackageWeight($product),
             'photo' => $handler->getMainPhoto($product),
@@ -29,5 +27,12 @@ class CreateProductStrategy implements DataStrategyInterface
             'variants' => $handler->getVariants($product),
             'product_attribute' => $handler->getAttributes($product),
         ];
+
+        if (!$product->is_type('variable')) {
+            $data['primary_price'] = $handler->getPrice($product);
+            $data['stock'] = $handler->getStock($product);
+        }
+
+        return $data;
     }
 }

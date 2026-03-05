@@ -3,8 +3,10 @@
 namespace SyncBasalam\Services\Orders;
 
 use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Logger\Logger;
 use SyncBasalam\Utilities\GetProvincesData;
+use SyncBasalam\Utilities\ProductMetaKey;
 use SyncBasalam\Services\ApiServiceManager;
 
 defined('ABSPATH') || exit;
@@ -15,7 +17,7 @@ class OrderManager
 
     public function __construct()
     {
-        $this->apiService = new ApiServiceManager();
+        $this->apiService = syncBasalamContainer()->get(ApiServiceManager::class);
     }
 
     public static function orderManger(\WP_REST_Request $request, $checkSyncStatus = true)
@@ -77,11 +79,11 @@ class OrderManager
 
             $vendor_id = syncBasalamSettings()->getSettings(SettingsConfig::VENDOR_ID);
 
-            $api_url = "https://order-processing.basalam.com/v2/vendors/$vendor_id/orders/$invoice_id";
+            $api_url = sprintf(Endpoints::ORDER_DETAIL, $vendor_id, $invoice_id);
 
-            $apiServiceManager = new ApiServiceManager();
+            $apiServiceManager = syncBasalamContainer()->get(ApiServiceManager::class);
 
-            $response = $apiServiceManager->sendGetRequest($api_url);
+            $response = $apiServiceManager->get($api_url);
 
             if (isset($response['success']) && !$response['success']) {
                 $wpdb->query('ROLLBACK');
@@ -453,7 +455,7 @@ class OrderManager
     {
         $product = get_posts([
             'post_type'      => 'product',
-            'meta_key'       => 'sync_basalam_product_id',
+            'meta_key'       => ProductMetaKey::basalamProductId(),
             'meta_value'     => $sync_basalam_product_id,
             'posts_per_page' => 1,
         ]);

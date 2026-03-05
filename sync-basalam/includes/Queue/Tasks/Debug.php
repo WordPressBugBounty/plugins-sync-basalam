@@ -2,6 +2,7 @@
 
 namespace SyncBasalam\Queue\Tasks;
 
+use SyncBasalam\Logger\Logger;
 use SyncBasalam\Queue\QueueAbstract;
 use SyncBasalam\Services\ApiServiceManager;
 
@@ -13,13 +14,13 @@ class Debug extends QueueAbstract
     public $tableName;
     private $db;
 
-    public function __construct()
+    public function __construct($apiService = null)
     {
         parent::__construct();
         global $wpdb;
         $this->db = $wpdb;
         $this->tableName = $this->db->prefix . 'sync_basalam_debug_logs';
-        $this->apiservice = new ApiServiceManager();
+        $this->apiservice = $apiService ?: syncBasalamContainer()->get(ApiServiceManager::class);
     }
 
     protected function getHookName()
@@ -33,7 +34,15 @@ class Debug extends QueueAbstract
 
         $start = microtime(true);
 
-        $response = $this->apiservice->sendGetRequest($url, []);
+        try {
+            $response = $this->apiservice->get($url, []);
+        } catch (\Exception $e) {
+            Logger::error('خطا در تسک Debug: ' . $e->getMessage());
+            $response = [
+                'status_code' => 0,
+                'error' => $e->getMessage(),
+            ];
+        }
 
         $elapsedMs = (int) round((microtime(true) - $start) * 1000);
 
@@ -41,8 +50,8 @@ class Debug extends QueueAbstract
         $statusCode = null;
         $errorMessage = null;
 
-        if (is_wp_error($response)) {
-            $errorMessage = $response['body'];
+        if (!is_array($response) || isset($response['error'])) {
+            $errorMessage = is_array($response) ? ($response['error'] ?? 'unknown error') : 'invalid response';
         } else {
             $statusCode = $response['status_code'];
             $success = $statusCode >= 200 && $statusCode < 400;

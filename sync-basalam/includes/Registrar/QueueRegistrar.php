@@ -12,11 +12,12 @@ class QueueRegistrar implements RegistrarInterface
 {
     public static function register(): void
     {
-        self::initTasks();
-        self::initWpBgProcess();
+        $container = syncBasalamContainer();
+        self::initTasks($container);
+        self::initWpBgProcess($container);
     }
 
-    private static function initTasks(): void
+    private static function initTasks($container): void
     {
         $taskClasses = [
             'Debug',
@@ -26,18 +27,18 @@ class QueueRegistrar implements RegistrarInterface
         foreach ($taskClasses as $className) {
             $fullClassName = 'SyncBasalam\\Queue\\Tasks\\' . $className;
             if (\class_exists($fullClassName) && \is_subclass_of($fullClassName, 'SyncBasalam\\Queue\\QueueAbstract')) {
-                $task = new $fullClassName();
+                $task = $container->get($fullClassName);
                 $task->registerHooks();
                 if ($task->NEED_SCHEDULE) $task->schedule();
             }
         }
     }
 
-    private static function initWpBgProcess(): void
+    private static function initWpBgProcess($container): void
     {
         $dispatchers = [
-            new CreateProduct(),
-            new UpdateProduct(),
+            $container->get(CreateProduct::class),
+            $container->get(UpdateProduct::class),
         ];
 
         foreach ($dispatchers as $dispatcher) {

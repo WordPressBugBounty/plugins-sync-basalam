@@ -63,10 +63,11 @@ class RegisterActions
         ActionHandler::postAjax('cancel_fetch_orders', CancelFetchOrders::class);
         ActionHandler::postAjax('basalam_add_map_option', CreateMapOption::class);
         ActionHandler::postAjax('basalam_delete_mapped_option', RemoveMapOption::class);
-        ActionHandler::postAction('create_product_basalam', CreateSingleProduct::class);
-        ActionHandler::postAction('restore_exist_product_on_basalam', RestoreProduct::class);
-        ActionHandler::postAction('archive_exist_product_on_basalam', ArchiveProduct::class);
-        ActionHandler::postAction('disconnect_exist_product_on_basalam', DisconnectProduct::class);
+        ActionHandler::postAjax('create_product_basalam', CreateSingleProduct::class);
+        ActionHandler::postAjax('update_product_in_basalam', UpdateSingleProduct::class);
+        ActionHandler::postAjax('restore_exist_product_on_basalam', RestoreProduct::class);
+        ActionHandler::postAjax('archive_exist_product_on_basalam', ArchiveProduct::class);
+        ActionHandler::postAjax('disconnect_exist_product_on_basalam', DisconnectProduct::class);
         ActionHandler::postAction('basalam_update_setting', UpdateSettings::class);
         ActionHandler::postAjax('confirm_basalam_order', ConfirmOrder::class);
         ActionHandler::postAjax('cancel_basalam_order', CancelOrder::class);
@@ -75,8 +76,7 @@ class RegisterActions
         ActionHandler::postAjax('tracking_code_basalam_order', TrackingCodeOrder::class);
         ActionHandler::postAjax('basalam_connect_product', ConnectSingleProduct::class);
         ActionHandler::postAjax('basalam_get_category_ids', DetectionProductCategories::class);
-        ActionHandler::postAction('update_product_in_basalam', UpdateSingleProduct::class);
-        ActionHandler::postAjaxNoAuth('basalam_get_category_attrs', GetCategoryAttributes::class);
+        ActionHandler::postAjax('basalam_get_category_attrs', GetCategoryAttributes::class);
         ActionHandler::postAjax('basalam_clear_logs', ClearLogs::class);
         ActionHandler::postAjax('get_woocommerce_categories', GetWooCategories::class);
         ActionHandler::postAjax('get_basalam_categories', FetchBasalamCategories::class);

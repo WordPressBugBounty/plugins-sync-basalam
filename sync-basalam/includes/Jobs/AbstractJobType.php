@@ -2,7 +2,6 @@
 
 namespace SyncBasalam\Jobs;
 
-use SyncBasalam\JobManager;
 use SyncBasalam\Jobs\Exceptions\RetryableException;
 use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 
@@ -12,9 +11,9 @@ abstract class AbstractJobType implements JobType
 {
     protected $jobManager;
 
-    public function __construct()
+    public function __construct($jobManager)
     {
-        $this->jobManager = JobManager::getInstance();
+        $this->jobManager = $jobManager;
     }
 
     abstract public function getType(): string;

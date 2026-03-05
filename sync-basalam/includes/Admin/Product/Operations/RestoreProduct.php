@@ -9,13 +9,13 @@ defined('ABSPATH') || exit;
 
 class RestoreProduct extends AbstractProductOperation
 {
-    private UpdateSingleProductService $updateProductService;
+    private $updateProductService;
     private const STATUS_ACTIVE = 2976;
 
-    public function __construct()
+    public function __construct($updateProductService = null)
     {
         parent::__construct();
-        $this->updateProductService = new UpdateSingleProductService();
+        $this->updateProductService = $updateProductService ?: syncBasalamContainer()->get(UpdateSingleProductService::class);
     }
 
 

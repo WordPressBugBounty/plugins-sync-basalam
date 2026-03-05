@@ -51,7 +51,7 @@ class SettingsManager
         $isAuto = self::getSettings(SettingsConfig::TASKS_PER_MINUTE_AUTO) == 'true';
 
         if ($isAuto) {
-            $monitor = SystemResourceMonitor::getInstance();
+            $monitor = syncBasalamContainer()->get(SystemResourceMonitor::class);
 
             return $monitor->calculateOptimalTasksPerMinute();
         } else {

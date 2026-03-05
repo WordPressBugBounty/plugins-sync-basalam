@@ -2,7 +2,9 @@
 
 namespace SyncBasalam\Migrations;
 
+use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Services\WebhookService;
+use SyncBasalam\Utilities\ProductMetaKey;
 
 defined('ABSPATH') || exit;
 class MigratorService
@@ -208,6 +210,66 @@ class MigratorService
             if (!$this->columnExists($table, $columnName)) {
                 $this->wpdb->query($sql);
             }
+        }
+    }
+
+    public function addRetryAfterColumnToJobManager()
+    {
+        $tableName = $this->wpdb->prefix . 'sync_basalam_job_manager';
+
+        $columnExists = $this->wpdb->get_var(
+            $this->wpdb->prepare("SHOW COLUMNS FROM `{$tableName}` LIKE %s", 'retry_after')
+        );
+
+        if (!$columnExists) {
+            $this->wpdb->query("ALTER TABLE {$tableName} ADD COLUMN retry_after BIGINT(20) NULL DEFAULT NULL");
+            $this->wpdb->query("ALTER TABLE {$tableName} ADD INDEX idx_retry_after (retry_after)");
+        }
+    }
+
+    public function migrateProductMetaKeysToVendorId()
+    {
+        $settings = get_option('sync_basalam_settings', []);
+        if (!is_array($settings)) return;
+
+        $vendorId = $settings[SettingsConfig::VENDOR_ID] ?? null;
+        $vendorId = preg_replace('/[^a-zA-Z0-9_-]/', '', (string) $vendorId);
+
+        if ($vendorId === '') return;
+
+        $postmetaTable = $this->wpdb->postmeta;
+
+        $metaKeyMap = [
+            ProductMetaKey::PRODUCT_ID => ProductMetaKey::basalamProductId($vendorId),
+            ProductMetaKey::PRODUCT_SYNC_STATUS => ProductMetaKey::basalamProductSyncStatus($vendorId),
+            ProductMetaKey::PRODUCT_STATUS => ProductMetaKey::basalamProductStatus($vendorId),
+        ];
+
+        foreach ($metaKeyMap as $oldMetaKey => $newMetaKey) {
+            if ($oldMetaKey === $newMetaKey) continue;
+
+            $this->wpdb->query(
+                $this->wpdb->prepare(
+                    "INSERT INTO {$postmetaTable} (post_id, meta_key, meta_value)
+                     SELECT old_meta.post_id, %s, old_meta.meta_value
+                     FROM {$postmetaTable} old_meta
+                     LEFT JOIN {$postmetaTable} new_meta
+                        ON new_meta.post_id = old_meta.post_id
+                        AND new_meta.meta_key = %s
+                     WHERE old_meta.meta_key = %s
+                        AND new_meta.meta_id IS NULL",
+                    $newMetaKey,
+                    $newMetaKey,
+                    $oldMetaKey
+                )
+            );
+
+            $this->wpdb->query(
+                $this->wpdb->prepare(
+                    "DELETE FROM {$postmetaTable} WHERE meta_key = %s",
+                    $oldMetaKey
+                )
+            );
         }
     }
 }

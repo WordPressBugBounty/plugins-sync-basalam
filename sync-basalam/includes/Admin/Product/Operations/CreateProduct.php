@@ -7,19 +7,23 @@ use SyncBasalam\Services\Products\CreateSingleProductService;
 use SyncBasalam\Services\Products\Discount\DiscountTaskProcessor;
 use SyncBasalam\Logger\Logger;
 use SyncBasalam\Admin\Product\Data\ProductDataFacade;
+use SyncBasalam\Utilities\ProductMetaKey;
 
 defined('ABSPATH') || exit;
 
 class CreateProduct extends AbstractProductOperation
 {
-    private CreateSingleProductService $createProductService;
-    private DiscountTaskProcessor $discountProcessor;
+    private $createProductService;
+    private $discountProcessor;
 
-    public function __construct()
+    public function __construct(
+        $createProductService = null,
+        $discountProcessor = null
+    )
     {
         parent::__construct();
-        $this->createProductService = new CreateSingleProductService();
-        $this->discountProcessor = new DiscountTaskProcessor();
+        $this->createProductService = $createProductService ?: syncBasalamContainer()->get(CreateSingleProductService::class);
+        $this->discountProcessor = $discountProcessor ?: syncBasalamContainer()->get(DiscountTaskProcessor::class);
     }
 
 
@@ -40,7 +44,7 @@ class CreateProduct extends AbstractProductOperation
     {
         if (!parent::validate($product_id)) return false;
 
-        $basalamProductId = get_post_meta($product_id, 'sync_basalam_product_id', true);
+        $basalamProductId = get_post_meta($product_id, ProductMetaKey::basalamProductId(), true);
         if (!empty($basalamProductId)) {
             Logger::warning(sprintf('محصول %d از قبل به باسلام متصل است.', $product_id), [
                 'product_id' => $product_id,

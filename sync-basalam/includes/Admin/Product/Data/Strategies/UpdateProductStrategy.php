@@ -13,8 +13,6 @@ class UpdateProductStrategy implements DataStrategyInterface
         $data = [
             'name' => $handler->getName($product),
             'description' => $handler->getDescription($product),
-            'primary_price' => $handler->getPrice($product),
-            'stock' => $handler->getStock($product),
             'weight' => $handler->getWeight($product),
             'package_weight' => $handler->getPackageWeight($product),
             'photo' => $handler->getMainPhoto($product),
@@ -25,6 +23,11 @@ class UpdateProductStrategy implements DataStrategyInterface
             'is_wholesale' => $handler->isWholesale($product),
             'variants' => $handler->getVariants($product),
         ];
+
+        if (!$product->is_type('variable')) {
+            $data['primary_price'] = $handler->getPrice($product);
+            $data['stock'] = $handler->getStock($product);
+        }
 
         return array_filter($data, fn($value) => $value !== null);
     }
