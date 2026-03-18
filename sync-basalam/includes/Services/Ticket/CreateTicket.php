@@ -22,7 +22,7 @@ class CreateTicket
             return $apiService->post($this->url, $data, $header);
         } catch (\Exception $e) {
             return [
-                'status_code' => 500,
+                'status_code' => $e->getCode() ?? 500,
                 'body' => null,
                 'error' => 'خطا در ایجاد تیکت: ' . $e->getMessage(),
             ];

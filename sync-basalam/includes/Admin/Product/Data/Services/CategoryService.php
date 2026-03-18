@@ -9,21 +9,69 @@ defined('ABSPATH') || exit;
 
 class CategoryService
 {
+    private static array $resolvedCategoryCache = [];
+
     public function getPrimaryCategoryId($product): ?int
     {
         $categoryIds = $this->getCategoryIds($product);
-        return !empty($categoryIds) ? end($categoryIds) : null;
+        if (empty($categoryIds)) return null;
+
+        $lastCategoryId = end($categoryIds);
+        return is_numeric($lastCategoryId) ? intval($lastCategoryId) : null;
     }
 
     public function getCategoryIds($product): array
     {
-        $mappedCategories = $this->getMappedCategories($product);
-        if ($mappedCategories) return $mappedCategories;
+        $productId = $this->resolveProductId($product);
+
+        if ($productId !== null && array_key_exists($productId, self::$resolvedCategoryCache)) {
+            return self::$resolvedCategoryCache[$productId];
+        }
+
+        $mappedCategories = $this->normalizeCategoryIds($this->getMappedCategories($product));
+        if (!empty($mappedCategories)) {
+            return $this->storeCache($productId, $mappedCategories);
+        }
 
         $productTitle = mb_substr($product->get_name(), 0, 120);
         $detectedCategories = GetCategoryId::getCategoryIdFromBasalam(urlencode($productTitle), 'multi');
 
-        return $detectedCategories ?: [];
+        $detectedCategories = $this->normalizeCategoryIds(is_array($detectedCategories) ? $detectedCategories : []);
+
+        return $this->storeCache($productId, $detectedCategories);
+    }
+
+    private function storeCache(?int $productId, array $categoryIds): array
+    {
+        if ($productId !== null) {
+            self::$resolvedCategoryCache[$productId] = $categoryIds;
+        }
+
+        return $categoryIds;
+    }
+
+    private function resolveProductId($product): ?int
+    {
+        if (!is_object($product) || !method_exists($product, 'get_id')) return null;
+
+        $productId = $product->get_id();
+        if (!is_numeric($productId)) return null;
+
+        return intval($productId);
+    }
+
+    private function normalizeCategoryIds(array $categoryIds): array
+    {
+        $normalized = [];
+
+        foreach ($categoryIds as $categoryId) {
+            if (!is_numeric($categoryId)) continue;
+
+            $categoryId = intval($categoryId);
+            if ($categoryId > 0) $normalized[] = $categoryId;
+        }
+
+        return array_values(array_unique($normalized));
     }
 
     private function getMappedCategories($product): array

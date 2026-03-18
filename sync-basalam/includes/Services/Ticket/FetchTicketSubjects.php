@@ -25,7 +25,7 @@ class FetchTicketSubjects
             return $apiService->get($this->url, $headers);
         } catch (\Exception $e) {
             return [
-                'status_code' => 500,
+                'status_code' => $e->getCode() ?? 500,
                 'body' => null,
                 'error' => 'خطا در دریافت موضوعات تیکت: ' . $e->getMessage(),
             ];

@@ -16,6 +16,14 @@ class UploadTicketMedia
         $apiService = syncBasalamContainer()->get(ApiServiceManager::class);
         $header = ['Authorization' => 'Bearer ' . $hamsalamToken];
 
-        return $apiService->upload($this->url, $filePath, [], $header);
+        try {
+            $apiService->upload($this->url, $filePath, [], $header);
+        } catch (\Exception $e) {
+            return [
+                'status_code' => $e->getCode() ?? 500,
+                'body' => null,
+                'error' => 'خطا در آپلود فایل: ' . $e->getMessage(),
+            ];
+        }
     }
 }

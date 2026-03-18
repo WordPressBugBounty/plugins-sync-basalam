@@ -4,6 +4,7 @@ namespace SyncBasalam\Actions\Controller\ProductActions;
 
 use SyncBasalam\Admin\Product\ProductOperations;
 use SyncBasalam\Actions\Controller\ActionController;
+use SyncBasalam\Logger\Logger;
 
 defined('ABSPATH') || exit;
 
@@ -33,6 +34,10 @@ class UpdateSingleProduct extends ActionController
         try {
             $result = $productOperations->updateExistProduct($productId, $categoryIds);
         } catch (\Exception $e) {
+            Logger::error("خطا در بروزرسانی محصول: " . $e->getMessage(), [
+                'product_id' => intval($productId),
+                'operation' => 'بروزرسانی محصول',
+            ]);
             wp_send_json_error(['message' => $e->getMessage()], 500);
         }
 

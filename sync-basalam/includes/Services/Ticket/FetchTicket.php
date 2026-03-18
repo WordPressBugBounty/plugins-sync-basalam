@@ -22,7 +22,7 @@ class FetchTicket
             return $apiService->get($this->url, $header);
         } catch (\Exception $e) {
             return [
-                'status_code' => 500,
+                'status_code' => $e->getCode() ?? 500,
                 'body' => null,
                 'error' => 'خطا در دریافت تیکت: ' . $e->getMessage(),
             ];

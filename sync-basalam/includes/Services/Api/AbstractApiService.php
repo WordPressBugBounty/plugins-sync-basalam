@@ -4,6 +4,7 @@ namespace SyncBasalam\Services\Api;
 
 use SyncBasalam\Logger\Logger;
 use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Jobs\Exceptions\RetryableException;
 
 defined('ABSPATH') || exit;
 
@@ -31,7 +32,7 @@ abstract class AbstractApiService
         $this->validator       = new ApiRequestValidator();
         $this->responseHandler = new ApiResponseHandler();
         $this->circuitBreaker  = new CircuitBreaker();
-    } 
+    }
 
     public function run(string $url, $data, array $headers = []): array
     {
@@ -62,7 +63,9 @@ abstract class AbstractApiService
             $this->circuitBreaker->recordSuccess();
             return $result;
         } catch (\Exception $e) {
-            $this->circuitBreaker->recordFailure();
+            if ($this->shouldRecordFailure($e, $url)) {
+                $this->circuitBreaker->recordFailure();
+            }
             throw $e;
         }
     }
@@ -79,4 +82,10 @@ abstract class AbstractApiService
     }
 
     abstract protected function executeRequest(array $request);
+
+    protected function shouldRecordFailure(\Exception $exception, string $url): bool
+    {
+        if (strpos($url, 'basalam.com') === false) return false;
+        return $exception instanceof RetryableException;
+    }
 }

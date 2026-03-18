@@ -14,7 +14,6 @@ class CreateProductStrategy implements DataStrategyInterface
             'name' => $handler->getName($product),
             'description' => $handler->getDescription($product),
             'category_id' => $handler->getCategoryId($product),
-            'category_ids' => $handler->getCategoryIds($product),
             'weight' => $handler->getWeight($product),
             'package_weight' => $handler->getPackageWeight($product),
             'photo' => $handler->getMainPhoto($product),

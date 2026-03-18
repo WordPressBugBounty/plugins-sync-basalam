@@ -272,4 +272,15 @@ class MigratorService
             );
         }
     }
+
+    public function clearAuthTokens()
+    {
+        $settings = get_option('sync_basalam_settings', []);
+        if (!is_array($settings)) return;
+
+        $settings[SettingsConfig::TOKEN] = null;
+        $settings[SettingsConfig::REFRESH_TOKEN] = null;
+
+        update_option('sync_basalam_settings', $settings);
+    }
 }

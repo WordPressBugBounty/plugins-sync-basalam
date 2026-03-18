@@ -2,6 +2,15 @@
 
 <details>
 
+<summary>1.8.1 - 2026-03-07</summary>
+
+### Added
+- basalam Chat widget
+
+</details>
+
+<details>
+
 <summary>1.8.0 - 2026-03-05</summary>
 
 ### Changed / Improved

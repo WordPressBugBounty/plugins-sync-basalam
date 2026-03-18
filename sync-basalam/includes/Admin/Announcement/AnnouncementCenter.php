@@ -14,28 +14,22 @@ class AnnouncementCenter
     private const SEEN_META_KEY = 'sync_basalam_seen_announcements';
     private const PER_PAGE = 5;
 
-    public static function shouldLoadOnCurrentPage(): bool
+    public static function shouldLoadAnnouncement(): bool
     {
-        if (!is_admin() || !current_user_can('manage_options')) {
-            return false;
-        }
-
+        
         $page = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
-
-        if ($page === '') {
+        
+        if ($page === '' || !is_admin() || !current_user_can('manage_options') || !syncBasalamSettings()->hasToken()) {
             return false;
         }
 
-        if (str_starts_with($page, 'sync_basalam')) {
-            return true;
-        }
-
-        return in_array($page, ['basalam-onboarding', 'basalam-save-token', 'basalam-show-products'], true);
+        if (str_starts_with($page, 'sync_basalam')) return true;
+        return false;
     }
 
     public static function renderPanel(): void
     {
-        if (!self::shouldLoadOnCurrentPage()) {
+        if (!self::shouldLoadAnnouncement()) {
             return;
         }
 

@@ -19,6 +19,7 @@ use SyncBasalam\Admin\Product\Operations\ConnectProduct;
 use SyncBasalam\Admin\Announcement\AnnouncementCenter;
 use SyncBasalam\Admin\Onboarding\PointerTour;
 use SyncBasalam\Services\SystemResourceMonitor;
+use SyncBasalam\Utilities\ChatWidget;
 
 defined("ABSPATH") || exit;
 
@@ -39,6 +40,7 @@ class AdminRegistrar implements RegistrarInterface
 
         // Admin Menu
         \add_action("admin_menu", [$pages, "registerMenus"]);
+        \add_filter("script_loader_tag", [ChatWidget::class, "addTokenToWidgetScript"], 10, 3);
 
         // Admin Scripts & Styles
         \add_action("admin_enqueue_scripts", [self::class, "adminEnqueueStyles"]);
@@ -269,12 +271,24 @@ class AdminRegistrar implements RegistrarInterface
             true
         );
 
+        if (ChatWidget::shouldLoadWidget()) {
+            wp_enqueue_script(
+                "basalam-chat-widget-script",
+                self::assetsUrl("chat/widget-loader.js"),
+                [],
+                $version,
+                true
+            );
+        }
+
         if ($shouldLoadPointerTour) {
             wp_localize_script('basalam-admin-script', 'basalamPointerTour', PointerTour::getPointerTourConfig());
         }
 
-        if (AnnouncementCenter::shouldLoadOnCurrentPage()) {
+        if (AnnouncementCenter::shouldLoadAnnouncement()) {
             wp_localize_script('basalam-admin-script', 'basalamAnnouncements', AnnouncementCenter::getConfig());
         }
     }
+    
+
 }
