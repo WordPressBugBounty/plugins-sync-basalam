@@ -2,7 +2,7 @@
 use SyncBasalam\Admin\Components\SettingPageComponents;
 use SyncBasalam\Services\VendorInfoService;
 
-$vendorInfo = (new VendorInfoService())->getVendorInfo();
+$vendorInfo = (new VendorInfoService())->FetchVendorInfo();
 
 defined('ABSPATH') || exit;
 ?>
@@ -50,6 +50,7 @@ defined('ABSPATH') || exit;
                         حذف دسترسی
                     </button>
                 </form>
+                <?php if (apply_filters('sync_basalam_show_contact_us', true)): ?>
                 <div class="Basalam-contact-us-section">
                     <div class="basalam-contact-container basalam-contact-padding-top">
                         <a href="https://t.me/woosalam" target="_blank">
@@ -69,6 +70,7 @@ defined('ABSPATH') || exit;
                         </a>
                     </div>
                 </div>
+                <?php endif; ?>
             </div>
         </div>
     </center>

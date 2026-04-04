@@ -25,7 +25,6 @@ class VendorInfoService
     public function FetchVendorInfo()
     {
         if (!$this->basalamToken || !$this->basalamVendorId) {
-            update_option('sync_basalam_info', null);
             return null;
         }
 
@@ -34,31 +33,18 @@ class VendorInfoService
             $FetchVendorInfo = $this->apiService->get($apiUrl, ['Authorization' => 'Bearer ' . $this->basalamToken]);
 
             if (!is_array($FetchVendorInfo) || !isset($FetchVendorInfo['body'])) {
-                update_option('sync_basalam_info', null);
                 return null;
             }
 
             $vendorInfo = json_decode($FetchVendorInfo['body'], true);
             if (!is_array($vendorInfo)) {
-                update_option('sync_basalam_info', null);
                 return null;
             }
 
-            update_option('sync_basalam_info', $vendorInfo);
             return $vendorInfo;
         } catch (\Exception $e) {
             Logger::error('خطا در دریافت اطلاعات فروشنده: ' . $e->getMessage());
-            update_option('sync_basalam_info', null);
             return null;
         }
-    }
-
-    public function getVendorInfo()
-    {
-        $vendorInfo = get_option('sync_basalam_info');
-
-        if (!$vendorInfo) return $this->FetchVendorInfo();
-
-        return $vendorInfo;
     }
 }

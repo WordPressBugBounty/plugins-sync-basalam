@@ -3,8 +3,10 @@
 namespace SyncBasalam\Admin\Product\Data;
 
 use SyncBasalam\Admin\Product\Data\Validators\ValidatorChain;
+use SyncBasalam\Admin\Product\Data\Validators\ImageValidator;
 use SyncBasalam\Admin\Product\Data\Validators\ProductExistenceValidator;
 use SyncBasalam\Admin\Product\Data\Validators\ProductStatusValidator;
+use SyncBasalam\Admin\Product\Data\Validators\WeightValidator;
 use SyncBasalam\Admin\Product\ProductDataFactory;
 use SyncBasalam\Utilities\ProductMetaKey;
 
@@ -22,7 +24,10 @@ class ProductDataFacade
             self::$factory = new ProductDataFactory();
             self::$validator = new ValidatorChain();
 
-            self::$validator->add(new ProductExistenceValidator())->add(new ProductStatusValidator());
+            self::$validator->add(new ProductExistenceValidator())
+                ->add(new ProductStatusValidator())
+                ->add(new ImageValidator())
+                ->add(new WeightValidator());
 
             self::$builder = new ProductDataBuilder(self::$validator, self::$factory);
         }

@@ -3,6 +3,7 @@
 namespace SyncBasalam\Admin\Product\Data\Services;
 
 use SyncBasalam\Admin\Product\Category\CategoryMapping;
+use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Services\Products\GetCategoryId;
 
 defined('ABSPATH') || exit;
@@ -33,7 +34,15 @@ class CategoryService
             return $this->storeCache($productId, $mappedCategories);
         }
 
-        $productTitle = mb_substr($product->get_name(), 0, 120);
+        $productTitle = $product->get_name();
+
+        $prefix = syncBasalamSettings()->getSettings(SettingsConfig::PRODUCT_PREFIX_TITLE);
+        $suffix = syncBasalamSettings()->getSettings(SettingsConfig::PRODUCT_SUFFIX_TITLE);
+
+        if (!empty($prefix)) $productTitle = $prefix . ' ' . $productTitle;
+        if (!empty($suffix)) $productTitle = $productTitle . ' ' . $suffix;
+
+        $productTitle = mb_substr($productTitle, 0, 120);
         $detectedCategories = GetCategoryId::getCategoryIdFromBasalam(urlencode($productTitle), 'multi');
 
         $detectedCategories = $this->normalizeCategoryIds(is_array($detectedCategories) ? $detectedCategories : []);

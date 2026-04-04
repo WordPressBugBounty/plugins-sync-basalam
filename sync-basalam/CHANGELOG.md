@@ -2,6 +2,21 @@
 
 <details>
 
+<summary>1.8.2 - 2026-04-04</summary>
+
+### Added
+- Photo and weight validator for products
+- Filter hook for contact-us section visibility
+- Prefix and suffix to product title for category detection
+
+### Fixed
+- Fetch current vendor info without cache
+</details>
+
+<details>
+
+<details>
+
 <summary>1.8.1 - 2026-03-07</summary>
 
 ### Added
