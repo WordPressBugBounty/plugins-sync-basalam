@@ -2,6 +2,15 @@
 
 <details>
 
+<summary>1.8.4 - 2026-05-03</summary>
+
+### Fixed
+- Circuit Breaker mechanism
+
+</details>
+
+<details>
+
 <summary>1.8.3 - 2026-05-03</summary>
 
 ### Added
