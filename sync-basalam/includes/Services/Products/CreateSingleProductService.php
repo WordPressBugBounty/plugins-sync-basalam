@@ -2,6 +2,7 @@
 
 namespace SyncBasalam\Services\Products;
 
+use SyncBasalam\Admin\Product\Data\Validators\CreateProductDataValidator;
 use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Services\ApiServiceManager;
@@ -14,19 +15,18 @@ defined('ABSPATH') || exit;
 class CreateSingleProductService
 {
     private $apiservice;
+    private $validator;
 
-    public function __construct()
+    public function __construct($validator = null)
     {
         $this->apiservice = syncBasalamContainer()->get(ApiServiceManager::class);
+        $this->validator = $validator ?: new CreateProductDataValidator();
     }
 
     public function createProductInBasalam($productData, $productId)
     {
-        if (!get_post_type($productId) === 'product') {
-            throw new \Exception('نوع post محصول نیست.');
-        }
-
         $productData = apply_filters('sync_basalam_product_data_before_create', $productData, $productId);
+        $this->ValidCreateProductData($productData, $productId);
 
         do_action('sync_basalam_before_create_product_api', $productId, $productData);
 
@@ -165,5 +165,14 @@ class CreateSingleProductService
         }
 
         throw new \Exception("فرایند اضافه کردن محصول ناموفق بود");
+    }
+
+    private function ValidCreateProductData(array $productData, int $productId): void
+    {
+        $validation = $this->validator->validate($productData, $productId);
+
+        if (!$validation['valid']) {
+            throw NonRetryableException::invalidData($validation['message']);
+        }
     }
 }

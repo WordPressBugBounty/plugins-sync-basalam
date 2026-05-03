@@ -16,9 +16,9 @@ class AnnouncementCenter
 
     public static function shouldLoadAnnouncement(): bool
     {
-        
+
         $page = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
-        
+
         if ($page === '' || !is_admin() || !current_user_can('manage_options') || !syncBasalamSettings()->hasToken()) {
             return false;
         }
@@ -36,10 +36,11 @@ class AnnouncementCenter
         AnnouncementComponents::renderPanel();
     }
 
-    public static function getConfig(): array
+    public static function getConfig(): ?array
     {
         $result = self::getAnnouncements();
-        $seenIds = self::getSeenIds($result['data']);
+
+        if ($result) $seenIds = self::getSeenIds($result['data']);
 
         return [
             'nonce'          => wp_create_nonce(self::MARK_SEEN_ACTION),
@@ -47,9 +48,9 @@ class AnnouncementCenter
             'markSeenAction' => self::MARK_SEEN_ACTION,
             'fetchPageAction' => self::FETCH_PAGE_ACTION,
             'perPage'        => self::PER_PAGE,
-            'totalPage'      => $result['total_page'],
-            'seenIds'        => $seenIds,
-            'items'          => $result['data'],
+            'totalPage'      => $result['total_page'] ?? 1,
+            'seenIds'        => $seenIds  ?? [],
+            'items'          => $result['data'] ?? [],
         ];
     }
 
@@ -89,20 +90,18 @@ class AnnouncementCenter
         ]);
     }
 
-    private static function getSeenIds(array $announcements): array
+    private static function getSeenIds(?array $announcements): array
     {
         $seenIds = get_user_meta(get_current_user_id(), self::SEEN_META_KEY, true);
 
-        if (!is_array($seenIds)) {
-            return [];
-        }
+        if (!is_array($seenIds) || empty($announcements)) return [];
 
         $validAnnouncementIds = array_values(array_map(static fn($item) => (string) ($item['id'] ?? ''), $announcements));
 
         return array_values(array_intersect(array_map('strval', $seenIds), $validAnnouncementIds));
     }
 
-    private static function getAnnouncements(int $page = 1): array
+    private static function getAnnouncements(int $page = 1): ?array
     {
         $fetcher = new FetchAnnouncements();
         return $fetcher->fetch($page, self::PER_PAGE);

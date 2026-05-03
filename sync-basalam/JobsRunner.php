@@ -12,22 +12,26 @@ class JobsRunner
     private $jobExecutor;
     private $jobManager;
     private $discountScheduler;
+    private $CheckHttpBlockService;
 
     public function __construct(
         $jobManager,
         $jobExecutor,
-        $discountScheduler
+        $discountScheduler,
+        $CheckHttpBlockService
     )
     {
         add_action('init', [$this, 'checkAndRunJobs']);
         $this->jobManager = $jobManager;
         $this->jobExecutor = $jobExecutor;
         $this->discountScheduler = $discountScheduler;
+        $this->CheckHttpBlockService = $CheckHttpBlockService;
     }
 
     public function checkAndRunJobs(): void
     {
-        $this->jobManager->deleteStaleProcessingJobs(120);
+        if($this->CheckHttpBlockService->SyncBasalamHttpBlock()) return;
+        $this->jobManager->ConvertStaleProcessingJobs(120);
         $this->discountScheduler->process();
 
         $circuitBreaker = new CircuitBreaker();

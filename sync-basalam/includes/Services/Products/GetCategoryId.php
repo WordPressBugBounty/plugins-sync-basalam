@@ -9,7 +9,9 @@ use SyncBasalam\Services\ApiServiceManager;
 defined('ABSPATH') || exit;
 class GetCategoryId
 {
-    public static function getCategoryIdFromBasalam($productTitle, $mode = 'all')
+    private static array $loggedErrors = [];
+
+    public static function getCategoryIdFromBasalam($productTitle, $mode = 'all', bool $logErrors = false, bool $throwErrors = false)
     {
         $apiservice = syncBasalamContainer()->get(ApiServiceManager::class);
 
@@ -18,7 +20,14 @@ class GetCategoryId
         try {
             $result = $apiservice->get($url, []);
         } catch (\Exception $e) {
-            Logger::error('خطا در دریافت دسته‌بندی خودکار محصول: ' . $e->getMessage());
+            if ($logErrors) {
+                self::logErrorOnce('خطا در دریافت دسته‌بندی خودکار محصول: ' . $e->getMessage());
+            }
+
+            if ($throwErrors) {
+                throw $e;
+            }
+
             return false;
         }
 
@@ -56,6 +65,16 @@ class GetCategoryId
         }
 
         return false;
+    }
+
+    private static function logErrorOnce(string $message): void
+    {
+        if (isset(self::$loggedErrors[$message])) {
+            return;
+        }
+
+        self::$loggedErrors[$message] = true;
+        Logger::error($message);
     }
 
     public static function extractCategoryIds($categories, &$categoryIds)

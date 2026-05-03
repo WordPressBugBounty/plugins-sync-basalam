@@ -13,7 +13,7 @@ class MobileFields
 
         woocommerce_wp_checkbox([
             'id'          => '_sync_basalam_is_mobile_product_checkbox',
-            'label'       => 'محصول موبایلی(باسلام)',
+            'label'       => 'محصول موبایلی',
             'description' => 'در صورتی که محصول شما موبایل است ، این گزینه را فعال نمایید .',
             'desc_tip'    => true,
             'value'       => $checked,

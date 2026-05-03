@@ -14,7 +14,7 @@ defined('ABSPATH') || exit;
 
 class Plugin
 {
-    public const VERSION = '1.8.2';
+    public const VERSION = '1.8.3';
 
     public function __construct()
     {
@@ -63,6 +63,10 @@ class Plugin
                 require_once($template);
             });
         }
+        add_action('admin_notices', function () {
+            $template = syncBasalamPlugin()->templatePath("notifications/HttpBlock.php");
+            require_once($template);
+        });
     }
 
     private function registrars()

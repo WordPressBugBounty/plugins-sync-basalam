@@ -2,6 +2,7 @@
 
 namespace SyncBasalam\Admin\Product\Data\Services;
 
+use SyncBasalam\Admin\Product\elements\SingleProduct\PriceIncreaseField;
 use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Services\Products\FetchCommission;
 
@@ -15,7 +16,7 @@ class PriceService
         if (!$price) return null;
 
         $categoryIds = $this->getCategoryIds($product);
-        return $this->applyPriceCalculations($price, $categoryIds);
+        return $this->applyPriceCalculations($price, $categoryIds, $product);
     }
 
     private function getBasePrice($product)
@@ -36,9 +37,9 @@ class PriceService
         return null;
     }
 
-    private function applyPriceCalculations(float $price, array $categoryIds): ?int
+    private function applyPriceCalculations(float $price, array $categoryIds, $product): ?int
     {
-        $increaseValue = intval(syncBasalamSettings()->getSettings(SettingsConfig::INCREASE_PRICE_VALUE));
+        $increaseValue = $this->getIncreaseValue($product);
         $roundMode = syncBasalamSettings()->getSettings(SettingsConfig::ROUND_PRICE);
         $currency = get_woocommerce_currency();
 
@@ -51,6 +52,35 @@ class PriceService
         if ($finalPrice < 1000) return null;
 
         return intval($finalPrice);
+    }
+
+    private function getIncreaseValue($product): int
+    {
+        $productId = method_exists($product, 'get_id') ? intval($product->get_id()) : 0;
+
+        if ($productId > 0) {
+            $productIncrease = $this->getProductIncreaseMeta($productId);
+
+            if ($productIncrease !== '' && is_numeric($productIncrease)) {
+                return intval($productIncrease);
+            }
+
+            if (method_exists($product, 'get_parent_id')) {
+                $parentId = intval($product->get_parent_id());
+                $parentIncrease = $parentId > 0 ? $this->getProductIncreaseMeta($parentId) : '';
+
+                if ($parentIncrease !== '' && is_numeric($parentIncrease)) {
+                    return intval($parentIncrease);
+                }
+            }
+        }
+
+        return intval(syncBasalamSettings()->getSettings(SettingsConfig::INCREASE_PRICE_VALUE));
+    }
+
+    private function getProductIncreaseMeta(int $productId): string
+    {
+        return (string) get_post_meta($productId, PriceIncreaseField::META_KEY, true);
     }
 
     private function convertToRial(float $price, string $currency)

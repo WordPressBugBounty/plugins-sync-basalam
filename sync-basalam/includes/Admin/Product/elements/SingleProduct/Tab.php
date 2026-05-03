@@ -36,6 +36,12 @@ class Tab
         echo '</div>';
         echo '<div class="options_group">';
 
+        // Product-specific price increase field
+        PriceIncreaseField::renderField();
+
+        echo '</div>';
+        echo '<div class="options_group">';
+
         // Wholesale Product Field
         WholesaleField::renderCheckbox();
 
@@ -47,6 +53,7 @@ class Tab
     {
         MobileFields::saveCheckbox($post_id);
         TypeFields::saveCheckbox($post_id);
+        PriceIncreaseField::saveField($post_id);
         WholesaleField::saveCheckbox($post_id);
     }
 }

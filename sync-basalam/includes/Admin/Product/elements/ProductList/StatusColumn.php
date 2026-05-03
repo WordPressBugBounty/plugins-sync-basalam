@@ -14,7 +14,7 @@ class StatusColumn
         foreach ($columns as $key => $value) {
             $newColumns[$key] = $value;
             if ($key === 'price') {
-                $newColumns['sync_basalam_status'] = 'وضعیت محصول (باسلام)';
+                $newColumns['sync_basalam_status'] = 'وضعیت محصول';
             }
         }
 

@@ -26,7 +26,11 @@ class DetectionProductCategories extends ActionController
 
         $productTitle = mb_substr($productTitle, 0, 120);
 
-        $categoryIds = GetCategoryId::getCategoryIdFromBasalam($productTitle, 'all');
+        try {
+            $categoryIds = GetCategoryId::getCategoryIdFromBasalam($productTitle, 'all', true, true);
+        } catch (\Exception $e) {
+            wp_send_json_error(['message' => 'خطا در دریافت دسته‌بندی خودکار محصول: ' . $e->getMessage()], 500);
+        }
 
         if ($categoryIds && is_array($categoryIds)) {
             $categories = array_map(function ($category) {
@@ -38,5 +42,7 @@ class DetectionProductCategories extends ActionController
 
             wp_send_json_success($categories);
         }
+
+        wp_send_json_error(['message' => 'دسته‌بندی مناسبی برای این محصول پیدا نشد.'], 404);
     }
 }

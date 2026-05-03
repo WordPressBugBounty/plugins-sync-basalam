@@ -240,14 +240,7 @@
   font-family: "PelakFA";
 }
 
-#wpbody-content
-  > div.basalam-container
-  > div.basalam-dashboard
-  > div.basalam-action-cards
-  > div:nth-child(3)
-  > form
-  > div.basalam-form-group.basalam-p
-  > label::before {
+#wpbody-content>div.basalam-container>div.basalam-dashboard>div.basalam-action-cards>div:nth-child(3)>form>div.basalam-form-group.basalam-p>label::before {
   width: 4px;
   height: 4px;
 }
@@ -335,10 +328,8 @@
   padding-top: 10px;
 }
 
-.basalam-action-card
-  .basalam-input[type="number"]:hover::-webkit-outer-spin-button,
-.basalam-action-card
-  .basalam-input[type="number"]:hover::-webkit-inner-spin-button {
+.basalam-action-card .basalam-input[type="number"]:hover::-webkit-outer-spin-button,
+.basalam-action-card .basalam-input[type="number"]:hover::-webkit-inner-spin-button {
   opacity: 1;
 }
 
@@ -603,6 +594,7 @@
   -ms-transform: translateY(-1px);
   -o-transform: translateY(-1px);
 }
+
 .basalam-access-button:hover {
   background: var(--basalam-primary-hover);
   color: white;
@@ -1677,6 +1669,7 @@
 }
 
 @media screen and (max-width: 480px) {
+
   #basalam-modal .basalam-action-card .basalam-form-row,
   #basalam-modal section#sep-section .basalam-form-row {
     grid-template-columns: 1fr !important;
@@ -1891,11 +1884,9 @@ input[type="number"]::-webkit-outer-spin-button {
   right: 0;
   width: 100px;
   height: 100px;
-  background: linear-gradient(
-    135deg,
-    var(--basalam-danger-color) 0%,
-    transparent 60%
-  );
+  background: linear-gradient(135deg,
+      var(--basalam-danger-color) 0%,
+      transparent 60%);
   opacity: 0.1;
   border-radius: 0 16px 0 100px;
 }
@@ -1933,6 +1924,7 @@ input[type="number"]::-webkit-outer-spin-button {
   -ms-transition: all 0.2s ease;
   -o-transition: all 0.2s ease;
 }
+
 .basalam-access-button {
   background: var(--basalam-primary-color);
   color: white;
@@ -2022,11 +2014,9 @@ input[type="number"]::-webkit-outer-spin-button {
   right: 0;
   width: 150px;
   height: 150px;
-  background: linear-gradient(
-    135deg,
-    var(--basalam-primary-color) 0%,
-    transparent 60%
-  );
+  background: linear-gradient(135deg,
+      var(--basalam-primary-color) 0%,
+      transparent 60%);
   opacity: 0.1;
   border-radius: 0 16px 0 150px;
 }
@@ -2138,10 +2128,12 @@ input[type="number"]::-webkit-outer-spin-button {
   justify-content: center;
   flex: 1;
 }
+
 .basalam_settings_options {
   font-family: "PelakFA" !important;
   font-weight: bold;
 }
+
 .basalam_status_data_item {
   display: flex;
   align-items: baseline;
@@ -2172,7 +2164,7 @@ input[type="number"]::-webkit-outer-spin-button {
   direction: ltr;
 }
 
-#sync_basalam_single_product_manage_box > div.inside > button:nth-child(4) {
+#sync_basalam_single_product_manage_box>div.inside>button:nth-child(4) {
   background-color: var(--basalam-danger-hover);
 }
 
@@ -2569,8 +2561,8 @@ input[type="number"]::-webkit-outer-spin-button {
   font-weight: bold;
 }
 
-#basalam_order_settings > div.postbox-header > h2,
-#basalam_order_info > div.postbox-header > h2 {
+#basalam_order_settings>div.postbox-header>h2,
+#basalam_order_info>div.postbox-header>h2 {
   font-family: "PelakFA";
 }
 
@@ -2582,7 +2574,7 @@ input[type="number"]::-webkit-outer-spin-button {
   display: inline-block !important;
 }
 
-#toplevel_page_sync_basalam > a > div.wp-menu-image.dashicons-before > img {
+#toplevel_page_sync_basalam>a>div.wp-menu-image.dashicons-before>img {
   padding: 5px 0 0;
 }
 
@@ -2745,7 +2737,7 @@ input[type="number"]::-webkit-outer-spin-button {
   animation: basalam-modal-fade-in 0.3s ease-out;
 }
 
-body > .basalam-info-modal {
+body>.basalam-info-modal {
   position: fixed !important;
   z-index: 2147483647 !important;
 }
@@ -2757,7 +2749,7 @@ body > .basalam-info-modal {
 }
 
 #wpwrap .basalam-info-modal,
-#wpadminbar ~ * .basalam-info-modal,
+#wpadminbar~* .basalam-info-modal,
 .wp-admin .basalam-info-modal {
   position: fixed !important;
   top: 0 !important;
@@ -2795,7 +2787,7 @@ body > .basalam-info-modal {
 
 .basalam-label-container .basalam-label {
   margin-bottom: 0 !important;
-  display: flex;
+  /* display: flex !important; */
   align-items: center;
   flex: 1;
   justify-content: space-between;
@@ -3177,7 +3169,7 @@ body > .basalam-info-modal {
     flex-direction: column;
   }
 
-  .vendor-info > .basalam-p {
+  .vendor-info>.basalam-p {
     font-size: 18px;
     margin-bottom: 15px !important;
     text-align: center !important;
@@ -3236,7 +3228,7 @@ body > .basalam-info-modal {
     align-items: center;
   }
 
-  .basalam-card > .basalam-p:first-child {
+  .basalam-card>.basalam-p:first-child {
     font-size: 16px;
     margin-bottom: 12px !important;
     text-align: center;
@@ -3300,6 +3292,10 @@ body > .basalam-info-modal {
 
   .basalam-contact-btn:active {
     transform: scale(0.95);
+    -webkit-transform: ;
+    -moz-transform: ;
+    -ms-transform: ;
+    -o-transform: ;
   }
 
   .basalam-contact-btn img {
@@ -3337,7 +3333,7 @@ body > .basalam-info-modal {
     padding: 15px;
   }
 
-  .basalam-card > .basalam-p:first-child {
+  .basalam-card>.basalam-p:first-child {
     font-size: 15px;
   }
 
@@ -3558,7 +3554,7 @@ body > .basalam-info-modal {
     box-sizing: border-box;
   }
 
-  .vendor-info > .basalam-p {
+  .vendor-info>.basalam-p {
     font-size: 16px;
     margin-bottom: 12px !important;
     text-align: center !important;
@@ -3614,7 +3610,7 @@ body > .basalam-info-modal {
     box-sizing: border-box;
   }
 
-  .basalam-card > .basalam-p:first-child {
+  .basalam-card>.basalam-p:first-child {
     font-size: 14px;
     text-align: center;
     margin-bottom: 10px !important;
@@ -3680,7 +3676,7 @@ body > .basalam-info-modal {
     width: 100%;
   }
 
-  .vendor-info > .basalam-p {
+  .vendor-info>.basalam-p {
     font-size: 15px;
   }
 
@@ -3705,7 +3701,7 @@ body > .basalam-info-modal {
     width: 100%;
   }
 
-  .basalam-card > .basalam-p:first-child {
+  .basalam-card>.basalam-p:first-child {
     font-size: 13px;
   }
 
@@ -3784,11 +3780,11 @@ body > .basalam-info-modal {
   border-radius: 50%;
 }
 
-.basalam-switch input:checked + .basalam-slider {
+.basalam-switch input:checked+.basalam-slider {
   background-color: var(--basalam-primary-color);
 }
 
-.basalam-switch input:checked + .basalam-slider:before {
+.basalam-switch input:checked+.basalam-slider:before {
   transform: translateX(26px);
 }
 
@@ -6272,23 +6268,29 @@ body > .basalam-info-modal {
   .ticket-header-data-heading {
     text-align: justify !important;
   }
+
   .ticket-list {
     gap: 12px;
   }
+
   .ticket-card {
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     gap: 12px;
     padding: 16px;
   }
+
   .ticket-card__field {
     align-items: center;
   }
+
   .ticket-card__field-label {
     display: none;
   }
+
   .ticket-card__field-value {
     font-size: 14px !important;
   }
+
   .ticket-card__field-status {
     padding: 8px;
   }
@@ -6730,6 +6732,7 @@ body > .basalam-info-modal {
   .ticket-items__answer {
     padding: 20px;
   }
+
   .ticket-items__item {
     padding: 20px;
   }
@@ -6758,12 +6761,14 @@ body > .basalam-info-modal {
   direction: ltr;
   unicode-bidi: bidi-override;
 }
+
 .basalam-star {
   font-size: 28px;
   cursor: pointer;
   color: #f5a623;
   transition: color 0.2s;
 }
+
 .basalam-star:hover {
   transform: scale(1.1);
 }
@@ -6817,6 +6822,7 @@ body > .basalam-info-modal {
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }
+
 .basalam-tab-btn.active {
   color: var(--basalam-primary-color);
   border-bottom-color: var(--basalam-primary-color);
@@ -6896,7 +6902,12 @@ body > .basalam-info-modal {
   from {
     opacity: 0;
     transform: translateY(10px);
+    -webkit-transform: translateY(10px);
+    -moz-transform: translateY(10px);
+    -ms-transform: translateY(10px);
+    -o-transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -7071,6 +7082,286 @@ body > .basalam-info-modal {
   border-top-color: #fff;
 }
 
+#bulk-edit .sync-basalam-bulk-edit {
+  display: none;
+}
+
+#bulk-edit.sync-basalam-bulk-mode .sync-basalam-bulk-edit {
+  display: block;
+}
+
+#bulk-edit.sync-basalam-bulk-mode .inline-edit-col-left,
+#bulk-edit.sync-basalam-bulk-mode .inline-edit-col-center,
+#bulk-edit.sync-basalam-bulk-mode .inline-edit-group,
+#bulk-edit.sync-basalam-bulk-mode .inline-edit-tags-wrap,
+#bulk-edit.sync-basalam-bulk-mode #woocommerce-fields-bulk,
+#bulk-edit.sync-basalam-bulk-mode fieldset.inline-edit-col-right:not(.sync-basalam-bulk-edit),
+#bulk-edit.sync-basalam-bulk-mode .inline-edit-col h4:not(.sync-basalam-bulk-edit__title),
+#bulk-edit.sync-basalam-bulk-mode .inline-edit-col>label:not(.sync-basalam-bulk-edit__field),
+#bulk-edit.sync-basalam-bulk-mode .inline-edit-col .inline-edit-group,
+#bulk-edit.sync-basalam-bulk-mode .inline-edit-col .cat-checklist,
+#bulk-edit.sync-basalam-bulk-mode .inline-edit-col .input-text-wrap,
+#bulk-edit.sync-basalam-bulk-mode .inline-edit-col .textarea-wrap,
+#bulk-edit.sync-basalam-bulk-mode .inline-edit-col .inline-edit-date,
+#bulk-edit.sync-basalam-bulk-mode .inline-edit-col .inline-edit-categories-label,
+#bulk-edit.sync-basalam-bulk-mode .inline-edit-col .inline-edit-tax,
+#bulk-edit.sync-basalam-bulk-mode .inline-edit-save .inline-edit-group {
+  display: none !important;
+}
+
+#bulk-edit.sync-basalam-bulk-mode .inline-edit-col-right {
+  width: 100%;
+  float: none;
+}
+
+#bulk-edit.sync-basalam-bulk-mode .inline-edit-col-right .inline-edit-col {
+  margin-right: 0;
+  width: 100%;
+}
+
+#bulk-edit.sync-basalam-bulk-mode td {
+  padding: 16px 20px !important;
+}
+
+#bulk-edit.sync-basalam-bulk-mode .inline-edit-wrapper {
+  display: block;
+}
+
+#bulk-edit.sync-basalam-bulk-mode .inline-edit-save {
+  margin-top: 14px;
+}
+
+#bulk-edit.sync-basalam-bulk-mode .submit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-start;
+  flex-direction: row-reverse;
+}
+
+#bulk-edit.sync-basalam-bulk-mode .submit .button {
+  font-family: "PelakFA", IRANSans, Tahoma, sans-serif;
+  min-height: 40px;
+  border-radius: 10px;
+  padding: 0 16px;
+}
+
+.sync-basalam-bulk-edit__header {
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #ffe3d8;
+}
+
+.sync-basalam-bulk-edit__title {
+  text-align: right !important;
+  font-size: 22px !important;
+}
+
+.sync-basalam-bulk-edit__desc {
+  text-align: right !important;
+  margin-top: 6px !important;
+  color: var(--basalam-gray-600);
+}
+
+.sync-basalam-bulk-edit__field {
+  float: none !important;
+  display: block;
+  width: 100%;
+  margin: 0 0 14px !important;
+}
+
+.sync-basalam-bulk-edit__field .title {
+  display: block;
+  float: none !important;
+  width: 100% !important;
+  margin-bottom: 8px;
+  padding: 0 !important;
+  text-align: right !important;
+}
+
+.sync-basalam-bulk-edit__field .basalam-label-container {
+  margin-bottom: 8px;
+}
+
+.sync-basalam-bulk-edit__field .basalam-label {
+  display: flex !important;
+  width: 100%;
+}
+
+.sync-basalam-bulk-edit__field .basalam-label-text {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--basalam-gray-700);
+}
+
+.sync-basalam-bulk-edit__field select,
+.sync-basalam-bulk-edit__field input {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 42px;
+  box-sizing: border-box;
+}
+
+.sync-basalam-bulk-edit__fields {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.sync-basalam-bulk-edit__section {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.sync-basalam-bulk-edit__divider {
+  width: 1px;
+  min-width: 1px;
+  align-self: stretch;
+  background: #ffd9cc;
+  border-radius: 999px;
+}
+
+.sync-basalam-bulk-type-fields {
+  display: none;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: stretch;
+  width: 100%;
+  gap: 12px;
+  margin-top: 10px;
+  align-items: end;
+}
+
+.sync-basalam-bulk-mode .sync-basalam-bulk-type-fields {
+  display: flex;
+}
+
+.sync-basalam-bulk-type-fields .sync-basalam-bulk-edit__field {
+  flex: 1 1 0;
+  min-width: 0;
+  margin-bottom: 0 !important;
+}
+
+.sync-basalam-bulk-increase-value {
+  display: none;
+  margin-top: 10px !important;
+}
+
+.sync-basalam-bulk-increase-value .basalam-input-container {
+  justify-content: stretch;
+  width: 100%;
+}
+
+.sync-basalam-bulk-increase-value .percentage-input {
+  flex: 1 1 0;
+}
+
+.sync-basalam-bulk-increase-value .percentage-unit {
+  min-width: 42px;
+  text-align: center !important;
+}
+
+.sync-basalam-bulk-increase-value .basalam-flex-end-gap-4 {
+  justify-content: flex-end;
+}
+
+.sync-basalam-bulk-edit__panel .basalam-input,
+.sync-basalam-bulk-edit__panel .basalam-select,
+.sync-basalam-bulk-edit__panel .sync-basalam-bulk-select {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  padding: 10px 14px !important;
+  border: 1px solid var(--basalam-gray-300) !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  color: var(--basalam-gray-800) !important;
+  font-family: "PelakFA", IRANSans, Tahoma, sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: 1.6 !important;
+  box-shadow: none !important;
+}
+
+.sync-basalam-bulk-edit__panel .basalam-input::placeholder {
+  color: var(--basalam-gray-500);
+  font-weight: 500;
+}
+
+.sync-basalam-bulk-edit__panel .basalam-input:focus,
+.sync-basalam-bulk-edit__panel .basalam-select:focus,
+.sync-basalam-bulk-edit__panel .sync-basalam-bulk-select:focus {
+  outline: none !important;
+  border-color: var(--basalam-primary-color) !important;
+  box-shadow: 0 0 0 3px rgba(255, 92, 53, 0.12) !important;
+}
+
+.sync-basalam-bulk-edit__panel input[type="number"]::-webkit-outer-spin-button,
+.sync-basalam-bulk-edit__panel input[type="number"]::-webkit-inner-spin-button {
+  margin: 0;
+}
+
+@media screen and (max-width: 782px) {
+  #bulk-edit.sync-basalam-bulk-mode td {
+    padding: 12px !important;
+  }
+
+  #bulk-edit.sync-basalam-bulk-mode .submit {
+    justify-content: stretch;
+    flex-wrap: wrap;
+  }
+
+  #bulk-edit.sync-basalam-bulk-mode .submit .button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .sync-basalam-bulk-type-fields {
+    flex-direction: column;
+  }
+
+  .sync-basalam-bulk-edit__fields {
+    flex-direction: column;
+  }
+
+  .sync-basalam-bulk-edit__divider {
+    width: 100%;
+    min-width: 100%;
+    min-height: 1px;
+  }
+
+  #sync_basalam_like_alert {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    padding: 12px !important;
+  }
+
+  #sync_basalam_like_alert .basalam-p {
+    flex: 0 0 100%;
+    width: 100%;
+    text-align: right !important;
+    font-size: 12px !important;
+    line-height: 1.8;
+  }
+
+  #sync_basalam_like_alert .button,
+  #sync_basalam_like_alert .button-primary {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 38px;
+    padding: 0 8px;
+    margin: 0;
+    text-align: center;
+    white-space: nowrap;
+  }
+}
+
 body.sync-basalam-announcement-open {
   overflow: hidden;
 }
@@ -7089,11 +7380,9 @@ body.sync-basalam-announcement-open {
   height: 52px;
   border: 1px solid rgba(255, 255, 255, 0.55);
   border-radius: 16px;
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.86),
-    rgba(247, 250, 252, 0.72)
-  );
+  background: linear-gradient(145deg,
+      rgba(255, 255, 255, 0.86),
+      rgba(247, 250, 252, 0.72));
   backdrop-filter: blur(12px);
   box-shadow: 0 10px 24px rgba(45, 55, 72, 0.16);
   color: var(--basalam-primary-color);
@@ -7109,6 +7398,10 @@ body.sync-basalam-announcement-open {
 .sync-basalam-announcement-trigger:hover {
   transform: translateY(-2px);
   box-shadow: 0 14px 30px rgba(45, 55, 72, 0.22);
+  -webkit-transform: translateY(-2px);
+  -moz-transform: translateY(-2px);
+  -ms-transform: translateY(-2px);
+  -o-transform: translateY(-2px);
 }
 
 .sync-basalam-announcement-trigger .dashicons {
@@ -7157,11 +7450,9 @@ body.sync-basalam-announcement-open {
   width: min(420px, calc(100vw - 32px));
   height: calc(100vh - 72px);
   border-radius: 24px;
-  background: linear-gradient(
-    165deg,
-    rgba(255, 255, 255, 0.86),
-    rgba(237, 242, 247, 0.68)
-  );
+  background: linear-gradient(165deg,
+      rgba(255, 255, 255, 0.86),
+      rgba(237, 242, 247, 0.68));
   border: 1px solid rgba(255, 255, 255, 0.72);
   box-shadow: 0 22px 45px rgba(45, 55, 72, 0.2);
   backdrop-filter: blur(16px);
@@ -7361,5 +7652,104 @@ body.sync-basalam-announcement-open {
 
   .sync-basalam-announcement-image-wrap {
     display: none;
+  }
+}
+
+
+.sync-basalam-bulk-edit__field .basalam-label {
+  display: flex !important;
+}
+
+#sync-basalam-bulk-toggle-percentage {
+  width: 5px !important;
+  max-width: 5px !important;
+  min-height: 5px !important;
+}
+._sync_basalam_increase_price_value_field{
+  font-family: pelakFa;
+}
+
+.basalam-increase-price-field {
+  display: grid;
+  grid-template-columns: minmax(150px, max-content) minmax(220px, 1fr);
+  align-items: start;
+  column-gap: 16px;
+  row-gap: 8px;
+  width: 100%;
+}
+
+.basalam-increase-price-field__label-section {
+  grid-column: 1;
+  justify-self: end;
+}
+
+.basalam-increase-price-field__header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  width: 100%;
+}
+
+.basalam-increase-price-field__header label {
+  margin: 0 !important;
+  text-align: right;
+}
+
+.basalam-increase-price-field__control-section {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 0;
+}
+
+.basalam-increase-price-field__input-row {
+  justify-content: stretch;
+  width: 100%;
+  direction: rtl;
+}
+
+.basalam-increase-price-field__input-row .percentage-input {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.basalam-increase-price-field__input-row .percentage-unit {
+  min-width: 48px;
+  text-align: center !important;
+}
+
+.basalam-increase-price-field__toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  direction: ltr;
+  width: fit-content;
+  margin-top: 2px;
+  align-self: center;
+}
+
+.basalam-increase-price-field__toggle-row label {
+  direction: rtl;
+}
+
+@media screen and (max-width: 782px) {
+  .basalam-increase-price-field {
+    grid-template-columns: 1fr;
+  }
+
+  .basalam-increase-price-field__label-section,
+  .basalam-increase-price-field__control-section {
+    grid-column: 1;
+  }
+
+  .basalam-increase-price-field__label-section {
+    justify-self: stretch;
+  }
+
+  .basalam-increase-price-field__header {
+    justify-content: flex-start;
   }
 }

@@ -1,4 +1,21 @@
 jQuery(document).ready(function ($) {
+  function getAjaxErrorMessage(xhr, fallbackMessage) {
+    if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
+      return xhr.responseJSON.data.message;
+    }
+
+    if (xhr.responseText) {
+      try {
+        var parsed = JSON.parse(xhr.responseText);
+        if (parsed && parsed.data && parsed.data.message) {
+          return parsed.data.message;
+        }
+      } catch (e) {}
+    }
+
+    return fallbackMessage;
+  }
+
   $(document).on("change", ".category-option", function () {
     if ($(this).is(":checked")) {
       var catID = $(this).val();
@@ -67,9 +84,8 @@ jQuery(document).ready(function ($) {
           });
         },
         error: function (xhr, status, error) {
-          $("#sync_basalam_category_attributes").html(
-            "خطا در دریافت ویژگی‌ها: " + error
-          );
+          var message = getAjaxErrorMessage(xhr, "خطا در دریافت ویژگی‌ها.");
+          $("#sync_basalam_category_attributes").html(message);
         },
       });
     } else {
@@ -124,12 +140,17 @@ jQuery(document).ready(function ($) {
           html += `</div>`;
           $("#sync_basalam_category_id").html(html);
         } else {
-          $("#sync_basalam_category_id").html("خطا در دریافت دسته بندی ها");
+          $("#sync_basalam_category_id").html(
+            res.data && res.data.message
+              ? res.data.message
+              : "خطا در دریافت دسته‌بندی‌ها."
+          );
         }
         $btn.prop("disabled", false).text(originalText);
       },
       error: function (xhr, status, error) {
-        $("#sync_basalam_category_id").html("خطایی در ارتباط رخ داد: " + error);
+        var message = getAjaxErrorMessage(xhr, "خطا در دریافت دسته‌بندی خودکار محصول.");
+        $("#sync_basalam_category_id").html(message);
         $btn.prop("disabled", false).text(originalText);
       },
     });

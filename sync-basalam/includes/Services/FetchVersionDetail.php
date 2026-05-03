@@ -25,7 +25,7 @@ class FetchVersionDetail
         try {
             $response = $this->apiService->get($url);
             return $response;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Logger::error('خطا در دریافت اطلاعات نسخه: ' . $e->getMessage());
             return null;
         }
@@ -51,7 +51,7 @@ class FetchVersionDetail
 
             delete_option('sync_basalam_force_update');
             return false;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Logger::error('خطا در بررسی force update: ' . $e->getMessage());
             return false;
         }

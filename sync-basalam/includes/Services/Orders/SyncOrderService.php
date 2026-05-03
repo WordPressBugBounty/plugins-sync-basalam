@@ -29,7 +29,8 @@ class SyncOrderService
             $invoiceId = $order['order']['id'] ?? null;
 
             if (!$invoiceId) {
-                Logger::warning("سفارش بدون شناسه فاکتور پیدا شد: " . json_encode($order));
+                $message = "سفارش بدون شناسه فاکتور پیدا شد: " . wp_json_encode($order, JSON_UNESCAPED_UNICODE);
+                Logger::warning($message);
                 continue;
             }
 
@@ -46,16 +47,15 @@ class SyncOrderService
             }
 
             try {
-                $request = new \WP_REST_Request('POST');
-                $request->set_param('invoice_id', $order['order']['id']);
-                $request->set_param('user_id', $order['order']['customer']['user']['id'] ?? null);
-                $request->set_param('city_id', $order['order']['customer']['city']['id'] ?? null);
-                $request->set_param('province_id', $order['order']['customer']['city']['parent']['id'] ?? null);
+                $result = OrderManager::createOrderWoo([
+                    'invoice_id'  => $order['order']['id'],
+                    'user_id'     => $order['order']['customer']['user']['id'] ?? null,
+                    'city_id'     => $order['order']['customer']['city']['id'] ?? null,
+                    'province_id' => $order['order']['customer']['city']['parent']['id'] ?? null,
+                ]);
 
-                $result = OrderManager::createOrderWoo($request->get_params());
-
-                if (is_wp_error($result) || (isset($result->data['success']) && !$result->data['success'])) {
-                    $errorMsg = is_wp_error($result) ? $result->get_error_message() : ($result->data['error'] ?? 'خطای نامشخص');
+                if (empty($result['success'])) {
+                    $errorMsg = $result['error'] ?? 'خطای نامشخص';
                     Logger::error("خطا در ایجاد سفارش {$invoiceId}: " . $errorMsg);
                     $errors[] = "سفارش {$invoiceId}: " . $errorMsg;
                 } else {

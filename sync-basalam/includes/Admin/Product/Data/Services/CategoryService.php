@@ -23,18 +23,23 @@ class CategoryService
 
     public function getCategoryIds($product): array
     {
-        $productId = $this->resolveProductId($product);
+        $categoryProduct = $this->resolveCategoryProduct($product);
+        $productId = $this->resolveProductId($categoryProduct);
 
         if ($productId !== null && array_key_exists($productId, self::$resolvedCategoryCache)) {
             return self::$resolvedCategoryCache[$productId];
         }
 
-        $mappedCategories = $this->normalizeCategoryIds($this->getMappedCategories($product));
+        $mappedCategories = $this->normalizeCategoryIds($this->getMappedCategories($categoryProduct));
         if (!empty($mappedCategories)) {
             return $this->storeCache($productId, $mappedCategories);
         }
 
-        $productTitle = $product->get_name();
+        if (!is_object($categoryProduct) || !method_exists($categoryProduct, 'get_name')) {
+            return $this->storeCache($productId, []);
+        }
+
+        $productTitle = $categoryProduct->get_name();
 
         $prefix = syncBasalamSettings()->getSettings(SettingsConfig::PRODUCT_PREFIX_TITLE);
         $suffix = syncBasalamSettings()->getSettings(SettingsConfig::PRODUCT_SUFFIX_TITLE);
@@ -43,7 +48,7 @@ class CategoryService
         if (!empty($suffix)) $productTitle = $productTitle . ' ' . $suffix;
 
         $productTitle = mb_substr($productTitle, 0, 120);
-        $detectedCategories = GetCategoryId::getCategoryIdFromBasalam(urlencode($productTitle), 'multi');
+        $detectedCategories = GetCategoryId::getCategoryIdFromBasalam(urlencode($productTitle), 'multi', false, true);
 
         $detectedCategories = $this->normalizeCategoryIds(is_array($detectedCategories) ? $detectedCategories : []);
 
@@ -57,6 +62,25 @@ class CategoryService
         }
 
         return $categoryIds;
+    }
+
+    private function resolveCategoryProduct($product)
+    {
+        if (!is_object($product)) {
+            return $product;
+        }
+
+        if ($product instanceof \WC_Product_Variation) {
+            $parentId = $product->get_parent_id();
+            if ($parentId > 0) {
+                $parentProduct = wc_get_product($parentId);
+                if ($parentProduct) {
+                    return $parentProduct;
+                }
+            }
+        }
+
+        return $product;
     }
 
     private function resolveProductId($product): ?int
@@ -85,6 +109,10 @@ class CategoryService
 
     private function getMappedCategories($product): array
     {
+        if (!is_object($product) || !method_exists($product, 'get_category_ids')) {
+            return [];
+        }
+
         $wooCategories = $product->get_category_ids();
 
         if (empty($wooCategories)) return [];

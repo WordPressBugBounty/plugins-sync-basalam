@@ -851,6 +851,128 @@ document.addEventListener("DOMContentLoaded", function () {
     toggleAttributeSuffixPriority();
   }
 
+  const initBulkEditFields = () => {
+    const SYNC_BASALAM_BULK_ACTION = "sync_basalam_bulk_edit";
+
+    const syncTypeVisibility = () => {
+      document
+        .querySelectorAll('select[name="sync_basalam_bulk_product_type_action"]')
+        .forEach((select) => {
+          const container = select
+            .closest(".sync-basalam-bulk-edit")
+            ?.querySelector(".sync-basalam-bulk-type-fields");
+
+          if (container) {
+            container.style.display = select.value === "yes" ? "flex" : "none";
+          }
+        });
+    };
+
+    const syncIncreaseVisibility = () => {
+      document
+        .querySelectorAll('select[name="sync_basalam_bulk_increase_action"]')
+        .forEach((select) => {
+          const field = select
+            .closest(".sync-basalam-bulk-edit")
+            ?.querySelector(".sync-basalam-bulk-increase-value");
+
+          if (field) {
+            field.style.display = select.value === "set" ? "block" : "none";
+          }
+        });
+    };
+
+    const setBulkEditMode = (mode) => {
+      const bulkRow = document.getElementById("bulk-edit");
+      if (!bulkRow) {
+        return;
+      }
+
+      bulkRow.classList.remove("sync-basalam-bulk-mode", "sync-basalam-default-bulk-mode");
+      bulkRow.classList.add(mode === "basalam" ? "sync-basalam-bulk-mode" : "sync-basalam-default-bulk-mode");
+    };
+
+    const openBasalamBulkEditor = (sourceSelect) => {
+      if (!window.inlineEditPost || typeof window.inlineEditPost.setBulk !== "function") {
+        return;
+      }
+
+      setBulkEditMode("basalam");
+
+      sourceSelect.value = "edit";
+      window.inlineEditPost.setBulk();
+      sourceSelect.value = SYNC_BASALAM_BULK_ACTION;
+
+      window.requestAnimationFrame(() => {
+        setBulkEditMode("basalam");
+        syncTypeVisibility();
+        syncIncreaseVisibility();
+      });
+    };
+
+    document.addEventListener("change", (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLSelectElement)) {
+        return;
+      }
+
+      if (target.name === "sync_basalam_bulk_product_type_action") {
+        syncTypeVisibility();
+      }
+
+      if (target.name === "sync_basalam_bulk_increase_action") {
+        syncIncreaseVisibility();
+      }
+    });
+
+    document.addEventListener("click", (event) => {
+      const button = event.target instanceof Element
+        ? event.target.closest("#doaction, #doaction2")
+        : null;
+
+      if (!button) {
+        return;
+      }
+
+      const selectorId = button.id === "doaction2" ? "bulk-action-selector-bottom" : "bulk-action-selector-top";
+      const actionSelect = document.getElementById(selectorId);
+
+      if (!(actionSelect instanceof HTMLSelectElement)) {
+        return;
+      }
+
+      if (actionSelect.value === SYNC_BASALAM_BULK_ACTION) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        openBasalamBulkEditor(actionSelect);
+        return;
+      }
+
+      if (actionSelect.value === "edit") {
+        setBulkEditMode("default");
+      }
+    }, true);
+
+    document.addEventListener("click", (event) => {
+      const cancelButton = event.target instanceof Element
+        ? event.target.closest("#bulk-edit .cancel")
+        : null;
+
+      if (!cancelButton) {
+        return;
+      }
+
+      setBulkEditMode("default");
+    });
+
+    setBulkEditMode("default");
+
+    syncTypeVisibility();
+    syncIncreaseVisibility();
+  };
+
+  initBulkEditFields();
+
   var modal = document.getElementById("sync_basalam_support_modal");
   var btn = document.getElementById("sync_basalam_support_btn");
   var cancelBtn = document.getElementById("sync_basalam_cancel_btn");

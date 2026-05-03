@@ -2,6 +2,8 @@
 
 namespace SyncBasalam\Admin\Product\elements\SingleProduct;
 
+use SyncBasalam\Admin\Product\Utils\ProductUnits;
+
 defined('ABSPATH') || exit;
 
 class TypeFields
@@ -13,7 +15,7 @@ class TypeFields
 
         woocommerce_wp_checkbox([
             'id'          => '_sync_basalam_is_product_type_checkbox',
-            'label'       => 'نوع محصول (باسلام)',
+            'label'       => 'نوع محصول',
             'description' => 'اگر این محصول از نوع باسلام است، این گزینه را فعال نمایید.',
             'desc_tip'    => true,
             'checked'     => $checked,
@@ -33,44 +35,7 @@ class TypeFields
         $unitValue = get_post_meta($postId, '_sync_basalam_product_unit', true);
         $amountValue = get_post_meta($postId, '_sync_basalam_product_value', true);
 
-        $units = [
-            'none' => 'انتخاب کنید',
-            '6304' => 'عددی',
-            '6305' => 'کیلو‌گرم',
-            '6306' => 'گرم',
-            '6307' => 'متر',
-            '6308' => 'سانتی‌متر',
-            '6309' => 'مثقال',
-            '6310' => 'تکه (اسلایس)',
-            '6311' => 'لیتر',
-            '6312' => 'میلی‌لیتر',
-            '6313' => 'سی‌سی',
-            '6314' => 'انس',
-            '6315' => 'قواره',
-            '6316' => 'طاقه',
-            '6317' => 'جین',
-            '6318' => 'جفت',
-            '6319' => 'بسته',
-            '6320' => 'توپ',
-            '6321' => 'کارتن',
-            '6322' => 'تخته',
-            '6323' => 'بطری',
-            '6324' => 'دست',
-            '6325' => 'بوته',
-            '6326' => 'شاخه',
-            '6327' => 'قالب',
-            '6328' => 'کلاف',
-            '6329' => 'اصله',
-            '6330' => 'سیر',
-            '6331' => 'اینچ',
-            '6332' => 'فوت',
-            '6373' => 'جلد',
-            '6374' => 'میلی‌متر',
-            '6375' => 'مترمربع',
-            '6392' => 'رول',
-            '6438' => 'سوت',
-            '6466' => 'قیراط',
-        ];
+        $units = ProductUnits::all();
 
         woocommerce_wp_select([
             'id'      => '_sync_basalam_product_unit',

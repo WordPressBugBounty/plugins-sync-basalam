@@ -128,6 +128,7 @@ function sync_basalam_remove_all_plugin_data(): void
                 OR meta_key = %s
                 OR meta_key = %s
                 OR meta_key = %s
+                OR meta_key = %s
                 OR meta_key = %s",
             'sync_basalam_%',
             '_sync_basalam_%',
@@ -135,7 +136,8 @@ function sync_basalam_remove_all_plugin_data(): void
             '_basalam_order_tracking_code',
             '_basalam_fee_amount',
             '_basalam_balance_amount',
-            '_basalam_purchase_count'
+            '_basalam_purchase_count',
+            '_sync_basalam_increase_price_value'
         )
     );
 

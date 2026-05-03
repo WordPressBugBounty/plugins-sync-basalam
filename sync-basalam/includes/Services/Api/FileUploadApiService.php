@@ -26,7 +26,7 @@ class FileUploadApiService
 
         $response = wp_remote_post($url, ['headers' => $headers, 'body' => $payload]);
 
-        return $this->handleResponse($response);
+        return $this->handleResponse($response, $url);
     }
 
     private function validateFile(string $filePath): array
@@ -50,9 +50,11 @@ class FileUploadApiService
         return ['valid' => true, 'message' => 'فایل متعبر است'];
     }
 
-    private function handleResponse($response): array
+    private function handleResponse($response, string $url = ''): array
     {
         if (is_wp_error($response)) {
+            RequestStatusTracker::recordWpError($response, $url);
+
             return [
                 'body' => null,
                 'status_code' => 500,
@@ -62,6 +64,7 @@ class FileUploadApiService
 
         $body = wp_remote_retrieve_body($response);
         $statusCode = wp_remote_retrieve_response_code($response);
+        RequestStatusTracker::recordHttpStatus((int) $statusCode, $url);
 
         $decodedBody = json_decode($body, true);
 

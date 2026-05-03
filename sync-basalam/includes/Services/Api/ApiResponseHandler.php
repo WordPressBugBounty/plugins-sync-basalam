@@ -2,6 +2,8 @@
 
 namespace SyncBasalam\Services\Api;
 
+use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Admin\Settings\SettingsManager;
 use SyncBasalam\Jobs\Exceptions\RetryableException;
 use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 
@@ -9,84 +11,49 @@ defined('ABSPATH') || exit;
 
 class ApiResponseHandler
 {
-    public function handle($response): array
+    public function handle($response, $url = ''): array
     {
         if (is_wp_error($response)) {
-            return $this->handleWpError($response);
+            return $this->handleWpError($response, $url);
         }
 
         $body = wp_remote_retrieve_body($response);
 
-        $statusCode = wp_remote_retrieve_response_code($response);
+        $statusCodeRaw = wp_remote_retrieve_response_code($response);
+        $statusCode    = is_numeric($statusCodeRaw) ? (int) $statusCodeRaw : 0;
 
-        return $this->handleHttpStatusCode($statusCode, $body);
+        return $this->handleHttpStatusCode($statusCode, $body, $url);
     }
 
 
-    private function handleWpError(\WP_Error $response): array
+    private function handleWpError(\WP_Error $response, string $url = ''): array
     {
-        $errorCode = $response->get_error_code();
         $errorMessage = $response->get_error_message();
+        $category = RequestStatusTracker::recordWpError($response, $url);
 
-        if ($this->isTimeoutError($errorCode, $errorMessage)) {
+        if ($category === 'blocked_http') {
+            throw new BlockedHttpRequestException($errorMessage);
+        }
+
+        if ($category === 'timeout') {
             throw RetryableException::apiTimeout('درخواست با تایم‌اوت مواجه شد: ' . $errorMessage);
         }
 
-        if ($this->isNetworkError($errorCode, $errorMessage)) {
+        if (in_array($category, ['dns_error', 'ssl_error', 'connection_error', 'network_error'], true)) {
             throw RetryableException::networkError('خطای شبکه: ' . $errorMessage);
         }
 
         throw RetryableException::temporary('خطای موقت در درخواست: ' . $errorMessage);
     }
 
-    private function isTimeoutError(string $errorCode, string $errorMessage): bool
+    private function handleHttpStatusCode(int $statusCode, $body, $url): array
     {
-        $timeoutIndicators = [
-            'http_request_failed',
-            'timeout',
-            'timed out',
-            'operation timed out',
-            'curl error 28',
-            'connection timeout',
-        ];
+        RequestStatusTracker::recordHttpStatus($statusCode, $url);
 
-        $errorCodeLower = strtolower($errorCode);
-        $errorMessageLower = strtolower($errorMessage);
-
-        foreach ($timeoutIndicators as $indicator) {
-            if (strpos($errorCodeLower, $indicator) !== false || strpos($errorMessageLower, $indicator) !== false) {
-                return true;
-            }
+        if ($statusCode === 0) {
+            throw new BlockedHttpRequestException('پاسخ نامعتبر از درخواست HTTP (کد وضعیت نامشخص)');
         }
 
-        return false;
-    }
-
-    private function isNetworkError(string $errorCode, string $errorMessage): bool
-    {
-        $networkIndicators = [
-            'network',
-            'connection',
-            'curl error',
-            'dns',
-            'socket',
-            'ssl',
-        ];
-
-        $errorCodeLower = strtolower($errorCode);
-        $errorMessageLower = strtolower($errorMessage);
-
-        foreach ($networkIndicators as $indicator) {
-            if (strpos($errorCodeLower, $indicator) !== false || strpos($errorMessageLower, $indicator) !== false) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private function handleHttpStatusCode(int $statusCode, $body): array
-    {
         if (in_array($statusCode, [200, 201, 202], true)) {
             return $this->successResponse($body, $statusCode);
         }
@@ -104,6 +71,12 @@ class ApiResponseHandler
         }
 
         if ($statusCode === 401) {
+            if ($this->isBasalamDomain($url)) {
+                SettingsManager::updateSettings([
+                    SettingsConfig::TOKEN         => null,
+                    SettingsConfig::REFRESH_TOKEN => null,
+                ]);
+            }
             throw NonRetryableException::unauthorized('دسترسی غیرمجاز - لطفا دوباره وارد شوید');
         }
 
@@ -144,6 +117,15 @@ class ApiResponseHandler
         return null;
     }
 
+    private function isBasalamDomain(string $url): bool
+    {
+        $host = parse_url($url, PHP_URL_HOST);
+
+        if (!is_string($host) || $host === '') return false;
+
+
+        return $host === 'basalam.com' || substr(strtolower($host), -strlen('.basalam.com')) === '.basalam.com';
+    }
 
     private function successResponse($body, int $statusCode): array
     {
@@ -156,6 +138,7 @@ class ApiResponseHandler
 
     public function handleTimeout(string $url): array
     {
+        RequestStatusTracker::recordCategory('timeout', ['url' => $url]);
         throw RetryableException::apiTimeout('درخواست تایم‌اوت شد');
     }
 }

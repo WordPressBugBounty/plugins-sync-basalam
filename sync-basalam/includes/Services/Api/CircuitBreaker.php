@@ -39,7 +39,7 @@ class CircuitBreaker
 
     private array $state;
 
-    public function __construct(int $failureThreshold = 10, int $recoveryTimeout = 300, int $closedResetInterval = 1800)
+    public function __construct(int $failureThreshold = 10, int $recoveryTimeout = 60, int $closedResetInterval = 300)
     {
         $this->failureThreshold    = $failureThreshold;
         $this->recoveryTimeout     = $recoveryTimeout;
@@ -51,25 +51,45 @@ class CircuitBreaker
      * Returns true when a request should be allowed through.
      * Throws a CircuitBreakerOpenException when the circuit is OPEN.
      */
+
     public function isAllowed(): bool
     {
         $currentState = $this->state['state'];
 
-        if ($currentState === self::STATE_CLOSED) return true;
+        if ($currentState === self::STATE_CLOSED) {
+            return true;
+        }
 
         if ($currentState === self::STATE_OPEN) {
             if ($this->recoveryTimeoutElapsed()) {
                 $this->transitionTo(self::STATE_HALF_OPEN);
-                return true;
+                return $this->acquireHalfOpenLock();
             }
 
-            throw new CircuitBreakerOpenException('سرویس باسلام موقتاً در دسترس نیست. لطفاً چند دقیقه دیگر تلاش کنید.', 503);
+            throw new CircuitBreakerOpenException(
+                'سرویس باسلام موقتاً در دسترس نیست. لطفاً چند دقیقه دیگر تلاش کنید.',
+                503
+            );
         }
 
-        // HALF_OPEN: allow the single probe request through.
-        return true;
+        // HALF_OPEN
+        return $this->acquireHalfOpenLock();
     }
 
+    private function acquireHalfOpenLock(): bool
+    {
+        if (!empty($this->state['half_open_lock'])) {
+            throw new CircuitBreakerOpenException(
+                'سرویس در حال بررسی است. لطفاً چند لحظه دیگر تلاش کنید.',
+                503
+            );
+        }
+
+        $this->state['half_open_lock'] = true;
+        $this->saveState();
+
+        return true;
+    }
     /**
      * Records a successful request and resets the failure counter.
      */
@@ -77,6 +97,8 @@ class CircuitBreaker
     {
         $this->state['failure_count'] = 0;
         $this->state['last_failure']  = null;
+        $this->state['half_open_lock'] = false;
+
         $this->transitionTo(self::STATE_CLOSED);
     }
 
@@ -87,6 +109,8 @@ class CircuitBreaker
     {
         $this->state['failure_count']++;
         $this->state['last_failure'] = time();
+
+        $this->state['half_open_lock'] = false;
 
         if ($this->state['state'] === self::STATE_HALF_OPEN) {
             $this->transitionTo(self::STATE_OPEN);
@@ -181,6 +205,7 @@ class CircuitBreaker
             'state'         => self::STATE_CLOSED,
             'failure_count' => 0,
             'last_failure'  => null,
+            'half_open_lock' => false,
         ];
     }
 }

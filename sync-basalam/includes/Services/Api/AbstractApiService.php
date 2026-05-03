@@ -59,7 +59,7 @@ abstract class AbstractApiService
 
         try {
             $response = $this->executeRequest($preparedRequest);
-            $result   = $this->responseHandler->handle($response);
+            $result   = $this->responseHandler->handle($response, $url);
             $this->circuitBreaker->recordSuccess();
             return $result;
         } catch (\Exception $e) {
@@ -86,6 +86,7 @@ abstract class AbstractApiService
     protected function shouldRecordFailure(\Exception $exception, string $url): bool
     {
         if (strpos($url, 'basalam.com') === false) return false;
+        if ($exception instanceof BlockedHttpRequestException) return false;
         return $exception instanceof RetryableException;
     }
 }

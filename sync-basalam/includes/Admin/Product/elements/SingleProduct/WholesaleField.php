@@ -13,7 +13,7 @@ class WholesaleField
 
         woocommerce_wp_checkbox([
             'id'          => '_sync_basalam_is_wholesale',
-            'label'       => 'محصول عمده است(باسلام)',
+            'label'       => 'محصول عمده است',
             'description' => 'اگر این محصول عمده است، این گزینه را فعال نمایید.',
             'desc_tip'    => true,
             'value'       => $checked,

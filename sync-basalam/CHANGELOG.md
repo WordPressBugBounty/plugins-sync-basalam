@@ -2,6 +2,26 @@
 
 <details>
 
+<summary>1.8.3 - 2026-05-03</summary>
+
+### Added
+- Added bulk edit support for wholesale settings, product type, and custom price increase
+- Added per-product custom price increase support
+- Added an information API endpoint to improve AI agent support in `admin.hamsalam.ir`
+
+### Changed / Improved
+- Added automatic order creation in status change events when the order does not already exist
+- Clear saved token on `401 Unauthorized` responses from `*.basalam.com` requests
+- Show an error when required Woosalam domains are blocked
+- Prevent task execution when required Woosalam domains are blocked
+
+### Fixed
+- Fixed user-reported issues
+
+</details>
+
+<details>
+
 <summary>1.8.2 - 2026-04-04</summary>
 
 ### Added

@@ -73,7 +73,7 @@ class OAuthManager
         $oauthData = $this->getOauthData();
         $siteUrl = get_site_url();
 
-        $scopes = "vendor.product.write vendor.parcel.write customer.profile.read vendor.profile.read vendor.parcel.read vendor.profile.write customer.chat.read customer.chat.write";
+        $scopes = apply_filters('sync_basalam_oauth_scopes', "vendor.product.write vendor.parcel.write customer.profile.read vendor.profile.read vendor.parcel.read vendor.profile.write customer.chat.read customer.chat.write");
 
         return [
             'redirect_uri' => $oauthData['redirect_uri'],

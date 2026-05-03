@@ -13,11 +13,88 @@ defined('ABSPATH') || exit;
 
 class OrderManager
 {
-    private $apiService;
 
-    public function __construct()
+    private static function shouldBypassWccfOrderHooks()
     {
-        $this->apiService = syncBasalamContainer()->get(ApiServiceManager::class);
+        return class_exists('WCCF_WC_Order') && !class_exists('RightPress_Product_Price_Shop');
+    }
+
+    private static function removeWccfOrderSaveHooks()
+    {
+        global $wp_filter;
+
+        $removedHooks = [];
+
+        if (!is_array($wp_filter) && !($wp_filter instanceof \ArrayAccess)) {
+            return $removedHooks;
+        }
+
+        foreach ($wp_filter as $hookName => $hook) {
+            if (!isset($hook->callbacks) || !is_array($hook->callbacks)) {
+                continue;
+            }
+
+            foreach ($hook->callbacks as $priority => $callbacks) {
+                foreach ($callbacks as $callbackConfig) {
+                    $callback = $callbackConfig['function'] ?? null;
+
+                    if (!is_array($callback) || !is_object($callback[0] ?? null) || !isset($callback[1])) {
+                        continue;
+                    }
+
+                    if (!($callback[0] instanceof \WCCF_WC_Order) || $callback[1] !== 'save_order_field_values') {
+                        continue;
+                    }
+
+                    if (remove_filter($hookName, $callback, $priority)) {
+                        $removedHooks[] = [
+                            'hook' => $hookName,
+                            'callback' => $callback,
+                            'priority' => $priority,
+                            'accepted_args' => $callbackConfig['accepted_args'] ?? 1,
+                        ];
+                    }
+                }
+            }
+        }
+
+        return $removedHooks;
+    }
+
+    private static function restoreWccfOrderSaveHooks(array $removedHooks)
+    {
+        foreach ($removedHooks as $hookConfig) {
+            add_filter(
+                $hookConfig['hook'],
+                $hookConfig['callback'],
+                $hookConfig['priority'],
+                $hookConfig['accepted_args']
+            );
+        }
+    }
+
+    private static function executeWithoutWccfOrderSaveHooks(callable $callback, $invoice_id, $contextLabel)
+    {
+        $removedWccfHooks = [];
+
+        if (self::shouldBypassWccfOrderHooks()) {
+            $removedWccfHooks = self::removeWccfOrderSaveHooks();
+        }
+
+        try {
+            return $callback();
+        } finally {
+            if (!empty($removedWccfHooks)) {
+                self::restoreWccfOrderSaveHooks($removedWccfHooks);
+            }
+        }
+    }
+
+    public static function createOrderWooFromRequest(\WP_REST_Request $request)
+    {
+        return self::createRestResponse(
+            self::createOrderWoo($request->get_params())
+        );
     }
 
     public static function orderManger(\WP_REST_Request $request, $checkSyncStatus = true)
@@ -25,28 +102,39 @@ class OrderManager
         $parsedParams = $request->get_params();
 
         if ($checkSyncStatus && !syncBasalamSettings()->getSettings(SettingsConfig::SYNC_STATUS_ORDER)) {
-            return;
+            return self::createRestResponse([
+                'success' => true,
+                'message' => 'Order sync is disabled.',
+                'status'  => 200,
+            ]);
         }
 
         Logger::debug("دریافت رویداد سفارش: " . json_encode($parsedParams));
 
         if (isset($parsedParams['event_id']) && $parsedParams['event_id'] == 7) {
             if ($parsedParams['type'] == 'shipped') {
-                self::shippedOrderWoo($parsedParams['invoice_id']);
+                return self::createRestResponse(self::shippedOrderWoo($parsedParams['invoice_id']));
             } elseif ($parsedParams['type'] == 'cancelled') {
-                self::cancelOrderWoo($parsedParams['invoice_id']);
+                return self::createRestResponse(self::cancelOrderWoo($parsedParams['invoice_id']));
             } elseif ($parsedParams['type'] == 'preparation') {
-                self::confirmOrderWoo($parsedParams['invoice_id']);
+                return self::createRestResponse(self::confirmOrderWoo($parsedParams['invoice_id']));
             }
         } elseif (isset($parsedParams['event_id']) && $parsedParams['event_id'] == 3) {
             if ($parsedParams['status'] == '3195') {
-                self::completeOrderWoo($parsedParams['more_data']['invoice_id']);
+                return self::createRestResponse(self::completeOrderWoo($parsedParams['more_data']['invoice_id']));
             } elseif ($parsedParams['status'] == '3067' || $parsedParams['status'] == '3233') {
-                self::cancelOrderWoo($parsedParams['more_data']['invoice_id']);
+                return self::createRestResponse(self::cancelOrderWoo($parsedParams['more_data']['invoice_id']));
             }
         } else {
-            self::createOrderWoo($parsedParams);
+            return self::createOrderWooFromRequest($request);
         }
+
+        return self::createRestResponse([
+            'success' => false,
+            'message' => 'Unsupported order event.',
+            'error'   => 'The incoming event did not match any supported order action.',
+            'status'  => 400,
+        ]);
     }
 
     public static function createOrderWoo($params)
@@ -61,7 +149,6 @@ class OrderManager
         $table_name = $wpdb->prefix . 'sync_basalam_payments';
 
         $wpdb->query('START TRANSACTION');
-
         try {
             $existing = $wpdb->get_var(
                 $wpdb->prepare(
@@ -72,9 +159,13 @@ class OrderManager
 
             if ($existing) {
                 $wpdb->query('ROLLBACK');
-                Logger::error("سفارش با شناسه فاکتور $invoice_id قبلا ایجاد شده");
 
-                return false;
+                return [
+                    'success' => false,
+                    'message' => 'Order already exists.',
+                    'error'   => "Order with invoice_id {$invoice_id} already exists.",
+                    'status'  => 409,
+                ];
             }
 
             $vendor_id = syncBasalamSettings()->getSettings(SettingsConfig::VENDOR_ID);
@@ -89,11 +180,12 @@ class OrderManager
                 $wpdb->query('ROLLBACK');
                 Logger::error("درخواست API ناموفق بود: " . ($response['error'] ?? 'خطای نامشخص'));
 
-                return new \WP_REST_Response([
+                return [
                     'success' => false,
                     'message' => 'Failed to fetch invoice details.',
                     'error'   => $response['error'] ?? 'Unknown error',
-                ], 500);
+                    'status'  => 500,
+                ];
             }
 
             $api_response = $response['body'] ?? '';
@@ -102,25 +194,41 @@ class OrderManager
             if (json_last_error() !== JSON_ERROR_NONE) {
                 $wpdb->query('ROLLBACK');
 
-                return new \WP_REST_Response([
+                return [
                     'success' => false,
                     'message' => 'Failed to parse API response.',
-                    'error'   => 'Invalid JSON response',
-                ], 500);
+                    'error'   => 'Invalid JSON response: ' . json_last_error_msg(),
+                    'status'  => 500,
+                ];
             }
 
             if (empty($data)) {
                 $wpdb->query('ROLLBACK');
                 Logger::error("پاسخ خالی از API برای فاکتور دریافت شد: $invoice_id");
 
-                return new \WP_REST_Response([
+                return [
                     'success' => false,
                     'message' => 'Empty API response.',
                     'error'   => 'No data received from API',
-                ], 500);
+                    'status'  => 500,
+                ];
             }
 
-            $order = wc_create_order();
+            $user_id = $user_id ?? ($data['customer_data']['user']['id'] ?? null);
+            $city_id = $city_id ?? ($data['customer_data']['city']['id'] ?? null);
+            $province_id = $province_id ?? ($data['customer_data']['city']['parent']['id'] ?? null);
+
+            $order = self::executeWithoutWccfOrderSaveHooks(function () {
+                return wc_create_order();
+            }, $invoice_id, 'wc_create_order');
+
+            if (is_wp_error($order)) {
+                throw new \RuntimeException('wc_create_order failed: ' . $order->get_error_message());
+            }
+
+            if (!$order instanceof \WC_Order) {
+                throw new \RuntimeException('wc_create_order did not return a valid WC_Order instance.');
+            }
             if (isset($data['items']) && is_array($data['items'])) {
                 foreach ($data['items'] as $item) {
                     $sync_basalam_product_id = $item['product']['id'] ?? null;
@@ -346,7 +454,9 @@ class OrderManager
                 $order->update_meta_data('_sync_basalam_hash_id', $data['hash_id']);
             }
 
-            $order->save();
+            self::executeWithoutWccfOrderSaveHooks(function () use ($order) {
+                $order->save();
+            }, $invoice_id, 'order->save()');
 
             $order_id = $order->get_id();
             if ($order_id) {
@@ -372,11 +482,12 @@ class OrderManager
 
                 $wpdb->query('COMMIT');
 
-                return new \WP_REST_Response([
+                return [
                     'success'  => true,
                     'message'  => 'Order created successfully',
                     'order_id' => $order_id,
-                ], 200);
+                    'status'   => 200,
+                ];
             } else {
                 throw new \Exception("خطا در ایجاد سفارش با شناسه $invoice_id ، از گزینه بررسی سفارشات استفاده نمایید.");
             }
@@ -385,11 +496,12 @@ class OrderManager
 
             Logger::error($e->getMessage());
 
-            return new \WP_REST_Response([
+            return [
                 'success' => false,
                 'message' => 'Failed to create order.',
                 'error'   => $e->getMessage(),
-            ], 500);
+                'status'  => 500,
+            ];
         }
     }
 
@@ -418,21 +530,54 @@ class OrderManager
         global $wpdb;
         $table_name = $wpdb->prefix . 'sync_basalam_payments';
 
-        $order_id = $wpdb->get_var($wpdb->prepare("SELECT order_id FROM {$table_name} WHERE invoice_id = $invoice_id"));
+        $order_id = $wpdb->get_var(
+            $wpdb->prepare("SELECT order_id FROM {$table_name} WHERE invoice_id = %d", $invoice_id)
+        );
 
         if (!$order_id) {
-            Logger::error("سفارشی با این شناسه فاکتور پیدا نشد: $invoice_id . عملیات '$job' انجام نشد.");
-            return false;
+            $create_result = self::createOrderWoo([
+                'invoice_id' => $invoice_id,
+            ]);
+
+            if (!empty($create_result['success']) && !empty($create_result['order_id'])) {
+                $order_id = $create_result['order_id'];
+            }
+        }
+
+        if (!$order_id) {
+            return [
+                'success'    => false,
+                'message'    => 'Order not found.',
+                'error'      => "No WooCommerce order found for invoice_id {$invoice_id}.",
+                'invoice_id' => $invoice_id,
+                'status'     => 404,
+            ];
         }
 
         $order = wc_get_order($order_id);
 
         if ($order && $order instanceof \WC_Order) {
             $order->update_status($status);
-            return $order_id;
+            return [
+                'success'    => true,
+                'message'    => 'Order status updated successfully.',
+                'order_id'   => $order_id,
+                'invoice_id' => $invoice_id,
+                'job'        => $job,
+                'status_key' => $status,
+                'status'     => 200,
+            ];
         }
 
-        return false;
+        self::logError("آبجکت سفارش ووکامرس برای order_id {$order_id} و invoice_id {$invoice_id} معتبر نیست");
+        return [
+            'success'    => false,
+            'message'    => 'Invalid WooCommerce order object.',
+            'error'      => "Invalid WooCommerce order object for order_id {$order_id} and invoice_id {$invoice_id}.",
+            'order_id'   => $order_id,
+            'invoice_id' => $invoice_id,
+            'status'     => 500,
+        ];
     }
 
     public static function getPlaceholderProductId()
@@ -566,5 +711,13 @@ class OrderManager
         }
 
         return null;
+    }
+
+    private static function createRestResponse(array $result)
+    {
+        $status = (int) ($result['status'] ?? (!empty($result['success']) ? 200 : 500));
+        unset($result['status']);
+
+        return new \WP_REST_Response($result, $status);
     }
 }

@@ -87,11 +87,13 @@ class BulkUpdateProductsJob extends AbstractJobType
                             }
 
                             if ($hasIncompleteVariants) {
-                                $this->jobManager->createJob(
-                                    'sync_basalam_update_single_product',
-                                    'pending',
-                                    $productId,
-                                );
+                                if ($this->currentProcessingJobExists()) {
+                                    $this->jobManager->createJob(
+                                        'sync_basalam_update_single_product',
+                                        'pending',
+                                        $productId,
+                                    );
+                                }
                                 continue;
                             }
                         }
@@ -113,11 +115,13 @@ class BulkUpdateProductsJob extends AbstractJobType
 
             $newLastId = max($productIds);
 
-            $this->jobManager->createJob(
-                'sync_basalam_bulk_update_products',
-                'pending',
-                json_encode(['last_updatable_product_id' => $newLastId])
-            );
+            if ($this->currentProcessingJobExists()) {
+                $this->jobManager->createJob(
+                    'sync_basalam_bulk_update_products',
+                    'pending',
+                    json_encode(['last_updatable_product_id' => $newLastId])
+                );
+            }
 
             return $this->success(['last_id' => $newLastId, 'count' => count($productsData)]);
         } catch (RetryableException $e) {
@@ -136,5 +140,13 @@ class BulkUpdateProductsJob extends AbstractJobType
             ]);
             throw $e;
         }
+    }
+
+    private function currentProcessingJobExists(): bool
+    {
+        return $this->jobManager->getJob([
+            'job_type' => $this->getType(),
+            'status' => 'processing',
+        ]) !== null;
     }
 }

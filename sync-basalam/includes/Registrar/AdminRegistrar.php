@@ -7,6 +7,7 @@ use SyncBasalam\Admin\Pages;
 use SyncBasalam\Registrar\Contracts\RegistrarInterface;
 use SyncBasalam\Admin\Product\elements\ProductList\StatusColumn;
 use SyncBasalam\Admin\Product\elements\ProductList\MetaBox;
+use SyncBasalam\Admin\Product\elements\ProductList\BulkEdit;
 use SyncBasalam\Admin\Product\elements\SingleProduct\Tab;
 use SyncBasalam\Admin\Product\elements\ProductList\Filter;
 use SyncBasalam\Admin\Product\elements\ProductList\Actions;
@@ -34,6 +35,7 @@ class AdminRegistrar implements RegistrarInterface
         $orderMetaBox = $container->get(OrderMetaBox::class);
         $orderStatuses = $container->get(OrderStatuses::class);
         $actions = $container->get(Actions::class);
+        $bulkEdit = $container->get(BulkEdit::class);
 
         // Initialize Admin Actions
         $container->get(RegisterActions::class);
@@ -89,6 +91,8 @@ class AdminRegistrar implements RegistrarInterface
         // Bulk Actions
         \add_filter("bulk_actions-edit-product", [$actions, "registerBulkActions"]);
         \add_filter("handle_bulk_actions-edit-product", [$actions, "handleBulkAction"], 10, 3);
+        \add_action('bulk_edit_custom_box', [$bulkEdit, 'renderFields'], 10, 2);
+        \add_action('admin_action_sync_basalam_bulk_edit', [$bulkEdit, 'save']);
 
         // Product Duplicate
         \add_action("woocommerce_product_duplicate", function ($newProduct) {

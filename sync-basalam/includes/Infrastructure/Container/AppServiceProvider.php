@@ -17,6 +17,7 @@ use SyncBasalam\Jobs\Types\FetchOrdersJob;
 use SyncBasalam\Jobs\Types\UpdateAllProductsJob;
 use SyncBasalam\Jobs\Types\UpdateSingleProductJob;
 use SyncBasalam\JobsRunner;
+use SyncBasalam\Services\CheckHttpBlockService;
 use SyncBasalam\Plugin;
 use SyncBasalam\Services\ApiServiceManager;
 use SyncBasalam\Services\Products\AutoConnectProducts;
@@ -151,7 +152,8 @@ class AppServiceProvider implements ServiceProviderInterface
             return new JobsRunner(
                 $container->get(JobManager::class),
                 $container->get(JobExecutor::class),
-                $container->get(DiscountTaskScheduler::class)
+                $container->get(DiscountTaskScheduler::class),
+                $container->get(CheckHttpBlockService::class)
             );
         });
     }

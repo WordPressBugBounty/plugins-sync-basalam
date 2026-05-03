@@ -10,6 +10,7 @@ class Actions
 {
     public function registerBulkActions($actions)
     {
+        $actions['sync_basalam_bulk_edit'] = 'ویرایش ووسلام';
         $actions['add_to_basalam'] = 'افزودن به باسلام';
         $actions['update_on_basalam'] = 'آپدیت در باسلام';
         $actions['disconnect_basalam_product'] = 'قطع اتصال محصول باسلام';

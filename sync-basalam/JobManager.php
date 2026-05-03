@@ -121,13 +121,13 @@ class JobManager
         return $wpdb->delete($this->jobManagerTableName, $where);
     }
 
-    public function deleteStaleProcessingJobs($timeoutSeconds = 120)
+    public function ConvertStaleProcessingJobs($timeoutSeconds = 120)
     {
         global $wpdb;
 
         $timeoutTimestamp = time() - $timeoutSeconds;
 
-        $wpdb->query(
+        return $wpdb->query(
             $wpdb->prepare(
                 "UPDATE {$this->jobManagerTableName}
                 SET status = 'pending', started_at = NULL
@@ -139,16 +139,6 @@ class JobManager
             )
         );
 
-        $sql = $wpdb->prepare(
-            "DELETE FROM {$this->jobManagerTableName}
-            WHERE status = %s
-            AND started_at IS NOT NULL
-            AND started_at < %d",
-            'processing',
-            $timeoutTimestamp
-        );
-
-        return $wpdb->query($sql);
     }
 
     public function hasProductJobInProgress(int $productId, string $jobType): bool
