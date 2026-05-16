@@ -41,6 +41,82 @@ class RequestStatusTracker
         self::recordEvent($category, $context);
     }
 
+    /**
+     * Returns a user-friendly Persian explanation for a given error category.
+     * Intended for log messages so non-technical users can understand the cause.
+     */
+    public static function describeCategoryFa(string $category, ?int $statusCode = null): string
+    {
+        switch ($category) {
+            case 'success':
+                return 'درخواست با موفقیت انجام شد.';
+
+            case 'timeout':
+                return 'خطای تایم اوت رخ داد و سرویس باسلام در زمان مقرر پاسخ نداد. معمولاً به دلیل کندی موقت اینترنت سرور یا شلوغی سرویس باسلام رخ می‌دهد و افزونه به‌صورت خودکار دوباره تلاش می‌کند.';
+
+            case 'rate_limit':
+                return 'rate limit رخ داد و تعداد درخواست‌ها در بازه‌ی کوتاه از حد مجاز عبور کرده است. افزونه برای دقایقی ریکوئستی به باسلام ارسال نمیکند و پس از دقایقی و دوباره تلاش می‌کند.';
+
+            case 'unauthorized':
+                return 'توکن باسلام منقضی شده است. لطفاً از طریق تنظیمات افزونه دوباره به حساب باسلام خود وارد شوید.';
+
+            case 'server_error':
+                $code = $statusCode ? ' (کد ' . $statusCode . ')' : '';
+                return 'خطای داخلی در سرورهای باسلام رخ داده است' . $code . '. مشکل از سمت افزونه نیست و معمولاً پس از چند دقیقه برطرف می‌شود.';
+
+            case 'client_error':
+                $code = $statusCode ? ' (کد ' . $statusCode . ')' : '';
+                return 'داده‌های ارسالی (payload) به باسلام صحیح نیست' . $code . '. لطفاً با پشتیبانی افزونه در ارتباط باشید (ثبت تیکت: https://admin.hamsalam.ir/ticket/new).';
+
+            case 'blocked_http':
+                return 'وردپرس درخواست‌های HTTP خارجی را مسدود کرده است (تنظیم WP_HTTP_BLOCK_EXTERNAL). برای رفع، دامنه basalam.com باید به WP_ACCESSIBLE_HOSTS اضافه شود.';
+
+            case 'dns_error':
+                return 'دامنه‌ی باسلام از روی سرور شما قابل دسترسی نیست. معمولاً به دلیل تنظیمات DNS هاست یا محدودیت‌های شبکه‌ی سرور است.';
+
+            case 'ssl_error':
+                return 'برقراری اتصال امن (SSL/TLS) با باسلام ممکن نشد. معمولاً به دلیل قدیمی بودن گواهی‌های root روی سرور هاست است.';
+
+            case 'connection_error':
+                return 'اتصال به سرور باسلام برقرار نشد یا در میانه‌ی راه قطع شد. مشکل موقتی شبکه است و افزونه دوباره تلاش می‌کند.';
+
+            case 'network_error':
+                return 'خطای عمومی شبکه هنگام ارتباط با باسلام. ممکن است مشکل از سمت سرور هاست یا فایروال باشد.';
+
+            case 'invalid_response':
+                return 'پاسخی معتبر از باسلام دریافت نشد (کد وضعیت نامشخص). معمولاً به دلیل قطع شدن ارتباط در میانه‌ی پاسخ است.';
+
+            case 'unexpected_status':
+                $code = $statusCode ? ' (کد ' . $statusCode . ')' : '';
+                return 'وضعیت غیرمنتظره‌ای از باسلام دریافت شد' . $code . '.';
+
+            case 'wp_error':
+            default:
+                return 'خطایی هنگام ارسال درخواست به باسلام رخ داد.';
+        }
+    }
+
+    /**
+     * Resolve a Persian reason directly from a WP_Error (categorizes internally).
+     */
+    public static function describeWpErrorFa(\WP_Error $error): string
+    {
+        $category = self::categorizeWpError(
+            (string) $error->get_error_code(),
+            (string) $error->get_error_message()
+        );
+
+        return self::describeCategoryFa($category);
+    }
+
+    /**
+     * Resolve a Persian reason directly from an HTTP status code (categorizes internally).
+     */
+    public static function describeHttpStatusFa(int $statusCode): string
+    {
+        return self::describeCategoryFa(self::categorizeHttpStatus($statusCode), $statusCode);
+    }
+
     public static function getSummary(): array
     {
         $state = self::getState();

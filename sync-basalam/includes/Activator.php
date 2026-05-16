@@ -18,7 +18,7 @@ class Activator
 
         $table_name_payments = $wpdb->prefix . 'sync_basalam_payments';
         $table_name_options = $wpdb->prefix . 'sync_basalam_map_options';
-        $table_name_uploaded_photo = $wpdb->prefix . 'sync_basalam_uploaded_photo';
+        $table_name_uploaded_media = $wpdb->prefix . 'sync_basalam_uploaded_media';
         $table_name_debug_logs = $wpdb->prefix . 'sync_basalam_debug_logs';
         $table_name_discount_tasks = $wpdb->prefix . 'sync_basalam_discount_tasks';
         $table_name_category_mappings = $wpdb->prefix . 'sync_basalam_category_mappings';
@@ -43,14 +43,17 @@ class Activator
             PRIMARY KEY (id)
         ) $charset_collate;";
 
-        $sql_uploaded_photo = "CREATE TABLE $table_name_uploaded_photo (
-        id INT AUTO_INCREMENT,
-        woo_photo_id INT,
-        sync_basalam_photo_id INT,
-        sync_basalam_photo_url VARCHAR(2083),
+        $sql_uploaded_media = "CREATE TABLE $table_name_uploaded_media (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        type VARCHAR(16) NOT NULL,
+        source_identity VARCHAR(191) NOT NULL,
+        media_id BIGINT UNSIGNED NULL,
+        media_url VARCHAR(2083) NULL,
         created_at DATETIME NOT NULL,
         PRIMARY KEY (id),
-        UNIQUE KEY unique_woo_photo_id (woo_photo_id)
+        UNIQUE KEY unique_type_source (type, source_identity),
+        KEY idx_type_created (type, created_at),
+        KEY idx_created_at (created_at)
         ) $charset_collate;";
 
         $sql_debug_logs = "CREATE TABLE $table_name_debug_logs (
@@ -123,7 +126,7 @@ class Activator
 
         dbDelta($sql_Payment);
         dbDelta($sql_options);
-        dbDelta($sql_uploaded_photo);
+        dbDelta($sql_uploaded_media);
         dbDelta($sql_debug_logs);
         dbDelta($sql_discount_tasks);
         dbDelta($sql_category_mappings);

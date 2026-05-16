@@ -5,6 +5,7 @@ namespace SyncBasalam\Admin\Product\Data\Handlers;
 use SyncBasalam\Admin\Product\Data\Services\CategoryService;
 use SyncBasalam\Admin\Product\Data\Services\PriceService;
 use SyncBasalam\Admin\Product\Data\Services\PhotoService;
+use SyncBasalam\Admin\Product\Data\Services\VideoService;
 use SyncBasalam\Admin\Product\Data\Services\AttributeService;
 use SyncBasalam\Admin\Settings\SettingsConfig;
 
@@ -15,6 +16,7 @@ class SimpleProductHandler implements ProductDataHandlerInterface
     private $categoryService;
     private $priceService;
     private $photoService;
+    private $videoService;
     private $attributeService;
     private array $settings;
 
@@ -23,6 +25,7 @@ class SimpleProductHandler implements ProductDataHandlerInterface
         $this->categoryService = new CategoryService();
         $this->priceService = new PriceService();
         $this->photoService = new PhotoService();
+        $this->videoService = new VideoService();
         $this->attributeService = new AttributeService();
         $this->settings = syncBasalamSettings()->getSettings();
     }
@@ -103,6 +106,11 @@ class SimpleProductHandler implements ProductDataHandlerInterface
     public function getGalleryPhotos($product): array
     {
         return $this->photoService->getGalleryPhotoIds($product);
+    }
+
+    public function getVideo($product): ?int
+    {
+        return $this->videoService->getVideoFileId($product);
     }
 
     public function getPreparationDays($product): int

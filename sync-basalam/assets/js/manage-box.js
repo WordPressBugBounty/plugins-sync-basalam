@@ -37,14 +37,14 @@ document.addEventListener("DOMContentLoaded", function () {
           .then((response) => response.json())
           .then((data) => {
             if (data.success) {
-              alert(data.data.message || "عملیات با موفقیت انجام شد.");
+              window.BasalamToast.success(data.data.message || "عملیات با موفقیت انجام شد.");
               location.reload();
             } else {
-              alert(data.data?.message || "خطا در انجام عملیات.");
+              window.BasalamToast.error(data.data?.message || "خطا در انجام عملیات.");
             }
           })
           .catch((error) => {
-            alert("خطا در انجام عملیات: " + error);
+            window.BasalamToast.error("خطا در انجام عملیات: " + error);
           })
           .finally(() => {
             this.innerText = originalText;

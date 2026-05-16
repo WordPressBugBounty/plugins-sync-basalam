@@ -140,15 +140,15 @@ document.addEventListener("DOMContentLoaded", function () {
         .then((data) => {
           closeModal();
           if (data.success) {
-            alert(data.data?.message || "عملیات با موفقیت آغاز شد.");
+            window.BasalamToast.success(data.data?.message || "عملیات با موفقیت آغاز شد.");
           } else {
-            alert(data.data?.message || "خطایی رخ داده است.");
+            window.BasalamToast.error(data.data?.message || "خطایی رخ داده است.");
           }
           location.reload();
         })
         .catch((error) => {
           console.error("Error:", error);
-          alert("خطایی در ارسال رخ داده است.");
+          window.BasalamToast.error("خطایی در ارسال رخ داده است.");
 
           if (quickBtn) quickBtn.disabled = false;
           if (fullBtn) fullBtn.disabled = false;
@@ -174,15 +174,15 @@ document.addEventListener("DOMContentLoaded", function () {
       .then((data) => {
         closeModal();
         if (data.success) {
-          alert(data.data?.message || "عملیات با موفقیت آغاز شد.");
+          window.BasalamToast.success(data.data?.message || "عملیات با موفقیت آغاز شد.");
         } else {
-          alert(data.data?.message || "خطایی رخ داده است.");
+          window.BasalamToast.error(data.data?.message || "خطایی رخ داده است.");
         }
         location.reload();
       })
       .catch((error) => {
         console.error("Error:", error);
-        alert("خطایی در ارسال رخ داده است.");
+        window.BasalamToast.error("خطایی در ارسال رخ داده است.");
       })
       .finally(() => {
         submitButton.disabled = false;
@@ -1101,7 +1101,7 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById('sync_basalam_like_alert').style.display = 'none';
             if (modal) modal.style.display = 'none';
           } else {
-            alert(response.data && response.data.message ? response.data.message : 'خطا در ارسال نظر');
+            window.BasalamToast.error(response.data && response.data.message ? response.data.message : 'خطا در ارسال نظر');
           }
         }
       });

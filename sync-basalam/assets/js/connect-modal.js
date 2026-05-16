@@ -30,7 +30,7 @@ jQuery(document).ready(function ($) {
         },
       });
     } else {
-      alert("لطفاً عنوان محصول را وارد کنید.");
+      window.BasalamToast.warning("لطفاً عنوان محصول را وارد کنید.");
     }
   });
 
@@ -40,7 +40,7 @@ jQuery(document).ready(function ($) {
     const wooProductId = $btn.data("woo-product-id");
     var nonce = $btn.data("_wpnonce");
     if (!BasalamProductId || !wooProductId) {
-      alert("مشخصات محصول ناقص است.");
+      window.BasalamToast.error("مشخصات محصول ناقص است.");
       return;
     }
 
@@ -57,10 +57,10 @@ jQuery(document).ready(function ($) {
       },
       success: function (data) {
         if (data.success) {
-          alert(data.data?.message || "عملیات با موفقیت انجام شد.");
+          window.BasalamToast.success(data.data?.message || "عملیات با موفقیت انجام شد.");
           location.reload();
         } else {
-          alert(data.data?.message || "خطایی رخ داده است.");
+          window.BasalamToast.error(data.data?.message || "خطایی رخ داده است.");
         }
       },
       error: function (xhr) {
@@ -70,7 +70,7 @@ jQuery(document).ready(function ($) {
         } catch (e) {
           response = {};
         }
-        alert(response?.data?.message || "خطایی رخ داده است.");
+        window.BasalamToast.error(response?.data?.message || "خطایی رخ داده است.");
       },
     });
   });

@@ -280,6 +280,7 @@ class SettingPageComponents
         echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_WEIGHT, 'وزن');
         echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_DESCRIPTION, 'توضیحات');
         echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_ATTR, 'ویژگی ها');
+        echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_VIDEO, 'ویدیو');
         echo '</div>';
     }
 
@@ -380,5 +381,32 @@ class SettingPageComponents
     {
         $current_value = syncBasalamSettings()->getSettings(SettingsConfig::CUSTOMER_SUFFIX_NAME);
         echo '<input type="text" name="sync_basalam_settings[' . esc_attr(SettingsConfig::CUSTOMER_SUFFIX_NAME) . ']" value="' . esc_attr($current_value) . '" class="basalam-input basalam-p basalam-max-width-80 basalam-font-12" placeholder="مثال: عزیز">';
+    }
+
+    public static function renderVideoSource()
+    {
+        $current_value = syncBasalamSettings()->getSettings(SettingsConfig::VIDEO_SOURCE) ?: 'inherit';
+
+        echo '<select class="basalam-select basalam-select-center basalam-video-source-select" name="sync_basalam_settings[' . esc_attr(SettingsConfig::VIDEO_SOURCE) . ']">'
+            . '<option value="inherit"' . selected($current_value, 'inherit', false) . '>ارث‌بری از قالب یا افزونه</option>'
+            . '<option value="plugin_box"' . selected($current_value, 'plugin_box', false) . '>باکس اختصاصی افزونه (در صفحه محصول)</option>'
+            . '</select>';
+    }
+
+    public static function renderVideoInheritMode()
+    {
+        $current_value = syncBasalamSettings()->getSettings(SettingsConfig::VIDEO_INHERIT_MODE) ?: 'auto';
+
+        echo '<select class="basalam-select basalam-select-center basalam-video-inherit-mode-select" name="sync_basalam_settings[' . esc_attr(SettingsConfig::VIDEO_INHERIT_MODE) . ']">'
+            . '<option value="auto"' . selected($current_value, 'auto', false) . '>تشخیص خودکار (Woodmart، Flatsome، YITH، ...)</option>'
+            . '<option value="manual"' . selected($current_value, 'manual', false) . '>وارد کردن دستی meta key</option>'
+            . '</select>';
+    }
+
+    public static function renderVideoMetaKey()
+    {
+        $current_value = syncBasalamSettings()->getSettings(SettingsConfig::VIDEO_META_KEY);
+
+        echo '<input type="text" name="sync_basalam_settings[' . esc_attr(SettingsConfig::VIDEO_META_KEY) . ']" value="' . esc_attr((string) $current_value) . '" class="basalam-input basalam-p basalam-video-meta-key basalam-max-width-80 basalam-font-12" placeholder="مثال: _woodmart_product_video">';
     }
 }

@@ -80,6 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (form && !form.dataset.increasePriceBound) {
       form.addEventListener("submit", function () {
         const toggles = form.querySelectorAll(".toggle-percentage");
+        let clampedNotice = false;
 
         toggles.forEach(function (toggle) {
           const toggleGroup =
@@ -110,8 +111,27 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
           }
 
-          toggleHidden.value = toggleInput.value.replace(/[^\d]/g, "");
+          const rawValue = toggleInput.value.replace(/[^\d]/g, "");
+          let numberValue = parseInt(rawValue, 10) || 0;
+
+          if (numberValue > 35 && numberValue <= 100) {
+            clampedNotice = true;
+            numberValue = 35;
+            toggleInput.value = numberValue.toLocaleString("en-US");
+            const unitEl = toggleGroup.querySelector(".percentage-unit");
+            if (unitEl) {
+              unitEl.textContent = "درصد";
+            }
+          }
+
+          toggleHidden.value = rawValue === "" ? "" : String(numberValue);
         });
+
+        if (clampedNotice) {
+          BasalamToast.info(
+            "مقدار افزایش قیمت در حالت درصد نمی‌تواند بیشتر از ۳۵٪ باشد. مقدار وارد شده به ۳۵ درصد تغییر داده شد و ذخیره می‌شود."
+          );
+        }
       });
 
       form.dataset.increasePriceBound = "1";

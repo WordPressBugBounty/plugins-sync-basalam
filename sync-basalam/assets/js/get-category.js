@@ -98,7 +98,7 @@ jQuery(document).ready(function ($) {
     var productTitle = $("#title").val();
 
     if (!productTitle || productTitle.trim() === "") {
-      alert("لطفاً ابتدا عنوان محصول را وارد کنید.");
+      window.BasalamToast.warning("لطفاً ابتدا عنوان محصول را وارد کنید.");
       $("#title").focus();
       return;
     }

@@ -2,6 +2,35 @@
 
 <details>
 
+<summary>1.8.7 - 2026-05-16</summary>
+
+### Added
+- Product video upload support (VideoService, VideoField, VideoSourceResolver)
+- Circuit breaker alert notifications
+- replace toast with alert()
+- Limit on increase precent(max 35%)
+- Migration 1.8.7
+
+### Fixed
+- Improved file upload, lock manager, and API response handling
+
+</details>
+
+<details>
+
+<summary>1.8.5,1.8.6 - 2026-05-10</summary>
+
+### Fixed
+- deduplictaion orders
+- fix stuck-processing
+
+</details>
+
+<details>
+
+
+<details>
+
 <summary>1.8.4 - 2026-05-03</summary>
 
 ### Fixed

@@ -34,6 +34,13 @@ class CustomUpdateProductStrategy implements DataStrategyInterface
             $data['photos'] = $handler->getGalleryPhotos($product);
         }
 
+        if (!array_key_exists('video', $data) && $this->shouldSyncField(SettingsConfig::SYNC_PRODUCT_FIELD_VIDEO)) {
+            $video = $handler->getVideo($product);
+            if ($video !== null) {
+                $data['video'] = $video;
+            }
+        }
+
         if (!array_key_exists('primary_price', $data) && $this->shouldSyncField(SettingsConfig::SYNC_PRODUCT_FIELD_PRICE)) {
             if (!$product->is_type('variable')) {
                 $data['primary_price'] = $handler->getPrice($product);

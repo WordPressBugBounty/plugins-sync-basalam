@@ -16,6 +16,14 @@ class CreateProductDataValidator
             ];
         }
 
+        $photoId = $productData['photo'] ?? null;
+        if (!is_numeric($photoId) || intval($photoId) <= 0) {
+            return [
+                'valid' => false,
+                'message' => 'آپلود تصویر اصلی محصول به باسلام ناموفق بود و شناسه تصویر تولید نشد.',
+            ];
+        }
+
         return [
             'valid' => true,
             'message' => sprintf('اطلاعات ایجاد محصول %d معتبر است.', $productId),

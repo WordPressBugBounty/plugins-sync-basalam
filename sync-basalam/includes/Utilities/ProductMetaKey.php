@@ -11,6 +11,12 @@ class ProductMetaKey
     public const PRODUCT_ID = 'sync_basalam_product_id';
     public const PRODUCT_SYNC_STATUS = 'sync_basalam_product_sync_status';
     public const PRODUCT_STATUS = 'sync_basalam_product_status';
+    public const PRODUCT_VIDEO = '_sync_basalam_product_video';
+
+    public static function basalamProductVideo(): string
+    {
+        return self::PRODUCT_VIDEO;
+    }
 
     public static function basalamProductId($vendorId = null): string
     {

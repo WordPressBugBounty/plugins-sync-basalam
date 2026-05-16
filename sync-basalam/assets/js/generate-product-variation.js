@@ -15,7 +15,11 @@ jQuery(document).ready(function ($) {
       };
 
       $.post(ajaxurl, data, function (response) {
-        alert(response.data.message);
+        if (response && response.success) {
+          window.BasalamToast.success(response.data?.message || "عملیات با موفقیت انجام شد.");
+        } else {
+          window.BasalamToast.error(response?.data?.message || "خطایی رخ داده است.");
+        }
         location.reload();
       });
     }

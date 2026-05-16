@@ -42,11 +42,15 @@ class MigratorService
     public function migrateUploadedPhotos()
     {
         $source = $this->wpdb->prefix . 'bsl_uploaded_photo';
-        $target = $this->wpdb->prefix . 'sync_basalam_uploaded_photo';
+        $target = $this->wpdb->prefix . 'sync_basalam_uploaded_media';
 
         if ($this->tableExists($source) && $this->tableExists($target)) {
-            $this->wpdb->query("INSERT INTO $target (woo_photo_id, sync_basalam_photo_id, sync_basalam_photo_url)
-                                SELECT woo_photo_id, bslm_photo_id, bslm_photo_url FROM $source");
+            $this->wpdb->query(
+                "INSERT IGNORE INTO {$target} (type, source_identity, media_id, media_url, created_at)
+                 SELECT 'photo', CONCAT('attachment:', woo_photo_id), bslm_photo_id, bslm_photo_url, NOW()
+                 FROM {$source}
+                 WHERE woo_photo_id IS NOT NULL"
+            );
         }
     }
 
@@ -213,6 +217,84 @@ class MigratorService
         }
     }
 
+    public function addUniqueInvoiceIdIndex()
+    {
+        $table = $this->wpdb->prefix . 'sync_basalam_payments';
+
+        if (!$this->tableExists($table)) {
+            return;
+        }
+
+        $existingIndex = $this->wpdb->get_var(
+            $this->wpdb->prepare(
+                "SELECT INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS
+                 WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s AND INDEX_NAME = %s LIMIT 1",
+                $table,
+                'unique_invoice_id'
+            )
+        );
+
+        if ($existingIndex) {
+            return;
+        }
+
+        $this->removeDuplicateInvoicePayments($table);
+
+        $this->wpdb->hide_errors();
+        $this->wpdb->query("ALTER TABLE {$table} ADD UNIQUE KEY unique_invoice_id (invoice_id)");
+        $this->wpdb->show_errors();
+    }
+
+    private function removeDuplicateInvoicePayments($table)
+    {
+        $duplicates = $this->wpdb->get_results(
+            "SELECT invoice_id, MIN(id) AS keep_id
+             FROM {$table}
+             WHERE invoice_id IS NOT NULL AND invoice_id > 0
+             GROUP BY invoice_id
+             HAVING COUNT(*) > 1"
+        );
+
+        if (empty($duplicates)) {
+            return;
+        }
+
+        foreach ($duplicates as $duplicate) {
+            $invoiceId = (int) $duplicate->invoice_id;
+            $keepId    = (int) $duplicate->keep_id;
+
+            $rowsToDelete = $this->wpdb->get_results(
+                $this->wpdb->prepare(
+                    "SELECT id, order_id FROM {$table} WHERE invoice_id = %d AND id <> %d",
+                    $invoiceId,
+                    $keepId
+                )
+            );
+
+            foreach ($rowsToDelete as $row) {
+                $orderId = (int) ($row->order_id ?? 0);
+                if ($orderId > 0 && function_exists('wc_get_order')) {
+                    $order = wc_get_order($orderId);
+                    if ($order instanceof \WC_Order) {
+                        try {
+                            $order->delete(true);
+                        } catch (\Throwable $e) {
+                            \SyncBasalam\Logger\Logger::error(
+                                "حذف سفارش تکراری ووکامرس با شناسه {$orderId} ناموفق بود: " . $e->getMessage()
+                            );
+                        }
+                    }
+                }
+
+                $this->wpdb->delete($table, ['id' => (int) $row->id], ['%d']);
+            }
+
+            \SyncBasalam\Logger\Logger::debug(
+                "سفارشات تکراری برای invoice_id {$invoiceId} پاک‌سازی شدند، شناسه نگه‌داشته‌شده: {$keepId}"
+            );
+        }
+    }
+
     public function addRetryAfterColumnToJobManager()
     {
         $tableName = $this->wpdb->prefix . 'sync_basalam_job_manager';
@@ -283,4 +365,46 @@ class MigratorService
 
         update_option('sync_basalam_settings', $settings);
     }
+
+    public function createUploadedMediaTable()
+    {
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+
+        $tableName = $this->wpdb->prefix . 'sync_basalam_uploaded_media';
+        $charsetCollate = $this->wpdb->get_charset_collate();
+
+        $sql = "CREATE TABLE $tableName (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            type VARCHAR(16) NOT NULL,
+            source_identity VARCHAR(191) NOT NULL,
+            media_id BIGINT UNSIGNED NULL,
+            media_url VARCHAR(2083) NULL,
+            created_at DATETIME NOT NULL,
+            PRIMARY KEY (id),
+            UNIQUE KEY unique_type_source (type, source_identity),
+            KEY idx_type_created (type, created_at),
+            KEY idx_created_at (created_at)
+        ) $charsetCollate;";
+
+        dbDelta($sql);
+
+        $this->migrateLegacyUploadedPhotos($tableName);
+    }
+
+    private function migrateLegacyUploadedPhotos(string $targetTable): void
+    {
+        $legacyTable = $this->wpdb->prefix . 'sync_basalam_uploaded_photo';
+
+        if (!$this->tableExists($legacyTable)) return;
+
+        $this->wpdb->query(
+            "INSERT IGNORE INTO {$targetTable} (type, source_identity, media_id, media_url, created_at)
+             SELECT 'photo', CONCAT('attachment:', woo_photo_id), sync_basalam_photo_id, sync_basalam_photo_url, COALESCE(created_at, NOW())
+             FROM {$legacyTable}
+             WHERE woo_photo_id IS NOT NULL"
+        );
+
+        $this->wpdb->query("DROP TABLE IF EXISTS {$legacyTable}");
+    }
+
 }

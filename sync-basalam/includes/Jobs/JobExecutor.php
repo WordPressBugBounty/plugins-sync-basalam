@@ -121,4 +121,14 @@ class JobExecutor
     {
         return $this->lockManager->release($jobType);
     }
+
+    public function acquireGlobalJobsLock(int $timeout = 0): bool
+    {
+        return $this->lockManager->acquireGlobalJobsLock($timeout);
+    }
+
+    public function releaseGlobalJobsLock(): bool
+    {
+        return $this->lockManager->releaseGlobalJobsLock();
+    }
 }

@@ -14,14 +14,14 @@ jQuery(document).ready(function ($) {
         },
         success: function (data) {
           if (data.success) {
-            alert(data.data?.message || "عملیات با موفقیت انجام شد.");
+            window.BasalamToast.success(data.data?.message || "عملیات با موفقیت انجام شد.");
           } else {
-            alert(data.data?.message || "خطایی رخ داده است.");
+            window.BasalamToast.error(data.data?.message || "خطایی رخ داده است.");
           }
           location.reload();
         },
         error: function () {
-          alert("خطایی در ارسال درخواست رخ داد.");
+          window.BasalamToast.error("خطایی در ارسال درخواست رخ داد.");
           location.reload();
         },
       });
@@ -48,12 +48,12 @@ jQuery(document).ready(function ($) {
     var description = $("#cancel-description").val();
 
     if (!reasonId) {
-      alert("لطفاً دلیل لغو سفارش را انتخاب کنید.");
+      window.BasalamToast.warning("لطفاً دلیل لغو سفارش را انتخاب کنید.");
       return;
     }
 
     if (!description.trim()) {
-      alert("لطفاً توضیحات را وارد کنید.");
+      window.BasalamToast.warning("لطفاً توضیحات را وارد کنید.");
       return;
     }
 
@@ -69,15 +69,15 @@ jQuery(document).ready(function ($) {
       },
       success: function (data) {
         if (data.success) {
-          alert(data.data?.message || "عملیات با موفقیت انجام شد.");
+          window.BasalamToast.success(data.data?.message || "عملیات با موفقیت انجام شد.");
         } else {
-          alert(data.data?.message || "خطایی رخ داده است.");
+          window.BasalamToast.error(data.data?.message || "خطایی رخ داده است.");
           console.error("Server error:", data);
         }
         location.reload();
       },
       error: function () {
-        alert("خطایی در ارسال درخواست رخ داد.");
+        window.BasalamToast.error("خطایی در ارسال درخواست رخ داد.");
       },
     });
   });
@@ -104,7 +104,7 @@ jQuery(document).ready(function ($) {
     var description = $("#request-cancel-description").val();
 
     if (!description.trim()) {
-      alert("لطفاً توضیحات را وارد کنید.");
+      window.BasalamToast.warning("لطفاً توضیحات را وارد کنید.");
       return;
     }
 
@@ -119,16 +119,16 @@ jQuery(document).ready(function ($) {
       },
       success: function (response) {
         if (response.success) {
-          alert(
+          window.BasalamToast.success(
             response.data?.message || "درخواست لغو سفارش با موفقیت ارسال شد."
           );
           location.reload();
         } else {
-          alert(response.data?.message || "خطایی رخ داده است");
+          window.BasalamToast.error(response.data?.message || "خطایی رخ داده است");
         }
       },
       error: function () {
-        alert("خطایی در ارسال درخواست رخ داد.");
+        window.BasalamToast.error("خطایی در ارسال درخواست رخ داد.");
       },
     });
   });
@@ -139,7 +139,7 @@ jQuery(document).ready(function ($) {
     var phoneNumber = $("#phone_number").val();
 
     if (!trackingCode || !phoneNumber) {
-      alert("لطفاً کد رهگیری و شماره تلفن را وارد کنید.");
+      window.BasalamToast.warning("لطفاً کد رهگیری و شماره تلفن را وارد کنید.");
       return;
     }
 
@@ -159,7 +159,7 @@ jQuery(document).ready(function ($) {
     var nonce = $(this).data("nonce");
 
     if (!shippingMethod) {
-      alert("لطفاً روش ارسال را انتخاب کنید.");
+      window.BasalamToast.warning("لطفاً روش ارسال را انتخاب کنید.");
       return;
     }
 
@@ -176,9 +176,9 @@ jQuery(document).ready(function ($) {
       },
       success: function (data) {
         if (data.success) {
-          alert(data.data?.message || "عملیات با موفقیت انجام شد.");
+          window.BasalamToast.success(data.data?.message || "عملیات با موفقیت انجام شد.");
         } else {
-          alert(data.data?.message || "خطایی رخ داده است.");
+          window.BasalamToast.error(data.data?.message || "خطایی رخ داده است.");
           console.error("Server error:", data);
         }
         location.reload();
@@ -191,7 +191,7 @@ jQuery(document).ready(function ($) {
         } catch (e) {
           console.error("JSON parse error:", e);
         }
-        alert(errorMsg);
+        window.BasalamToast.error(errorMsg);
         console.error("AJAX error:", xhr);
         location.reload();
       },
@@ -214,7 +214,7 @@ jQuery(document).ready(function ($) {
     var nonce = $(this).data("nonce");
 
     if (!description || !postponeDays) {
-      alert("لطفاً توضیحات و تعداد روزهای تاخیر را وارد کنید.");
+      window.BasalamToast.warning("لطفاً توضیحات و تعداد روزهای تاخیر را وارد کنید.");
       return;
     }
 
@@ -230,9 +230,9 @@ jQuery(document).ready(function ($) {
       },
       success: function (data) {
         if (data.success) {
-          alert(data.data?.message || "عملیات با موفقیت انجام شد.");
+          window.BasalamToast.success(data.data?.message || "عملیات با موفقیت انجام شد.");
         } else {
-          alert(data.data?.message || "خطایی رخ داده است.");
+          window.BasalamToast.error(data.data?.message || "خطایی رخ داده است.");
         }
         location.reload();
       },
@@ -242,7 +242,7 @@ jQuery(document).ready(function ($) {
           const json = JSON.parse(xhr.responseText);
           errorMsg = json.data?.message || errorMsg;
         } catch (e) {}
-        alert(errorMsg);
+        window.BasalamToast.error(errorMsg);
         location.reload();
       },
     });

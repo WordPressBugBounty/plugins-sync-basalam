@@ -53,6 +53,10 @@ class SettingsConfig
     public const ORDER_SHIPPING_METHOD = "order_shipping_method";
     public const CUSTOMER_PREFIX_NAME = "customer_prefix_name";
     public const CUSTOMER_SUFFIX_NAME = "customer_suffix_name";
+    public const SYNC_PRODUCT_FIELD_VIDEO = "sync_product_field_video";
+    public const VIDEO_SOURCE = "video_source";
+    public const VIDEO_INHERIT_MODE = "video_inherit_mode";
+    public const VIDEO_META_KEY = "video_meta_key";
 
     public static function getDefaultSettings(): array
     {
@@ -102,6 +106,10 @@ class SettingsConfig
             self::ORDER_SHIPPING_METHOD             => 'basalam',
             self::CUSTOMER_PREFIX_NAME              => null,
             self::CUSTOMER_SUFFIX_NAME              => null,
+            self::SYNC_PRODUCT_FIELD_VIDEO          => 0,
+            self::VIDEO_SOURCE                      => 'plugin_box',
+            self::VIDEO_INHERIT_MODE                => 'auto',
+            self::VIDEO_META_KEY                    => null,
         ];
     }
 }

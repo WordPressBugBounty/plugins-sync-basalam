@@ -34,10 +34,10 @@ jQuery(document).ready(function ($) {
       },
       success: function (response) {
         if (response.success) {
-          alert(response.data?.message || "عملیات با موفقیت انجام شد.");
+          window.BasalamToast.success(response.data?.message || "عملیات با موفقیت انجام شد.");
           location.reload();
         } else {
-          alert(response.data?.message || "خطایی رخ داده است.");
+          window.BasalamToast.error(response.data?.message || "خطایی رخ داده است.");
           $btn.prop("disabled", false).find(".basalam-btn-text").text("بررسی سفارشات باسلام");
         }
       },
@@ -47,7 +47,7 @@ jQuery(document).ready(function ($) {
           const response = JSON.parse(jqXHR.responseText);
           message = response.data?.message || message;
         } catch (e) {}
-        alert(message);
+        window.BasalamToast.error(message);
         $btn.prop("disabled", false).find(".basalam-btn-text").text("بررسی سفارشات باسلام");
       },
     });
@@ -67,7 +67,7 @@ jQuery(document).ready(function ($) {
 
     // Validate days
     if (isNaN(days) || days < 1 || days > 30) {
-      alert("عدد وارد شده باید بین ۱ تا ۳۰ باشد.");
+      window.BasalamToast.warning("عدد وارد شده باید بین ۱ تا ۳۰ باشد.");
       $daysInput.focus();
       return;
     }
@@ -85,10 +85,10 @@ jQuery(document).ready(function ($) {
       },
       success: function (response) {
         if (response.success) {
-          alert(response.data?.message || "عملیات با موفقیت انجام شد.");
+          window.BasalamToast.success(response.data?.message || "عملیات با موفقیت انجام شد.");
           location.reload();
         } else {
-          alert(response.data?.message || "خطایی رخ داده است.");
+          window.BasalamToast.error(response.data?.message || "خطایی رخ داده است.");
           $btn.text("بررسی سفارشات").prop("disabled", false);
           $mainBtn.prop("disabled", false).find(".basalam-btn-text").text("بررسی سفارشات باسلام");
         }
@@ -99,7 +99,7 @@ jQuery(document).ready(function ($) {
           const response = JSON.parse(jqXHR.responseText);
           message = response.data?.message || message;
         } catch (e) {}
-        alert(message);
+        window.BasalamToast.error(message);
         $btn.text("بررسی سفارشات").prop("disabled", false);
         $mainBtn.prop("disabled", false).find(".basalam-btn-text").text("بررسی سفارشات باسلام");
       },
@@ -128,10 +128,10 @@ jQuery(document).ready(function ($) {
       },
       success: function (response) {
         if (response.success) {
-          alert(response.data?.message || "عملیات لغو شد.");
+          window.BasalamToast.info(response.data?.message || "عملیات لغو شد.");
           location.reload();
         } else {
-          alert(response.data?.message || "خطایی رخ داده است.");
+          window.BasalamToast.error(response.data?.message || "خطایی رخ داده است.");
           $btn.prop("disabled", false);
         }
       },
@@ -141,7 +141,7 @@ jQuery(document).ready(function ($) {
           const response = JSON.parse(jqXHR.responseText);
           message = response.data?.message || message;
         } catch (e) {}
-        alert(message);
+        window.BasalamToast.error(message);
         $btn.prop("disabled", false);
       },
     });

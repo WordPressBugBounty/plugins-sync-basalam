@@ -70,12 +70,13 @@ function sync_basalam_remove_all_plugin_data(): void
     $tables = [
         $wpdb->prefix . 'sync_basalam_payments',
         $wpdb->prefix . 'sync_basalam_map_options',
-        $wpdb->prefix . 'sync_basalam_uploaded_photo',
+        $wpdb->prefix . 'sync_basalam_uploaded_media',
         $wpdb->prefix . 'sync_basalam_debug_logs',
         $wpdb->prefix . 'sync_basalam_discount_tasks',
         $wpdb->prefix . 'sync_basalam_category_mappings',
         $wpdb->prefix . 'sync_basalam_job_manager',
         // Legacy tables from older naming/migrations.
+        $wpdb->prefix . 'sync_basalam_uploaded_photo',
         $wpdb->prefix . 'bsl_payments',
         $wpdb->prefix . 'bsl_map_options',
         $wpdb->prefix . 'bsl_uploaded_photo',

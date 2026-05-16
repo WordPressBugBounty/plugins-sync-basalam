@@ -33,6 +33,12 @@ class UpdateProductStrategy implements DataStrategyInterface
         if (!array_key_exists('photos', $data)) {
             $data['photos'] = $handler->getGalleryPhotos($product);
         }
+        if (!array_key_exists('video', $data)) {
+            $video = $handler->getVideo($product);
+            if ($video !== null) {
+                $data['video'] = $video;
+            }
+        }
         if (!array_key_exists('preparation_days', $data)) {
             $data['preparation_days'] = $handler->getPreparationDays($product);
         }

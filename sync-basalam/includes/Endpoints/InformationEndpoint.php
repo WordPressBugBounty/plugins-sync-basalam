@@ -84,6 +84,12 @@ class InformationEndpoint
             unset($settings[$settingKey]);
         }
 
+        foreach (array_keys($settings) as $settingKey) {
+            if (stripos((string) $settingKey, 'token') !== false) {
+                unset($settings[$settingKey]);
+            }
+        }
+
         return $settings;
     }
 

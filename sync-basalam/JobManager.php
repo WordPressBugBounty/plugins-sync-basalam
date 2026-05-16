@@ -53,6 +53,11 @@ class JobManager
         ));
     }
 
+    public function hasAnyProcessingJob(): bool
+    {
+        return $this->getCountJobs(['status' => 'processing']) > 0;
+    }
+
     public function getJob($where = array())
     {
         global $wpdb;
@@ -127,18 +132,26 @@ class JobManager
 
         $timeoutTimestamp = time() - $timeoutSeconds;
 
-        return $wpdb->query(
+        $wpdb->query(
             $wpdb->prepare(
                 "UPDATE {$this->jobManagerTableName}
-                SET status = 'pending', started_at = NULL
+                SET status = CASE
+                        WHEN attempts + 1 >= max_attempts THEN 'failed'
+                        ELSE 'pending'
+                    END,
+                    attempts = attempts + 1,
+                    started_at = NULL,
+                    failed_at = CASE
+                        WHEN attempts + 1 >= max_attempts THEN %d
+                        ELSE failed_at
+                    END
                 WHERE status = 'processing'
-                AND job_type = 'sync_basalam_bulk_update_products'
                 AND started_at IS NOT NULL
                 AND started_at < %d",
+                time(),
                 $timeoutTimestamp
             )
         );
-
     }
 
     public function hasProductJobInProgress(int $productId, string $jobType): bool

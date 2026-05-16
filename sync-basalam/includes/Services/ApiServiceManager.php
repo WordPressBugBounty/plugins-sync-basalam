@@ -50,9 +50,9 @@ class ApiServiceManager
         return $this->deleteService->send($url, $headers, (array) $data);
     }
 
-    public function upload($url, $localFile, $data = [], $headers = [])
+    public function upload($url, $localFile, $data = [], $headers = [], $options = [])
     {
         if ($this->fileUploadService === null) $this->fileUploadService = new FileUploadApiService();
-        return $this->fileUploadService->upload($url, $localFile, $data, $headers);
+        return $this->fileUploadService->upload($url, $localFile, $data, $headers, $options);
     }
 }

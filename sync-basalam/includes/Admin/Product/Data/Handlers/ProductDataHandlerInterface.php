@@ -16,6 +16,7 @@ interface ProductDataHandlerInterface
     public function getPackageWeight($product): int;
     public function getMainPhoto($product): ?int;
     public function getGalleryPhotos($product): array;
+    public function getVideo($product): ?int;
     public function getPreparationDays($product): int;
     public function getUnitType($product): int;
     public function getUnitQuantity($product): int;

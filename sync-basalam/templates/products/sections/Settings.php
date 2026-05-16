@@ -179,6 +179,27 @@ defined('ABSPATH') || exit;
                         ); ?>
                         <?php SettingPageComponents::renderDiscountReductionPercent(); ?>
                     </div>
+                    <div class="basalam-form-group basalam-p">
+                        <?php echo CommonComponents::renderLabelWithTooltip(
+                            'منبع ویدیو محصول',
+                            'مشخص کنید ویدیو محصول از کجا خوانده شود. اگر قالب یا افزونه‌ای فیلد ویدیو دارد، گزینه «ارث‌بری» را انتخاب کنید. در غیر این صورت می‌توانید از باکس اختصاصی افزونه در صفحه ویرایش محصول استفاده کنید.'
+                        ); ?>
+                        <?php SettingPageComponents::renderVideoSource(); ?>
+                    </div>
+                    <div class="basalam-form-group basalam-p basalam-video-inherit-container">
+                        <?php echo CommonComponents::renderLabelWithTooltip(
+                            'روش ارث‌بری ویدیو',
+                            'حالت تشخیص خودکار، meta key های رایج قالب‌ها و افزونه‌ها (Woodmart، Flatsome، YITH و ...) را امتحان می‌کند. در حالت دستی شما meta key دقیق را وارد می‌کنید.'
+                        ); ?>
+                        <?php SettingPageComponents::renderVideoInheritMode(); ?>
+                    </div>
+                    <div class="basalam-form-group basalam-p basalam-video-meta-key-container">
+                        <?php echo CommonComponents::renderLabelWithTooltip(
+                            'Meta key ویدیو',
+                            'دقیقاً همان نام meta_key که قالب یا افزونه شما برای ذخیره ویدیو استفاده می‌کند را اینجا وارد کنید.'
+                        ); ?>
+                        <?php SettingPageComponents::renderVideoMetaKey(); ?>
+                    </div>
                 </div>
                 <div id="Basalam-custom-fields" class="basalam-element-hidden basalam-custom-fields-box">
                     <label class="basalam-label basalam-p">فیلدهایی که هنگام آپدیت محصول به باسلام ارسال میشوند </label><br>
@@ -249,6 +270,39 @@ defined('ABSPATH') || exit;
                     <?php SettingPageComponents::renderTasksPerMinuteInfo(); ?>
                 </div>
             </div>
+
+            <script>
+                (function ($) {
+                    $(function () {
+                        var $source = $('.basalam-video-source-select');
+                        var $mode = $('.basalam-video-inherit-mode-select');
+                        var $inheritContainer = $('.basalam-video-inherit-container');
+                        var $metaKeyContainer = $('.basalam-video-meta-key-container');
+
+                        function syncVideoFields() {
+                            var source = $source.val();
+                            var mode = $mode.val();
+
+                            if (source === 'plugin_box') {
+                                $inheritContainer.hide();
+                                $metaKeyContainer.hide();
+                                return;
+                            }
+
+                            $inheritContainer.show();
+                            if (mode === 'manual') {
+                                $metaKeyContainer.show();
+                            } else {
+                                $metaKeyContainer.hide();
+                            }
+                        }
+
+                        $source.on('change', syncVideoFields);
+                        $mode.on('change', syncVideoFields);
+                        syncVideoFields();
+                    });
+                })(jQuery);
+            </script>
 
             <center class="basalam-center-block basalam-submit-section basalam-submit-section-hidden" id="basalam-advanced-submit-section">
                 <button type="submit" class="basalam-primary-button basalam-p basalam-btn-fill">

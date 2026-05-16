@@ -36,6 +36,12 @@ class CreateProductStrategy implements DataStrategyInterface
         if (!array_key_exists('photos', $data)) {
             $data['photos'] = $handler->getGalleryPhotos($product);
         }
+        if (!array_key_exists('video', $data)) {
+            $video = $handler->getVideo($product);
+            if ($video !== null) {
+                $data['video'] = $video;
+            }
+        }
         if (!array_key_exists('status', $data)) {
             $data['status'] = 2976;
         }

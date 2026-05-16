@@ -9,6 +9,7 @@ use SyncBasalam\Admin\Product\elements\ProductList\StatusColumn;
 use SyncBasalam\Admin\Product\elements\ProductList\MetaBox;
 use SyncBasalam\Admin\Product\elements\ProductList\BulkEdit;
 use SyncBasalam\Admin\Product\elements\SingleProduct\Tab;
+use SyncBasalam\Admin\Product\elements\SingleProduct\VideoField;
 use SyncBasalam\Admin\Product\elements\ProductList\Filter;
 use SyncBasalam\Admin\Product\elements\ProductList\Actions;
 use SyncBasalam\Admin\Order\OrderColumn;
@@ -60,6 +61,10 @@ class AdminRegistrar implements RegistrarInterface
         \add_filter('woocommerce_product_data_tabs', [Tab::class, 'registerTab']);
         \add_action('woocommerce_product_data_panels', [Tab::class, 'renderTabContent']);
         \add_action('woocommerce_process_product_meta', [Tab::class, 'saveTabData']);
+
+        // Basalam Product Video Meta Box (sidebar, like product image/gallery)
+        \add_action('add_meta_boxes_product', [VideoField::class, 'registerMetaBox']);
+        \add_action('woocommerce_process_product_meta', [VideoField::class, 'save']);
 
         // Product Filter
         \add_action("restrict_manage_posts", [$filter, "renderFilterDropdown"]);
@@ -166,6 +171,12 @@ class AdminRegistrar implements RegistrarInterface
             array(),
             $version
         );
+        wp_enqueue_style(
+            "basalam-admin-toast-style",
+            self::assetsUrl("css/toast.css"),
+            array(),
+            $version
+        );
 
         if (PointerTour::shouldLoadPointerTour((string) $hook)) {
             wp_enqueue_style('wp-pointer');
@@ -182,79 +193,86 @@ class AdminRegistrar implements RegistrarInterface
         }
 
         wp_enqueue_script(
+            "basalam-admin-toast-script",
+            self::assetsUrl("js/toast.js"),
+            [],
+            $version,
+            true
+        );
+        wp_enqueue_script(
             "basalam-admin-logs-script",
             self::assetsUrl("js/logs.js"),
-            ["jquery"],
+            ["jquery", "basalam-admin-toast-script"],
             $version,
             true
         );
         wp_enqueue_script(
             "basalam-admin-help-script",
             self::assetsUrl("js/help.js"),
-            ["jquery"],
+            ["jquery", "basalam-admin-toast-script"],
             $version,
             true
         );
         wp_enqueue_script(
             "basalam-admin-product-fields-script",
             self::assetsUrl("js/product-fields.js"),
-            ["jquery"],
+            ["jquery", "basalam-admin-toast-script"],
             $version,
             true
         );
         wp_enqueue_script(
             "basalam-admin-manage-box-script",
             self::assetsUrl("js/manage-box.js"),
-            ["jquery"],
+            ["jquery", "basalam-admin-toast-script"],
             $version,
             true
         );
         wp_enqueue_script(
             "basalam-admin-connect-modal-script",
             self::assetsUrl("js/connect-modal.js"),
-            ["jquery"],
+            ["jquery", "basalam-admin-toast-script"],
             $version,
             true
         );
         wp_enqueue_script(
             "basalam-round-script",
             self::assetsUrl("js/round.js"),
-            ["jquery"],
+            ["jquery", "basalam-admin-toast-script"],
             $version,
             true
         );
         wp_enqueue_script(
             "basalam-get-category-script",
             self::assetsUrl("js/get-category.js"),
-            ["jquery"],
+            ["jquery", "basalam-admin-toast-script"],
             $version,
             true
         );
         wp_enqueue_script(
             "basalam-order-script",
             self::assetsUrl("js/order.js"),
-            ["jquery"],
+            ["jquery", "basalam-admin-toast-script"],
             $version,
             true
         );
         wp_enqueue_script(
             "basalam-admin-script",
             self::assetsUrl("js/admin.js"),
-            $shouldLoadPointerTour ? ["jquery", "wp-pointer"] : ["jquery"],
+            $shouldLoadPointerTour ? ["jquery", "wp-pointer", "basalam-admin-toast-script"] : ["jquery", "basalam-admin-toast-script"],
             $version,
             true
         );
         wp_enqueue_script(
             "basalam-check-sync-script",
             self::assetsUrl("js/check-sync.js"),
-            ["jquery"],
+            ["jquery", "basalam-admin-toast-script"],
             $version,
             true
         );
         wp_enqueue_script(
             "basalam-map-category-option-script",
             self::assetsUrl("js/map-category-option.js"),
-            ["jquery"],
+            ["jquery", "basalam-admin-toast-script"],
             $version,
             true
         );
@@ -262,7 +280,7 @@ class AdminRegistrar implements RegistrarInterface
         wp_enqueue_script(
             "basalam-generate-product-variation-script",
             self::assetsUrl("js/generate-product-variation.js"),
-            ["jquery"],
+            ["jquery", "basalam-admin-toast-script"],
             $version,
             true
         );
@@ -270,7 +288,7 @@ class AdminRegistrar implements RegistrarInterface
         wp_enqueue_script(
             "basalam-ticket-script",
             self::assetsUrl("js/ticket.js"),
-            [],
+            ["basalam-admin-toast-script"],
             $version,
             true
         );

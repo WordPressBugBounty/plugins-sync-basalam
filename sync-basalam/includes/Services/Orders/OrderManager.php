@@ -148,25 +148,76 @@ class OrderManager
         global $wpdb;
         $table_name = $wpdb->prefix . 'sync_basalam_payments';
 
-        $wpdb->query('START TRANSACTION');
+        if (empty($invoice_id)) {
+            return [
+                'success' => false,
+                'message' => 'Missing invoice_id.',
+                'error'   => 'invoice_id is required to create an order.',
+                'status'  => 400,
+            ];
+        }
+
+        $existingOrderId = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT order_id FROM {$table_name} WHERE invoice_id = %d LIMIT 1",
+                $invoice_id
+            )
+        );
+
+        if ($existingOrderId) {
+            return [
+                'success'  => true,
+                'message'  => 'Order already exists.',
+                'order_id' => (int) $existingOrderId,
+                'status'   => 200,
+            ];
+        }
+
+        $lockName = 'sync_basalam_invoice_' . $invoice_id;
+        $gotLock = $wpdb->get_var(
+            $wpdb->prepare("SELECT GET_LOCK(%s, 0)", $lockName)
+        );
+
+        if ($gotLock !== '1' && $gotLock !== 1) {
+            Logger::debug("ریکوئست تکراری webhook برای invoice_id {$invoice_id} ـ نادیده گرفته شد (در حال پردازش توسط ریکوئست دیگر).");
+            return [
+                'success' => true,
+                'message' => 'Order is already being processed by another request.',
+                'status'  => 200,
+            ];
+        }
+
         try {
-            $existing = $wpdb->get_var(
+            $existingOrderId = $wpdb->get_var(
                 $wpdb->prepare(
-                    "SELECT COUNT(*) FROM {$table_name} WHERE invoice_id = %d FOR UPDATE",
+                    "SELECT order_id FROM {$table_name} WHERE invoice_id = %d LIMIT 1",
                     $invoice_id
                 )
             );
 
-            if ($existing) {
-                $wpdb->query('ROLLBACK');
-
+            if ($existingOrderId) {
                 return [
-                    'success' => false,
-                    'message' => 'Order already exists.',
-                    'error'   => "Order with invoice_id {$invoice_id} already exists.",
-                    'status'  => 409,
+                    'success'  => true,
+                    'message'  => 'Order already exists.',
+                    'order_id' => (int) $existingOrderId,
+                    'status'   => 200,
                 ];
             }
+
+            return self::createOrderWooLocked($params, $invoice_id, $payment_id, $user_id, $city_id, $province_id, $table_name);
+        } finally {
+            $wpdb->query(
+                $wpdb->prepare("SELECT RELEASE_LOCK(%s)", $lockName)
+            );
+        }
+    }
+
+    private static function createOrderWooLocked($params, $invoice_id, $payment_id, $user_id, $city_id, $province_id, $table_name)
+    {
+        global $wpdb;
+
+        $wpdb->query('START TRANSACTION');
+        try {
 
             $vendor_id = syncBasalamSettings()->getSettings(SettingsConfig::VENDOR_ID);
 

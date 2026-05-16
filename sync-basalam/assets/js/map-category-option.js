@@ -13,7 +13,7 @@ jQuery(document).ready(function ($) {
     const nonce = $("#basalam_add_map_option_nonce").val();
 
     if (!wooName || !basalamName) {
-      alert("لطفاً هر دو مقدار را وارد کنید.");
+      window.BasalamToast.warning("لطفاً هر دو مقدار را وارد کنید.");
       return;
     }
 
@@ -28,6 +28,7 @@ jQuery(document).ready(function ($) {
       },
       success: function (response) {
         if (response.success) {
+          window.BasalamToast.success("ویژگی با موفقیت ذخیره شد.");
           $("#Basalam-map-option-result").text("ویژگی با موفقیت ذخیره شد.");
           $(".options_mapping_section").show();
           $("#woo-option-name").val("");
@@ -50,14 +51,14 @@ jQuery(document).ready(function ($) {
           }
         } else {
           const errorMessage = response.data?.message || "خطا در ذخیره‌سازی.";
-          alert(errorMessage);
+          window.BasalamToast.error(errorMessage);
           $("#Basalam-map-option-result").text(errorMessage);
         }
       },
       error: function (xhr) {
         const errorMessage =
           xhr.responseJSON?.data?.message || "خطا در ارسال درخواست.";
-        alert(errorMessage);
+        window.BasalamToast.error(errorMessage);
         $("#Basalam-map-option-result").text(errorMessage);
       },
     });
@@ -87,15 +88,16 @@ jQuery(document).ready(function ($) {
       success: function (response) {
         if (response.success) {
           $row.remove();
+          window.BasalamToast.success("ویژگی با موفقیت حذف شد.");
           if ($(".basalam-table tbody tr").length === 0) {
             $(".options_mapping_section").hide();
           }
         } else {
-          alert("عملیات ناموفق بود");
+          window.BasalamToast.error("عملیات ناموفق بود");
         }
       },
       error: function () {
-        alert("خطایی در ارسال درخواست رخ داد.");
+        window.BasalamToast.error("خطایی در ارسال درخواست رخ داد.");
         location.reload();
       },
     });

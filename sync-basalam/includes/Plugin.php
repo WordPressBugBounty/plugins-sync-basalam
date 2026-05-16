@@ -8,13 +8,14 @@ use SyncBasalam\Registrar\ListenerRegistrar;
 use SyncBasalam\Registrar\OrderRegistrar;
 use SyncBasalam\Registrar\ProductRegistrar;
 use SyncBasalam\Registrar\QueueRegistrar;
+use SyncBasalam\Services\Api\CircuitBreaker;
 use SyncBasalam\Services\FetchVersionDetail;
 
 defined('ABSPATH') || exit;
 
 class Plugin
 {
-    public const VERSION = '1.8.4';
+    public const VERSION = '1.8.7';
 
     public function __construct()
     {
@@ -66,6 +67,14 @@ class Plugin
         add_action('admin_notices', function () {
             $template = syncBasalamPlugin()->templatePath("notifications/HttpBlock.php");
             require_once($template);
+        });
+        add_action('admin_notices', function () {
+            $circuitBreaker = new CircuitBreaker();
+
+            if ($circuitBreaker->getState() === CircuitBreaker::STATE_CLOSED) return;
+
+            $template = syncBasalamPlugin()->templatePath("notifications/CircuitBreakerAlert.php");
+            require $template;
         });
     }
 

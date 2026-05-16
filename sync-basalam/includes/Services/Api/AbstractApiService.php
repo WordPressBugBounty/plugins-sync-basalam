@@ -62,7 +62,7 @@ abstract class AbstractApiService
             $result   = $this->responseHandler->handle($response, $url);
             $this->circuitBreaker->recordSuccess();
             return $result;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             if ($this->shouldRecordFailure($e, $url)) {
                 $this->circuitBreaker->recordFailure();
             }
@@ -83,10 +83,21 @@ abstract class AbstractApiService
 
     abstract protected function executeRequest(array $request);
 
-    protected function shouldRecordFailure(\Exception $exception, string $url): bool
+    protected function shouldRecordFailure(\Throwable $exception, string $url): bool
     {
-        if (strpos($url, 'basalam.com') === false) return false;
+        if (!$this->isBasalamDomain($url)) return false;
         if ($exception instanceof BlockedHttpRequestException) return false;
         return $exception instanceof RetryableException;
+    }
+
+    protected function isBasalamDomain(string $url): bool
+    {
+        $host = parse_url($url, PHP_URL_HOST);
+
+        if (!is_string($host) || $host === '') return false;
+
+        $host = strtolower($host);
+
+        return $host === 'basalam.com' || substr($host, -strlen('.basalam.com')) === '.basalam.com';
     }
 }

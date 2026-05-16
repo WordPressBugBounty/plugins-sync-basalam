@@ -610,15 +610,15 @@ if (!syncBasalamSettings()->getSettings(SettingsConfig::TOKEN)) {
                 },
                 success: function(response) {
                     if (response.success) {
-                        alert('اتصال با موفقیت ایجاد شد!');
+                        window.BasalamToast.success('اتصال با موفقیت ایجاد شد!');
                         clearSelection();
                         loadCategoryMappings();
                     } else {
-                        alert('خطا در ایجاد اتصال: ' + response.data);
+                        window.BasalamToast.error('خطا در ایجاد اتصال: ' + response.data);
                     }
                 },
                 error: function() {
-                    alert('خطا در اتصال به سرور');
+                    window.BasalamToast.error('خطا در اتصال به سرور');
                 }
             });
         }
@@ -634,14 +634,14 @@ if (!syncBasalamSettings()->getSettings(SettingsConfig::TOKEN)) {
                 },
                 success: function(response) {
                     if (response.success) {
-                        alert('اتصال با موفقیت حذف شد!');
+                        window.BasalamToast.success('اتصال با موفقیت حذف شد!');
                         loadCategoryMappings();
                     } else {
-                        alert('خطا در حذف اتصال: ' + response.data);
+                        window.BasalamToast.error('خطا در حذف اتصال: ' + response.data);
                     }
                 },
                 error: function() {
-                    alert('خطا در اتصال به سرور');
+                    window.BasalamToast.error('خطا در اتصال به سرور');
                 }
             });
         }

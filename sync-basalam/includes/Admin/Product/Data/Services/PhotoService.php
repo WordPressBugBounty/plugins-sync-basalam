@@ -2,6 +2,7 @@
 
 namespace SyncBasalam\Admin\Product\Data\Services;
 
+use SyncBasalam\Logger\Logger;
 use SyncBasalam\Services\FileUploader;
 
 defined('ABSPATH') || exit;
@@ -14,6 +15,7 @@ class PhotoService
     {
         $this->fileUploader = new FileUploader();
     }
+
     public function getMainPhotoId($product): ?int
     {
         $mainImageId = $product->get_image_id();
@@ -38,10 +40,8 @@ class PhotoService
 
         if (empty($galleryImageIds)) return [];
 
-        // Limit to 10 photos maximum
         $galleryImageIds = array_slice($galleryImageIds, 0, 10);
-        foreach ($galleryImageIds as $index => $imageId) {
-
+        foreach ($galleryImageIds as $imageId) {
             $existingPhoto = $this->getExistingPhoto($imageId);
 
             if ($existingPhoto) {
@@ -64,10 +64,9 @@ class PhotoService
         if (!$imagePathOrUrl) return null;
 
         try {
-            $data = $this->fileUploader->upload($imagePathOrUrl);
-            return $data;
-        } catch (\Exception $e) {
-            return null;
+            return $this->fileUploader->upload($imagePathOrUrl);
+        } catch (\Throwable $e) {
+            throw new \RuntimeException('آپلود تصویر محصول به باسلام ناموفق بود: ' . $e->getMessage(), 0, $e);
         }
     }
 
@@ -84,18 +83,19 @@ class PhotoService
     private function getExistingPhoto(int $wooPhotoId)
     {
         global $wpdb;
-        $tableName = $wpdb->prefix . 'sync_basalam_uploaded_photo';
+        $tableName = $wpdb->prefix . 'sync_basalam_uploaded_media';
+        $sourceIdentity = 'attachment:' . $wooPhotoId;
 
         $result = $wpdb->get_row($wpdb->prepare(
-            "SELECT sync_basalam_photo_id AS file_id, sync_basalam_photo_url AS url, created_at
+            "SELECT media_id AS file_id, media_url AS url, created_at
             FROM $tableName
-            WHERE woo_photo_id = %d",
-            $wooPhotoId
+            WHERE type = %s AND source_identity = %s",
+            'photo',
+            $sourceIdentity
         ), ARRAY_A);
 
         if (!$result) return null;
 
-        // Check if photo is older than 14 days
         $createdAt = strtotime($result['created_at']);
         $now = current_time('timestamp');
         $fourteenDays = 14 * DAY_IN_SECONDS;
@@ -103,7 +103,11 @@ class PhotoService
         $age = $now - $createdAt;
 
         if ($age >= $fourteenDays) {
-            $wpdb->delete($tableName, ['woo_photo_id' => $wooPhotoId], ['%d']);
+            $wpdb->delete(
+                $tableName,
+                ['type' => 'photo', 'source_identity' => $sourceIdentity],
+                ['%s', '%s']
+            );
             return null;
         }
 
@@ -113,15 +117,18 @@ class PhotoService
     private function storePhotoRecord(int $wooPhotoId, array $basalamPhoto): void
     {
         global $wpdb;
-        $tableName = $wpdb->prefix . 'sync_basalam_uploaded_photo';
+        $tableName = $wpdb->prefix . 'sync_basalam_uploaded_media';
 
-        $insertData = [
-            'woo_photo_id' => $wooPhotoId,
-            'sync_basalam_photo_id' => $basalamPhoto['file_id'],
-            'sync_basalam_photo_url' => $basalamPhoto['url'],
-            'created_at' => current_time('mysql'),
-        ];
-
-        $wpdb->insert($tableName, $insertData, ['%d', '%d', '%s', '%s']);
+        $wpdb->replace(
+            $tableName,
+            [
+                'type' => 'photo',
+                'source_identity' => 'attachment:' . $wooPhotoId,
+                'media_id' => (int) $basalamPhoto['file_id'],
+                'media_url' => $basalamPhoto['url'] ?? '',
+                'created_at' => current_time('mysql'),
+            ],
+            ['%s', '%s', '%d', '%s', '%s']
+        );
     }
 }
