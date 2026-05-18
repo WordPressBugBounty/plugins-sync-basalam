@@ -66,7 +66,7 @@ class RequestStatusTracker
 
             case 'client_error':
                 $code = $statusCode ? ' (کد ' . $statusCode . ')' : '';
-                return 'داده‌های ارسالی (payload) به باسلام صحیح نیست' . $code . '. لطفاً با پشتیبانی افزونه در ارتباط باشید (ثبت تیکت: https://admin.hamsalam.ir/ticket/new).';
+                return ' داده‌های ارسالی (payload) به باسلام صحیح نیست' . $code . 'در صورت نامفهموم بودن خطا، لطفا تیکت ثبت کنید(https://admin.hamsalam.ir/ticket/new)';
 
             case 'blocked_http':
                 return 'وردپرس درخواست‌های HTTP خارجی را مسدود کرده است (تنظیم WP_HTTP_BLOCK_EXTERNAL). برای رفع، دامنه basalam.com باید به WP_ACCESSIBLE_HOSTS اضافه شود.';

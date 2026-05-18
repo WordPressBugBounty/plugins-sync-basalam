@@ -14,7 +14,7 @@ class FileUploader
     private const PHOTO_MAX_SIZE = 5 * 1024 * 1024;
 
     private const VIDEO_EXTENSIONS = ['mp4', 'mov', '3gp', 'm4v', 'mkv', 'flv', 'mpg', 'webm', 'mpeg', 'ts', 'avi', 'qt', 'm4a'];
-    private const VIDEO_MAX_SIZE = 50 * 1024 * 1024;
+    private const VIDEO_MAX_SIZE = 120 * 1024 * 1024;
 
     public function upload($filePath)
     {

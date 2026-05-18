@@ -40,7 +40,7 @@ class PhotoService
 
         if (empty($galleryImageIds)) return [];
 
-        $galleryImageIds = array_slice($galleryImageIds, 0, 10);
+        $galleryImageIds = array_slice($galleryImageIds, 0, 20);
         foreach ($galleryImageIds as $imageId) {
             $existingPhoto = $this->getExistingPhoto($imageId);
 

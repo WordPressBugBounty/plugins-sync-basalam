@@ -2,6 +2,17 @@
 
 <details>
 
+<summary>1.8.8 - 2026-05-18</summary>
+
+### Fixed
+- fix City/state mapping with persian shiping woo
+- increase count of photo limit
+
+
+</details>
+
+<details>
+
 <summary>1.8.7 - 2026-05-16</summary>
 
 ### Added
