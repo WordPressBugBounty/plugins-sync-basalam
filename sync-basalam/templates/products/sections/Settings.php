@@ -110,6 +110,10 @@ defined('ABSPATH') || exit;
                         <?php SettingPageComponents::renderDefaultPreparation(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
+                        <?php echo CommonComponents::renderLabelWithTooltip('مدیریت زمان آماده‌سازی', 'باسلام برای هر دسته‌بندی حداکثر زمان آماده‌سازی مشخصی دارد. اگر زمان آماده‌سازی تنظیم‌شده بیشتر از این حد باشد: «کاهش به حداکثر مجاز» مقدار را به سقف دسته‌بندی کاهش داده و محصول را ارسال می‌کند؛ «عدم ارسال و ثبت لاگ» محصول را ارسال نمی‌کند و فقط یک لاگ ثبت می‌شود. مثال: اگر زمان آماده‌سازی شما ۱۰ روز باشد و سقف دسته‌بندی باسلام ۷ روز باشد، در حالت «کاهش به حداکثر مجاز» مقدار ۷ روز به باسلام ارسال می‌شود و در حالت «عدم ارسال و ثبت لاگ» محصول ارسال نمی‌شود.'); ?>
+                        <?php SettingPageComponents::renderCapPreparationToCategoryMax(); ?>
+                    </div>
+                    <div class="basalam-form-group basalam-p">
                         <?php echo CommonComponents::renderLabelWithTooltip('افزایش قیمت در باسلام', 'درصد یا مبلغ ثابتی که به قیمت محصولات در باسلام اضافه می‌شود. می‌تواند به صورت درصد(1-100) یا مبلغ ثابت(101-∞) باشد.'); ?>
                         <?php SettingPageComponents::renderDefaultPercentage(); ?>
                     </div>

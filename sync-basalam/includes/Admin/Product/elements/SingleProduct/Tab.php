@@ -30,6 +30,12 @@ class Tab
         echo '</div>';
         echo '<div class="options_group">';
 
+        // Gold Product Field
+        GoldFields::renderCheckbox();
+
+        echo '</div>';
+        echo '<div class="options_group">';
+
         // Product Type Field
         TypeFields::renderCheckbox();
 
@@ -52,6 +58,7 @@ class Tab
     public static function saveTabData($post_id)
     {
         MobileFields::saveCheckbox($post_id);
+        GoldFields::saveCheckbox($post_id);
         TypeFields::saveCheckbox($post_id);
         PriceIncreaseField::saveField($post_id);
         WholesaleField::saveCheckbox($post_id);

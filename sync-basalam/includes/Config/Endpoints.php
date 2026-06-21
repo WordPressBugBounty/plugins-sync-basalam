@@ -48,6 +48,9 @@ final class Endpoints
     /** GET commission percentage */
     const COMMISSION = self::CORE_BASE . '/api_v2/commission/get_percent';
 
+    /** GET full category tree with max preparation days (core v3) */
+    const CATEGORIES_PREPARATION = self::CORE_BASE . '/v3/categories';
+
     /** GET/POST/PATCH/DELETE webhooks */
     const WEBHOOKS = self::OPENAPI_BASE . '/v1/webhooks';
 

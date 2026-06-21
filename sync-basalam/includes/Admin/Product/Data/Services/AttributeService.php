@@ -11,10 +11,12 @@ defined('ABSPATH') || exit;
 class AttributeService
 {
     private $mobileDataHandler;
+    private $goldDataHandler;
 
     public function __construct()
     {
         $this->mobileDataHandler = new MobileDataHandler();
+        $this->goldDataHandler = new GoldDataHandler();
     }
 
     public function getAttributeSuffix($product): ?string
@@ -75,6 +77,8 @@ class AttributeService
         $attributes = [];
 
         if ($this->isMobileProduct($product)) $attributes = array_merge($attributes, $this->getMobileAttributes($product));
+
+        if ($this->isGoldProduct($product)) $attributes = array_merge($attributes, $this->getGoldAttributes($product));
 
         $wooAttributes = $this->getMappedAttributes($product);
         if (!empty($wooAttributes)) $attributes = array_merge($attributes, $wooAttributes);
@@ -176,6 +180,11 @@ class AttributeService
         return $this->mobileDataHandler->getMobileAttributesAsArray($product);
     }
 
+    private function getGoldAttributes($product): array
+    {
+        return $this->goldDataHandler->getGoldAttributesAsArray($product);
+    }
+
     private function getMappedCategoryOptions(): array
     {
         global $wpdb;
@@ -186,5 +195,10 @@ class AttributeService
     private function isMobileProduct($product): bool
     {
         return get_post_meta($product->get_id(), '_sync_basalam_is_mobile_product_checkbox', true) === 'yes';
+    }
+
+    private function isGoldProduct($product): bool
+    {
+        return get_post_meta($product->get_id(), '_sync_basalam_is_gold_product_checkbox', true) === 'yes';
     }
 }

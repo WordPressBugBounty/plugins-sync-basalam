@@ -41,13 +41,22 @@ class SettingPageComponents
     public static function renderPackageWeight()
     {
         $current_value = syncBasalamSettings()->getSettings(SettingsConfig::DEFAULT_PACKAGE_WEIGHT);
-        echo '<input type="number" name="sync_basalam_settings[' . esc_attr(SettingsConfig::DEFAULT_PACKAGE_WEIGHT) . ']" min="10" value="' . esc_attr($current_value) . '" class="basalam-input basalam-p" required>';
+        echo '<input type="number" name="sync_basalam_settings[' . esc_attr(SettingsConfig::DEFAULT_PACKAGE_WEIGHT) . ']" min="1" value="' . esc_attr($current_value) . '" class="basalam-input basalam-p" required>';
     }
 
     public static function renderDefaultPreparation()
     {
         $current_value = syncBasalamSettings()->getSettings(SettingsConfig::DEFAULT_PREPARATION);
         echo '<input type="number" name="sync_basalam_settings[' . esc_attr(SettingsConfig::DEFAULT_PREPARATION) . ']" min="0" value="' . esc_attr($current_value) . '" class="basalam-input basalam-p" required>';
+    }
+
+    public static function renderCapPreparationToCategoryMax()
+    {
+        $current_value = syncBasalamSettings()->getSettings(SettingsConfig::CAP_PREPARATION_TO_CATEGORY_MAX);
+        echo '<select class="basalam-select basalam-select-center" name="sync_basalam_settings[' . esc_attr(SettingsConfig::CAP_PREPARATION_TO_CATEGORY_MAX) . ']">'
+            . '<option value="yes"' . selected($current_value, 'yes', false) . '>کاهش به حداکثر مجاز</option>'
+            . '<option value="no"' . selected($current_value, 'no', false) . '>عدم ارسال</option>'
+            . '</select>';
     }
 
     public static function renderDefaultStockQuantity()

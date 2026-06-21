@@ -8,6 +8,15 @@ jQuery(document).ready(function ($) {
     }
   });
 
+  $("#_sync_basalam_is_gold_product_checkbox").on("change", function () {
+    var goldFields = $("#basalam_gold_product_fields");
+    if ($(this).is(":checked")) {
+      goldFields.show();
+    } else {
+      goldFields.hide();
+    }
+  });
+
   var basalamFields = $("#basalam_product_fields");
 
   if ($("#_sync_basalam_is_product_type_checkbox").is(":checked")) {

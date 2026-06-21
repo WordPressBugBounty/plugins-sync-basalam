@@ -57,6 +57,7 @@ class SettingsConfig
     public const VIDEO_SOURCE = "video_source";
     public const VIDEO_INHERIT_MODE = "video_inherit_mode";
     public const VIDEO_META_KEY = "video_meta_key";
+    public const CAP_PREPARATION_TO_CATEGORY_MAX = "cap_preparation_to_category_max";
 
     public static function getDefaultSettings(): array
     {
@@ -110,6 +111,7 @@ class SettingsConfig
             self::VIDEO_SOURCE                      => 'plugin_box',
             self::VIDEO_INHERIT_MODE                => 'auto',
             self::VIDEO_META_KEY                    => null,
+            self::CAP_PREPARATION_TO_CATEGORY_MAX   => 'yes',
         ];
     }
 }

@@ -8,6 +8,7 @@ use SyncBasalam\Admin\Product\Data\Services\PhotoService;
 use SyncBasalam\Admin\Product\Data\Services\VideoService;
 use SyncBasalam\Admin\Product\Data\Services\AttributeService;
 use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Services\Products\PreparationDaysGuard;
 
 defined('ABSPATH') || exit;
 
@@ -18,6 +19,7 @@ class SimpleProductHandler implements ProductDataHandlerInterface
     private $photoService;
     private $videoService;
     private $attributeService;
+    private $preparationGuard;
     private array $settings;
 
     public function __construct()
@@ -27,6 +29,7 @@ class SimpleProductHandler implements ProductDataHandlerInterface
         $this->photoService = new PhotoService();
         $this->videoService = new VideoService();
         $this->attributeService = new AttributeService();
+        $this->preparationGuard = new PreparationDaysGuard();
         $this->settings = syncBasalamSettings()->getSettings();
     }
 
@@ -115,7 +118,9 @@ class SimpleProductHandler implements ProductDataHandlerInterface
 
     public function getPreparationDays($product): int
     {
-        return $this->settings[SettingsConfig::DEFAULT_PREPARATION];
+        $preparationDays = (int) $this->settings[SettingsConfig::DEFAULT_PREPARATION];
+
+        return $this->preparationGuard->enforce($preparationDays, $product);
     }
 
     public function getUnitType($product): int

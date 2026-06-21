@@ -2,6 +2,19 @@
 
 <details>
 
+<summary>1.9.0 - 2026-06-21</summary>
+
+### Added
+- add gold product type with purity and weight attributes
+- add preparation days management for product categories
+
+### Fixed
+- decrease min pkg weight
+
+</details>
+
+<details>
+
 <summary>1.8.8 - 2026-05-18</summary>
 
 ### Fixed
