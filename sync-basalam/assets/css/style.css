@@ -886,6 +886,30 @@
   position: relative;
   display: inline-block;
 }
+@media screen and (max-width: 782px) {
+  .tablenav .actions.basalam-orders-fetch-wrapper {
+    display: inline-block !important;
+    margin: 8px 0;
+  }
+
+  .basalam-orders-btn-group {
+    align-items: center;
+  }
+
+  .basalam-orders-btn-group .basalam-button {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 32px !important;
+    line-height: 1 !important;
+    padding: 0 8px !important;
+  }
+
+  .basalam-orders-btn-group .basalam-btn-text {
+    line-height: 1 !important;
+    white-space: nowrap;
+  }
+}
 
 .basalam-orders-btn-group {
   display: flex;

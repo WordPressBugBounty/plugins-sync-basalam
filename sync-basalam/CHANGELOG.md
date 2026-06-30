@@ -2,6 +2,15 @@
 
 <details>
 
+<summary>1.9.1 - 2026-06-30</summary>
+
+### Fixed
+- show check-orders button and vertically center its content on mobile/tablet
+
+</details>
+
+<details>
+
 <summary>1.9.0 - 2026-06-21</summary>
 
 ### Added
