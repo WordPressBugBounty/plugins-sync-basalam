@@ -71,7 +71,7 @@ class Container implements ContainerInterface
             return $instance;
         }
 
-        throw new RuntimeException(sprintf('Service "%s" is not bound in container.', $id));
+        throw new RuntimeException(esc_html(sprintf('Service "%s" is not bound in container.', $id)));
     }
 
     public function provider(ServiceProviderInterface $provider): void

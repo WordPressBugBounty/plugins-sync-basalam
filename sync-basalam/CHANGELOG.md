@@ -2,6 +2,20 @@
 
 <details>
 
+<summary>1.9.2 - 2026-07-08</summary>
+
+### Security
+- Fixed a CSRF vulnerability in the Basalam OAuth callback (`basalam-save-token`) that could let a forged request overwrite the stored connection credentials; the callback now requires a single-use, time-limited authorization that the admin actively started, and the "connect to Basalam" links go through a nonce-protected request
+- Hardened output escaping across admin pages, templates and exception messages (esc_html/esc_attr)
+- Switched internal redirects to wp_safe_redirect and documented direct custom-table queries
+
+### Changed / Improved
+- Tested up to WordPress 7.0
+
+</details>
+
+<details>
+
 <summary>1.9.1 - 2026-06-30</summary>
 
 ### Fixed

@@ -66,7 +66,8 @@ class PhotoService
         try {
             return $this->fileUploader->upload($imagePathOrUrl);
         } catch (\Throwable $e) {
-            throw new \RuntimeException('آپلود تصویر محصول به باسلام ناموفق بود: ' . $e->getMessage(), 0, $e);
+            // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Message is escaped; $e is the previous Throwable passed for exception chaining, not output.
+            throw new \RuntimeException(esc_html('آپلود تصویر محصول به باسلام ناموفق بود: ' . $e->getMessage()), 0, $e);
         }
     }
 
@@ -86,6 +87,7 @@ class PhotoService
         $tableName = $wpdb->prefix . 'sync_basalam_uploaded_media';
         $sourceIdentity = 'attachment:' . $wooPhotoId;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix, not user input.
         $result = $wpdb->get_row($wpdb->prepare(
             "SELECT media_id AS file_id, media_url AS url, created_at
             FROM $tableName
@@ -103,6 +105,7 @@ class PhotoService
         $age = $now - $createdAt;
 
         if ($age >= $fourteenDays) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom plugin table; no object cache for these operational queries.
             $wpdb->delete(
                 $tableName,
                 ['type' => 'photo', 'source_identity' => $sourceIdentity],
@@ -119,6 +122,7 @@ class PhotoService
         global $wpdb;
         $tableName = $wpdb->prefix . 'sync_basalam_uploaded_media';
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom plugin table; no object cache for these operational queries.
         $wpdb->replace(
             $tableName,
             [

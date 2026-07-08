@@ -33,18 +33,18 @@ class ApiResponseHandler
         $reason = RequestStatusTracker::describeCategoryFa($category);
 
         if ($category === 'blocked_http') {
-            throw new BlockedHttpRequestException($reason . ' | جزئیات فنی: ' . $errorMessage);
+            throw new BlockedHttpRequestException(esc_html($reason . ' | جزئیات فنی: ' . $errorMessage));
         }
 
         if ($category === 'timeout') {
-            throw RetryableException::apiTimeout($reason . ' | جزئیات فنی: ' . $errorMessage);
+            throw RetryableException::apiTimeout(esc_html($reason . ' | جزئیات فنی: ' . $errorMessage));
         }
 
         if (in_array($category, ['dns_error', 'ssl_error', 'connection_error', 'network_error'], true)) {
-            throw RetryableException::networkError($reason . ' | جزئیات فنی: ' . $errorMessage);
+            throw RetryableException::networkError(esc_html($reason . ' | جزئیات فنی: ' . $errorMessage));
         }
 
-        throw RetryableException::temporary($reason . ' | جزئیات فنی: ' . $errorMessage);
+        throw RetryableException::temporary(esc_html($reason . ' | جزئیات فنی: ' . $errorMessage));
     }
 
     private function handleHttpStatusCode(int $statusCode, $body, $url): array
@@ -52,7 +52,7 @@ class ApiResponseHandler
         RequestStatusTracker::recordHttpStatus($statusCode, $url);
 
         if ($statusCode === 0) {
-            throw new BlockedHttpRequestException(RequestStatusTracker::describeHttpStatusFa(0));
+            throw new BlockedHttpRequestException(esc_html(RequestStatusTracker::describeHttpStatusFa(0)));
         }
 
         if (in_array($statusCode, [200, 201, 202], true)) {
@@ -60,15 +60,15 @@ class ApiResponseHandler
         }
 
         if (in_array($statusCode, [408, 504], true)) {
-            throw RetryableException::apiTimeout(RequestStatusTracker::describeHttpStatusFa($statusCode));
+            throw RetryableException::apiTimeout(esc_html(RequestStatusTracker::describeHttpStatusFa($statusCode)));
         }
 
         if ($statusCode === 429) {
-            throw RetryableException::rateLimit(RequestStatusTracker::describeHttpStatusFa(429));
+            throw RetryableException::rateLimit(esc_html(RequestStatusTracker::describeHttpStatusFa(429)));
         }
 
         if (in_array($statusCode, [500, 502, 503], true)) {
-            throw RetryableException::serverError(RequestStatusTracker::describeHttpStatusFa($statusCode));
+            throw RetryableException::serverError(esc_html(RequestStatusTracker::describeHttpStatusFa($statusCode)));
         }
 
         if ($statusCode === 401) {
@@ -78,7 +78,7 @@ class ApiResponseHandler
                     SettingsConfig::REFRESH_TOKEN => null,
                 ]);
             }
-            throw NonRetryableException::unauthorized(RequestStatusTracker::describeHttpStatusFa(401));
+            throw NonRetryableException::unauthorized(esc_html(RequestStatusTracker::describeHttpStatusFa(401)));
         }
 
         $clientErrors = [
@@ -92,11 +92,11 @@ class ApiResponseHandler
             $bodyMessage = $this->extractErrorMessageFromBody($body);
             $base = $bodyMessage ?: $clientErrors[$statusCode];
             $reason = RequestStatusTracker::describeHttpStatusFa($statusCode);
-            throw NonRetryableException::permanent($base . $reason);
+            throw NonRetryableException::permanent(esc_html($base . $reason));
         }
 
         // Unknown error - treat as retryable
-        throw RetryableException::temporary(RequestStatusTracker::describeHttpStatusFa($statusCode));
+        throw RetryableException::temporary(esc_html(RequestStatusTracker::describeHttpStatusFa($statusCode)));
     }
 
     private function extractErrorMessageFromBody($body): ?string
@@ -142,6 +142,6 @@ class ApiResponseHandler
     public function handleTimeout(string $url): array
     {
         RequestStatusTracker::recordCategory('timeout', ['url' => $url]);
-        throw RetryableException::apiTimeout(RequestStatusTracker::describeCategoryFa('timeout'));
+        throw RetryableException::apiTimeout(esc_html(RequestStatusTracker::describeCategoryFa('timeout')));
     }
 }

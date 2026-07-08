@@ -157,6 +157,7 @@ class OrderManager
             ];
         }
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix, not user input.
         $existingOrderId = $wpdb->get_var(
             $wpdb->prepare(
                 "SELECT order_id FROM {$table_name} WHERE invoice_id = %d LIMIT 1",
@@ -174,6 +175,7 @@ class OrderManager
         }
 
         $lockName = 'sync_basalam_invoice_' . $invoice_id;
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Named MySQL advisory lock; no object cache applicable.
         $gotLock = $wpdb->get_var(
             $wpdb->prepare("SELECT GET_LOCK(%s, 0)", $lockName)
         );
@@ -188,6 +190,7 @@ class OrderManager
         }
 
         try {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix, not user input.
             $existingOrderId = $wpdb->get_var(
                 $wpdb->prepare(
                     "SELECT order_id FROM {$table_name} WHERE invoice_id = %d LIMIT 1",
@@ -206,6 +209,7 @@ class OrderManager
 
             return self::createOrderWooLocked($params, $invoice_id, $payment_id, $user_id, $city_id, $province_id, $table_name);
         } finally {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Named MySQL advisory lock; no object cache applicable.
             $wpdb->query(
                 $wpdb->prepare("SELECT RELEASE_LOCK(%s)", $lockName)
             );
@@ -216,6 +220,7 @@ class OrderManager
     {
         global $wpdb;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Transaction control statement; no object cache applicable.
         $wpdb->query('START TRANSACTION');
         try {
 
@@ -228,6 +233,7 @@ class OrderManager
             $response = $apiServiceManager->get($api_url);
 
             if (isset($response['success']) && !$response['success']) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Transaction control statement; no object cache applicable.
                 $wpdb->query('ROLLBACK');
                 Logger::error("درخواست API ناموفق بود: " . ($response['error'] ?? 'خطای نامشخص'));
 
@@ -243,6 +249,7 @@ class OrderManager
             $data = json_decode($api_response, true);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Transaction control statement; no object cache applicable.
                 $wpdb->query('ROLLBACK');
 
                 return [
@@ -254,6 +261,7 @@ class OrderManager
             }
 
             if (empty($data)) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Transaction control statement; no object cache applicable.
                 $wpdb->query('ROLLBACK');
                 Logger::error("پاسخ خالی از API برای فاکتور دریافت شد: $invoice_id");
 
@@ -371,7 +379,7 @@ class OrderManager
 
                 // Set state and city with PWS compatibility
                 $addressData = [
-                    'province' => $province,
+                        'province' => $province,
                     'city'     => $city,
                 ];
                 GetProvincesData::setOrderAddress($order, $addressData, 'billing');
@@ -380,8 +388,8 @@ class OrderManager
                 // Add shipping method based on settings
                 $shipping_method_setting = syncBasalamSettings()->getSettings(SettingsConfig::ORDER_SHIPPING_METHOD);
 
-                if (isset($data['parcel_detail']['shipping_cost'])) {
-                    $shipping_cost = $data['parcel_detail']['shipping_cost'];
+                if (isset($data['financial_report']['shipping_submit']['total']['amount'])) {
+                    $shipping_cost = $data['financial_report']['shipping_submit']['total']['amount'];
 
                     $currency = get_woocommerce_currency();
                     if ($currency === 'IRT') {
@@ -512,6 +520,7 @@ class OrderManager
             $order_id = $order->get_id();
             if ($order_id) {
 
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom plugin table; no object cache for these operational queries.
                 $insert_result = $wpdb->insert(
                     $table_name,
                     [
@@ -531,6 +540,7 @@ class OrderManager
 
                 update_post_meta($order_id, '_is_sync_basalam_order', true);
 
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Transaction control statement; no object cache applicable.
                 $wpdb->query('COMMIT');
 
                 return [
@@ -543,6 +553,7 @@ class OrderManager
                 throw new \Exception("خطا در ایجاد سفارش با شناسه $invoice_id ، از گزینه بررسی سفارشات استفاده نمایید.");
             }
         } catch (\Exception $e) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Transaction control statement; no object cache applicable.
             $wpdb->query('ROLLBACK');
 
             Logger::error($e->getMessage());
@@ -581,6 +592,7 @@ class OrderManager
         global $wpdb;
         $table_name = $wpdb->prefix . 'sync_basalam_payments';
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix, not user input.
         $order_id = $wpdb->get_var(
             $wpdb->prepare("SELECT order_id FROM {$table_name} WHERE invoice_id = %d", $invoice_id)
         );
@@ -677,6 +689,7 @@ class OrderManager
     public static function productExistsByTitle($title)
     {
         global $wpdb;
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct lookup on core posts table; no cache key available for this title match.
         $product_id = $wpdb->get_var(
             $wpdb->prepare(
                 "SELECT ID FROM {$wpdb->posts} WHERE post_type = 'product' AND post_status != 'private' AND post_title = %s LIMIT 1",

@@ -27,7 +27,7 @@ defined('ABSPATH') || exit;
 
             <?php
             if (is_callable($steps[$current_step]['content'])) {
-                echo call_user_func($steps[$current_step]['content']);
+                echo call_user_func($steps[$current_step]['content']); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback.
             } else {
                 echo esc_html($steps[$current_step]['content']);
             }

@@ -22,17 +22,17 @@ defined('ABSPATH') || exit;
 
         <div class="basalam-form-row">
             <div class="basalam-form-group basalam-form-group-full basalam-p">
-                <?php echo CommonComponents::renderLabelWithTooltip('افزایش قیمت در باسلام', 'درصد یا مبلغ ثابتی که به قیمت محصولات در باسلام اضافه می‌شود. می‌تواند به صورت درصد(1-100) یا مبلغ ثابت(101-∞) باشد.'); ?>
+                <?php echo CommonComponents::renderLabelWithTooltip('افزایش قیمت در باسلام', 'درصد یا مبلغ ثابتی که به قیمت محصولات در باسلام اضافه می‌شود. می‌تواند به صورت درصد(1-100) یا مبلغ ثابت(101-∞) باشد.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                 <?php SettingPageComponents::renderDefaultPercentage(); ?>
             </div>
         </div>
         <div class="basalam-form-row basalam-form-row-two-col">
             <div class="basalam-form-group basalam-p">
-                <?php echo CommonComponents::renderLabelWithTooltip('موجودی محصولات در باسلام', 'موجودی پیش‌فرضی که برای محصولات ووکامرس بدون موجودی مشخص شده در باسلام نظر گرفته می‌شود.'); ?>
+                <?php echo CommonComponents::renderLabelWithTooltip('موجودی محصولات در باسلام', 'موجودی پیش‌فرضی که برای محصولات ووکامرس بدون موجودی مشخص شده در باسلام نظر گرفته می‌شود.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                 <?php SettingPageComponents::renderDefaultStockQuantity(); ?>
             </div>
             <div class="basalam-form-group basalam-p">
-                <?php echo CommonComponents::renderLabelWithTooltip('قیمت محصول در باسلام', 'انتخاب کنید که قیمت اصلی یا قیمت حراجی محصول به باسلام ارسال شود ، در صورتی که قیمت حراجی را انتخاب کنید و محصولی قیمت حراجی نداشته باشد قیمت اصلی به باسلام ارسال میشود.'); ?>
+                <?php echo CommonComponents::renderLabelWithTooltip('قیمت محصول در باسلام', 'انتخاب کنید که قیمت اصلی یا قیمت حراجی محصول به باسلام ارسال شود ، در صورتی که قیمت حراجی را انتخاب کنید و محصولی قیمت حراجی نداشته باشد قیمت اصلی به باسلام ارسال میشود.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                 <?php SettingPageComponents::renderProductPrice(); ?>
             </div>
         </div>
@@ -57,7 +57,7 @@ defined('ABSPATH') || exit;
 </center>
 <div class="basalam-p basalam-flex-responsive">
     <div class="basalam-flex-align-center-33">
-        <?php echo CommonComponents::renderLabelWithTooltip('دیباگ', 'حالت دیباگ فقط برای توسعه‌دهندگان توصیه می‌شود.', 'right'); ?>
+        <?php echo CommonComponents::renderLabelWithTooltip('دیباگ', 'حالت دیباگ فقط برای توسعه‌دهندگان توصیه می‌شود.', 'right'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
     </div>
     <?php SettingPageComponents::renderDeveloperMode(); ?>
 </div>
@@ -98,107 +98,107 @@ defined('ABSPATH') || exit;
                 </div>
                 <div class="basalam-form-row">
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip('وزن محصولات (گرم)', 'وزن پیش‌فرض که برای محصولات ووکامرس بدون وزن مشخص شده در باسلام نظر گرفته می‌شود. این مقدار در محاسبه هزینه حمل و نقل باسلام مهم است.'); ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('وزن محصولات (گرم)', 'وزن پیش‌فرض که برای محصولات ووکامرس بدون وزن مشخص شده در باسلام نظر گرفته می‌شود. این مقدار در محاسبه هزینه حمل و نقل باسلام مهم است.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderDefaultWeight(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip('وزن بسته بندی (گرم)', 'وزن بسته‌بندی که به وزن محصول اضافه می‌شود و در محاسبه حمل و نقل هزینه ارسال باسلام اهمیت دارد. شامل جعبه، برچسب و سایر مواد بسته‌بندی.'); ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('وزن بسته بندی (گرم)', 'وزن بسته‌بندی که به وزن محصول اضافه می‌شود و در محاسبه حمل و نقل هزینه ارسال باسلام اهمیت دارد. شامل جعبه، برچسب و سایر مواد بسته‌بندی.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderPackageWeight(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip('زمان آماده‌سازی (روز)', 'تعداد روزهایی که برای آماده‌سازی و بسته‌بندی محصولات نیاز دارید. این زمان به مشتریان باسلام نمایش داده می‌شود.'); ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('زمان آماده‌سازی (روز)', 'تعداد روزهایی که برای آماده‌سازی و بسته‌بندی محصولات نیاز دارید. این زمان به مشتریان باسلام نمایش داده می‌شود.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderDefaultPreparation(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip('مدیریت زمان آماده‌سازی', 'باسلام برای هر دسته‌بندی حداکثر زمان آماده‌سازی مشخصی دارد. اگر زمان آماده‌سازی تنظیم‌شده بیشتر از این حد باشد: «کاهش به حداکثر مجاز» مقدار را به سقف دسته‌بندی کاهش داده و محصول را ارسال می‌کند؛ «عدم ارسال و ثبت لاگ» محصول را ارسال نمی‌کند و فقط یک لاگ ثبت می‌شود. مثال: اگر زمان آماده‌سازی شما ۱۰ روز باشد و سقف دسته‌بندی باسلام ۷ روز باشد، در حالت «کاهش به حداکثر مجاز» مقدار ۷ روز به باسلام ارسال می‌شود و در حالت «عدم ارسال و ثبت لاگ» محصول ارسال نمی‌شود.'); ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('مدیریت زمان آماده‌سازی', 'باسلام برای هر دسته‌بندی حداکثر زمان آماده‌سازی مشخصی دارد. اگر زمان آماده‌سازی تنظیم‌شده بیشتر از این حد باشد: «کاهش به حداکثر مجاز» مقدار را به سقف دسته‌بندی کاهش داده و محصول را ارسال می‌کند؛ «عدم ارسال و ثبت لاگ» محصول را ارسال نمی‌کند و فقط یک لاگ ثبت می‌شود. مثال: اگر زمان آماده‌سازی شما ۱۰ روز باشد و سقف دسته‌بندی باسلام ۷ روز باشد، در حالت «کاهش به حداکثر مجاز» مقدار ۷ روز به باسلام ارسال می‌شود و در حالت «عدم ارسال و ثبت لاگ» محصول ارسال نمی‌شود.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderCapPreparationToCategoryMax(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip('افزایش قیمت در باسلام', 'درصد یا مبلغ ثابتی که به قیمت محصولات در باسلام اضافه می‌شود. می‌تواند به صورت درصد(1-100) یا مبلغ ثابت(101-∞) باشد.'); ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('افزایش قیمت در باسلام', 'درصد یا مبلغ ثابتی که به قیمت محصولات در باسلام اضافه می‌شود. می‌تواند به صورت درصد(1-100) یا مبلغ ثابت(101-∞) باشد.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderDefaultPercentage(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip('جهت رند کردن قیمت در باسلام', 'نحوه رند کردن قیمت‌ها در باسلام. می‌توانید قیمت را به بالا، پایین یا بدون رند تنظیم کنید.'); ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('جهت رند کردن قیمت در باسلام', 'نحوه رند کردن قیمت‌ها در باسلام. می‌توانید قیمت را به بالا، پایین یا بدون رند تنظیم کنید.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderDefaultRound(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip('موجودی محصولات', 'موجودی پیش‌فرضی که برای محصولات ووکامرس بدون موجودی مشخص شده در باسلام در نظر گرفته می‌شود.'); ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('موجودی محصولات', 'موجودی پیش‌فرضی که برای محصولات ووکامرس بدون موجودی مشخص شده در باسلام در نظر گرفته می‌شود.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderDefaultStockQuantity(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip('موجودی امن', 'اگر موجودی محصول در ووکامرس برابر یا کمتر از این عدد باشد، محصول در باسلام به صورت ناموجود نمایش داده می‌شود.'); ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('موجودی امن', 'اگر موجودی محصول در ووکامرس برابر یا کمتر از این عدد باشد، محصول در باسلام به صورت ناموجود نمایش داده می‌شود.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderSafeStock(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip('اولویت موجودی محصولات متغیر', 'مشخص کنید در محصولات متغیر، اولویت محاسبه موجودی بر اساس موجودی خود محصول باشد یا موجودی هر متغیر. در صورتی که برای اولویت انتخاب‌شده موجودی ثبت نشده باشد، موجودی بر اساس اولویت بعدی محاسبه خواهد شد.'); ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('اولویت موجودی محصولات متغیر', 'مشخص کنید در محصولات متغیر، اولویت محاسبه موجودی بر اساس موجودی خود محصول باشد یا موجودی هر متغیر. در صورتی که برای اولویت انتخاب‌شده موجودی ثبت نشده باشد، موجودی بر اساس اولویت بعدی محاسبه خواهد شد.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderVariableProductStockSource(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip('فیلد های ارسالی هنگام آپدیت محصول', 'انتخاب کنید که هنگام آپدیت محصول چه اطلاعاتی به باسلام ارسال شود. حالت سفارشی امکان انتخاب دقیق اطلاعات را می‌دهد.'); ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('فیلد های ارسالی هنگام آپدیت محصول', 'انتخاب کنید که هنگام آپدیت محصول چه اطلاعاتی به باسلام ارسال شود. حالت سفارشی امکان انتخاب دقیق اطلاعات را می‌دهد.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderSyncProduct(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip('پیشوند نام محصولات', 'متنی که به ابتدای نام همه محصولات در باسلام اضافه می‌شود. برای مثال: "فروشگاه من -"'); ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('پیشوند نام محصولات', 'متنی که به ابتدای نام همه محصولات در باسلام اضافه می‌شود. برای مثال: "فروشگاه من -"'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderPrefixProductTitle(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip('پسوند نام محصولات', 'متنی که به انتهای نام همه محصولات در باسلام اضافه می‌شود. برای مثال: "- اصل و کیفیت تضمین"'); ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('پسوند نام محصولات', 'متنی که به انتهای نام همه محصولات در باسلام اضافه می‌شود. برای مثال: "- اصل و کیفیت تضمین"'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderSuffixProductTitle(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip('پسوند از ویژگی محصول', 'با فعال کردن این گزینه، می‌توانید یکی از ویژگی‌های محصول را به عنوان پسوند به نام محصول اضافه کنید (مثلا نام ناشر کتاب).'); ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('پسوند از ویژگی محصول', 'با فعال کردن این گزینه، می‌توانید یکی از ویژگی‌های محصول را به عنوان پسوند به نام محصول اضافه کنید (مثلا نام ناشر کتاب).'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderAttributeSuffixEnabled(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p basalam-attribute-suffix-container">
-                        <?php echo CommonComponents::renderLabelWithTooltip('نام ویژگی برای پسوند', 'نام ویژگی محصول که می‌خواهید به عنوان پسوند به نام محصول اضافه شود.'); ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('نام ویژگی برای پسوند', 'نام ویژگی محصول که می‌خواهید به عنوان پسوند به نام محصول اضافه شود.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderAttributeSuffixPriority(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip('محصولات عمده', 'مشخص کنید که آیا همه محصولات به صورت عمده به باسلام ارسال شوند یا اینکه فقط برخی یا هیچ کدام ، از صفحه ویرایش محصول در ووکامرس میتوانید وضعیت عمده محصول را در باسلام مشخص کنید.'); ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('محصولات عمده', 'مشخص کنید که آیا همه محصولات به صورت عمده به باسلام ارسال شوند یا اینکه فقط برخی یا هیچ کدام ، از صفحه ویرایش محصول در ووکامرس میتوانید وضعیت عمده محصول را در باسلام مشخص کنید.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderWholesaleProducts(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip('ویژگی ها به توضیحات', 'آیا ویژگی‌های محصول به توضیحات محصول در باسلام اضافه شود یا خیر.'); ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('ویژگی ها به توضیحات', 'آیا ویژگی‌های محصول به توضیحات محصول در باسلام اضافه شود یا خیر.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderAttrAddToDesc(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip('توضیحات کوتاه به توضیحات', 'آیا توضیحات کوتاه محصول به توضیحات کامل محصول در باسلام اضافه شود یا خیر.'); ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('توضیحات کوتاه به توضیحات', 'آیا توضیحات کوتاه محصول به توضیحات کامل محصول در باسلام اضافه شود یا خیر.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderShortAttrAddToDesc(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip('قیمت محصول در باسلام', 'انتخاب کنید که قیمت اصلی یا قیمت حراجی محصول به باسلام ارسال شود ، در صورتی که قیمت حراجی را انتخاب کنید و محصولی قیمت حراجی نداشته باشد قیمت اصلی به باسلام ارسال میشود.'); ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('قیمت محصول در باسلام', 'انتخاب کنید که قیمت اصلی یا قیمت حراجی محصول به باسلام ارسال شود ، در صورتی که قیمت حراجی را انتخاب کنید و محصولی قیمت حراجی نداشته باشد قیمت اصلی به باسلام ارسال میشود.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderProductPrice(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip(
+                        <?php echo CommonComponents::renderLabelWithTooltip( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback.
                             'مدت زمان تخفیف محصول',
                             'در باسلام هر تخفیف بازه زمانی مشخصی دارد. از این بخش می‌توانید مدت اعتبار تخفیف محصولات را تعیین کنید. با هر بار بروزرسانی محصول، این زمان نیز به‌روز خواهد شد.'
                         ); ?>
                         <?php SettingPageComponents::renderProductDiscountDuration(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip(
+                        <?php echo CommonComponents::renderLabelWithTooltip( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback.
                             'کاهش درصد تخفیف',
                             'این مقدار هنگام اعمال قیمت خط خورده در باسلام استفاده میشود. اگر درصد تخفیف محصول از این عدد بیشتر باشد، همین عدد از آن کم می‌شود. مثال: اگر این مقدار 10 باشد و تخفیف محصول 25٪ باشد، درصد تخفیف در باسلام 15% میشود. اگر تخفیف محصول 8٪ باشد (کمتر یا مساوی 10)، بدون تغییر همان 8٪ ارسال می‌شود.'
                         ); ?>
                         <?php SettingPageComponents::renderDiscountReductionPercent(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip(
+                        <?php echo CommonComponents::renderLabelWithTooltip( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback.
                             'منبع ویدیو محصول',
                             'مشخص کنید ویدیو محصول از کجا خوانده شود. اگر قالب یا افزونه‌ای فیلد ویدیو دارد، گزینه «ارث‌بری» را انتخاب کنید. در غیر این صورت می‌توانید از باکس اختصاصی افزونه در صفحه ویرایش محصول استفاده کنید.'
                         ); ?>
                         <?php SettingPageComponents::renderVideoSource(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p basalam-video-inherit-container">
-                        <?php echo CommonComponents::renderLabelWithTooltip(
+                        <?php echo CommonComponents::renderLabelWithTooltip( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback.
                             'روش ارث‌بری ویدیو',
                             'حالت تشخیص خودکار، meta key های رایج قالب‌ها و افزونه‌ها (Woodmart، Flatsome، YITH و ...) را امتحان می‌کند. در حالت دستی شما meta key دقیق را وارد می‌کنید.'
                         ); ?>
                         <?php SettingPageComponents::renderVideoInheritMode(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p basalam-video-meta-key-container">
-                        <?php echo CommonComponents::renderLabelWithTooltip(
+                        <?php echo CommonComponents::renderLabelWithTooltip( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback.
                             'Meta key ویدیو',
                             'دقیقاً همان نام meta_key که قالب یا افزونه شما برای ذخیره ویدیو استفاده می‌کند را اینجا وارد کنید.'
                         ); ?>
@@ -212,7 +212,7 @@ defined('ABSPATH') || exit;
 
                 <!-- Category Mapping Section -->
                 <div class="basalam-form-group basalam-p basalam-margin-top-25-bottom-10">
-                    <?php echo CommonComponents::renderLabelWithTooltip('تغییر نام ویژگی دسته بندی', 'امکان تعریف مترادف برای ویژگی‌های محصول بین ووکامرس و باسلام ، برای مثال "چاپ کننده" در ووکامرس به "ناشر" در باسلام تبدیل شود.'); ?>
+                    <?php echo CommonComponents::renderLabelWithTooltip('تغییر نام ویژگی دسته بندی', 'امکان تعریف مترادف برای ویژگی‌های محصول بین ووکامرس و باسلام ، برای مثال "چاپ کننده" در ووکامرس به "ناشر" در باسلام تبدیل شود.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                     <?php SettingPageComponents::renderMapOptionsProduct(); ?>
                 </div>
                 <div>
@@ -232,19 +232,19 @@ defined('ABSPATH') || exit;
                 </div>
                 <div class="basalam-form-row">
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip('وضعیت سفارش های باسلام', ' در صورتی که وضعیت سفارش ، وضعیت های اختصاصی ووسلام باشد امکان مدیریت سفارش(تایید سفارش ، لغو سفارش ، ارسال کد رهگیری و...) از صفحه ویرایش سفارش وجود دارد ، در غیر این صورت سفارشات باسلام با وضعیت پیشفرض ووکارس "در حال انجام" به ووکامرس اضافه میشود.'); ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('وضعیت سفارش های باسلام', ' در صورتی که وضعیت سفارش ، وضعیت های اختصاصی ووسلام باشد امکان مدیریت سفارش(تایید سفارش ، لغو سفارش ، ارسال کد رهگیری و...) از صفحه ویرایش سفارش وجود دارد ، در غیر این صورت سفارشات باسلام با وضعیت پیشفرض ووکارس "در حال انجام" به ووکامرس اضافه میشود.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderOrderStatus(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip('روش حمل و نقل سفارشات', 'روش حمل و نقل پیش‌فرض برای سفارشات باسلام. "حمل و نقل باسلام" نام روش را از باسلام می‌گیرد. یا می‌توانید یکی از روش‌های حمل و نقل فعال ووکامرس را انتخاب کنید.'); ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('روش حمل و نقل سفارشات', 'روش حمل و نقل پیش‌فرض برای سفارشات باسلام. "حمل و نقل باسلام" نام روش را از باسلام می‌گیرد. یا می‌توانید یکی از روش‌های حمل و نقل فعال ووکامرس را انتخاب کنید.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderShippingMethod(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip('پیشوند نام سفارش‌دهنده', 'متنی که به ابتدای نام کوچک (نام) سفارش‌دهنده در ووکامرس اضافه می‌شود. برای مثال: "آقای" یا "خانم"'); ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('پیشوند نام سفارش‌دهنده', 'متنی که به ابتدای نام کوچک (نام) سفارش‌دهنده در ووکامرس اضافه می‌شود. برای مثال: "آقای" یا "خانم"'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderCustomerPrefixName(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip('پسوند نام سفارش‌دهنده', 'متنی که به انتهای نام خانوادگی (فامیلی) سفارش‌دهنده در ووکامرس اضافه می‌شود. برای مثال: "عزیز"'); ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('پسوند نام سفارش‌دهنده', 'متنی که به انتهای نام خانوادگی (فامیلی) سفارش‌دهنده در ووکامرس اضافه می‌شود. برای مثال: "عزیز"'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderCustomerSuffixName(); ?>
                     </div>
                 </div>
@@ -258,14 +258,14 @@ defined('ABSPATH') || exit;
                 </div>
                 <div class="basalam-form-row">
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip(
+                        <?php echo CommonComponents::renderLabelWithTooltip( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback.
                             'تشخیص خودکار سرعت',
                             'فعال کردن تشخیص خودکار: سیستم بر اساس منابع سرور (رم، CPU، دیسک، شبکه) به طور خودکار بهترین سرعت را تعیین می‌کند. غیرفعال کردن: شما مقدار را دستی تنظیم کنید.'
                         ); ?>
                         <?php SettingPageComponents::renderTasksPerMinuteAutoToggle(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p basalam-tasks-manual-container">
-                        <?php echo CommonComponents::renderLabelWithTooltip(
+                        <?php echo CommonComponents::renderLabelWithTooltip( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback.
                             'تعداد تسک در دقیقه (دستی)',
                             'تعداد تسک‌هایی که در هر دقیقه اجرا می‌شوند. این تنظیم بر سرعت پردازش محصولات و عملیات‌های پس‌زمینه تأثیر می‌گذارد. مقدار بالاتر = سرعت بیشتر (بین 1 تا 60)'
                         ); ?>

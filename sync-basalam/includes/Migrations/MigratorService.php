@@ -23,6 +23,7 @@ class MigratorService
         $target = $this->wpdb->prefix . 'sync_basalam_payments';
 
         if ($this->tableExists($source) && $this->tableExists($target)) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Legacy-data migration; table identifiers from $wpdb->prefix / core $wpdb properties, not user input.
             $this->wpdb->query("INSERT INTO $target (payment_id, invoice_id, user_id, city_id, province_id, order_id)
                                 SELECT payment_id, invoice_id, user_id, city_id, province_id, order_id FROM $source");
         }
@@ -34,6 +35,7 @@ class MigratorService
         $target = $this->wpdb->prefix . 'sync_basalam_map_options';
 
         if ($this->tableExists($source) && $this->tableExists($target)) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Legacy-data migration; table identifiers from $wpdb->prefix / core $wpdb properties, not user input.
             $this->wpdb->query("INSERT INTO $target (woo_name, sync_basalam_name)
                                 SELECT woo_name, bslm_name FROM $source");
         }
@@ -45,6 +47,7 @@ class MigratorService
         $target = $this->wpdb->prefix . 'sync_basalam_uploaded_media';
 
         if ($this->tableExists($source) && $this->tableExists($target)) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Legacy-data migration; table identifiers from $wpdb->prefix / core $wpdb properties, not user input.
             $this->wpdb->query(
                 "INSERT IGNORE INTO {$target} (type, source_identity, media_id, media_url, created_at)
                  SELECT 'photo', CONCAT('attachment:', woo_photo_id), bslm_photo_id, bslm_photo_url, NOW()
@@ -56,12 +59,14 @@ class MigratorService
 
     public function migratePostMeta()
     {
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Legacy-data migration; table identifiers from $wpdb->prefix / core $wpdb properties, not user input.
         $this->wpdb->query(
             "UPDATE {$this->wpdb->postmeta}
              SET meta_key = REPLACE(meta_key, 'bslm_', 'sync_basalam_')
              WHERE meta_key LIKE '%bslm_%'"
         );
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Legacy-data migration; table identifiers from $wpdb->prefix / core $wpdb properties, not user input.
         $this->wpdb->query(
             "UPDATE {$this->wpdb->postmeta}
              SET meta_key = REPLACE(meta_key, 'bsl_', 'sync_basalam_')
@@ -71,12 +76,14 @@ class MigratorService
 
     public function migrateOptionsRows()
     {
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Legacy-data migration; table identifiers from $wpdb->prefix / core $wpdb properties, not user input.
         $this->wpdb->query(
             "UPDATE {$this->wpdb->options}
              SET option_name = REPLACE(option_name, 'bslm_', 'sync_basalam_')
              WHERE option_name LIKE '%bslm_%'"
         );
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Legacy-data migration; table identifiers from $wpdb->prefix / core $wpdb properties, not user input.
         $this->wpdb->query(
             "UPDATE {$this->wpdb->options}
              SET option_name = REPLACE(option_name, 'bsl_', 'sync_basalam_')
@@ -88,6 +95,7 @@ class MigratorService
     {
         $source = $this->wpdb->prefix . 'actionscheduler_actions';
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Legacy-data migration; table identifier from $wpdb->prefix, not user input; values are prepared.
         $this->wpdb->query(
             $this->wpdb->prepare(
                 "UPDATE $source
@@ -98,6 +106,7 @@ class MigratorService
             )
         );
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Legacy-data migration; table identifier from $wpdb->prefix, not user input; values are prepared.
         $this->wpdb->query(
             $this->wpdb->prepare(
                 "UPDATE $source
@@ -113,6 +122,7 @@ class MigratorService
     {
         $settingsRowName = 'sync_basalam_settings';
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Legacy-data migration; table identifier from core $wpdb property, not user input; value is prepared.
         $settingsSerialized = $this->wpdb->get_var(
             $this->wpdb->prepare(
                 "SELECT option_value FROM {$this->wpdb->options} WHERE option_name = %s",
@@ -158,6 +168,7 @@ class MigratorService
 
         foreach ($tables as $table) {
             if ($this->tableExists($table)) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter -- One-time schema migration; table identifier from $wpdb->prefix, not user input.
                 $this->wpdb->query("RENAME TABLE $table TO {$table}_old");
             }
         }
@@ -166,12 +177,14 @@ class MigratorService
     private function tableExists($table)
     {
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Legacy-data migration; no object cache for these one-time operational queries.
         return $this->wpdb->get_var($this->wpdb->prepare("SHOW TABLES LIKE %s", $table)) === $table;
     }
 
     private function columnExists($table, $column)
     {
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Legacy-data migration; table identifier from $wpdb->prefix, not user input; value is prepared.
         $result = $this->wpdb->get_results($this->wpdb->prepare(
             "SHOW COLUMNS FROM `$table` LIKE %s",
             $column
@@ -186,6 +199,7 @@ class MigratorService
         $table = $this->wpdb->prefix . 'sync_basalam_uploaded_photo';
 
         if ($this->tableExists($table) && !$this->columnExists($table, 'created_at')) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter -- One-time schema migration; table identifier from $wpdb->prefix, not user input.
             $this->wpdb->query("ALTER TABLE $table ADD COLUMN created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP");
         }
     }
@@ -212,6 +226,7 @@ class MigratorService
 
         foreach ($columns as $columnName => $sql) {
             if (!$this->columnExists($table, $columnName)) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter -- One-time schema migration; ALTER statement built from static SQL with a $wpdb->prefix table identifier, not user input.
                 $this->wpdb->query($sql);
             }
         }
@@ -225,6 +240,7 @@ class MigratorService
             return;
         }
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Legacy-data migration; no object cache for these one-time operational queries; values are prepared.
         $existingIndex = $this->wpdb->get_var(
             $this->wpdb->prepare(
                 "SELECT INDEX_NAME FROM INFORMATION_SCHEMA.STATISTICS
@@ -241,12 +257,14 @@ class MigratorService
         $this->removeDuplicateInvoicePayments($table);
 
         $this->wpdb->hide_errors();
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter -- One-time schema migration; table identifier from $wpdb->prefix, not user input.
         $this->wpdb->query("ALTER TABLE {$table} ADD UNIQUE KEY unique_invoice_id (invoice_id)");
         $this->wpdb->show_errors();
     }
 
     private function removeDuplicateInvoicePayments($table)
     {
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Legacy-data migration; table identifier from $wpdb->prefix, not user input.
         $duplicates = $this->wpdb->get_results(
             "SELECT invoice_id, MIN(id) AS keep_id
              FROM {$table}
@@ -263,6 +281,7 @@ class MigratorService
             $invoiceId = (int) $duplicate->invoice_id;
             $keepId    = (int) $duplicate->keep_id;
 
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Legacy-data migration; table identifier from $wpdb->prefix, not user input; values are prepared.
             $rowsToDelete = $this->wpdb->get_results(
                 $this->wpdb->prepare(
                     "SELECT id, order_id FROM {$table} WHERE invoice_id = %d AND id <> %d",
@@ -286,6 +305,7 @@ class MigratorService
                     }
                 }
 
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Legacy-data migration; no object cache for these one-time operational queries.
                 $this->wpdb->delete($table, ['id' => (int) $row->id], ['%d']);
             }
 
@@ -299,12 +319,15 @@ class MigratorService
     {
         $tableName = $this->wpdb->prefix . 'sync_basalam_job_manager';
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Legacy-data migration; table identifier from $wpdb->prefix, not user input; value is prepared.
         $columnExists = $this->wpdb->get_var(
             $this->wpdb->prepare("SHOW COLUMNS FROM `{$tableName}` LIKE %s", 'retry_after')
         );
 
         if (!$columnExists) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter -- One-time schema migration; table identifier from $wpdb->prefix, not user input.
             $this->wpdb->query("ALTER TABLE {$tableName} ADD COLUMN retry_after BIGINT(20) NULL DEFAULT NULL");
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter -- One-time schema migration; table identifier from $wpdb->prefix, not user input.
             $this->wpdb->query("ALTER TABLE {$tableName} ADD INDEX idx_retry_after (retry_after)");
         }
     }
@@ -330,6 +353,7 @@ class MigratorService
         foreach ($metaKeyMap as $oldMetaKey => $newMetaKey) {
             if ($oldMetaKey === $newMetaKey) continue;
 
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Legacy-data migration; table identifier from core $wpdb property, not user input; values are prepared.
             $this->wpdb->query(
                 $this->wpdb->prepare(
                     "INSERT INTO {$postmetaTable} (post_id, meta_key, meta_value)
@@ -346,6 +370,7 @@ class MigratorService
                 )
             );
 
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Legacy-data migration; table identifier from core $wpdb property, not user input; value is prepared.
             $this->wpdb->query(
                 $this->wpdb->prepare(
                     "DELETE FROM {$postmetaTable} WHERE meta_key = %s",
@@ -397,6 +422,7 @@ class MigratorService
 
         if (!$this->tableExists($legacyTable)) return;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Legacy-data migration; table identifiers from $wpdb->prefix, not user input.
         $this->wpdb->query(
             "INSERT IGNORE INTO {$targetTable} (type, source_identity, media_id, media_url, created_at)
              SELECT 'photo', CONCAT('attachment:', woo_photo_id), sync_basalam_photo_id, sync_basalam_photo_url, COALESCE(created_at, NOW())
@@ -404,6 +430,7 @@ class MigratorService
              WHERE woo_photo_id IS NOT NULL"
         );
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter -- One-time schema migration; table identifier from $wpdb->prefix, not user input.
         $this->wpdb->query("DROP TABLE IF EXISTS {$legacyTable}");
     }
 

@@ -160,7 +160,7 @@ $isTicketClosed = TicketServiceManager::isTicketClosed($ticket);
 <?php if (!$isTicketClosed): ?>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            ticketFileUpload('ticket-file-reply', '<?php echo wp_create_nonce('upload_ticket_media_nonce'); ?>');
+            ticketFileUpload('ticket-file-reply', '<?php echo esc_attr(wp_create_nonce('upload_ticket_media_nonce')); ?>');
         });
     </script>
 <?php endif; ?>

@@ -39,6 +39,7 @@ class CancelUpdateProducts extends ActionController
         ];
 
         foreach ($patterns as $pattern) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom plugin option cleanup; no object cache for these operational queries.
             $wpdb->query(
                 $wpdb->prepare(
                     "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
@@ -59,6 +60,7 @@ class CancelUpdateProducts extends ActionController
         ];
 
         foreach ($patterns as $pattern) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom plugin option cleanup; no object cache for these operational queries.
             $wpdb->query(
                 $wpdb->prepare(
                     "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",

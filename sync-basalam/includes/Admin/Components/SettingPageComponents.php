@@ -193,7 +193,7 @@ class SettingPageComponents
         $is_auto = syncBasalamSettings()->getSettings(SettingsConfig::TASKS_PER_MINUTE_AUTO) == 'true';
         $disabled = $is_auto ? 'disabled' : '';
 
-        echo '<input type="number" name="sync_basalam_settings[' . esc_attr(SettingsConfig::TASKS_PER_MINUTE) . ']" min="1" max="60" value="' . esc_attr($current_value) . '" class="basalam-input basalam-p basalam-tasks-manual-input" ' . $disabled . ' required>';
+        echo '<input type="number" name="sync_basalam_settings[' . esc_attr(SettingsConfig::TASKS_PER_MINUTE) . ']" min="1" max="60" value="' . esc_attr($current_value) . '" class="basalam-input basalam-p basalam-tasks-manual-input" ' . esc_attr($disabled) . ' required>';
     }
 
     public static function renderTasksPerMinuteAutoToggle()
@@ -203,7 +203,7 @@ class SettingPageComponents
 
         echo '<label class="basalam-switch">';
         echo '<input type="hidden" name="sync_basalam_settings[' . esc_attr(SettingsConfig::TASKS_PER_MINUTE_AUTO) . ']" value="false">';
-        echo '<input type="checkbox" name="sync_basalam_settings[' . esc_attr(SettingsConfig::TASKS_PER_MINUTE_AUTO) . ']" value="true" ' . $checked . ' class="basalam-tasks-auto-toggle">';
+        echo '<input type="checkbox" name="sync_basalam_settings[' . esc_attr(SettingsConfig::TASKS_PER_MINUTE_AUTO) . ']" value="true" ' . esc_attr($checked) . ' class="basalam-tasks-auto-toggle">';
         echo '<span class="basalam-slider"></span>';
         echo '</label>';
     }
@@ -250,7 +250,7 @@ class SettingPageComponents
         $checked = $current_value == 'yes' ? 'checked' : '';
 
         echo '<label class="basalam-switch">';
-        echo '<input type="checkbox" name="sync_basalam_settings[' . esc_attr(SettingsConfig::PRODUCT_ATTRIBUTE_SUFFIX_ENABLED) . ']" value="yes" ' . $checked . ' class="basalam-attribute-suffix-toggle">';
+        echo '<input type="checkbox" name="sync_basalam_settings[' . esc_attr(SettingsConfig::PRODUCT_ATTRIBUTE_SUFFIX_ENABLED) . ']" value="yes" ' . esc_attr($checked) . ' class="basalam-attribute-suffix-toggle">';
         echo '<span class="basalam-slider"></span>';
         echo '</label>';
         echo '<input type="hidden" name="sync_basalam_settings[' . esc_attr(SettingsConfig::PRODUCT_ATTRIBUTE_SUFFIX_ENABLED) . ']" value="no" class="basalam-attribute-suffix-hidden">';
@@ -262,7 +262,7 @@ class SettingPageComponents
         $is_enabled = syncBasalamSettings()->getSettings(SettingsConfig::PRODUCT_ATTRIBUTE_SUFFIX_ENABLED) == 'yes';
         $disabled = $is_enabled ? '' : 'disabled';
 
-        echo '<input type="text" name="sync_basalam_settings[' . esc_attr(SettingsConfig::PRODUCT_ATTRIBUTE_SUFFIX_PRIORITY) . ']" value="' . esc_attr($current_value) . '" class="basalam-input basalam-p basalam-attribute-suffix-priority basalam-max-width-80 basalam-font-12" placeholder="مثال: ناشر" ' . $disabled . '>';
+        echo '<input type="text" name="sync_basalam_settings[' . esc_attr(SettingsConfig::PRODUCT_ATTRIBUTE_SUFFIX_PRIORITY) . ']" value="' . esc_attr($current_value) . '" class="basalam-input basalam-p basalam-attribute-suffix-priority basalam-max-width-80 basalam-font-12" placeholder="مثال: ناشر" ' . esc_attr($disabled) . '>';
     }
 
     public static function renderMapOptionsProduct()
@@ -282,14 +282,14 @@ class SettingPageComponents
     public static function renderSyncProductFields()
     {
         echo '<div>';
-        echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_NAME, 'نام');
-        echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_PHOTOS, 'عکس');
-        echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_PRICE, 'قیمت');
-        echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_STOCK, 'موجودی');
-        echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_WEIGHT, 'وزن');
-        echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_DESCRIPTION, 'توضیحات');
-        echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_ATTR, 'ویژگی ها');
-        echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_VIDEO, 'ویدیو');
+        echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_NAME, 'نام'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped inside the component method.
+        echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_PHOTOS, 'عکس'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped inside the component method.
+        echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_PRICE, 'قیمت'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped inside the component method.
+        echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_STOCK, 'موجودی'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped inside the component method.
+        echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_WEIGHT, 'وزن'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped inside the component method.
+        echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_DESCRIPTION, 'توضیحات'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped inside the component method.
+        echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_ATTR, 'ویژگی ها'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped inside the component method.
+        echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_VIDEO, 'ویدیو'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped inside the component method.
         echo '</div>';
     }
 

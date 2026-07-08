@@ -24,6 +24,7 @@ class JobManager
     {
         global $wpdb;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom plugin table; no object cache for these operational queries.
         return $wpdb->insert(
             $this->jobManagerTableName,
             array(
@@ -41,6 +42,7 @@ class JobManager
     {
         global $wpdb;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix, not user input.
         return $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM {$this->jobManagerTableName}
              WHERE job_type = %s
@@ -69,7 +71,7 @@ class JobManager
 
         foreach ($where as $column => $value) {
             if (!in_array($column, self::ALLOWED_COLUMNS, true)) {
-                throw new \InvalidArgumentException("Invalid column: {$column}");
+                throw new \InvalidArgumentException(esc_html("Invalid column: {$column}"));
             }
             $conditions[] = "{$column} = %s";
             $values[]     = $value;
@@ -77,6 +79,7 @@ class JobManager
 
         $sql = "SELECT * FROM {$this->jobManagerTableName} WHERE " . implode(" AND ", $conditions) . " LIMIT 1";
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifiers from $wpdb->prefix and whitelisted column list, not user input; values are prepared.
         return $wpdb->get_row($wpdb->prepare($sql, $values));
     }
 
@@ -91,7 +94,7 @@ class JobManager
 
         foreach ($where as $column => $value) {
             if (!in_array($column, self::ALLOWED_COLUMNS, true)) {
-                throw new \InvalidArgumentException("Invalid column: {$column}");
+                throw new \InvalidArgumentException(esc_html("Invalid column: {$column}"));
             }
             if (is_array($value)) {
                 $placeholders = array_fill(0, count($value), '%s');
@@ -105,6 +108,7 @@ class JobManager
 
         $sql = "SELECT COUNT(*) FROM {$this->jobManagerTableName} WHERE " . implode(" AND ", $conditions);
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifiers from $wpdb->prefix and whitelisted column list, not user input; values are prepared.
         return (int) $wpdb->get_var($wpdb->prepare($sql, $values));
     }
 
@@ -114,6 +118,7 @@ class JobManager
 
         if (empty($where) || empty($jobData)) return false;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom plugin table; no object cache for these operational queries.
         return $wpdb->update($this->jobManagerTableName, $jobData, $where);
     }
 
@@ -123,6 +128,7 @@ class JobManager
 
         if (empty($where)) return false;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom plugin table; no object cache for these operational queries.
         return $wpdb->delete($this->jobManagerTableName, $where);
     }
 
@@ -132,6 +138,7 @@ class JobManager
 
         $timeoutTimestamp = time() - $timeoutSeconds;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix, not user input.
         $wpdb->query(
             $wpdb->prepare(
                 "UPDATE {$this->jobManagerTableName}
@@ -158,6 +165,7 @@ class JobManager
     {
         global $wpdb;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix, not user input.
         $jobs = $wpdb->get_results($wpdb->prepare(
             "SELECT payload FROM {$this->jobManagerTableName}
             WHERE job_type = %s
@@ -187,6 +195,7 @@ class JobManager
     {
         global $wpdb;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix, not user input.
         $job = $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM {$this->jobManagerTableName} WHERE id = %d",
             $jobId
@@ -225,10 +234,13 @@ class JobManager
         $retryAfter   = time() + $delaySeconds;
 
         // Atomic DELETE + INSERT inside a transaction so a crash can't lose the job.
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Transaction control for atomic job requeue; no object cache applicable.
         $wpdb->query('START TRANSACTION');
         try {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom plugin table; no object cache for these operational queries.
             $wpdb->delete($this->jobManagerTableName, ['id' => $jobId]);
 
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom plugin table; no object cache for these operational queries.
             $wpdb->insert(
                 $this->jobManagerTableName,
                 [
@@ -244,8 +256,10 @@ class JobManager
                 ]
             );
 
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Transaction control for atomic job requeue; no object cache applicable.
             $wpdb->query('COMMIT');
         } catch (\Exception $e) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Transaction control for atomic job requeue; no object cache applicable.
             $wpdb->query('ROLLBACK');
             throw $e;
         }

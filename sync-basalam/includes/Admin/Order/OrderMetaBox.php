@@ -78,6 +78,7 @@ class OrderMetaBox
         global $wpdb;
         $table_name = $wpdb->prefix . 'sync_basalam_payments';
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix, not user input.
         $invoice_id = $wpdb->get_var(
             $wpdb->prepare(
                 "SELECT invoice_id FROM {$table_name} WHERE order_id = %d",

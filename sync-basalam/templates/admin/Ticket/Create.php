@@ -117,6 +117,6 @@ $TicketSubjects = isset($fetchTicketSubjects['body']) ? json_decode($fetchTicket
 </div>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        ticketFileUpload('ticket-file-create', '<?php echo wp_create_nonce('upload_ticket_media_nonce'); ?>');
+        ticketFileUpload('ticket-file-create', '<?php echo esc_attr(wp_create_nonce('upload_ticket_media_nonce')); ?>');
     });
 </script>

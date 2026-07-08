@@ -98,6 +98,7 @@ class VideoService
         global $wpdb;
         $tableName = $wpdb->prefix . 'sync_basalam_uploaded_media';
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix, not user input.
         $result = $wpdb->get_row($wpdb->prepare(
             "SELECT media_id AS file_id, media_url AS url, created_at
             FROM $tableName
@@ -113,6 +114,7 @@ class VideoService
         $fourteenDays = 14 * DAY_IN_SECONDS;
 
         if (($now - $createdAt) >= $fourteenDays) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom plugin table; no object cache for these operational queries.
             $wpdb->delete(
                 $tableName,
                 ['type' => 'video', 'source_identity' => $sourceIdentity],
@@ -129,6 +131,7 @@ class VideoService
         global $wpdb;
         $tableName = $wpdb->prefix . 'sync_basalam_uploaded_media';
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom plugin table; no object cache for these operational queries.
         $wpdb->replace(
             $tableName,
             [

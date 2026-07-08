@@ -216,6 +216,7 @@ abstract class AsyncBackgroundProcess
             LIMIT 1
         ", $keyPattern);
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom plugin table; no object cache for these operational queries.
         $batch = $wpdb->get_row($query);
 
         if (empty($batch)) return array();
@@ -254,6 +255,7 @@ abstract class AsyncBackgroundProcess
         $table = $wpdb->options;
         $keyPattern = $this->identifier . '_batch_%';
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom plugin table; no object cache for these operational queries.
         return $wpdb->get_results(
             $wpdb->prepare("
                 SELECT option_name

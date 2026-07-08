@@ -1,3 +1,4 @@
+<?php defined('ABSPATH') || exit; ?>
 <div class="basalam-order-info basalam-p">
     <div class="basalam-info-item">
         <span class="basalam-info-label">تعداد سفارشات کاربر:</span>

@@ -38,7 +38,7 @@ class UpdateSingleProductService
         } catch (NonRetryableException $e) {
             throw $e;
         } catch (\Exception $e) {
-            throw new \Exception('خطا در ارتباط با API باسلام: ' . $e->getMessage());
+            throw new \Exception(esc_html('خطا در ارتباط با API باسلام: ' . $e->getMessage()));
         }
 
         $body = $request['body'] ?? '';
@@ -58,10 +58,10 @@ class UpdateSingleProductService
             elseif (isset($body[0]['fields'][0])) $field = $body[0]['fields'][0];
             else $field = '';
 
-            $errorMessage = $message ? esc_html($message) : 'درخواست با خطا مواجه شد.';
-            if ($field) $errorMessage .= ' (فیلد: ' . esc_html($field) . ')';
+            $errorMessage = $message ?: 'درخواست با خطا مواجه شد.';
+            if ($field) $errorMessage .= ' (فیلد: ' . $field . ')';
 
-            throw NonRetryableException::permanent($errorMessage);
+            throw NonRetryableException::permanent(esc_html($errorMessage));
         }
 
         if (is_wp_error($request)) throw NonRetryableException::permanent('خطایی در ارتباط با سرور رخ داد.');
@@ -161,7 +161,7 @@ class UpdateSingleProductService
         } catch (NonRetryableException $e) {
             throw $e;
         } catch (\Exception $e) {
-            throw NonRetryableException::permanent($e->getMessage());
+            throw NonRetryableException::permanent(esc_html($e->getMessage()));
         }
 
         if (!is_wp_error($request)) {

@@ -170,6 +170,7 @@ class DiscountTaskModel
             $prepareValues
         );
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix and generated %d/%s placeholders, not user input; values are prepared.
         return $this->wpdb->query($sql);
     }
 

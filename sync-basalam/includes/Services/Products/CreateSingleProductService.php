@@ -41,7 +41,7 @@ class CreateSingleProductService
         } catch (NonRetryableException $e) {
             throw $e;
         } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
+            throw new \Exception(esc_html($e->getMessage()));
         }
 
         if ($request['status_code'] != 201 && isset($request['status_code'])) {
@@ -65,7 +65,7 @@ class CreateSingleProductService
             $errorMessage = 'فرایند اضافه کردن محصول ناموفق بود: ' . esc_html($message);
             if ($field) $errorMessage .= ' (فیلد: ' . esc_html($field) . ')';
 
-            throw new \Exception($errorMessage);
+            throw new \Exception(esc_html($errorMessage));
         }
 
         if (is_wp_error($request)) {
@@ -172,7 +172,7 @@ class CreateSingleProductService
         $validation = $this->validator->validate($productData, $productId);
 
         if (!$validation['valid']) {
-            throw NonRetryableException::invalidData($validation['message']);
+            throw NonRetryableException::invalidData(esc_html($validation['message']));
         }
     }
 }

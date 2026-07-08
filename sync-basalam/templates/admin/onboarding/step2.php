@@ -1,19 +1,19 @@
 <?php
 
-use SyncBasalam\Admin\Settings\OAuthManager;
-
 defined('ABSPATH') || exit;
-
-$OAuthManger = new OAuthManager();
-$oauthUrls = $OAuthManger->getOAuthUrls();
 
 ?>
 <div class="step-content">
     <div>
-        <a href="<?php echo esc_url($oauthUrls['url_req_token']); ?>" class="basalam-primary-button basalam-p basalam-a">
-            <img src="<?php echo esc_url(syncBasalamPlugin()->assetsUrl() . '/icons/create.svg'); ?>" alt="">
-            دریافت دسترسی از باسلام
-        </a>
+        <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post">
+            <input type="hidden" name="action" value="basalam_update_setting">
+            <input type="hidden" name="get_token" value="1">
+            <?php wp_nonce_field('basalam_update_setting_nonce', '_wpnonce'); ?>
+            <button type="submit" class="basalam-primary-button basalam-p basalam-a">
+                <img src="<?php echo esc_url(syncBasalamPlugin()->assetsUrl() . '/icons/create.svg'); ?>" alt="">
+                دریافت دسترسی از باسلام
+            </button>
+        </form>
     </div>
     <div class="step-instructions">
         <ol>

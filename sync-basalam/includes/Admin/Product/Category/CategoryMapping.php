@@ -64,7 +64,7 @@ class CategoryMapping
         try {
             $response = $apiService->get(Endpoints::CATEGORIES);
         } catch (\Exception $e) {
-            throw new \Exception('خطا در دریافت دسته‌بندی‌های باسلام: ' . $e->getMessage());
+            throw new \Exception(esc_html('خطا در دریافت دسته‌بندی‌های باسلام: ' . $e->getMessage()));
         }
 
         if (!$response || !isset($response['body'])) throw new \Exception('خطا در دریافت دسته‌بندی‌های باسلام');
@@ -108,6 +108,7 @@ class CategoryMapping
         global $wpdb;
         $tableName = $wpdb->prefix . self::$tableName;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix, not user input.
         $results = $wpdb->get_results(
             "SELECT * FROM $tableName ORDER BY created_at DESC",
             ARRAY_A
@@ -121,6 +122,7 @@ class CategoryMapping
         global $wpdb;
         $tableName = $wpdb->prefix . self::$tableName;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix, not user input.
         $existing = $wpdb->get_var($wpdb->prepare(
             "SELECT id FROM $tableName WHERE woo_category_id = %d",
             $wooCategoryId
@@ -134,6 +136,7 @@ class CategoryMapping
         $level2 = isset($basalamCategoryIds[1]) && is_numeric($basalamCategoryIds[1]) ? intval($basalamCategoryIds[1]) : null;
         $level3 = isset($basalamCategoryIds[2]) && is_numeric($basalamCategoryIds[2]) ? intval($basalamCategoryIds[2]) : null;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom plugin table; no object cache for these operational queries.
         $result = $wpdb->insert(
             $tableName,
             [
@@ -155,6 +158,7 @@ class CategoryMapping
         global $wpdb;
         $tableName = $wpdb->prefix . self::$tableName;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom plugin table; no object cache for these operational queries.
         $result = $wpdb->delete(
             $tableName,
             ['id' => $mappingId],
@@ -169,6 +173,7 @@ class CategoryMapping
         global $wpdb;
         $tableName = $wpdb->prefix . self::$tableName;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix, not user input.
         $result = $wpdb->get_row($wpdb->prepare(
             "SELECT basalam_category_level1, basalam_category_level2, basalam_category_level3, basalam_category_name FROM $tableName WHERE woo_category_id = %d",
             $wooCategoryId
@@ -198,6 +203,7 @@ class CategoryMapping
         global $wpdb;
         $tableName = $wpdb->prefix . self::$tableName;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix, not user input.
         $results = $wpdb->get_results(
             "SELECT woo_category_id, basalam_category_level1, basalam_category_level2, basalam_category_level3 FROM $tableName",
             ARRAY_A
@@ -226,8 +232,10 @@ class CategoryMapping
         global $wpdb;
         $tableName = $wpdb->prefix . self::$tableName;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix, not user input.
         $totalMappings = $wpdb->get_var("SELECT COUNT(*) FROM $tableName");
         $totalProducts = wp_count_posts('product')->publish;
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix, not user input.
         $mappedCategories = $wpdb->get_col("SELECT woo_category_id FROM $tableName");
 
         $productsWithMapping = 0;
@@ -242,6 +250,7 @@ class CategoryMapping
                 AND tr.term_taxonomy_id IN ($placeholders)",
                 ...$mappedCategories
             );
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Core WP table identifiers from $wpdb properties, not user input; values are prepared.
             $productsWithMapping = $wpdb->get_var($query);
         }
 

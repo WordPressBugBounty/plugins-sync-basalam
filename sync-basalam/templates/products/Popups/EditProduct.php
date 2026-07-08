@@ -98,7 +98,7 @@
                         <p class="basalam-margin-warning">
                             <strong>تعداد محصولات در صف:</strong>
                             <span class="basalam-badge-warning">
-                                <?php echo $single_update_count; ?> محصول
+                                <?php echo esc_html($single_update_count); ?> محصول
                             </span>
                         </p>
                     <?php endif; ?>

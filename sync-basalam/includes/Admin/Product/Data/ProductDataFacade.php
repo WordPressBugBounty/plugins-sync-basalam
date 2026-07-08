@@ -38,7 +38,7 @@ class ProductDataFacade
         self::initialize();
 
         $product = wc_get_product($productId);
-        if (!$product) throw new \InvalidArgumentException("Product with ID {$productId} not found");
+        if (!$product) throw new \InvalidArgumentException(esc_html("Product with ID {$productId} not found"));
 
         $basalamProductId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
         $isUpdate = !empty($basalamProductId);

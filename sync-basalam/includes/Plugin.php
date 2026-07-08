@@ -15,7 +15,7 @@ defined('ABSPATH') || exit;
 
 class Plugin
 {
-    public const VERSION = '1.9.1';
+    public const VERSION = '1.9.2';
 
     public function __construct()
     {
@@ -30,7 +30,7 @@ class Plugin
         if (get_transient('sync_basalam_just_activated')) {
             delete_transient('sync_basalam_just_activated');
             if (!syncBasalamSettings()->hasToken()) {
-                wp_redirect(admin_url('admin.php?page=basalam-onboarding'));
+                wp_safe_redirect(admin_url('admin.php?page=basalam-onboarding'));
                 exit();
             }
         }

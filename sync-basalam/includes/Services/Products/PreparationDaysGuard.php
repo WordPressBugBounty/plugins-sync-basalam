@@ -54,7 +54,7 @@ class PreparationDaysGuard
             $maxPreparation
         );
 
-        throw NonRetryableException::invalidData($message);
+        throw NonRetryableException::invalidData(esc_html($message));
     }
 
     private function resolveCategoryId($product): ?int

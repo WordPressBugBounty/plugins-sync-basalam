@@ -23,10 +23,10 @@ class ProductOperationFactory
     {
         if (!isset(self::OPERATIONS[$type])) {
             throw new \InvalidArgumentException(
-                sprintf('Operation type "%s" is not supported. Available types: %s',
+                esc_html(sprintf('Operation type "%s" is not supported. Available types: %s',
                     $type,
                     implode(', ', array_keys(self::OPERATIONS))
-                )
+                ))
             );
         }
 

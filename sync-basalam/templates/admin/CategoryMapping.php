@@ -312,7 +312,7 @@ if (!syncBasalamSettings()->getSettings(SettingsConfig::TOKEN)) {
                 method: 'POST',
                 data: {
                     action: 'get_woocommerce_categories',
-                    _wpnonce: '<?php echo wp_create_nonce('get_woocommerce_categories_nonce'); ?>'
+                    _wpnonce: '<?php echo esc_attr(wp_create_nonce('get_woocommerce_categories_nonce')); ?>'
                 },
                 success: function(response) {
                     if (response.success) {
@@ -334,7 +334,7 @@ if (!syncBasalamSettings()->getSettings(SettingsConfig::TOKEN)) {
                 method: 'POST',
                 data: {
                     action: 'get_basalam_categories',
-                    _wpnonce: '<?php echo wp_create_nonce('get_basalam_categories_nonce'); ?>'
+                    _wpnonce: '<?php echo esc_attr(wp_create_nonce('get_basalam_categories_nonce')); ?>'
                 },
                 success: function(response) {
                     if (response.success) {
@@ -356,7 +356,7 @@ if (!syncBasalamSettings()->getSettings(SettingsConfig::TOKEN)) {
                 method: 'POST',
                 data: {
                     action: 'get_category_mappings',
-                    _wpnonce: '<?php echo wp_create_nonce('get_category_mappings_nonce'); ?>'
+                    _wpnonce: '<?php echo esc_attr(wp_create_nonce('get_category_mappings_nonce')); ?>'
                 },
                 success: function(response) {
                     if (response.success) {
@@ -606,7 +606,7 @@ if (!syncBasalamSettings()->getSettings(SettingsConfig::TOKEN)) {
                     woo_category_name: selectedWooCategory.name,
                     basalam_category_ids: selectedBasalamCategory.path,
                     basalam_category_name: selectedBasalamCategory.name,
-                    _wpnonce: '<?php echo wp_create_nonce('create_category_mapping_nonce'); ?>'
+                    _wpnonce: '<?php echo esc_attr(wp_create_nonce('create_category_mapping_nonce')); ?>'
                 },
                 success: function(response) {
                     if (response.success) {
@@ -630,7 +630,7 @@ if (!syncBasalamSettings()->getSettings(SettingsConfig::TOKEN)) {
                 data: {
                     action: 'delete_category_mapping',
                     mapping_id: mappingId,
-                    _wpnonce: '<?php echo wp_create_nonce('delete_category_mapping_nonce'); ?>'
+                    _wpnonce: '<?php echo esc_attr(wp_create_nonce('delete_category_mapping_nonce')); ?>'
                 },
                 success: function(response) {
                     if (response.success) {

@@ -50,6 +50,7 @@ class AutoConnectProducts
                     $likeTitle = $normalizedTitle;
                 }
 
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct lookup on core posts/postmeta tables; no cache key available for this title match.
                 $productId = $wpdb->get_var(
                     $wpdb->prepare("
                     SELECT p.ID

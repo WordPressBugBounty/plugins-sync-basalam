@@ -36,6 +36,7 @@ function sync_basalam_cleanup_runtime_data(): void
 
     $job_manager_table = $wpdb->prefix . 'sync_basalam_job_manager';
     if (sync_basalam_table_exists($job_manager_table)) {
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix, not user input.
         $wpdb->query("DELETE FROM {$job_manager_table}");
     }
 
@@ -87,6 +88,7 @@ function sync_basalam_remove_all_plugin_data(): void
 
     foreach ($tables as $table) {
         if (sync_basalam_table_exists($table)) {
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Plugin uninstall drops own tables; identifier from $wpdb->prefix, not user input.
             $wpdb->query("DROP TABLE IF EXISTS {$table}");
         }
     }
@@ -113,6 +115,7 @@ function sync_basalam_remove_all_plugin_data(): void
         ]
     );
 
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Plugin uninstall cleanup on core usermeta table; no object cache applicable.
     $wpdb->query(
         $wpdb->prepare(
             "DELETE FROM {$wpdb->usermeta} WHERE meta_key LIKE %s",
@@ -120,6 +123,7 @@ function sync_basalam_remove_all_plugin_data(): void
         )
     );
 
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Plugin uninstall cleanup on core postmeta table; no object cache applicable.
     $wpdb->query(
         $wpdb->prepare(
             "DELETE FROM {$wpdb->postmeta}
@@ -215,6 +219,7 @@ function sync_basalam_delete_action_scheduler_rows(): void
         return;
     }
 
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Action Scheduler table; identifier from $wpdb->prefix, not user input.
     $wpdb->query(
         $wpdb->prepare(
             "DELETE FROM {$actions_table}
@@ -231,6 +236,7 @@ function sync_basalam_delete_action_scheduler_rows(): void
         return;
     }
 
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Action Scheduler table; identifier from $wpdb->prefix, not user input.
     $group_ids = $wpdb->get_col(
         $wpdb->prepare(
             "SELECT group_id FROM {$groups_table} WHERE slug = %s",
@@ -251,7 +257,9 @@ function sync_basalam_delete_action_scheduler_rows(): void
 
     $ids = implode(',', $group_ids);
 
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Action Scheduler table; identifier from $wpdb->prefix and intval-sanitized ID list, not user input.
     $wpdb->query("DELETE FROM {$actions_table} WHERE group_id IN ({$ids})");
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Action Scheduler table; identifier from $wpdb->prefix and intval-sanitized ID list, not user input.
     $wpdb->query("DELETE FROM {$groups_table} WHERE group_id IN ({$ids})");
 }
 
@@ -273,6 +281,7 @@ function sync_basalam_cleanup_network_site_transients(): void
     ];
 
     foreach ($patterns as $pattern) {
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Multisite uninstall cleanup on core sitemeta table; no object cache applicable.
         $wpdb->query(
             $wpdb->prepare(
                 "DELETE FROM {$wpdb->sitemeta} WHERE meta_key LIKE %s",
@@ -287,6 +296,7 @@ function sync_basalam_delete_option_rows_like(array $patterns): void
     global $wpdb;
 
     foreach ($patterns as $pattern) {
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Plugin uninstall cleanup on core options table; no object cache applicable.
         $wpdb->query(
             $wpdb->prepare(
                 "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
@@ -300,6 +310,7 @@ function sync_basalam_table_exists(string $table_name): bool
 {
     global $wpdb;
 
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Table existence check; no object cache applicable.
     $table = $wpdb->get_var(
         $wpdb->prepare(
             'SHOW TABLES LIKE %s',

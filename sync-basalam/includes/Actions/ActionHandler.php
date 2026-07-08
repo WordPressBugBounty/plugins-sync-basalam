@@ -22,7 +22,7 @@ class ActionHandler
 
             do_action('after_' . $actionName, $result, $_POST);
             $redirectTo = isset($_POST['redirect_to']) ? esc_url_raw($_POST['redirect_to']) : wp_get_referer();
-            wp_redirect($redirectTo ?: admin_url());
+            wp_redirect($redirectTo ?: admin_url()); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect -- Intentional external/user-provided redirect.
             exit;
         });
     }

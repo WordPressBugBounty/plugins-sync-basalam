@@ -41,7 +41,7 @@ class FileUploader
         $preparedFile = $this->prepare($filePath, $config['allowed_extensions']);
 
         if ($preparedFile === false) {
-            throw new \RuntimeException('فایل ' . $config['error_label'] . ' برای آپلود معتبر یا در دسترس نیست.');
+            throw new \RuntimeException('فایل ' . esc_html($config['error_label']) . ' برای آپلود معتبر یا در دسترس نیست.');
         }
 
         $pathToUpload = $preparedFile['path'];
@@ -50,7 +50,7 @@ class FileUploader
 
         if (!$this->checkFileSize($pathToUpload, $config['max_size'])) {
             if ($isTemp && $tmpFile) unlink($tmpFile);
-            throw new \RuntimeException('حجم فایل ' . $config['error_label'] . ' بیش از حد مجاز است.');
+            throw new \RuntimeException('حجم فایل ' . esc_html($config['error_label']) . ' بیش از حد مجاز است.');
         }
 
         $response = $this->uploadFileToBasalam($pathToUpload, $config);
@@ -66,7 +66,7 @@ class FileUploader
 
         $errorMessage = $response['error'] ?? 'آپلود ' . $config['error_label'] . ' به باسلام ناموفق بود.';
 
-        throw new \RuntimeException($errorMessage);
+        throw new \RuntimeException(esc_html($errorMessage));
     }
 
     private function prepare($filePath, array $allowedExtensions)

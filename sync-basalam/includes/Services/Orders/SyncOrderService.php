@@ -34,6 +34,7 @@ class SyncOrderService
                 continue;
             }
 
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix, not user input.
             $exists = $wpdb->get_var(
                 $wpdb->prepare(
                     "SELECT invoice_id FROM {$tableName} WHERE invoice_id = %d",

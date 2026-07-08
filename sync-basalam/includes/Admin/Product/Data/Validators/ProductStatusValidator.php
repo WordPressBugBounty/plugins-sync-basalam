@@ -10,10 +10,10 @@ class ProductStatusValidator implements ValidatorInterface
     {
         if ($product->get_status() !== 'publish') {
             throw new \InvalidArgumentException(
-                sprintf('Product %d is not published (current status: %s)',
+                esc_html(sprintf('Product %d is not published (current status: %s)',
                     $product->get_id(),
                     $product->get_status()
-                )
+                ))
             );
         }
     }

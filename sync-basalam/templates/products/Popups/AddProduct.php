@@ -23,7 +23,7 @@
                         <p class="basalam-warning-text">
                             <strong>تعداد محصولات در صف:</strong>
                             <span class="basalam-warning-badge">
-                                <?php echo $total_create_count > 1000 ? '+1000' : $total_create_count; ?> محصول
+                                <?php echo esc_html($total_create_count > 1000 ? '+1000' : $total_create_count); ?> محصول
                             </span>
                         </p>
                     <?php endif; ?>

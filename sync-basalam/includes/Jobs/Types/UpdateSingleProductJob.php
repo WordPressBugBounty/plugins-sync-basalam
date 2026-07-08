@@ -40,7 +40,7 @@ class UpdateSingleProductJob extends AbstractJobType
 
         $product = \wc_get_product($productId);
         if (!$product) {
-            throw NonRetryableException::productNotFound($productId);
+            throw NonRetryableException::productNotFound(esc_html($productId));
         }
 
         try {

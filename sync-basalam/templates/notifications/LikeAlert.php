@@ -13,9 +13,9 @@ if (!$show_notice) return;
 ?>
 
 <div class="notice notice-info basalam-notice-flex" id="sync_basalam_like_alert">
-    <input type="hidden" id="sync_basalam_remind_later_review_nonce" value="<?php echo wp_create_nonce('sync_basalam_remind_later_review_nonce'); ?>">
-    <input type="hidden" id="sync_basalam_never_remind_review_nonce" value="<?php echo wp_create_nonce('sync_basalam_never_remind_review_nonce'); ?>">
-    <input type="hidden" id="sync_basalam_submit_review_nonce" value="<?php echo wp_create_nonce('sync_basalam_submit_review_nonce'); ?>">
+    <input type="hidden" id="sync_basalam_remind_later_review_nonce" value="<?php echo esc_attr(wp_create_nonce('sync_basalam_remind_later_review_nonce')); ?>">
+    <input type="hidden" id="sync_basalam_never_remind_review_nonce" value="<?php echo esc_attr(wp_create_nonce('sync_basalam_never_remind_review_nonce')); ?>">
+    <input type="hidden" id="sync_basalam_submit_review_nonce" value="<?php echo esc_attr(wp_create_nonce('sync_basalam_submit_review_nonce')); ?>">
     <p class="basalam-p">
         در صورتی که از عملکرد پلاگین ووسلام رضایت دارید، لطفا از ما در جعبه ابزار باسلام حمایت کنید.
     </p>

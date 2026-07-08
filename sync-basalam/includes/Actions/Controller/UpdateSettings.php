@@ -12,7 +12,7 @@ class UpdateSettings extends ActionController
         try {
             Settings::saveSettings();
         } catch (\Exception $e) {
-            wp_die('Error saving settings: ' . $e->getMessage());
+            wp_die('Error saving settings: ' . esc_html($e->getMessage()));
         }
     }
 }

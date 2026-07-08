@@ -48,6 +48,7 @@ abstract class AbstractJobType implements JobType
 
         $tableName = $wpdb->prefix . 'sync_basalam_job_manager';
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix, not user input.
         $jobs = $wpdb->get_results($wpdb->prepare(
             "SELECT payload FROM {$tableName}
             WHERE job_type = %s

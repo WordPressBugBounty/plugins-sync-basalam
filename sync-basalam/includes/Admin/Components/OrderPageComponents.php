@@ -45,7 +45,7 @@ class OrderPageComponents
                 <div class="basalam-orders-fetch-dropdown" style="display: none;">
                     <div class="basalam-dropdown-content">
                         <div class="basalam-dropdown-label-row">
-                            <?php echo CommonComponents::renderLabelWithTooltip('تعداد روزها (۱ تا ۳۰)', 'سفارشات باسلام که در ووکامرس ثبت نشده باشند در روزهای مشخص شده به ووکامرس اضافه خواهند شد.'); ?>
+                            <?php echo CommonComponents::renderLabelWithTooltip('تعداد روزها (۱ تا ۳۰)', 'سفارشات باسلام که در ووکامرس ثبت نشده باشند در روزهای مشخص شده به ووکامرس اضافه خواهند شد.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped inside the component method. ?>
                         </div>
                         <input type="number" class="basalam-dropdown-input basalam-input" id="basalam-orders-fetch-days" min="1" max="30" value="7">
                         <button type="button" class="basalam-primary-button basalam-p basalam-dropdown-submit" data-nonce="<?php echo esc_attr($nonce); ?>">
@@ -116,7 +116,7 @@ class OrderPageComponents
                 <div class="basalam-orders-fetch-dropdown" style="display: none;">
                     <div class="basalam-dropdown-content">
                         <div class="basalam-dropdown-label-row">
-                            <?php echo CommonComponents::renderLabelWithTooltip('تعداد روزها (۱ تا ۳۰)', 'سفارشات باسلام که در ووکامرس ثبت نشده باشند در روزهای مشخص شده به ووکامرس اضافه خواهند شد.'); ?>
+                            <?php echo CommonComponents::renderLabelWithTooltip('تعداد روزها (۱ تا ۳۰)', 'سفارشات باسلام که در ووکامرس ثبت نشده باشند در روزهای مشخص شده به ووکامرس اضافه خواهند شد.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped inside the component method. ?>
                         </div>
                         <input type="number" class="basalam-dropdown-input basalam-input" id="basalam-orders-fetch-days" min="1" max="30" value="7" required>
                         <button type="button" class="basalam-primary-button basalam-p basalam-dropdown-submit" data-nonce="<?php echo esc_attr($nonce); ?>">

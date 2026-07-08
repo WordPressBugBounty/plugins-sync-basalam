@@ -9,6 +9,7 @@ global $wpdb;
 
 $count_of_published_woocommerce_products = wp_count_posts('product')->publish;
 $productIdMetaKey = ProductMetaKey::basalamProductId();
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direct count on core postmeta table; no object cache for this aggregate.
 $count_of_synced_basalam_products = intval($wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = %s", $productIdMetaKey)));
 
 $job_manager = new JobManager();

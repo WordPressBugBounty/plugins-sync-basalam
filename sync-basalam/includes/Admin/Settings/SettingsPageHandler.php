@@ -36,7 +36,12 @@ class SettingsPageHandler
         $OAuthManger = new OAuthManager();
         $oauthUrls = $OAuthManger->getOAuthUrls();
 
-        wp_redirect($oauthUrls['url_req_token']);
+        // Mark this authorization as started by the current (authenticated) admin
+        // so the OAuth callback can reject forged requests. This runs only after
+        // the nonce-protected settings POST, so it cannot be triggered cross-site.
+        OAuthManager::issueOauthState();
+
+        wp_redirect($oauthUrls['url_req_token']); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect -- Intentional external/user-provided redirect.
         exit();
     }
 
@@ -54,9 +59,9 @@ class SettingsPageHandler
         $onboardingCompleted = get_option('sync_basalam_onboarding_completed');
 
         if (!$onboardingCompleted) {
-            wp_redirect(admin_url('admin.php?page=basalam-onboarding&step=3'));
+            wp_safe_redirect(admin_url('admin.php?page=basalam-onboarding&step=3'));
         } else {
-            wp_redirect(admin_url('admin.php?page=sync_basalam'));
+            wp_safe_redirect(admin_url('admin.php?page=sync_basalam'));
         }
         exit();
     }

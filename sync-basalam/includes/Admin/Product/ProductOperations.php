@@ -40,7 +40,7 @@ class ProductOperations
         } catch (NonRetryableException $e) {
             throw $e;
         } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
+            throw new \Exception(esc_html($e->getMessage()));
         }
     }
 
@@ -53,7 +53,7 @@ class ProductOperations
         } catch (NonRetryableException $e) {
             throw $e;
         } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
+            throw new \Exception(esc_html($e->getMessage()));
         }
     }
 
@@ -66,7 +66,7 @@ class ProductOperations
         } catch (NonRetryableException $e) {
             throw $e;
         } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
+            throw new \Exception(esc_html($e->getMessage()));
         }
     }
 
@@ -79,7 +79,7 @@ class ProductOperations
         } catch (NonRetryableException $e) {
             throw $e;
         } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
+            throw new \Exception(esc_html($e->getMessage()));
         }
     }
 

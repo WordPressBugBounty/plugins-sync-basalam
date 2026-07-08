@@ -30,6 +30,7 @@ class LockManager
     {
         global $wpdb;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Named MySQL advisory lock; no object cache applicable.
         $result = $wpdb->get_var($wpdb->prepare("SELECT GET_LOCK(%s, %d)", $lockName, $timeout));
 
         return $result === '1';
@@ -39,6 +40,7 @@ class LockManager
     {
         global $wpdb;
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Named MySQL advisory lock; no object cache applicable.
         $result = $wpdb->get_var($wpdb->prepare("SELECT RELEASE_LOCK(%s)", $lockName));
 
         return $result === '1';

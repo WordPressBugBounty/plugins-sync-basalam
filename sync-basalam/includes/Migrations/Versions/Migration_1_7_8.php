@@ -19,8 +19,11 @@ class Migration_1_7_8 implements MigrationInterface
 
     private function addNewColumns($wpdb, $tableName)
     {
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Migration schema change on own plugin table; identifier from $wpdb->prefix, not user input.
         $wpdb->query("ALTER TABLE {$tableName} ADD COLUMN attempts TINYINT UNSIGNED NOT NULL DEFAULT 0");
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Migration schema change on own plugin table; identifier from $wpdb->prefix, not user input.
         $wpdb->query("ALTER TABLE {$tableName} ADD COLUMN max_attempts TINYINT UNSIGNED NOT NULL DEFAULT 3");
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Migration schema change on own plugin table; identifier from $wpdb->prefix, not user input.
         $wpdb->query("ALTER TABLE {$tableName} ADD COLUMN failed_at INT NULL");
     }
 

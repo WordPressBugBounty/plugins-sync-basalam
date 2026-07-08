@@ -51,6 +51,7 @@ class ProductQueryService
             LIMIT %d
         ", $productIdMetaKey, $lastId, $postsPerPage);
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Core WP table identifiers from $wpdb properties and a whitelisted static stock-condition fragment, not user input; values are prepared.
         $ids = $wpdb->get_col($query);
 
         return array_map('intval', $ids);
@@ -80,6 +81,7 @@ class ProductQueryService
         LIMIT %d
         ", $productIdMetaKey, $lastId, $postsPerPage);
 
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Core WP table identifiers from $wpdb properties, not user input; values are prepared.
         $ids = $wpdb->get_col($query);
 
         return array_map('intval', $ids);

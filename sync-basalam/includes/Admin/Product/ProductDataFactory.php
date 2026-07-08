@@ -39,7 +39,7 @@ class ProductDataFactory
             case 'custom_update':
                 return new CustomUpdateProductStrategy();
             default:
-                throw new \InvalidArgumentException("Unknown strategy type: {$type}");
+                throw new \InvalidArgumentException(esc_html("Unknown strategy type: {$type}"));
         }
     }
 }

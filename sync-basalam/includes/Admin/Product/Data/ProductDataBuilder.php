@@ -34,7 +34,7 @@ class ProductDataBuilder
     {
         $product = wc_get_product($productId);
 
-        if (!$product) throw new \InvalidArgumentException("Product with ID {$productId} not found");
+        if (!$product) throw new \InvalidArgumentException(esc_html("Product with ID {$productId} not found"));
 
         // Validate product first
         if ($this->validator) $this->validator->validate($product);

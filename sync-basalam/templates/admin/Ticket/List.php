@@ -130,7 +130,7 @@ for ($i = $start; $i <= $end; $i++) {
     $class = 'pagination-link basalam-p';
     if ($i === $current_page) $class .= ' pagination-link--active';
 
-    echo '<a class="' . esc_attr($class) . '" href="' . esc_url(add_query_arg('paged', $i, $base_url)) . '">' . $i . '</a>';
+    echo '<a class="' . esc_attr($class) . '" href="' . esc_url(add_query_arg('paged', $i, $base_url)) . '">' . esc_html($i) . '</a>';
 }
 
 
@@ -140,7 +140,7 @@ if ($current_page < ($total_pages - $range - 1)) {
 
 
 if ($current_page < ($total_pages - $range)) {
-    echo '<a class="pagination-link basalam-p" href="' . esc_url(add_query_arg('paged', $total_pages, $base_url)) . '">' . $total_pages . '</a>';
+    echo '<a class="pagination-link basalam-p" href="' . esc_url(add_query_arg('paged', $total_pages, $base_url)) . '">' . esc_html($total_pages) . '</a>';
 }
 
 

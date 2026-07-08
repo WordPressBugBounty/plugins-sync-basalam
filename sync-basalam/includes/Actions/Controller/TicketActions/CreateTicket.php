@@ -29,7 +29,7 @@ class CreateTicket extends ActionController
             wp_die('خطایی در ارسال تیکت رخ داده است. لطفا مجددا تلاش کنید.');
         }
 
-        wp_redirect(admin_url("admin.php?page=sync_basalam_ticket&ticket_id=" . $ticket['data']['id']));
+        wp_safe_redirect(admin_url("admin.php?page=sync_basalam_ticket&ticket_id=" . $ticket['data']['id']));
         exit();
     }
 }
