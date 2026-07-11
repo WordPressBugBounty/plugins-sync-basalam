@@ -22,6 +22,9 @@ use SyncBasalam\Admin\Announcement\AnnouncementCenter;
 use SyncBasalam\Admin\Onboarding\PointerTour;
 use SyncBasalam\Services\SystemResourceMonitor;
 use SyncBasalam\Utilities\ChatWidget;
+use SyncBasalam\Admin\FinancialManagement\Menu as FinancialManagementMenu;
+use SyncBasalam\Admin\FinancialManagement\BalanceSettlement;
+use SyncBasalam\Admin\FinancialManagement\FinancialManagementHistory;
 
 defined("ABSPATH") || exit;
 
@@ -48,7 +51,12 @@ class AdminRegistrar implements RegistrarInterface
         // Admin Scripts & Styles
         \add_action("admin_enqueue_scripts", [self::class, "adminEnqueueStyles"]);
         \add_action("admin_enqueue_scripts", [self::class, "adminEnqueueScripts"]);
+        \add_action("admin_enqueue_scripts", [self::class, "financialManagementEnqueueAssets"]);
         \add_action("admin_footer", [AnnouncementCenter::class, 'renderPanel']);
+
+        // Financial Management (مدیریت مالی)
+        FinancialManagementHistory::register();
+        BalanceSettlement::register();
 
         // Product Columns
         \add_filter("manage_edit-product_columns", [StatusColumn::class, "registerStatusColumn"]);
@@ -112,7 +120,6 @@ class AdminRegistrar implements RegistrarInterface
 
         // Initialize AJAX handlers
         $connectProduct = $container->get(ConnectProduct::class);
-        add_action('wp_ajax_sync_basalam_connect_product', [$connectProduct, 'handleConnectProduct']);
         add_action('wp_ajax_basalam_search_products', [$connectProduct, 'handleSearchProducts']);
         add_action('wp_ajax_sync_basalam_mark_pointer_onboarding_completed', [PointerTour::class, 'markPointerOnboardingCompleted']);
         add_action('wp_ajax_' . AnnouncementCenter::MARK_SEEN_ACTION, [AnnouncementCenter::class, 'markAllSeen']);
@@ -311,6 +318,61 @@ class AdminRegistrar implements RegistrarInterface
             wp_localize_script('basalam-admin-script', 'basalamAnnouncements', AnnouncementCenter::getConfig());
         }
     }
-    
+
+    public static function financialManagementEnqueueAssets($hook = '')
+    {
+        $page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : '';
+        if ($page !== FinancialManagementMenu::PAGE_SLUG) {
+            return;
+        }
+
+        $version = syncbasalamplugin()->getVersion();
+
+        wp_enqueue_style(
+            'sync-basalam-finance-style',
+            self::assetsUrl('css/finance.css'),
+            [],
+            $version
+        );
+
+        wp_enqueue_script(
+            'sync-basalam-finance-history-pagination',
+            self::assetsUrl('js/finance-history-pagination.js'),
+            [],
+            $version,
+            true
+        );
+
+        wp_localize_script('sync-basalam-finance-history-pagination', 'syncBasalamHistoryPagination', [
+            'ajaxUrl' => admin_url('admin-ajax.php'),
+            'action' => FinancialManagementHistory::AJAX_ACTION,
+            'nonce' => wp_create_nonce(FinancialManagementHistory::AJAX_ACTION),
+            'pageSlug' => FinancialManagementMenu::PAGE_SLUG,
+            'errorMessage' => 'بارگذاری تاریخچه تسویه انجام نشد.',
+        ]);
+
+        wp_enqueue_script(
+            'sync-basalam-finance-balance-settlement',
+            self::assetsUrl('js/finance-balance-settlement.js'),
+            [],
+            $version,
+            true
+        );
+
+        wp_localize_script('sync-basalam-finance-balance-settlement', 'syncBasalamBalanceSettlement', [
+            'ajaxUrl' => admin_url('admin-ajax.php'),
+            'action' => BalanceSettlement::AJAX_ACTION,
+            'bankAccountsAction' => BalanceSettlement::AJAX_ACTION_BANK_ACCOUNTS,
+            'nonce' => wp_create_nonce(BalanceSettlement::AJAX_ACTION),
+            'submitText' => 'ثبت درخواست',
+            'loadingText' => 'در حال ارسال...',
+            'errorMessage' => 'خطا در ثبت درخواست تسویه.',
+            'successMessage' => 'درخواست تسویه با موفقیت ثبت شد.',
+            'amountError' => 'لطفاً مبلغ معتبری وارد کنید.',
+            'walletTitle' => 'انتقال به کیف پول',
+            'bankTitle' => 'انتقال به حساب بانکی',
+            'bankAccountsError' => 'خطا در دریافت لیست حساب‌های بانکی.',
+        ]);
+    }
 
 }

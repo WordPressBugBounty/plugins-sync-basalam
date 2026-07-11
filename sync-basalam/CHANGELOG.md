@@ -2,6 +2,19 @@
 
 <details>
 
+<summary>1.10.0 - 2026-07-11</summary>
+
+### Added
+- Merged the "Woosalam Plus" add-on into the core plugin as a built-in "Financial Management" section: view store balance, active settlement requests, settlement history, and submit settlement requests to wallet or bank account
+- Added the `customer.identity.read` scope to the Basalam OAuth connection request (required to fetch the user's bank account list in the settlement flow)
+
+### Note
+- Users who connected to Basalam before this release must reconnect ("Connect to Basalam") once so the new scope is granted before the bank-account settlement feature works
+
+</details>
+
+<details>
+
 <summary>1.9.2 - 2026-07-08</summary>
 
 ### Security

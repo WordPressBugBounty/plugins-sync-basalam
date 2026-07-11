@@ -14,6 +14,7 @@ use SyncBasalam\Admin\Pages\CreateTicketPage;
 use SyncBasalam\Admin\Pages\SingleTicketPage;
 use SyncBasalam\Admin\Settings;
 use SyncBasalam\Admin\Components\CommonComponents;
+use SyncBasalam\Admin\FinancialManagement\Menu as FinancialManagementMenu;
 
 class Pages
 {
@@ -79,6 +80,15 @@ class Pages
             'manage_options',
             'sync_basalam_category_mapping',
             [new CategoryMappingPage(), 'render']
+        );
+
+        add_submenu_page(
+            'sync_basalam',
+            'مدیریت مالی',
+            $this->renderUi->renderIcon('dashicons-chart-line') . 'مدیریت مالی',
+            'manage_options',
+            FinancialManagementMenu::PAGE_SLUG,
+            [FinancialManagementMenu::class, 'renderMainPage']
         );
 
         if (class_exists('Digikala\Admin\Menus')) \Digikala\Admin\Menus::register();

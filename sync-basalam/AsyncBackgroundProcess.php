@@ -27,8 +27,8 @@ abstract class AsyncBackgroundProcess
 
         add_filter('cron_schedules', array($this, 'addCronInterval'));
 
-        add_action('wp_ajax_' . $this->identifier, array($this, 'handleAsyncRequest'));
-        add_action('wp_ajax_nopriv_' . $this->identifier, array($this, 'handleAsyncRequest'));
+        add_action('wp_ajax_' . $this->identifier, array($this, 'maybeHandleAsyncRequest'));
+        add_action('wp_ajax_nopriv_' . $this->identifier, array($this, 'maybeHandleAsyncRequest'));
         add_action($this->cronHook, array($this, 'handleCronHealthcheck'));
 
         $this->init();
@@ -124,6 +124,13 @@ abstract class AsyncBackgroundProcess
         spawn_cron();
 
         return true;
+    }
+
+    public function maybeHandleAsyncRequest()
+    {
+        check_ajax_referer($this->identifier, 'nonce');
+
+        $this->handleAsyncRequest();
     }
 
     public function handleAsyncRequest()

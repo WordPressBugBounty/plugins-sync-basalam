@@ -21,6 +21,7 @@ jQuery(document).ready(function ($) {
           action: "basalam_search_products",
           title: searchTerm,
           woo_product_id: wooProductId,
+          _wpnonce: $("#basalam-search-products-nonce").val(),
         },
         success: function (response) {
           $("#basalam-product-results").html(response);

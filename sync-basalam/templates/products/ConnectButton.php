@@ -9,6 +9,7 @@
         <div class="basalam-search-box">
             <input type="text" id="basalam-product-search" class="basalam-p" value="<?php echo esc_attr(get_the_title()); ?>" placeholder="نام محصول را وارد کنید">
             <input type="hidden" id="Basalam-woo-product-id" value="<?php echo esc_attr(get_the_ID()); ?>">
+            <input type="hidden" id="basalam-search-products-nonce" value="<?php echo esc_attr(wp_create_nonce('basalam_search_products_nonce')); ?>">
             <button id="basalam-search-btn" class="basalam-button basalam-p">جستجو</button>
         </div>
 

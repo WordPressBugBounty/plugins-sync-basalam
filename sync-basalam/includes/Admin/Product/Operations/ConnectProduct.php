@@ -13,6 +13,16 @@ class ConnectProduct
 {
     public function handleConnectProduct(): array
     {
+        $nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
+
+        if (!wp_verify_nonce($nonce, 'basalam_connect_product_nonce')) {
+            return [
+                'success'     => false,
+                'message'     => 'دسترسی غیرمجاز!',
+                'status_code' => 403,
+            ];
+        }
+
         if (!current_user_can('manage_woocommerce')) {
             return [
                 'success'     => false,
@@ -58,6 +68,8 @@ class ConnectProduct
 
     public function handleSearchProducts(): void
     {
+        check_ajax_referer('basalam_search_products_nonce', '_wpnonce');
+
         if (!current_user_can('edit_posts')) {
             wp_send_json_error("دسترسی غیرمجاز.");
         }
