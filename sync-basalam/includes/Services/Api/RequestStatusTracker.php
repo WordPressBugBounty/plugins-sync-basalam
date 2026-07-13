@@ -65,8 +65,7 @@ class RequestStatusTracker
                 return 'خطای داخلی در سرورهای باسلام رخ داده است' . $code . '. مشکل از سمت افزونه نیست و معمولاً پس از چند دقیقه برطرف می‌شود.';
 
             case 'client_error':
-                $code = $statusCode ? ' (کد ' . $statusCode . ')' : '';
-                return ' داده‌های ارسالی (payload) به باسلام صحیح نیست' . $code . 'در صورت نامفهموم بودن خطا، لطفا تیکت ثبت کنید(https://admin.hamsalam.ir/ticket/new)';
+                return $statusCode ? ' (کد ' . $statusCode . ')' : '';
 
             case 'blocked_http':
                 return 'وردپرس درخواست‌های HTTP خارجی را مسدود کرده است (تنظیم WP_HTTP_BLOCK_EXTERNAL). برای رفع، دامنه basalam.com باید به WP_ACCESSIBLE_HOSTS اضافه شود.';

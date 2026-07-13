@@ -2,6 +2,15 @@
 
 <details>
 
+<summary>1.10.1 - 2026-07-13</summary>
+
+### Fixed
+- When Basalam rejects a product create/update with `422` because the description contains forbidden content (social-network names, page/channel mentions, etc.), the plugin now extracts the flagged phrases — highlighted inside `<em>...</em>` in the response `snippet` — strips them from the description, and automatically retries (up to 3 times). Previously the sanitizer looked for a non-existent `value` field, so nothing was removed and the retry never helped
+
+</details>
+
+<details>
+
 <summary>1.10.0 - 2026-07-11</summary>
 
 ### Added

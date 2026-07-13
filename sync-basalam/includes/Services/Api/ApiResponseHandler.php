@@ -92,11 +92,24 @@ class ApiResponseHandler
             $bodyMessage = $this->extractErrorMessageFromBody($body);
             $base = $bodyMessage ?: $clientErrors[$statusCode];
             $reason = RequestStatusTracker::describeHttpStatusFa($statusCode);
-            throw NonRetryableException::permanent(esc_html($base . $reason));
+            throw NonRetryableException::permanent(esc_html($base . $reason))
+                ->setResponseData($this->decodeBody($body));
         }
 
         // Unknown error - treat as retryable
         throw RetryableException::temporary(esc_html(RequestStatusTracker::describeHttpStatusFa($statusCode)));
+    }
+
+    private function decodeBody($body): ?array
+    {
+        if (is_array($body)) return $body;
+
+        if (is_string($body) && $body !== '') {
+            $decoded = json_decode($body, true);
+            if (is_array($decoded)) return $decoded;
+        }
+
+        return null;
     }
 
     private function extractErrorMessageFromBody($body): ?string

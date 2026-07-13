@@ -34,14 +34,24 @@ class CreateSingleProductService
 
         $url = sprintf(Endpoints::PRODUCT_CREATE, $vendorId);
 
-        try {
-            $request = $this->apiservice->post($url, $productData);
-        } catch (RetryableException $e) {
-            throw $e;
-        } catch (NonRetryableException $e) {
-            throw $e;
-        } catch (\Exception $e) {
-            throw new \Exception(esc_html($e->getMessage()));
+        $maxDescriptionRetries = 3;
+        $descriptionRetry = 0;
+
+        while (true) {
+            try {
+                $request = $this->apiservice->post($url, $productData);
+                break;
+            } catch (RetryableException $e) {
+                throw $e;
+            } catch (NonRetryableException $e) {
+                if ($descriptionRetry < $maxDescriptionRetries && $this->stripForbiddenDescription($e, $productData, $productId, $descriptionRetry)) {
+                    $descriptionRetry++;
+                    continue;
+                }
+                throw $e;
+            } catch (\Exception $e) {
+                throw new \Exception(esc_html($e->getMessage()));
+            }
         }
 
         if ($request['status_code'] != 201 && isset($request['status_code'])) {
@@ -165,6 +175,21 @@ class CreateSingleProductService
         }
 
         throw new \Exception("فرایند اضافه کردن محصول ناموفق بود");
+    }
+
+    private function stripForbiddenDescription(NonRetryableException $e, array &$productData, int $productId, int $attempt): bool
+    {
+        if (!isset($productData['description']) || !is_string($productData['description'])) return false;
+
+        $values = DescriptionErrorSanitizer::extractDescriptionValues($e->getResponseData());
+        if (empty($values)) return false;
+
+        $cleaned = DescriptionErrorSanitizer::sanitize($productData['description'], $values);
+        if ($cleaned === $productData['description']) return false;
+
+        $productData['description'] = $cleaned;
+
+        return true;
     }
 
     private function ValidCreateProductData(array $productData, int $productId): void

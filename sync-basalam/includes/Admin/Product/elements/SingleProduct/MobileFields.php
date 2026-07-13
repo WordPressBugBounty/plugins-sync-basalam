@@ -94,12 +94,12 @@ class MobileFields
         }
 
         $fields = [
-            '_sync_basalam_mobile_storage'   => '',
-            '_sync_basalam_cpu_type'         => '',
-            '_sync_basalam_mobile_ram'       => '',
-            '_sync_basalam_screen_size'      => '',
-            '_sync_basalam_rear_camera'      => '',
-            '_sync_basalam_battery_capacity' => '',
+            '_sync_basalam_mobile_storage',
+            '_sync_basalam_cpu_type',
+            '_sync_basalam_mobile_ram',
+            '_sync_basalam_screen_size',
+            '_sync_basalam_rear_camera',
+            '_sync_basalam_battery_capacity',
         ];
 
         foreach ($fields as $fieldKey) {
