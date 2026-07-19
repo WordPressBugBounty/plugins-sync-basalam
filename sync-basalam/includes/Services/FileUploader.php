@@ -2,10 +2,6 @@
 
 namespace SyncBasalam\Services;
 
-use SyncBasalam\Admin\Settings\SettingsConfig;
-use SyncBasalam\Config\Endpoints;
-use SyncBasalam\Logger\Logger;
-
 defined('ABSPATH') || exit;
 
 class FileUploader
@@ -18,7 +14,7 @@ class FileUploader
 
     public function upload($filePath)
     {
-        return $this->doUpload($filePath, [
+        return $this->uploadMedia($filePath, [
             'file_type' => 'product.photo',
             'allowed_extensions' => self::PHOTO_EXTENSIONS,
             'max_size' => self::PHOTO_MAX_SIZE,
@@ -28,7 +24,7 @@ class FileUploader
 
     public function uploadVideo($filePath)
     {
-        return $this->doUpload($filePath, [
+        return $this->uploadMedia($filePath, [
             'file_type' => 'product.video',
             'allowed_extensions' => self::VIDEO_EXTENSIONS,
             'max_size' => self::VIDEO_MAX_SIZE,
@@ -36,40 +32,41 @@ class FileUploader
         ]);
     }
 
-    private function doUpload(string $filePath, array $config): array
+    private function uploadMedia(string $filePath, array $config): array
     {
-        $preparedFile = $this->prepare($filePath, $config['allowed_extensions']);
+        $preparedFile = $this->prepare($filePath, $config['allowed_extensions'], $config['max_size']);
 
         if ($preparedFile === false) {
             throw new \RuntimeException('فایل ' . esc_html($config['error_label']) . ' برای آپلود معتبر یا در دسترس نیست.');
         }
 
         $pathToUpload = $preparedFile['path'];
-        $isTemp = $preparedFile['isTemp'];
         $tmpFile = $preparedFile['tmpFile'] ?? null;
 
-        if (!$this->checkFileSize($pathToUpload, $config['max_size'])) {
-            if ($isTemp && $tmpFile) unlink($tmpFile);
-            throw new \RuntimeException('حجم فایل ' . esc_html($config['error_label']) . ' بیش از حد مجاز است.');
-        }
+        try {
+            if (!$this->checkFileSize($pathToUpload, $config['max_size'])) {
+                throw new \RuntimeException('حجم فایل ' . esc_html($config['error_label']) . ' بیش از حد مجاز است.');
+            }
 
-        $response = $this->uploadFileToBasalam($pathToUpload, $config);
-
-        if ($isTemp && $tmpFile) unlink($tmpFile);
-
-        if ($response && $response['status_code'] == 200 && $response['body']) {
-            return [
-                'file_id' => $response['body']['id'],
-                'url'     => $response['body']['urls']['primary'] ?? null,
+            $options = [
+                'allowed_extensions' => $config['allowed_extensions'],
+                'max_size' => $config['max_size'],
+                'timeout' => $config['file_type'] === 'product.video' ? 600 : 120,
             ];
+
+            $mediaUploader = new MediaUploadService();
+
+            if ($config['file_type'] === 'product.video') {
+                return $mediaUploader->uploadVideo($pathToUpload, $options);
+            }
+
+            return $mediaUploader->uploadPhoto($pathToUpload, $options);
+        } finally {
+            if (!empty($preparedFile['isTemp']) && $tmpFile && file_exists($tmpFile)) unlink($tmpFile);
         }
-
-        $errorMessage = $response['error'] ?? 'آپلود ' . $config['error_label'] . ' به باسلام ناموفق بود.';
-
-        throw new \RuntimeException(esc_html($errorMessage));
     }
 
-    private function prepare($filePath, array $allowedExtensions)
+    private function prepare($filePath, array $allowedExtensions, int $maxSize)
     {
         if (filter_var($filePath, FILTER_VALIDATE_URL)) {
             $parsedUrl = parse_url($filePath);
@@ -79,14 +76,23 @@ class FileUploader
             if (!in_array($extension, $allowedExtensions, true)) return false;
 
             $tmpFile = sys_get_temp_dir() . '/' . uniqid('upload_', true) . '.' . $extension;
+            $response = wp_safe_remote_get($filePath, [
+                'timeout' => 600,
+                'stream' => true,
+                'filename' => $tmpFile,
+                'limit_response_size' => $maxSize + 1,
+            ]);
 
-            $fileContents = file_get_contents($filePath);
-
-            if ($fileContents === false) {
-                throw new \RuntimeException('دانلود فایل از آدرس مبدا ناموفق بود.');
+            if (is_wp_error($response)) {
+                if (file_exists($tmpFile)) unlink($tmpFile);
+                throw new \RuntimeException('دانلود فایل از آدرس مبدا ناموفق بود: ' . esc_html($response->get_error_message()));
             }
 
-            file_put_contents($tmpFile, $fileContents);
+            $statusCode = (int) wp_remote_retrieve_response_code($response);
+            if ($statusCode < 200 || $statusCode >= 300 || !file_exists($tmpFile)) {
+                if (file_exists($tmpFile)) unlink($tmpFile);
+                throw new \RuntimeException('دانلود فایل از آدرس مبدا ناموفق بود.');
+            }
 
             return [
                 'path' => $tmpFile,
@@ -98,7 +104,6 @@ class FileUploader
         if (!file_exists($filePath)) return false;
 
         $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
-
         if (!in_array($extension, $allowedExtensions, true)) return false;
 
         return [
@@ -113,37 +118,11 @@ class FileUploader
         if (!file_exists($path)) return false;
 
         $fileSize = filesize($path);
-
-        if ($fileSize > $maxSize) return false;
-
-        return true;
+        return $fileSize !== false && $fileSize <= $maxSize;
     }
 
     public function FileExtensionValidator($extension)
     {
         return in_array($extension, self::PHOTO_EXTENSIONS, true);
-    }
-
-    public function uploadFileToBasalam($filePath, array $config = [])
-    {
-        $apiService = syncBasalamContainer()->get(ApiServiceManager::class);
-
-        $url = Endpoints::FILE_UPLOAD;
-
-        $fileType = $config['file_type'] ?? 'product.photo';
-        $allowedExtensions = $config['allowed_extensions'] ?? self::PHOTO_EXTENSIONS;
-        $maxSize = $config['max_size'] ?? self::PHOTO_MAX_SIZE;
-
-        $data = ['file_type' => $fileType];
-        $token = syncBasalamSettings()->getSettings(SettingsConfig::TOKEN);
-
-        $headers = ['Authorization' => 'Bearer ' . $token];
-
-        $options = [
-            'allowed_extensions' => $allowedExtensions,
-            'max_size' => $maxSize,
-        ];
-
-        return $apiService->upload($url, $filePath, $data, $headers, $options);
     }
 }

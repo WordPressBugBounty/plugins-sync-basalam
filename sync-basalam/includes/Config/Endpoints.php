@@ -39,8 +39,14 @@ final class Endpoints
     /** GET category-detection prediction — append encoded title as query param */
     const CATEGORY_DETECT = self::CATEGORY_BASE . '/category_detection/api_v1.0/predict/';
 
-    /** POST / PUT file upload */
-    const FILE_UPLOAD = self::UPLOAD_BASE . '/v3/files';
+    /** POST initialize a product media upload */
+    const MEDIA_UPLOAD_REQUEST = self::UPLOAD_BASE . '/v3/media/upload-request';
+
+    /** POST complete a product media upload */
+    const MEDIA_UPLOAD_COMPLETE = self::UPLOAD_BASE . '/v3/media/complete';
+
+    /** GET product media upload status — sprintf($url, $fileId) */
+    const MEDIA_UPLOAD_STATUS = self::UPLOAD_BASE . '/v3/media/status/%s';
 
     /** GET product data list */
     const PRODUCTS_DATA = self::CORE_BASE . '/v4/products';

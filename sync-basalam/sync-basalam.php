@@ -12,7 +12,7 @@ defined('ABSPATH') || exit;
 /**
  * Plugin Name: sync basalam | ووسلام
  * Description: با استفاده از پلاگین ووسلام  میتوایند تمامی محصولات ووکامرس را با یک کلیک به غرفه باسلامی خود اضافه کنید‌، همچنین تمامی سفارش باسلامی شما به سایت شما اضافه میگردد.
- * Version: 1.10.1
+ * Version: 1.10.2
  * Author: Woosalam Dev
  * Author URI: https://wp.hamsalam.ir/
  * Plugin URI: https://wp.hamsalam.ir

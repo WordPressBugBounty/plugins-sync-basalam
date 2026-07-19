@@ -19,17 +19,96 @@ class FileUploadApiService
             ];
         }
 
+        if (function_exists('curl_init') && class_exists('CURLFile')) {
+            return $this->uploadWithCurl($url, $filePath, $data, $headers, $options);
+        }
+
+        $fileSize = filesize($filePath);
+        if ($fileSize !== false && $fileSize > 10 * 1024 * 1024) {
+            return [
+                'body' => null,
+                'status_code' => 500,
+                'error' => 'برای آپلود فایل‌های بزرگ، افزونه cURL در PHP باید فعال باشد.',
+            ];
+        }
+
         $boundary = wp_generate_password(24);
         $payload = $this->makePayloadupload($data, $filePath, $boundary);
-
         $headers = array_merge($headers, ['content-type' => 'multipart/form-data; boundary=' . $boundary]);
+        $timeout = isset($options['timeout']) ? (int) $options['timeout'] : 120;
 
-        $response = wp_remote_post(
-            $url,
-            ['headers' => $headers, 'body' => $payload, 'timeout' => 10,],
-        );
+        $response = wp_remote_post($url, [
+            'headers' => $headers,
+            'body' => $payload,
+            'timeout' => max(10, $timeout),
+        ]);
 
         return $this->handleResponse($response, $url);
+    }
+
+    private function uploadWithCurl(string $url, string $filePath, array $data, array $headers, array $options): array
+    {
+        $filetypeInfo = wp_check_filetype($filePath);
+        $mimeType = $filetypeInfo['type'] ?? 'application/octet-stream';
+        $fields = $data;
+        $fields['file'] = new \CURLFile($filePath, $mimeType, basename($filePath));
+        $headerLines = [];
+
+        foreach ($headers as $name => $value) {
+            if (strtolower((string) $name) === 'content-type') continue;
+            $headerLines[] = $name . ': ' . $value;
+        }
+
+        $timeout = isset($options['timeout']) ? (int) $options['timeout'] : 120;
+        $curl = curl_init($url);
+
+        curl_setopt_array($curl, [
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $fields,
+            CURLOPT_HTTPHEADER => $headerLines,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 20,
+            CURLOPT_TIMEOUT => max(10, $timeout),
+            CURLOPT_FOLLOWLOCATION => false,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+        ]);
+
+        $body = curl_exec($curl);
+        $statusCode = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+        if ($body === false) {
+            $message = curl_error($curl);
+            curl_close($curl);
+
+            Logger::error('خطا در ارسال فایل با cURL: ' . $message, ['url' => $url]);
+
+            return [
+                'body' => null,
+                'status_code' => 500,
+                'error' => $message ?: 'خطای نامشخص در ارسال فایل',
+            ];
+        }
+
+        curl_close($curl);
+        RequestStatusTracker::recordHttpStatus($statusCode, $url);
+        $decodedBody = json_decode($body, true);
+
+        if ($statusCode >= 400) {
+            $reason = RequestStatusTracker::describeHttpStatusFa($statusCode);
+            Logger::error('آپلود فایل به باسلام ناموفق بود. ' . $reason, [
+                'url' => $url,
+                'status_code' => $statusCode,
+                'reason' => $reason,
+                'response_body' => $decodedBody ?? $body,
+            ]);
+        }
+
+        return [
+            'body' => $decodedBody,
+            'status_code' => $statusCode,
+            'error' => $statusCode >= 400 ? $this->extractErrorMessage($decodedBody, $body) : null,
+        ];
     }
 
     private function validateFile(string $filePath, array $options = []): array

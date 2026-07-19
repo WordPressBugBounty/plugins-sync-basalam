@@ -2,6 +2,18 @@
 
 <details>
 
+<summary>1.10.2 - 2026-07-19</summary>
+
+### Changed / Improved
+- Migrated product photo and video uploads from the legacy direct upload endpoint to Uploadio's presigned media flow
+- Added SHA-256 metadata, direct staging upload, completion handling, and status polling so product payloads receive the final Basalam media ID and URL
+- Ensured temporary remote media files are removed after both successful and failed uploads
+- Streamed remote media downloads and multipart uploads with size-aware limits and timeouts to support large product videos without buffering the entire file in PHP memory
+
+</details>
+
+<details>
+
 <summary>1.10.1 - 2026-07-13</summary>
 
 ### Fixed
