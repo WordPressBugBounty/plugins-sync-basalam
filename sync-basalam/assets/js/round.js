@@ -1,4 +1,34 @@
 document.addEventListener("DOMContentLoaded", function () {
+  const COMMISSION_VALUE = "commission";
+  // Range in which a value is read as a percentage; outside it the value is a fixed Toman amount
+  const PERCENT_RANGE_MIN = -100;
+  const PERCENT_RANGE_MAX = 100;
+  // Maximum allowed increase and decrease percentage
+  const MAX_PERCENT = 35;
+  const MIN_PERCENT = -35;
+
+  // Parses the raw input text into an integer, keeping a leading minus sign
+  const parseValue = function (rawText) {
+    const isNegative = /^\s*-/.test(rawText);
+    const digits = rawText.replace(/[^\d]/g, "");
+
+    if (digits === "") {
+      return { raw: isNegative ? "-" : "", value: 0, empty: true };
+    }
+
+    const value = (isNegative ? -1 : 1) * parseInt(digits, 10);
+
+    return { raw: digits, value: value, empty: false };
+  };
+
+  const formatValue = function (value) {
+    return value.toLocaleString("en-US");
+  };
+
+  const isPercent = function (value) {
+    return value >= PERCENT_RANGE_MIN && value <= PERCENT_RANGE_MAX;
+  };
+
   const groups = document.querySelectorAll(
     ".basalam-form-group, .basalam-form-group-full"
   );
@@ -10,15 +40,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const input =
-      group.querySelector('[data-role="increase-price-input"]') ||
+      group.querySelector('[data-role="price-change-input"]') ||
       group.querySelector(
-        'input.percentage-input[type="text"][name="sync_basalam_settings[increase_price_value]"]'
+        'input.percentage-input[type="text"][name="sync_basalam_settings[price_change_value]"]'
       );
     const unit = group.querySelector(".percentage-unit");
     const hiddenInput =
-      group.querySelector('[data-role="increase-price-hidden"]') ||
+      group.querySelector('[data-role="price-change-hidden"]') ||
       group.querySelector(
-        'input[type="hidden"][name="sync_basalam_settings[increase_price_value]"]'
+        'input[type="hidden"][name="sync_basalam_settings[price_change_value]"]'
       );
 
     if (!input || !unit || !hiddenInput) {
@@ -26,13 +56,19 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const normalizeInput = function () {
-      const rawValue = input.value.replace(/[^\d]/g, "");
-      const numberValue = parseInt(rawValue, 10) || 0;
+      const parsed = parseValue(input.value);
 
-      input.value = rawValue === "" ? "" : numberValue.toLocaleString("en-US");
-      unit.textContent = numberValue <= 100 ? "درصد" : "تومان";
+      if (parsed.empty) {
+        input.value = parsed.raw;
+        unit.textContent = "درصد";
 
-      return rawValue === "" ? "" : String(numberValue);
+        return "";
+      }
+
+      input.value = formatValue(parsed.value);
+      unit.textContent = isPercent(parsed.value) ? "درصد" : "تومان";
+
+      return String(parsed.value);
     };
 
     const updateHiddenValue = function (value) {
@@ -47,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const syncHiddenInput = function () {
       if (checkbox.checked) {
-        updateHiddenValue("-1");
+        updateHiddenValue(COMMISSION_VALUE);
         return;
       }
 
@@ -68,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (checkbox.checked) {
         input.value = "";
-        updateHiddenValue("-1");
+        updateHiddenValue(COMMISSION_VALUE);
         unit.textContent = "درصد";
         return;
       }
@@ -77,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     const form = group.closest("form");
-    if (form && !form.dataset.increasePriceBound) {
+    if (form && !form.dataset.priceChangeBound) {
       form.addEventListener("submit", function () {
         const toggles = form.querySelectorAll(".toggle-percentage");
         let clampedNotice = false;
@@ -92,14 +128,14 @@ document.addEventListener("DOMContentLoaded", function () {
           }
 
           const toggleInput =
-            toggleGroup.querySelector('[data-role="increase-price-input"]') ||
+            toggleGroup.querySelector('[data-role="price-change-input"]') ||
             toggleGroup.querySelector(
-              'input.percentage-input[type="text"][name="sync_basalam_settings[increase_price_value]"]'
+              'input.percentage-input[type="text"][name="sync_basalam_settings[price_change_value]"]'
             );
           const toggleHidden =
-            toggleGroup.querySelector('[data-role="increase-price-hidden"]') ||
+            toggleGroup.querySelector('[data-role="price-change-hidden"]') ||
             toggleGroup.querySelector(
-              'input[type="hidden"][name="sync_basalam_settings[increase_price_value]"]'
+              'input[type="hidden"][name="sync_basalam_settings[price_change_value]"]'
             );
 
           if (!toggleInput || !toggleHidden) {
@@ -107,34 +143,40 @@ document.addEventListener("DOMContentLoaded", function () {
           }
 
           if (toggle.checked) {
-            toggleHidden.value = "-1";
+            toggleHidden.value = COMMISSION_VALUE;
             return;
           }
 
-          const rawValue = toggleInput.value.replace(/[^\d]/g, "");
-          let numberValue = parseInt(rawValue, 10) || 0;
+          const parsed = parseValue(toggleInput.value);
 
-          if (numberValue > 35 && numberValue <= 100) {
+          if (parsed.empty) {
+            toggleHidden.value = "";
+            return;
+          }
+
+          let numberValue = parsed.value;
+
+          if (isPercent(numberValue) && (numberValue > MAX_PERCENT || numberValue < MIN_PERCENT)) {
             clampedNotice = true;
-            numberValue = 35;
-            toggleInput.value = numberValue.toLocaleString("en-US");
+            numberValue = numberValue > MAX_PERCENT ? MAX_PERCENT : MIN_PERCENT;
+            toggleInput.value = formatValue(numberValue);
             const unitEl = toggleGroup.querySelector(".percentage-unit");
             if (unitEl) {
               unitEl.textContent = "درصد";
             }
           }
 
-          toggleHidden.value = rawValue === "" ? "" : String(numberValue);
+          toggleHidden.value = String(numberValue);
         });
 
         if (clampedNotice) {
           BasalamToast.info(
-            "مقدار افزایش قیمت در حالت درصد نمی‌تواند بیشتر از ۳۵٪ باشد. مقدار وارد شده به ۳۵ درصد تغییر داده شد و ذخیره می‌شود."
+            "مقدار تغییر قیمت در حالت درصد نمی‌تواند بیشتر از ۳۵٪ افزایش یا ۳۵٪ کاهش باشد. مقدار وارد شده به سقف مجاز تغییر داده شد و ذخیره می‌شود."
           );
         }
       });
 
-      form.dataset.increasePriceBound = "1";
+      form.dataset.priceChangeBound = "1";
     }
   });
 });

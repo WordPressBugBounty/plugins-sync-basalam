@@ -143,7 +143,7 @@ class MigratorService
             'basalam_refresh_token'      => 'refresh_token',
             'basalam_vendor_id'          => 'vendor_id',
             'basalam_is_vendor'          => 'is_vendor',
-            'basalam_increase'           => 'increase_price_value',
+            'basalam_increase'           => 'price_change_value',
             'basalam_round'              => 'round_price',
             'basalam_webhook_token'      => 'webhook_header_token',
             'basalam_auto_confirm_order' => 'auto_confirm_order',

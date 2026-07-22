@@ -2,9 +2,11 @@
 
 namespace SyncBasalam\Admin\Product\Data\Services;
 
-use SyncBasalam\Admin\Product\elements\SingleProduct\PriceIncreaseField;
+use SyncBasalam\Admin\Product\elements\SingleProduct\PriceChangeField;
 use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Logger\Logger;
 use SyncBasalam\Services\Products\FetchCommission;
+use SyncBasalam\Utilities\PriceAdjustment;
 
 defined('ABSPATH') || exit;
 
@@ -39,14 +41,16 @@ class PriceService
 
     private function applyPriceCalculations(float $price, array $categoryIds, $product): ?int
     {
-        $increaseValue = $this->getIncreaseValue($product);
+        $priceChangeValue = $this->getPriceChangeValue($product);
         $roundMode = syncBasalamSettings()->getSettings(SettingsConfig::ROUND_PRICE);
         $currency = get_woocommerce_currency();
 
         $finalPrice = $this->convertToRial($price, $currency);
         if (!$finalPrice) return null;
 
-        if ($increaseValue) $finalPrice = $this->applyIncrease($finalPrice, $increaseValue, $categoryIds);
+
+        if ($priceChangeValue !== '' && $priceChangeValue !== '0') $finalPrice = $this->applyPriceChange($finalPrice, $priceChangeValue, $categoryIds);
+
         if ($roundMode && $roundMode != 'none') $finalPrice = $this->applyRounding($finalPrice, $roundMode);
 
         if ($finalPrice < 1000) return null;
@@ -54,33 +58,31 @@ class PriceService
         return intval($finalPrice);
     }
 
-    private function getIncreaseValue($product): int
+    private function getPriceChangeValue($product): string
     {
         $productId = method_exists($product, 'get_id') ? intval($product->get_id()) : 0;
 
         if ($productId > 0) {
-            $productIncrease = $this->getProductIncreaseMeta($productId);
+            $productValue = PriceAdjustment::normalize($this->getProductPriceChangeMeta($productId));
 
-            if ($productIncrease !== '' && is_numeric($productIncrease)) {
-                return intval($productIncrease);
-            }
+            if ($productValue !== null) return $productValue;
 
             if (method_exists($product, 'get_parent_id')) {
                 $parentId = intval($product->get_parent_id());
-                $parentIncrease = $parentId > 0 ? $this->getProductIncreaseMeta($parentId) : '';
+                $parentValue = $parentId > 0
+                    ? PriceAdjustment::normalize($this->getProductPriceChangeMeta($parentId))
+                    : null;
 
-                if ($parentIncrease !== '' && is_numeric($parentIncrease)) {
-                    return intval($parentIncrease);
-                }
+                if ($parentValue !== null) return $parentValue;
             }
         }
 
-        return intval(syncBasalamSettings()->getSettings(SettingsConfig::INCREASE_PRICE_VALUE));
+        return (string) (PriceAdjustment::normalize(syncBasalamSettings()->getSettings(SettingsConfig::PRICE_CHANGE_VALUE)) ?? '0');
     }
 
-    private function getProductIncreaseMeta(int $productId): string
+    private function getProductPriceChangeMeta(int $productId): string
     {
-        return (string) get_post_meta($productId, PriceIncreaseField::META_KEY, true);
+        return (string) get_post_meta($productId, PriceChangeField::META_KEY, true);
     }
 
     private function convertToRial(float $price, string $currency)
@@ -92,22 +94,37 @@ class PriceService
         return $price;
     }
 
-    private function applyIncrease(float $price, int $increaseValue, array $categoryIds): float
+    private function applyPriceChange(float $price, string $priceChangeValue, array $categoryIds): float
     {
-        if ($increaseValue === -1) return $this->applyCommissionCalculation($price, $categoryIds);
+        if (PriceAdjustment::isCommission($priceChangeValue)) return $this->applyCommissionCalculation($price, $categoryIds);
 
-        if ($increaseValue <= 100) return $price + ($price * ($increaseValue / 100));
+        $value = intval($priceChangeValue);
 
-        return $price + ($increaseValue * 10);
+        if (PriceAdjustment::isPercent($value)) return $price + ($price * ($value / 100));
+
+        return $price + ($value * 10);
     }
 
     private function applyCommissionCalculation(float $price, array $categoryIds): float
     {
-        $categoryPercent = FetchCommission::fetchCategoryCommission($categoryIds);
+        $categoryPercent = floatval(FetchCommission::fetchCategoryCommission($categoryIds));
 
-        if ($categoryPercent > 0 && $categoryPercent < 100) return $price / (1 - ($categoryPercent / 100));
-        else return $price;
+        if ($categoryPercent <= 0 || $categoryPercent >= 100) return $price;
 
+        $multiplier = 1 / (1 - ($categoryPercent / 100));
+        $maxMultiplier = 1 + (PriceAdjustment::MAX_PERCENT / 100);
+
+        if ($multiplier > $maxMultiplier) {
+            Logger::warning('کارمزد دسته‌بندی باسلام خارج از بازه منطقی بود و افزایش قیمت به سقف مجاز محدود شد.', [
+                'category_ids'     => $categoryIds,
+                'commission_percent' => $categoryPercent,
+                'max_percent'      => PriceAdjustment::MAX_PERCENT,
+            ]);
+
+            $multiplier = $maxMultiplier;
+        }
+
+        return $price * $multiplier;
     }
 
     private function applyRounding(float $price, $mode): float

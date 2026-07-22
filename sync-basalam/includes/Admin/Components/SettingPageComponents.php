@@ -3,6 +3,7 @@
 namespace SyncBasalam\Admin\Components;
 
 use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Utilities\PriceAdjustment;
 
 defined('ABSPATH') || exit;
 
@@ -81,22 +82,23 @@ class SettingPageComponents
             . '</select>';
     }
 
-    public static function renderDefaultPercentage()
+    public static function renderPriceChange()
     {
-        static $increasePriceControlIndex = 0;
-        $increasePriceControlIndex++;
+        static $priceChangeControlIndex = 0;
+        $priceChangeControlIndex++;
 
-        $current_value = syncBasalamSettings()->getSettings(SettingsConfig::INCREASE_PRICE_VALUE);
-        $is_checked = ($current_value == -1) ? 'checked' : '';
-        $input_disabled = ($current_value == -1) ? 'disabled' : '';
-        $input_value = ($current_value == -1) ? '' : number_format($current_value);
-        $checkbox_id = 'toggle-percentage-' . $increasePriceControlIndex;
-        $hidden_input_id =   'final-value-' . $increasePriceControlIndex;
-        $text_input_id = 'increase-price-input-' . $increasePriceControlIndex;
+        $current_value = syncBasalamSettings()->getSettings(SettingsConfig::PRICE_CHANGE_VALUE);
+        $is_commission = PriceAdjustment::isCommission($current_value);
+        $is_checked = $is_commission ? 'checked' : '';
+        $input_disabled = $is_commission ? 'disabled' : '';
+        $input_value = $is_commission || !is_numeric($current_value) ? '' : number_format((int) $current_value);
+        $checkbox_id = 'toggle-percentage-' . $priceChangeControlIndex;
+        $hidden_input_id = 'price-change-value-' . $priceChangeControlIndex;
+        $text_input_id = 'price-change-input-' . $priceChangeControlIndex;
 
         echo '<div class="basalam-input-container">';
-        echo '<input type="text" id="' . esc_attr($text_input_id) . '" data-role="increase-price-input" name="sync_basalam_settings[' . esc_attr(SettingsConfig::INCREASE_PRICE_VALUE) . ']" min="0" value="' . esc_attr($input_value) . '" class="basalam-input basalam-p percentage-input" ' . esc_attr($input_disabled) . ' required>';
-        echo '<span class="percentage-unit basalam-p basalam-min-width-0 basalam-font-13">' . ($current_value <= 100 ? 'درصد' : 'تومان') . '</span>';
+        echo '<input type="text" id="' . esc_attr($text_input_id) . '" data-role="price-change-input" name="sync_basalam_settings[' . esc_attr(SettingsConfig::PRICE_CHANGE_VALUE) . ']" value="' . esc_attr($input_value) . '" class="basalam-input basalam-p percentage-input" inputmode="text" autocomplete="off" ' . esc_attr($input_disabled) . ' required>';
+        echo '<span class="percentage-unit basalam-p basalam-min-width-0 basalam-font-13">' . esc_html(PriceAdjustment::unitLabel($current_value)) . '</span>';
         echo '</div>';
 
         echo '<div class="basalam-flex-end-gap-4 basalam-margin-top-8">';
@@ -104,7 +106,7 @@ class SettingPageComponents
         echo '<label class="basalam-font-10" for="' . esc_attr($checkbox_id) . '">کارمزد دسته‌بندی</label>';
         echo '</div>';
 
-        echo '<input type="hidden" id="' . esc_attr($hidden_input_id) . '" data-role="increase-price-hidden" name="sync_basalam_settings[' . esc_attr(SettingsConfig::INCREASE_PRICE_VALUE) . ']" value="' . esc_attr($current_value) . '">';
+        echo '<input type="hidden" id="' . esc_attr($hidden_input_id) . '" data-role="price-change-hidden" name="sync_basalam_settings[' . esc_attr(SettingsConfig::PRICE_CHANGE_VALUE) . ']" value="' . esc_attr($current_value) . '">';
     }
 
     public static function renderDefaultRound()

@@ -2,6 +2,20 @@
 
 <details>
 
+<summary>1.10.3 - 2026-07-22</summary>
+
+### Changed / Improved
+- "Price increase" became "price change" everywhere (code, markup, CSS classes): negative values are supported, so e.g. `-10` lowers the final Basalam price by 10% (percentages are capped at 35% increase and 35% decrease; values outside the -100..100 range are fixed Toman amounts)
+- The global setting key was renamed from `increase_price_value` to `price_change_value`, and the per-product meta from `_sync_basalam_increase_price_value` to `_sync_basalam_price_change_value`. Old values are not migrated — re-enter the price change in the settings
+- The category-commission mode is now stored as `commission` instead of `-1`, so it no longer collides with a real negative percentage
+
+### Added
+- A "custom price change" field in the Basalam product settings tab and in the products list bulk edit, so a single product or a selection of products can override the global value (or switch to category commission)
+
+</details>
+
+<details>
+
 <summary>1.10.2 - 2026-07-19</summary>
 
 ### Changed / Improved

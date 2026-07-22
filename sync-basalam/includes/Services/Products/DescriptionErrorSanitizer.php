@@ -57,7 +57,17 @@ class DescriptionErrorSanitizer
             if (preg_match_all('/<em>(.*?)<\/em>/isu', $snippet, $matches)) {
                 foreach ($matches[1] as $match) {
                     $value = trim(wp_strip_all_tags(html_entity_decode($match, ENT_QUOTES | ENT_HTML5, 'UTF-8')));
-                    if ($value !== '') $found[] = $value;
+                    if ($value === '') continue;
+
+                    $found[] = $value;
+
+                    // Basalam highlights a whole window of text and returns it normalized
+                    // (e.g. "یک" comes back as "1"), so the full phrase often matches nothing
+                    // in the original description. The part that actually triggers the
+                    // "social id" signal is the handle-like token, so target it separately.
+                    foreach (self::handleLikeTokens($value) as $token) {
+                        $found[] = $token;
+                    }
                 }
             }
         }
@@ -69,6 +79,21 @@ class DescriptionErrorSanitizer
         }
 
         return $found;
+    }
+
+    /**
+     * Pulls out handle/domain-like tokens ("s.exy", "س.کسی", "insta.gram") from a
+     * highlighted snippet.
+     *
+     * @return string[]
+     */
+    private static function handleLikeTokens(string $text): array
+    {
+        if (!preg_match_all('/[\p{L}\p{N}_]+(?:\.[\p{L}\p{N}_]+)+/u', $text, $matches)) return [];
+
+        return array_values(array_filter($matches[0], static function ($token) {
+            return mb_strlen($token) >= 3;
+        }));
     }
 
     public static function sanitize(string $description, array $values): string

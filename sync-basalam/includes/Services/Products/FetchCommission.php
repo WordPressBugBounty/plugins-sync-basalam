@@ -2,7 +2,6 @@
 
 namespace SyncBasalam\Services\Products;
 
-use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Services\ApiServiceManager;
 

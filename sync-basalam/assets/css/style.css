@@ -1839,7 +1839,9 @@
 #sync_basalam_product_video_box>div.postbox-header>h2,
 #_sync_basalam_is_gold_product_checkbox_field,
 #basalam_gold_product_fields,
-#basalam_product_data>div:nth-child(2)>p>label {
+#basalam_product_data>div:nth-child(2)>p>label,
+#_sync_basalam_price_change_value_display,
+ {
   font-family: "PelakFA";
 }
 
@@ -7226,6 +7228,35 @@ body>.basalam-info-modal {
   margin-bottom: 8px;
 }
 
+.sync-basalam-bulk-price-change-value {
+  display: none;
+  margin-top: 10px !important;
+}
+
+.sync-basalam-bulk-price-change-value .basalam-input-container {
+  justify-content: stretch;
+  width: 100%;
+}
+
+.sync-basalam-bulk-price-change-value .percentage-input {
+  flex: 1 1 0;
+}
+
+.sync-basalam-bulk-price-change-value .percentage-unit {
+  min-width: 42px;
+  text-align: center !important;
+}
+
+.sync-basalam-bulk-price-change-value .basalam-flex-end-gap-4 {
+  justify-content: flex-end;
+}
+
+#sync-basalam-bulk-toggle-percentage {
+  width: 5px !important;
+  max-width: 5px !important;
+  min-height: 5px !important;
+}
+
 .sync-basalam-bulk-edit__field .basalam-label {
   display: flex !important;
   width: 100%;
@@ -7286,29 +7317,6 @@ body>.basalam-info-modal {
   flex: 1 1 0;
   min-width: 0;
   margin-bottom: 0 !important;
-}
-
-.sync-basalam-bulk-increase-value {
-  display: none;
-  margin-top: 10px !important;
-}
-
-.sync-basalam-bulk-increase-value .basalam-input-container {
-  justify-content: stretch;
-  width: 100%;
-}
-
-.sync-basalam-bulk-increase-value .percentage-input {
-  flex: 1 1 0;
-}
-
-.sync-basalam-bulk-increase-value .percentage-unit {
-  min-width: 42px;
-  text-align: center !important;
-}
-
-.sync-basalam-bulk-increase-value .basalam-flex-end-gap-4 {
-  justify-content: flex-end;
 }
 
 .sync-basalam-bulk-edit__panel .basalam-input,
@@ -7703,97 +7711,74 @@ body.sync-basalam-announcement-open {
   display: flex !important;
 }
 
-#sync-basalam-bulk-toggle-percentage {
-  width: 5px !important;
-  max-width: 5px !important;
-  min-height: 5px !important;
-}
-
-._sync_basalam_increase_price_value_field {
+/* Product data panel: custom price change field, aligned with WooCommerce form-field rows */
+.basalam-price-change-field {
   font-family: pelakFa;
 }
 
-.basalam-increase-price-field {
-  display: grid;
-  grid-template-columns: minmax(150px, max-content) minmax(220px, 1fr);
-  align-items: start;
-  column-gap: 16px;
-  row-gap: 8px;
-  width: 100%;
+.basalam-price-change-field > label {
+  line-height: 32px;
 }
 
-.basalam-increase-price-field__label-section {
-  grid-column: 1;
-  justify-self: end;
-}
-
-.basalam-increase-price-field__header {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
-  width: 100%;
-}
-
-.basalam-increase-price-field__header label {
-  margin: 0 !important;
-  text-align: right;
-}
-
-.basalam-increase-price-field__control-section {
-  grid-column: 2;
+.basalam-price-change-field .basalam-price-change-field__control {
+  float: left;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: 8px;
-  min-width: 0;
+  gap: 6px;
+  width: 50%;
 }
 
-.basalam-increase-price-field__input-row {
-  justify-content: stretch;
-  width: 100%;
-  direction: rtl;
+.rtl .basalam-price-change-field .basalam-price-change-field__control {
+  float: right;
 }
 
-.basalam-increase-price-field__input-row .percentage-input {
-  flex: 1 1 0;
-  min-width: 0;
-}
-
-.basalam-increase-price-field__input-row .percentage-unit {
-  min-width: 48px;
-  text-align: center !important;
-}
-
-.basalam-increase-price-field__toggle-row {
+.basalam-price-change-field .basalam-price-change-field__input {
   display: flex;
   align-items: center;
-  gap: 4px;
-  direction: ltr;
-  width: fit-content;
-  margin-top: 2px;
-  align-self: center;
+  width: max-content;
+  gap: 6px;
+  direction: rtl;
 }
 
-.basalam-increase-price-field__toggle-row label {
-  direction: rtl;
+.basalam-price-change-field .basalam-price-change-field__input .percentage-input {
+  flex: 1 1 auto;
+  width: auto !important;
+  float: none !important;
+  margin: 0 !important;
+  min-width: 0;
+  height: 32px;
+  text-align: center;
+}
+
+.basalam-price-change-field .percentage-unit {
+  flex: 0 0 auto;
+  min-width: 48px;
+  text-align: center;
+  color: #50575e;
+}
+
+.basalam-price-change-field .basalam-price-change-field__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.basalam-price-change-field .basalam-price-change-field__toggle input[type="checkbox"] {
+  margin: 0;
+}
+
+.basalam-price-change-field .basalam-price-change-field__toggle label {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: auto !important;
+  float: none !important;
+  line-height: 1.4;
 }
 
 @media screen and (max-width: 782px) {
-  .basalam-increase-price-field {
-    grid-template-columns: 1fr;
-  }
-
-  .basalam-increase-price-field__label-section,
-  .basalam-increase-price-field__control-section {
-    grid-column: 1;
-  }
-
-  .basalam-increase-price-field__label-section {
-    justify-self: stretch;
-  }
-
-  .basalam-increase-price-field__header {
-    justify-content: flex-start;
+  .basalam-price-change-field .basalam-price-change-field__control {
+    float: none;
+    width: 100%;
   }
 }

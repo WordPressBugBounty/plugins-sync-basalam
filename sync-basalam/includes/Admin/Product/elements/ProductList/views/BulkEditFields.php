@@ -52,28 +52,29 @@ defined('ABSPATH') || exit;
 
             <span class="sync-basalam-bulk-edit__divider" aria-hidden="true"></span>
 
-            <div class="sync-basalam-bulk-edit__section sync-basalam-bulk-edit__section--increase basalam-form-group basalam-form-group-full basalam-p">
+            <div class="sync-basalam-bulk-edit__section sync-basalam-bulk-edit__section--price-change basalam-form-group basalam-form-group-full basalam-p">
                 <label class="alignleft sync-basalam-bulk-edit__field">
-                    <?php echo wp_kses_post(\SyncBasalam\Admin\Components\CommonComponents::renderLabelWithTooltip('افزایش قیمت اختصاصی', 'اگر برای این بخش مقداری تنظیم کنید، برای محصولات انتخاب‌شده به جای افزایش قیمت سراسری تنظیمات استفاده می‌شود. مقدار 1 تا 100 درصد، بیشتر از 100 مبلغ ثابت تومانی.')); ?>
-                    <select name="sync_basalam_bulk_increase_action" class="sync-basalam-bulk-select basalam-select basalam-font-pelak-12">
+                    <?php echo wp_kses_post(\SyncBasalam\Admin\Components\CommonComponents::renderLabelWithTooltip('تغییر قیمت اختصاصی', 'اگر برای این بخش مقداری تنظیم کنید، برای محصولات انتخاب‌شده به جای تغییر قیمت سراسری تنظیمات استفاده می‌شود. مقدار درصدی حداکثر 35 درصد افزایش یا 35 درصد کاهش (منفی یعنی کاهش قیمت)، خارج از بازه -100 تا 100 مبلغ ثابت تومانی.')); ?>
+                    <select name="sync_basalam_bulk_price_change_action" class="sync-basalam-bulk-select basalam-select basalam-font-pelak-12">
                         <option value="keep">بدون تغییر</option>
                         <option value="set">تنظیم مقدار</option>
-                        <option value="clear">حذف و استفاده از تنظیم اصلی</option>
+                        <option value="clear">حذف و استفاده از تنظیم سراسری</option>
                     </select>
                 </label>
 
-                <div class="sync-basalam-bulk-edit__field sync-basalam-bulk-increase-value">
+                <div class="sync-basalam-bulk-edit__field sync-basalam-bulk-price-change-value">
                     <div class="basalam-input-container">
-                        <input type="text" id="sync-basalam-bulk-increase-price-input" data-role="increase-price-input" value="" class="basalam-input basalam-p percentage-input basalam-font-pelak-12" inputmode="numeric" autocomplete="off">
+                        <input type="text" id="sync-basalam-bulk-price-change-input" data-role="price-change-input" value="" class="basalam-input basalam-p percentage-input basalam-font-pelak-12" inputmode="text" autocomplete="off">
                         <span class="percentage-unit basalam-p basalam-min-width-0 basalam-font-13">درصد</span>
                     </div>
                     <div class="basalam-flex-end-gap-4 basalam-margin-top-8">
                         <input type="checkbox" id="sync-basalam-bulk-toggle-percentage" class="toggle-percentage" name="sync_basalam_bulk_toggle_percentage">
                         <label class="basalam-font-10" for="sync-basalam-bulk-toggle-percentage">کارمزد دسته‌بندی</label>
                     </div>
-                    <input type="hidden" id="sync-basalam-bulk-final-value" data-role="increase-price-hidden" name="sync_basalam_bulk_increase_value" value="">
+                    <input type="hidden" id="sync-basalam-bulk-price-change-value" data-role="price-change-hidden" name="sync_basalam_bulk_price_change_value" value="">
                 </div>
             </div>
+
         </div>
     </div>
 </fieldset>

@@ -22,8 +22,8 @@ defined('ABSPATH') || exit;
 
         <div class="basalam-form-row">
             <div class="basalam-form-group basalam-form-group-full basalam-p">
-                <?php echo CommonComponents::renderLabelWithTooltip('افزایش قیمت در باسلام', 'درصد یا مبلغ ثابتی که به قیمت محصولات در باسلام اضافه می‌شود. می‌تواند به صورت درصد(1-100) یا مبلغ ثابت(101-∞) باشد.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
-                <?php SettingPageComponents::renderDefaultPercentage(); ?>
+                <?php echo CommonComponents::renderLabelWithTooltip('تغییر قیمت در باسلام', 'درصد یا مبلغ ثابتی که به قیمت محصولات در باسلام اعمال می‌شود. مقدار مثبت افزایش و مقدار منفی کاهش قیمت است؛ حداکثر 35 درصد افزایش و 35 درصد کاهش. مقادیر خارج از بازه -100 تا 100 به عنوان مبلغ ثابت تومانی در نظر گرفته می‌شوند. با فعال کردن «کارمزد دسته‌بندی» قیمت بر اساس کارمزد دسته‌بندی باسلام محاسبه می‌شود.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
+                <?php SettingPageComponents::renderPriceChange(); ?>
             </div>
         </div>
         <div class="basalam-form-row basalam-form-row-two-col">
@@ -114,8 +114,8 @@ defined('ABSPATH') || exit;
                         <?php SettingPageComponents::renderCapPreparationToCategoryMax(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip('افزایش قیمت در باسلام', 'درصد یا مبلغ ثابتی که به قیمت محصولات در باسلام اضافه می‌شود. می‌تواند به صورت درصد(1-100) یا مبلغ ثابت(101-∞) باشد.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
-                        <?php SettingPageComponents::renderDefaultPercentage(); ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('تغییر قیمت در باسلام', 'درصد یا مبلغ ثابتی که به قیمت محصولات در باسلام اعمال می‌شود. مقدار مثبت افزایش و مقدار منفی کاهش قیمت است؛ حداکثر 35 درصد افزایش و 35 درصد کاهش. مقادیر خارج از بازه -100 تا 100 به عنوان مبلغ ثابت تومانی در نظر گرفته می‌شوند. با فعال کردن «کارمزد دسته‌بندی» قیمت بر اساس کارمزد دسته‌بندی باسلام محاسبه می‌شود.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
+                        <?php SettingPageComponents::renderPriceChange(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
                         <?php echo CommonComponents::renderLabelWithTooltip('جهت رند کردن قیمت در باسلام', 'نحوه رند کردن قیمت‌ها در باسلام. می‌توانید قیمت را به بالا، پایین یا بدون رند تنظیم کنید.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>

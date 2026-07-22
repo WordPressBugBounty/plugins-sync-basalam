@@ -142,7 +142,7 @@ function sync_basalam_remove_all_plugin_data(): void
             '_basalam_fee_amount',
             '_basalam_balance_amount',
             '_basalam_purchase_count',
-            '_sync_basalam_increase_price_value'
+            '_sync_basalam_price_change_value'
         )
     );
 

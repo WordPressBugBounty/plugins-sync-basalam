@@ -22,7 +22,7 @@ class SettingsConfig
     public const SYNC_STATUS_PRODUCT = "sync_status_product";
     public const SYNC_STATUS_ORDER = "sync_status_order";
     public const DEVELOPER_MODE = "developer_mode";
-    public const INCREASE_PRICE_VALUE = "increase_price_value";
+    public const PRICE_CHANGE_VALUE = "price_change_value";
     public const ROUND_PRICE = "round_price";
     public const EXPIRE_TOKEN_TIME = "expire_token_time";
     public const WEBHOOK_HEADER_TOKEN = "webhook_header_token";
@@ -74,7 +74,7 @@ class SettingsConfig
             self::DEVELOPER_MODE                    => false,
             self::VENDOR_ID                         => null,
             self::IS_VENDOR                         => true,
-            self::INCREASE_PRICE_VALUE              => 0,
+            self::PRICE_CHANGE_VALUE                => 0,
             self::ROUND_PRICE                       => 'none',
             self::EXPIRE_TOKEN_TIME                 => null,
             self::PRODUCT_PREFIX_TITLE              => null,

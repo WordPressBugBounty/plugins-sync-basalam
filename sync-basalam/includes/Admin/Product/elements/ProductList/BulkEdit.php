@@ -2,8 +2,9 @@
 
 namespace SyncBasalam\Admin\Product\elements\ProductList;
 
-use SyncBasalam\Admin\Product\elements\SingleProduct\PriceIncreaseField;
+use SyncBasalam\Admin\Product\elements\SingleProduct\PriceChangeField;
 use SyncBasalam\Admin\Product\Utils\ProductUnits;
+use SyncBasalam\Utilities\PriceAdjustment;
 
 defined('ABSPATH') || exit;
 
@@ -25,30 +26,42 @@ class BulkEdit
         require __DIR__ . '/views/BulkEditFields.php';
     }
 
-    public function save(int $postId, \WP_Post $post): void
+    /**
+     * Runs on admin_action_sync_basalam_bulk_edit, which passes no arguments,
+     * so the selected products are read from the bulk edit request itself.
+     */
+    public function save(): void
     {
-        if ($post->post_type !== 'product') {
+        if (!isset($_REQUEST['post']) || !is_array($_REQUEST['post'])) {
             return;
         }
 
         if (
-            !isset($_REQUEST['_inline_edit'])
-            || !wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_inline_edit'])), 'inlineeditnonce')
+            !isset($_REQUEST['_wpnonce'])
+            || !wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['_wpnonce'])), 'bulk-posts')
         ) {
+            wp_die('درخواست نامعتبر است. لطفاً دوباره تلاش کنید.');
+        }
+
+        if (!isset($_REQUEST['sync_basalam_bulk_product_type_action']) && !isset($_REQUEST['sync_basalam_bulk_price_change_action'])) {
             return;
         }
 
-        if (!current_user_can('edit_post', $postId)) {
-            return;
-        }
+        $postIds = array_map('intval', wp_unslash($_REQUEST['post'])); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce verified above; each ID is cast with intval().
 
-        if (!isset($_REQUEST['sync_basalam_bulk_product_type_action']) && !isset($_REQUEST['sync_basalam_bulk_increase_action'])) {
-            return;
-        }
+        foreach ($postIds as $postId) {
+            if ($postId <= 0 || get_post_type($postId) !== 'product') {
+                continue;
+            }
 
-        $this->saveProductType($postId);
-        $this->saveWholesale($postId);
-        $this->saveIncrease($postId);
+            if (!current_user_can('edit_post', $postId)) {
+                continue;
+            }
+
+            $this->saveProductType($postId);
+            $this->saveWholesale($postId);
+            $this->savePriceChange($postId);
+        }
     }
 
     private function saveProductType(int $postId): void
@@ -99,10 +112,10 @@ class BulkEdit
         update_post_meta($postId, self::WHOLESALE_META_KEY, $wholesaleValue);
     }
 
-    private function saveIncrease(int $postId): void
+    private function savePriceChange(int $postId): void
     {
-        $action = isset($_REQUEST['sync_basalam_bulk_increase_action'])
-            ? sanitize_text_field(wp_unslash($_REQUEST['sync_basalam_bulk_increase_action']))
+        $action = isset($_REQUEST['sync_basalam_bulk_price_change_action'])
+            ? sanitize_text_field(wp_unslash($_REQUEST['sync_basalam_bulk_price_change_action']))
             : 'keep';
 
         if ($action === 'keep') {
@@ -110,20 +123,21 @@ class BulkEdit
         }
 
         if ($action === 'clear') {
-            delete_post_meta($postId, PriceIncreaseField::META_KEY);
+            delete_post_meta($postId, PriceChangeField::META_KEY);
 
             return;
         }
 
-        $value = isset($_REQUEST['sync_basalam_bulk_increase_value'])
-            ? sanitize_text_field(wp_unslash($_REQUEST['sync_basalam_bulk_increase_value']))
+        $value = isset($_REQUEST['sync_basalam_bulk_price_change_value'])
+            ? sanitize_text_field(wp_unslash($_REQUEST['sync_basalam_bulk_price_change_value']))
             : '';
 
-        if ($value === '' || !is_numeric($value)) {
+        $priceChangeValue = PriceAdjustment::normalize($value);
+
+        if ($priceChangeValue === null) {
             return;
         }
 
-        $increaseValue = (string) intval($value);
-        update_post_meta($postId, PriceIncreaseField::META_KEY, $increaseValue);
+        update_post_meta($postId, PriceChangeField::META_KEY, $priceChangeValue);
     }
 }

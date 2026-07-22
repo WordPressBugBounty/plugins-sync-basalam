@@ -868,13 +868,13 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     };
 
-    const syncIncreaseVisibility = () => {
+    const syncPriceChangeVisibility = () => {
       document
-        .querySelectorAll('select[name="sync_basalam_bulk_increase_action"]')
+        .querySelectorAll('select[name="sync_basalam_bulk_price_change_action"]')
         .forEach((select) => {
           const field = select
             .closest(".sync-basalam-bulk-edit")
-            ?.querySelector(".sync-basalam-bulk-increase-value");
+            ?.querySelector(".sync-basalam-bulk-price-change-value");
 
           if (field) {
             field.style.display = select.value === "set" ? "block" : "none";
@@ -906,7 +906,7 @@ document.addEventListener("DOMContentLoaded", function () {
       window.requestAnimationFrame(() => {
         setBulkEditMode("basalam");
         syncTypeVisibility();
-        syncIncreaseVisibility();
+        syncPriceChangeVisibility();
       });
     };
 
@@ -920,8 +920,8 @@ document.addEventListener("DOMContentLoaded", function () {
         syncTypeVisibility();
       }
 
-      if (target.name === "sync_basalam_bulk_increase_action") {
-        syncIncreaseVisibility();
+      if (target.name === "sync_basalam_bulk_price_change_action") {
+        syncPriceChangeVisibility();
       }
     });
 
@@ -968,7 +968,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setBulkEditMode("default");
 
     syncTypeVisibility();
-    syncIncreaseVisibility();
+    syncPriceChangeVisibility();
   };
 
   initBulkEditFields();
