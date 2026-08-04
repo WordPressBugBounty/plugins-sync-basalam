@@ -14,7 +14,7 @@ class CreateTicketItem extends ActionController
     {
         $ticketManager = new TicketServiceManager();
 
-        $content  = isset($_POST['content']) ? \sanitize_textarea_field(\wp_unslash($_POST['content'])) : '';
+        $content  = isset($_POST['content']) ? TicketExtraInfoFormatter::sanitizeContent($_POST['content']) : '';
         $content  = TicketExtraInfoFormatter::appendFromRequest($content, $_POST);
         $ticketId = isset($_POST['ticket_id']) ? intval(\wp_unslash($_POST['ticket_id'])) : 0;
 

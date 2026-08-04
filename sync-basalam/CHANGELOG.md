@@ -2,6 +2,16 @@
 
 <details>
 
+<summary>1.10.4 - 2026-08-04</summary>
+
+### Fixed
+- Preserved complete URLs in new ticket messages, ticket replies, and optional access-information fields, including percent-encoded URL segments that WordPress text sanitization previously removed
+- Updated ticket media uploads to send `type=ticket_item` and `collection=IMAGE` as multipart form fields to the `/media` endpoint, and fixed the upload service to return the API response
+
+</details>
+
+<details>
+
 <summary>1.10.3 - 2026-07-22</summary>
 
 ### Changed / Improved

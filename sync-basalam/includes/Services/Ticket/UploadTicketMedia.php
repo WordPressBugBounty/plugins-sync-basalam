@@ -14,10 +14,17 @@ class UploadTicketMedia
     public function execute($hamsalamToken, $filePath)
     {
         $apiService = syncBasalamContainer()->get(ApiServiceManager::class);
-        $header = ['Authorization' => 'Bearer ' . $hamsalamToken];
+        $headers = [
+            'Authorization' => 'Bearer ' . $hamsalamToken,
+            'Accept' => 'application/json',
+        ];
+        $fields = [
+            'type' => 'ticket_item',
+            'collection' => 'IMAGE',
+        ];
 
         try {
-            $apiService->upload($this->url, $filePath, [], $header);
+            return $apiService->upload($this->url, $filePath, $fields, $headers);
         } catch (\Exception $e) {
             return [
                 'status_code' => $e->getCode() ?? 500,

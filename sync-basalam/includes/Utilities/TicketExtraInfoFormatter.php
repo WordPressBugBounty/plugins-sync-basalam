@@ -6,6 +6,22 @@ defined('ABSPATH') || exit;
 
 class TicketExtraInfoFormatter
 {
+    public static function sanitizeContent($value): string
+    {
+        $value = wp_check_invalid_utf8(wp_unslash((string) $value));
+
+        if (strpos($value, '<') !== false) {
+            $value = wp_pre_kses_less_than($value);
+            $value = wp_strip_all_tags($value, false);
+            $value = str_replace("<\n", "&lt;\n", $value);
+        }
+
+        $value = str_replace(["\r\n", "\r"], "\n", $value);
+        $value = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $value);
+
+        return trim($value);
+    }
+
     public static function appendFromRequest(string $content, array $request): string
     {
         $dashboardLines = self::collectDashboardLines($request);
@@ -60,6 +76,6 @@ class TicketExtraInfoFormatter
 
     private static function sanitize($value): string
     {
-        return sanitize_text_field(wp_unslash((string) $value));
+        return preg_replace('/\s+/', ' ', self::sanitizeContent($value));
     }
 }

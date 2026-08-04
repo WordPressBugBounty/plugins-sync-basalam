@@ -126,7 +126,7 @@ final class Endpoints
     const TICKET_ITEMS = self::HAMSALAM_BASE . '/tickets/%d/ticket-items';
 
     /** POST upload ticket media */
-    const TICKET_MEDIA_UPLOAD = self::HAMSALAM_BASE . '/media?type=ticket_item&collection=IMAGE';
+    const TICKET_MEDIA_UPLOAD = self::HAMSALAM_BASE . '/media';
 
     // App Store
 
