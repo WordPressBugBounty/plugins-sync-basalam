@@ -16,6 +16,9 @@ defined('ABSPATH') || exit;
 
 class BulkUpdateProductsJob extends AbstractJobType
 {
+    private const LAST_REQUEST_AT_OPTION = 'sync_basalam_bulk_update_products_last_run';
+    private const REQUEST_INTERVAL_SECONDS = 12;
+
     private $apiService;
     private $factory;
     private $settingsAccessor;
@@ -40,6 +43,13 @@ class BulkUpdateProductsJob extends AbstractJobType
     public function getPriority(): int
     {
         return 1;
+    }
+
+    public function canRun(): bool
+    {
+        $lastRequestAt = (float) get_option(self::LAST_REQUEST_AT_OPTION, 0);
+
+        return (microtime(true) - $lastRequestAt) >= self::REQUEST_INTERVAL_SECONDS;
     }
 
     public function execute(array $payload): JobResult
@@ -107,6 +117,7 @@ class BulkUpdateProductsJob extends AbstractJobType
 
             if (empty($productsData)) return $this->success(['skipped' => true, 'message' => 'No products to update in this batch']);
 
+            update_option(self::LAST_REQUEST_AT_OPTION, microtime(true), false);
             $res = $this->apiService->patch($url, ['data' => $productsData]);
 
             if ($res['status_code'] == 202) {

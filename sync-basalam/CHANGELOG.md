@@ -2,6 +2,15 @@
 
 <details>
 
+<summary>1.10.5 - 2026-08-05</summary>
+
+### Changed / Improved
+- Limited bulk product update API requests to a maximum of five per minute without reducing the execution rate of other background jobs
+
+</details>
+
+<details>
+
 <summary>1.10.4 - 2026-08-04</summary>
 
 ### Fixed
