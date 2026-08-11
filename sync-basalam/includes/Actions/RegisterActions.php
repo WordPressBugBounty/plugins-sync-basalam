@@ -86,6 +86,7 @@ class RegisterActions
         ActionHandler::postAjax('get_mapping_stats', GetMappingStats::class);
         ActionHandler::postAction('auto_confirm_order_in_basalam', AutoConfirmOrders::class);
         ActionHandler::postAction('create_ticket', CreateTicket::class);
+        ActionHandler::postAjax('create_ticket', CreateTicket::class);
         ActionHandler::postAction('create_ticket_item', CreateTicketItem::class);
         ActionHandler::postAjax('upload_ticket_media', UploadTicketMediaAjax::class);
         ActionHandler::postAjax('sync_basalam_remind_later_review', RemindLaterReview::class);

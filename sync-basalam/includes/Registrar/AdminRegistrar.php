@@ -24,6 +24,7 @@ use SyncBasalam\Services\Products\ProductConnection;
 use SyncBasalam\Services\SystemResourceMonitor;
 use SyncBasalam\Utilities\ProductMetaKey;
 use SyncBasalam\Utilities\ChatWidget;
+use SyncBasalam\Utilities\TicketFlashNotice;
 use SyncBasalam\Admin\FinancialManagement\Menu as FinancialManagementMenu;
 use SyncBasalam\Admin\FinancialManagement\BalanceSettlement;
 use SyncBasalam\Admin\FinancialManagement\FinancialManagementHistory;
@@ -259,6 +260,19 @@ class AdminRegistrar implements RegistrarInterface
             $version,
             true
         );
+
+        $ticketNotice = TicketFlashNotice::pull();
+        if ($ticketNotice !== null) {
+            wp_add_inline_script(
+                "basalam-admin-toast-script",
+                sprintf(
+                    'window.addEventListener("DOMContentLoaded",function(){if(window.BasalamToast){window.BasalamToast.show(%s,%s);}});',
+                    wp_json_encode($ticketNotice['message'], JSON_UNESCAPED_UNICODE),
+                    wp_json_encode($ticketNotice['type'])
+                ),
+                'after'
+            );
+        }
         wp_enqueue_script(
             "basalam-admin-logs-script",
             self::assetsUrl("js/logs.js"),
@@ -345,11 +359,15 @@ class AdminRegistrar implements RegistrarInterface
             true
         );
 
+        $ticketScriptPath = syncBasalamPlugin()->pluginPath() . '/assets/js/ticket.js';
+        $ticketScriptVersion = file_exists($ticketScriptPath)
+            ? $version . '-' . filemtime($ticketScriptPath)
+            : $version;
         wp_enqueue_script(
             "basalam-ticket-script",
             self::assetsUrl("js/ticket.js"),
             ["basalam-admin-toast-script"],
-            $version,
+            $ticketScriptVersion,
             true
         );
 

@@ -58,3 +58,146 @@ function ticketFileUpload(inputId, nonce) {
             });
     });
 }
+
+(function (window, document) {
+    'use strict';
+
+    var sections = [
+        {
+            prefix: 'dashboard',
+            label: 'پیشخوان وردپرس'
+        },
+        {
+            prefix: 'host_panel',
+            label: 'کنترل پنل هاست'
+        }
+    ];
+
+    function showError(message) {
+        if (window.BasalamToast) {
+            window.BasalamToast.error(message);
+        }
+    }
+
+    function field(form, name) {
+        return form.querySelector('[name="' + name + '"]');
+    }
+
+    function validateAccess(form) {
+        for (var i = 0; i < sections.length; i++) {
+            var section = sections[i];
+            var loginUrl = field(form, section.prefix + '_login_url');
+            var username = field(form, section.prefix + '_username');
+            var password = field(form, section.prefix + '_password');
+            if (!loginUrl || !username || !password) continue;
+
+            var loginValue = loginUrl.value.trim();
+            var usernameValue = username.value.trim();
+            var passwordValue = password.value;
+            var hasAnyValue = loginValue !== '' || usernameValue !== '' || passwordValue !== '';
+            if (!hasAnyValue) continue;
+
+            if (usernameValue === '' || passwordValue === '') {
+                var missingField = usernameValue === '' ? username : password;
+                missingField.setAttribute('aria-invalid', 'true');
+                missingField.focus();
+                showError('برای ' + section.label + ' نام کاربری و رمز عبور را کامل وارد کنید.');
+                return false;
+            }
+
+            if (passwordValue.length > 1024 || /[\u0000-\u001F\u007F]/.test(passwordValue)) {
+                password.setAttribute('aria-invalid', 'true');
+                password.focus();
+                showError(passwordValue.length > 1024
+                    ? 'رمز عبور طولانی‌تر از حد مجاز است.'
+                    : 'رمز عبور دارای نویسه کنترلی نامعتبر است.');
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    function setSubmitting(form, submitting) {
+        var submitButton = form.querySelector('button[type="submit"]');
+        if (!submitButton) return;
+
+        submitButton.disabled = submitting;
+        if (submitting) {
+            submitButton.dataset.originalText = submitButton.textContent;
+            submitButton.textContent = 'در حال ارسال...';
+        } else if (submitButton.dataset.originalText) {
+            submitButton.textContent = submitButton.dataset.originalText;
+            delete submitButton.dataset.originalText;
+        }
+    }
+
+    function rememberCreatedTicket(form, ticketId) {
+        if (!ticketId) return;
+
+        var input = field(form, 'existing_ticket_id');
+        if (!input) {
+            input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'existing_ticket_id';
+            form.appendChild(input);
+        }
+        input.value = String(ticketId);
+    }
+
+    function submitCreateTicket(form) {
+        setSubmitting(form, true);
+
+        fetch(window.ajaxurl, {
+            method: 'POST',
+            body: new FormData(form),
+            credentials: 'same-origin'
+        })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (response) {
+                var data = response && response.data ? response.data : {};
+                if (!response || !response.success) {
+                    rememberCreatedTicket(form, data.ticket_id);
+                    showError(data.message || 'خطایی در ثبت تیکت رخ داد. اطلاعات فرم حفظ شده است.');
+                    return;
+                }
+
+                if (data.redirect_url) {
+                    window.location.assign(data.redirect_url);
+                }
+            })
+            .catch(function () {
+                showError('ارتباط با سرور برقرار نشد. اطلاعات فرم حفظ شده است.');
+            })
+            .finally(function () {
+                setSubmitting(form, false);
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var actionInputs = document.querySelectorAll(
+            'input[name="action"][value="create_ticket"], ' +
+            'input[name="action"][value="create_ticket_item"]'
+        );
+
+        for (var i = 0; i < actionInputs.length; i++) {
+            var form = actionInputs[i].closest('form');
+            if (!form || form.dataset.ticketAccessValidation === '1') continue;
+            form.dataset.ticketAccessValidation = '1';
+            form.addEventListener('submit', function (event) {
+                if (!validateAccess(event.currentTarget)) {
+                    event.preventDefault();
+                    return;
+                }
+
+                var action = field(event.currentTarget, 'action');
+                if (action && action.value === 'create_ticket') {
+                    event.preventDefault();
+                    submitCreateTicket(event.currentTarget);
+                }
+            });
+        }
+    });
+})(window, document);

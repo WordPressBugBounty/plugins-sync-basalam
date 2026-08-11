@@ -2,6 +2,17 @@
 
 <details>
 
+<summary>1.10.7 - 2026-08-11</summary>
+
+### Fixed
+- Ticket validation and API failures are now shown as admin toasts instead of WordPress `admin-post.php` error pages
+- New-ticket submissions now use AJAX, preserving entered text, credentials, and uploaded-image previews when a request fails; if the ticket was created before access storage failed, retrying updates only the access data and does not create a duplicate ticket
+- Ticket JavaScript now uses a file-aware cache version so updated validation and submission behavior is loaded immediately after deployment
+
+</details>
+
+<details>
+
 <summary>1.10.6 - 2026-08-11</summary>
 
 ### Fixed

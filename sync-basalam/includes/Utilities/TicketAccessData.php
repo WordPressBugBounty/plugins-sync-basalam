@@ -12,7 +12,10 @@ class TicketAccessData
 {
     public static function fromRequest(array $request): array
     {
-        $payload = ['domain' => untrailingslashit(get_site_url())];
+        $siteDomain = defined('SYNC_BASALAM_SITE_ACCESS_DOMAIN')
+            ? (string) constant('SYNC_BASALAM_SITE_ACCESS_DOMAIN')
+            : get_site_url();
+        $payload = ['domain' => untrailingslashit($siteDomain)];
 
         $wordpress = self::section($request, [
             'login_url' => 'dashboard_login_url',

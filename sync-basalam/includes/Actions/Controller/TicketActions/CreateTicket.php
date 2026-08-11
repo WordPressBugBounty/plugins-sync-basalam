@@ -6,20 +6,55 @@ use SyncBasalam\Actions\Controller\ActionController;
 use SyncBasalam\Services\TicketServiceManager;
 use SyncBasalam\Utilities\TicketExtraInfoFormatter;
 use SyncBasalam\Utilities\TicketAccessData;
+use SyncBasalam\Utilities\TicketFlashNotice;
 
 defined('ABSPATH') || exit;
 
 class CreateTicket extends ActionController
 {
+    private $createdTicketId = 0;
+
     public function __invoke()
     {
         if (!current_user_can('manage_options')) {
+            if (wp_doing_ajax()) {
+                wp_send_json_error(['message' => 'دسترسی غیرمجاز!'], 403);
+            }
             wp_die('دسترسی غیرمجاز!');
         }
 
-        $ticketId = $this->processSubmission();
+        try {
+            $ticketId = $this->processSubmission();
+        } catch (\Throwable $e) {
+            $message = $e instanceof \InvalidArgumentException || $e instanceof \RuntimeException
+                ? $e->getMessage()
+                : 'خطای غیرمنتظره‌ای در ثبت تیکت رخ داد. لطفا مجددا تلاش کنید.';
 
-        wp_safe_redirect(admin_url("admin.php?page=sync_basalam_ticket&ticket_id=" . $ticketId));
+            if (wp_doing_ajax()) {
+                wp_send_json_error([
+                    'message' => $message,
+                    'ticket_id' => $this->createdTicketId,
+                ], 400);
+            }
+
+            TicketFlashNotice::push($message, 'error');
+
+            $redirectUrl = $this->createdTicketId > 0
+                ? admin_url('admin.php?page=sync_basalam_ticket&ticket_id=' . $this->createdTicketId)
+                : admin_url('admin.php?page=sync_basalam_new_ticket');
+            wp_safe_redirect($redirectUrl);
+            exit();
+        }
+
+        $redirectUrl = admin_url('admin.php?page=sync_basalam_ticket&ticket_id=' . $ticketId);
+        if (wp_doing_ajax()) {
+            wp_send_json_success([
+                'ticket_id' => $ticketId,
+                'redirect_url' => $redirectUrl,
+            ]);
+        }
+
+        wp_safe_redirect($redirectUrl);
         exit();
     }
 
@@ -40,32 +75,44 @@ class CreateTicket extends ActionController
         try {
             $accessData = TicketAccessData::fromRequest($_POST);
         } catch (\InvalidArgumentException $e) {
-            wp_die(esc_html($e->getMessage()));
+            throw $e;
         }
 
         $fileIds = isset($_POST['file_ids']) && is_array($_POST['file_ids'])
             ? array_map('intval', $_POST['file_ids'])
             : [];
 
-        $result = $ticketManager->createTicket($title, $subject, $content, $fileIds);
-        if (TicketServiceManager::isSuccessful($result) && isset($result['body'])) {
-            $ticket = json_decode($result['body'], true);
+        $existingTicketId = isset($_POST['existing_ticket_id'])
+            ? intval(wp_unslash($_POST['existing_ticket_id']))
+            : 0;
+        if ($existingTicketId > 0) {
+            if (empty($accessData)) {
+                throw new \RuntimeException('اطلاعات دسترسی برای ارسال مجدد کامل نیست.');
+            }
+            $ticketId = $existingTicketId;
+            $this->createdTicketId = $ticketId;
         } else {
-            wp_die('خطایی در ارسال تیکت رخ داده است. لطفا مجددا تلاش کنید.');
-        }
+            $result = $ticketManager->createTicket($title, $subject, $content, $fileIds);
+            if (TicketServiceManager::isSuccessful($result) && isset($result['body'])) {
+                $ticket = json_decode($result['body'], true);
+            } else {
+                throw new \RuntimeException('خطایی در ارسال تیکت رخ داده است. لطفا مجددا تلاش کنید.');
+            }
 
-        $ticketId = intval($ticket['data']['id'] ?? 0);
-        if ($ticketId <= 0) {
-            wp_die('پاسخ ایجاد تیکت معتبر نیست. لطفا مجددا تلاش کنید.');
+            $ticketId = intval($ticket['data']['id'] ?? 0);
+            if ($ticketId <= 0) {
+                throw new \RuntimeException('پاسخ ایجاد تیکت معتبر نیست. لطفا مجددا تلاش کنید.');
+            }
+            $this->createdTicketId = $ticketId;
         }
 
         if (!empty($accessData)) {
             $accessResult = $ticketManager->upsertTicketSiteAccess($ticketId, $accessData);
             if (!TicketServiceManager::isSuccessful($accessResult)) {
-                wp_die(esc_html(
+                throw new \RuntimeException(
                     'تیکت شماره ' . $ticketId . ' ثبت شد، اما اطلاعات دسترسی ذخیره نشد. '
                     . 'لطفا از صفحه تیکت دوباره اطلاعات دسترسی را ارسال کنید.'
-                ));
+                );
             }
         }
 

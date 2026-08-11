@@ -6,6 +6,7 @@ use SyncBasalam\Actions\Controller\ActionController;
 use SyncBasalam\Services\TicketServiceManager;
 use SyncBasalam\Utilities\TicketExtraInfoFormatter;
 use SyncBasalam\Utilities\TicketAccessData;
+use SyncBasalam\Utilities\TicketFlashNotice;
 
 defined('ABSPATH') || exit;
 
@@ -17,7 +18,21 @@ class CreateTicketItem extends ActionController
             wp_die('دسترسی غیرمجاز!');
         }
 
-        $this->processSubmission();
+        try {
+            $this->processSubmission();
+        } catch (\Throwable $e) {
+            $message = $e instanceof \InvalidArgumentException || $e instanceof \RuntimeException
+                ? $e->getMessage()
+                : 'خطای غیرمنتظره‌ای در ارسال پاسخ تیکت رخ داد. لطفا مجددا تلاش کنید.';
+            TicketFlashNotice::push($message, 'error');
+
+            $ticketId = isset($_POST['ticket_id']) ? intval(wp_unslash($_POST['ticket_id'])) : 0;
+            $redirectUrl = $ticketId > 0
+                ? admin_url('admin.php?page=sync_basalam_ticket&ticket_id=' . $ticketId)
+                : admin_url('admin.php?page=sync_basalam_tickets');
+            wp_safe_redirect($redirectUrl);
+            exit();
+        }
     }
 
     /** Run reply creation before the optional access replacement. */
@@ -29,19 +44,23 @@ class CreateTicketItem extends ActionController
         try {
             $accessData = TicketAccessData::fromRequest($_POST);
         } catch (\InvalidArgumentException $e) {
-            wp_die(esc_html($e->getMessage()));
+            throw $e;
         }
         if ($content === '' && !empty($accessData)) {
             $content = 'اطلاعات دسترسی به‌روزرسانی شد.';
         }
         $ticketId = isset($_POST['ticket_id']) ? intval(\wp_unslash($_POST['ticket_id'])) : 0;
 
-        if ($ticketId <= 0) return;
+        if ($ticketId <= 0) {
+            throw new \RuntimeException('شناسه تیکت معتبر نیست.');
+        }
 
         $ticketResponse = $ticketManager->fetchTicket($ticketId);
         $ticket = isset($ticketResponse['body']) ? json_decode($ticketResponse['body'], true) : null;
 
-        if (is_array($ticket) && TicketServiceManager::isTicketClosed($ticket)) return;
+        if (is_array($ticket) && TicketServiceManager::isTicketClosed($ticket)) {
+            throw new \RuntimeException('این تیکت بسته شده است و امکان ارسال پاسخ جدید وجود ندارد.');
+        }
 
         $fileIds = isset($_POST['file_ids']) && is_array($_POST['file_ids'])
             ? array_map('intval', $_POST['file_ids'])
@@ -49,16 +68,16 @@ class CreateTicketItem extends ActionController
 
         $itemResult = $ticketManager->createTicketItem($ticketId, $content, $fileIds);
         if (!TicketServiceManager::isSuccessful($itemResult)) {
-            wp_die('خطایی در ارسال پاسخ تیکت رخ داد. لطفا مجددا تلاش کنید.');
+            throw new \RuntimeException('خطایی در ارسال پاسخ تیکت رخ داد. لطفا مجددا تلاش کنید.');
         }
 
         if (!empty($accessData)) {
             $accessResult = $ticketManager->upsertTicketSiteAccess($ticketId, $accessData);
             if (!TicketServiceManager::isSuccessful($accessResult)) {
-                wp_die(esc_html(
+                throw new \RuntimeException(
                     'پاسخ تیکت ثبت شد، اما اطلاعات دسترسی ذخیره نشد. '
                     . 'لطفا دوباره اطلاعات دسترسی را ارسال کنید.'
-                ));
+                );
             }
         }
     }
