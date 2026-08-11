@@ -2,6 +2,23 @@
 
 <details>
 
+<summary>1.10.6 - 2026-08-11</summary>
+
+### Fixed
+- Product images in AVIF or another image format unsupported by Basalam are now converted to JPEG before the upload request, preventing the `422` unsupported-MIME error
+- Temporary downloaded and converted product-image files are removed after both successful and failed uploads; when the server cannot decode the source format, the plugin now returns an actionable error instead of sending an invalid MIME type to Basalam
+- A copied product no longer inherits *any* Woosalam data from the product it was copied from — not the Basalam connection, and not the per-product settings (video, custom price change, gold/mobile fields, product type and value, wholesale, discount flag). Every `sync_basalam_*` / `_sync_basalam_*` meta on the duplicate and its variations is stripped before WooCommerce saves the duplicate (`woocommerce_duplicate_product_exclude_meta`), cleaned again after duplication, and also cleaned for copies made by third-party duplicate plugins (`dp_duplicate_post`, `dp_duplicate_page`, `duplicate_post_post_copy`). Individual keys can be kept via the `sync_basalam_duplicate_purge_meta_keys` filter
+- Disconnecting a product now removes the connection meta of every vendor id (previously only the currently configured vendor's keys were removed, so a stale, hard to find key could stay in the database) and clears `sync_basalam_variation_id` from all variations, not only from products currently typed as variable
+- No product data, status change, or discount is sent to Basalam while two or more WooCommerce products share one Basalam product id. The operation is stopped with a clear message instead of overwriting the wrong Basalam product (this is what made old prices and old stock reappear on Basalam)
+- Products with an empty Basalam product id no longer produce a malformed update request
+
+### Added
+- A one-time repair on update that finds WooCommerce products sharing a Basalam product id, keeps the connection on the oldest (original) product, disconnects the copies, and reports the result in an admin notice and the plugin log
+
+</details>
+
+<details>
+
 <summary>1.10.5 - 2026-08-05</summary>
 
 ### Changed / Improved

@@ -6,7 +6,7 @@ defined('ABSPATH') || exit;
 
 class FileUploader
 {
-    private const PHOTO_EXTENSIONS = ['jpg', 'png', 'webp', 'bmp', 'jfif', 'jpeg', 'avif'];
+    private const PHOTO_EXTENSIONS = ['jpg', 'png', 'webp', 'gif', 'bmp', 'jfif', 'jpeg', 'avif'];
     private const PHOTO_MAX_SIZE = 5 * 1024 * 1024;
 
     private const VIDEO_EXTENSIONS = ['mp4', 'mov', '3gp', 'm4v', 'mkv', 'flv', 'mpg', 'webm', 'mpeg', 'ts', 'avi', 'qt', 'm4a'];
@@ -42,14 +42,26 @@ class FileUploader
 
         $pathToUpload = $preparedFile['path'];
         $tmpFile = $preparedFile['tmpFile'] ?? null;
+        $normalizedFile = null;
 
         try {
             if (!$this->checkFileSize($pathToUpload, $config['max_size'])) {
                 throw new \RuntimeException('حجم فایل ' . esc_html($config['error_label']) . ' بیش از حد مجاز است.');
             }
 
+            if ($config['file_type'] === 'product.photo') {
+                $normalizedFile = (new ImageFormatNormalizer())->normalize($pathToUpload, $config['max_size']);
+                if ($normalizedFile !== null) $pathToUpload = $normalizedFile;
+            }
+
+            if (!$this->checkFileSize($pathToUpload, $config['max_size'])) {
+                throw new \RuntimeException('حجم فایل ' . esc_html($config['error_label']) . ' بیش از حد مجاز است.');
+            }
+
             $options = [
-                'allowed_extensions' => $config['allowed_extensions'],
+                'allowed_extensions' => $config['file_type'] === 'product.photo'
+                    ? ImageFormatNormalizer::SUPPORTED_EXTENSIONS
+                    : $config['allowed_extensions'],
                 'max_size' => $config['max_size'],
                 'timeout' => $config['file_type'] === 'product.video' ? 600 : 120,
             ];
@@ -62,6 +74,7 @@ class FileUploader
 
             return $mediaUploader->uploadPhoto($pathToUpload, $options);
         } finally {
+            if ($normalizedFile && file_exists($normalizedFile)) unlink($normalizedFile);
             if (!empty($preparedFile['isTemp']) && $tmpFile && file_exists($tmpFile)) unlink($tmpFile);
         }
     }

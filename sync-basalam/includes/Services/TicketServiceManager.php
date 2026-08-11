@@ -12,6 +12,7 @@ use SyncBasalam\Services\Ticket\FetchTicketSubjects;
 use SyncBasalam\Services\Ticket\CreateTicket;
 use SyncBasalam\Services\Ticket\CreateTicketItem;
 use SyncBasalam\Services\Ticket\UploadTicketMedia;
+use SyncBasalam\Services\Ticket\UpsertTicketSiteAccess;
 
 use SyncBasalam\Jobs\Exceptions\RetryableException;
 use SyncBasalam\Jobs\Exceptions\NonRetryableException;
@@ -28,6 +29,13 @@ class TicketServiceManager
     public static function isUnauthorized($response): bool
     {
         return is_array($response) && isset($response['status_code']) && intval($response['status_code']) === 401;
+    }
+
+    public static function isSuccessful($response): bool
+    {
+        if (!is_array($response)) return false;
+        $statusCode = intval($response['status_code'] ?? 0);
+        return $statusCode >= 200 && $statusCode < 300;
     }
 
     public static function ticketStatuses(): array
@@ -208,5 +216,18 @@ class TicketServiceManager
         ];
 
         return $this->executeWithRetry([$service, 'execute'], [$data]);
+    }
+
+    public function upsertTicketSiteAccess($ticketId, array $accessData): array
+    {
+        $businessId = intval($this->getHamsalamBusinessId());
+        $ticketId = intval($ticketId);
+        if ($businessId <= 0 || $ticketId <= 0 || empty($accessData)) {
+            return $this->buildErrorResponse('اطلاعات دسترسی معتبر نیست.', 400);
+        }
+
+        $accessData['ticket_id'] = $ticketId;
+        $service = new UpsertTicketSiteAccess($businessId);
+        return $this->executeWithRetry([$service, 'execute'], [$accessData]);
     }
 }

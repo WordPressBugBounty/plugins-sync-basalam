@@ -16,11 +16,13 @@ use SyncBasalam\Admin\Order\OrderColumn;
 use SyncBasalam\Admin\Order\OrderMetaBox;
 use SyncBasalam\Admin\Components\OrderPageComponents;
 use SyncBasalam\Admin\Order\OrderStatuses;
-use SyncBasalam\Admin\Product\ProductOperations;
 use SyncBasalam\Admin\Product\Operations\ConnectProduct;
 use SyncBasalam\Admin\Announcement\AnnouncementCenter;
 use SyncBasalam\Admin\Onboarding\PointerTour;
+use SyncBasalam\Services\Products\DuplicateConnectionReport;
+use SyncBasalam\Services\Products\ProductConnection;
 use SyncBasalam\Services\SystemResourceMonitor;
+use SyncBasalam\Utilities\ProductMetaKey;
 use SyncBasalam\Utilities\ChatWidget;
 use SyncBasalam\Admin\FinancialManagement\Menu as FinancialManagementMenu;
 use SyncBasalam\Admin\FinancialManagement\BalanceSettlement;
@@ -108,9 +110,35 @@ class AdminRegistrar implements RegistrarInterface
         \add_action('admin_action_sync_basalam_bulk_edit', [$bulkEdit, 'save']);
 
         // Product Duplicate
+        // نسخه کپی یک محصول تازه است و نباید هیچ داده ووسلامی از محصول اصلی به ارث ببرد؛
+        // مخصوصا شناسه اتصال، وگرنه بروزرسانی نسخه کپی، محصول اصلی را در باسلام تغییر می‌دهد.
+        \add_filter("woocommerce_duplicate_product_exclude_meta", [self::class, "excludePluginMetaFromDuplicate"], 10, 2);
+
         \add_action("woocommerce_product_duplicate", function ($newProduct) {
-            ProductOperations::disconnectProduct($newProduct->get_id());
+            if (!is_object($newProduct) || !method_exists($newProduct, "get_id")) return;
+
+            ProductConnection::purgeAll($newProduct->get_id());
         }, 10, 1);
+
+        // Product Duplicate (third party plugins, e.g. Yoast Duplicate Post)
+        foreach (["dp_duplicate_post", "dp_duplicate_page", "duplicate_post_post_copy"] as $duplicateHook) {
+            \add_action($duplicateHook, function ($newPostId, $sourcePost = null) {
+                if (!is_scalar($newPostId) || \get_post_type((int) $newPostId) !== "product") return;
+
+                // اگر هوک، پست مبدا را هم بدهد مطمئنیم شناسه اول نسخه کپی است.
+                if (is_object($sourcePost) && !empty($sourcePost->ID) && (int) $sourcePost->ID !== (int) $newPostId) {
+                    ProductConnection::purgeAll((int) $newPostId);
+
+                    return;
+                }
+
+                // در غیر این صورت محافظه‌کارانه عمل می‌کنیم تا داده محصول اصلی پاک نشود.
+                ProductConnection::purgeIfCopy((int) $newPostId);
+            }, 10, 2);
+        }
+
+        // Duplicate connection report (admin notice + dismiss handler)
+        DuplicateConnectionReport::registerHooks();
 
         // Order Check Buttons (HPOS)
         \add_action("woocommerce_order_list_table_extra_tablenav", [OrderPageComponents::class, "renderCheckOrdersButton"], 20, 1);
@@ -138,6 +166,31 @@ class AdminRegistrar implements RegistrarInterface
         });
     }
 
+
+    /**
+     * حذف همه متاهای ووسلام از نسخه کپی، پیش از ذخیره شدن آن توسط ووکامرس.
+     * ووکامرس همین فهرست را روی تنوع‌های کپی شده هم اعمال می‌کند.
+     *
+     * @param array $excludedMeta کلیدهایی که تا اینجا برای حذف انتخاب شده‌اند.
+     * @param array $productMetaKeys کلیدهای متای محصول اصلی.
+     */
+    public static function excludePluginMetaFromDuplicate($excludedMeta, $productMetaKeys = [])
+    {
+        $excludedMeta = is_array($excludedMeta) ? $excludedMeta : [];
+
+        foreach ((array) $productMetaKeys as $metaKey) {
+            if (ProductConnection::isPluginMetaKey($metaKey)) $excludedMeta[] = $metaKey;
+        }
+
+        // کلیدهای تنوع‌ها در فهرست متای محصول والد نیستند و باید دستی اضافه شوند.
+        $excludedMeta = array_merge(
+            $excludedMeta,
+            ProductMetaKey::basalamProductMetaKeys(),
+            [ProductMetaKey::basalamVariationId(), ProductMetaKey::DISCOUNTED]
+        );
+
+        return array_values(array_unique($excludedMeta));
+    }
 
     public static function assetsUrl($path = null)
     {

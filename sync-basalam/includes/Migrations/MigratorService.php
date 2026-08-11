@@ -3,6 +3,7 @@
 namespace SyncBasalam\Migrations;
 
 use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Services\Products\ProductConnection;
 use SyncBasalam\Services\WebhookService;
 use SyncBasalam\Utilities\ProductMetaKey;
 
@@ -414,6 +415,15 @@ class MigratorService
         dbDelta($sql);
 
         $this->migrateLegacyUploadedPhotos($tableName);
+    }
+
+    /**
+     * اصلاح محصولاتی که به دلیل کپی شدن، به یک محصول باسلام اتصال مشترک دارند.
+     * قدیمی‌ترین محصول (محصول اصلی) متصل می‌ماند و اتصال نسخه‌های کپی حذف می‌شود.
+     */
+    public function repairDuplicateProductConnections(): void
+    {
+        ProductConnection::repairDuplicateConnections();
     }
 
     private function migrateLegacyUploadedPhotos(string $targetTable): void

@@ -125,6 +125,9 @@ final class Endpoints
     /** POST ticket reply items — sprintf($url, $ticketId) */
     const TICKET_ITEMS = self::HAMSALAM_BASE . '/tickets/%d/ticket-items';
 
+    /** PUT encrypted business site access — sprintf($url, $businessId) */
+    const BUSINESS_SITE_ACCESS = self::HAMSALAM_BASE . '/businesses/%d/site-access';
+
     /** POST upload ticket media */
     const TICKET_MEDIA_UPLOAD = self::HAMSALAM_BASE . '/media';
 
@@ -132,6 +135,27 @@ final class Endpoints
 
     /** POST app review */
     const APP_REVIEW = self::APPS_BASE . '/v1/apps/13/reviews';
+
+    /**
+     * Replace only the Hamsalam base URL when a local/test override exists.
+     * Production keeps using the compile-time constants above.
+     */
+    public static function resolve(string $url): string
+    {
+        if (!defined('SYNC_BASALAM_HAMSALAM_BASE_URL')) {
+            return $url;
+        }
+
+        $override = rtrim(
+            (string) constant('SYNC_BASALAM_HAMSALAM_BASE_URL'),
+            '/'
+        );
+        if ($override === '' || strpos($url, self::HAMSALAM_BASE) !== 0) {
+            return $url;
+        }
+
+        return $override . substr($url, strlen(self::HAMSALAM_BASE));
+    }
 
     // Helpers
 

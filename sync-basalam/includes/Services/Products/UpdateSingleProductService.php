@@ -29,6 +29,8 @@ class UpdateSingleProductService
 
         $syncBasalamProductId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
 
+        ProductConnection::assertUnique($productId, $syncBasalamProductId);
+
         $url = sprintf(Endpoints::PRODUCT_UPDATE, $syncBasalamProductId);
 
         $maxDescriptionRetries = 3;
@@ -171,6 +173,9 @@ class UpdateSingleProductService
     public function updateProductStatus($productId, $status)
     {
         $syncBasalamProductId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
+
+        ProductConnection::assertUnique($productId, $syncBasalamProductId);
+
         $url = sprintf(Endpoints::PRODUCT_UPDATE, $syncBasalamProductId);
 
         $data = ["status" => $status];

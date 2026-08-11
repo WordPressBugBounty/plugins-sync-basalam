@@ -69,7 +69,7 @@ $TicketSubjects = isset($fetchTicketSubjects['body']) ? json_decode($fetchTicket
                                     </div>
                                     <div class="create-ticket__control">
                                         <label for="dashboard-password" class="create-ticket__label basalam-p">رمز عبور پیشخوان</label>
-                                        <input type="text" name="dashboard_password" id="dashboard-password" class="basalam-input create-ticket__input">
+                                        <input type="password" name="dashboard_password" id="dashboard-password" class="basalam-input create-ticket__input" autocomplete="new-password" spellcheck="false">
                                     </div>
                                 </div>
 
@@ -85,7 +85,7 @@ $TicketSubjects = isset($fetchTicketSubjects['body']) ? json_decode($fetchTicket
                                     </div>
                                     <div class="create-ticket__control">
                                         <label for="host-panel-password" class="create-ticket__label basalam-p">رمز عبور کنترل پنل هاست</label>
-                                        <input type="text" name="host_panel_password" id="host-panel-password" class="basalam-input create-ticket__input">
+                                        <input type="password" name="host_panel_password" id="host-panel-password" class="basalam-input create-ticket__input" autocomplete="new-password" spellcheck="false">
                                     </div>
                                 </div>
                             </div>

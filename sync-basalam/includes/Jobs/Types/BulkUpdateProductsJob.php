@@ -10,6 +10,7 @@ use SyncBasalam\Admin\ProductService;
 use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Admin\Product\Data\ProductDataBuilder;
+use SyncBasalam\Services\Products\ProductConnection;
 use SyncBasalam\Logger\Logger;
 
 defined('ABSPATH') || exit;
@@ -78,7 +79,15 @@ class BulkUpdateProductsJob extends AbstractJobType
             $builder = new ProductDataBuilder(null, $this->factory);
             $productsData = [];
 
+            $conflicts = ProductConnection::conflictMap($productIds);
+
             foreach ($productIds as $productId) {
+                // محصولی که اتصالش با محصول دیگری مشترک است نباید در باسلام بروزرسانی شود.
+                if (isset($conflicts[$productId])) {
+                    ProductConnection::reportConflict((int) $productId, $conflicts[$productId]);
+                    continue;
+                }
+
                 try {
                     $productData = $builder->reset()
                         ->setStrategy($this->factory->createStrategy('quick_update'))

@@ -4,6 +4,7 @@ namespace SyncBasalam\Services\Products\Discount;
 
 use SyncBasalam\JobManager;
 use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Services\Products\ProductConnection;
 use SyncBasalam\Utilities\ProductMetaKey;
 
 defined('ABSPATH') || exit;
@@ -181,6 +182,9 @@ class DiscountTaskProcessor
         $product = wc_get_product($productId);
 
         if (!$product) return;
+
+        // اتصال مشترک با محصول دیگر یعنی تخفیف روی محصول اشتباهی در باسلام اعمال می‌شود.
+        if (ProductConnection::hasConflict($productId)) return;
 
         $items = [];
 

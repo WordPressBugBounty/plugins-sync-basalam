@@ -4,6 +4,7 @@ namespace SyncBasalam\Services\Api;
 
 use SyncBasalam\Logger\Logger;
 use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Jobs\Exceptions\RetryableException;
 
 defined('ABSPATH') || exit;
@@ -36,6 +37,7 @@ abstract class AbstractApiService
 
     public function run(string $url, $data, array $headers = []): array
     {
+        $url = Endpoints::resolve($url);
         $validationResult = $this->validator->validate($url, $data, $headers);
 
         if (!$validationResult['valid']) {

@@ -12,6 +12,8 @@ class ProductMetaKey
     public const PRODUCT_SYNC_STATUS = 'sync_basalam_product_sync_status';
     public const PRODUCT_STATUS = 'sync_basalam_product_status';
     public const PRODUCT_VIDEO = '_sync_basalam_product_video';
+    public const VARIATION_ID = 'sync_basalam_variation_id';
+    public const DISCOUNTED = 'sync_basalam_discounted';
 
     public static function basalamProductVideo(): string
     {
@@ -33,12 +35,29 @@ class ProductMetaKey
         return self::build(self::PRODUCT_STATUS, $vendorId);
     }
 
+    public static function basalamVariationId(): string
+    {
+        return self::VARIATION_ID;
+    }
+
     public static function basalamProductMetaKeys($vendorId = null): array
     {
         return [
             self::basalamProductId($vendorId),
             self::basalamProductSyncStatus($vendorId),
             self::basalamProductStatus($vendorId),
+        ];
+    }
+
+    /**
+     * پیشوند کلیدهای اتصال؛ برای پیدا کردن کلیدهای همه غرفه‌ها (کلیدهای دارای پسوند شناسه غرفه).
+     */
+    public static function basalamProductMetaKeyPrefixes(): array
+    {
+        return [
+            self::PRODUCT_ID,
+            self::PRODUCT_SYNC_STATUS,
+            self::PRODUCT_STATUS,
         ];
     }
 

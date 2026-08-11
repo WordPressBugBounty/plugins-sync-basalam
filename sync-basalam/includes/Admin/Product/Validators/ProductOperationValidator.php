@@ -3,6 +3,7 @@
 namespace SyncBasalam\Admin\Product\Validators;
 
 use SyncBasalam\Logger\Logger;
+use SyncBasalam\Services\Products\ProductConnection;
 use SyncBasalam\Utilities\ProductMetaKey;
 
 defined('ABSPATH') || exit;
@@ -38,6 +39,15 @@ class ProductOperationValidator
             return [
                 'valid' => false,
                 'message' => sprintf('محصول %d به باسلام متصل نیست.', $product_id)
+            ];
+        }
+
+        $conflictingIds = ProductConnection::conflictingProductIds($product_id);
+
+        if ($conflictingIds) {
+            return [
+                'valid' => false,
+                'message' => ProductConnection::conflictMessage($basalamProductId, $conflictingIds)
             ];
         }
 

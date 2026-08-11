@@ -5,6 +5,7 @@ namespace SyncBasalam\Actions\Controller\TicketActions;
 use SyncBasalam\Actions\Controller\ActionController;
 use SyncBasalam\Services\TicketServiceManager;
 use SyncBasalam\Utilities\TicketExtraInfoFormatter;
+use SyncBasalam\Utilities\TicketAccessData;
 
 defined('ABSPATH') || exit;
 
@@ -12,10 +13,27 @@ class CreateTicketItem extends ActionController
 {
     public function __invoke()
     {
-        $ticketManager = new TicketServiceManager();
+        if (!current_user_can('manage_options')) {
+            wp_die('دسترسی غیرمجاز!');
+        }
+
+        $this->processSubmission();
+    }
+
+    /** Run reply creation before the optional access replacement. */
+    public function processSubmission(?TicketServiceManager $ticketManager = null): void
+    {
+        $ticketManager = $ticketManager ?: new TicketServiceManager();
 
         $content  = isset($_POST['content']) ? TicketExtraInfoFormatter::sanitizeContent($_POST['content']) : '';
-        $content  = TicketExtraInfoFormatter::appendFromRequest($content, $_POST);
+        try {
+            $accessData = TicketAccessData::fromRequest($_POST);
+        } catch (\InvalidArgumentException $e) {
+            wp_die(esc_html($e->getMessage()));
+        }
+        if ($content === '' && !empty($accessData)) {
+            $content = 'اطلاعات دسترسی به‌روزرسانی شد.';
+        }
         $ticketId = isset($_POST['ticket_id']) ? intval(\wp_unslash($_POST['ticket_id'])) : 0;
 
         if ($ticketId <= 0) return;
@@ -29,6 +47,19 @@ class CreateTicketItem extends ActionController
             ? array_map('intval', $_POST['file_ids'])
             : [];
 
-        $ticketManager->createTicketItem($ticketId, $content, $fileIds);
+        $itemResult = $ticketManager->createTicketItem($ticketId, $content, $fileIds);
+        if (!TicketServiceManager::isSuccessful($itemResult)) {
+            wp_die('خطایی در ارسال پاسخ تیکت رخ داد. لطفا مجددا تلاش کنید.');
+        }
+
+        if (!empty($accessData)) {
+            $accessResult = $ticketManager->upsertTicketSiteAccess($ticketId, $accessData);
+            if (!TicketServiceManager::isSuccessful($accessResult)) {
+                wp_die(esc_html(
+                    'پاسخ تیکت ثبت شد، اما اطلاعات دسترسی ذخیره نشد. '
+                    . 'لطفا دوباره اطلاعات دسترسی را ارسال کنید.'
+                ));
+            }
+        }
     }
 }

@@ -8,7 +8,7 @@ use SyncBasalam\Admin\Product\Operations\ArchiveProduct;
 use SyncBasalam\Admin\Product\Operations\RestoreProduct;
 use SyncBasalam\Jobs\Exceptions\RetryableException;
 use SyncBasalam\Jobs\Exceptions\NonRetryableException;
-use SyncBasalam\Utilities\ProductMetaKey;
+use SyncBasalam\Services\Products\ProductConnection;
 
 defined('ABSPATH') || exit;
 
@@ -88,20 +88,7 @@ class ProductOperations
     {
         do_action('sync_basalam_before_disconnect_product', $product_id);
 
-        $metaKeysToRemove = ProductMetaKey::basalamProductMetaKeys();
-
-        foreach ($metaKeysToRemove as $metaKey) {
-            delete_post_meta($product_id, $metaKey);
-        }
-
-        $product = wc_get_product($product_id);
-
-        if ($product && $product->is_type('variable')) {
-            $variationIds = $product->get_children();
-            foreach ($variationIds as $variationId) {
-                delete_post_meta($variationId, 'sync_basalam_variation_id');
-            }
-        }
+        ProductConnection::purge($product_id);
 
         $result = [
             'success'     => true,

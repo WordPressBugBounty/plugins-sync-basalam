@@ -53,6 +53,7 @@ class MetaBox
 
         $basalamProductStatus = get_post_meta($productId, ProductMetaKey::basalamProductStatus(), true);
         $basalamProductSyncStatus = get_post_meta($productId, ProductMetaKey::basalamProductSyncStatus(), true);
+        $syncBasalamProductId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
 
         $settings = syncBasalamSettings();
         $BasalamAccessToken = $settings->getSettings(SettingsConfig::TOKEN);
@@ -64,8 +65,8 @@ class MetaBox
             } elseif (!$BasalamAccessToken || !$syncBasalamVendorId) {
                 echo '<p class="basalam-p basalam-font-12">دسترسی های لازم دریافت نشده است ، ابتدا دسترسی ها را <a href="/wp-admin/admin.php?page=sync_basalam" target="_blank">دریافت</a> نمایید.</p>';
             } else {
-                if ($basalamProductStatus) {
-                    $syncBasalamProductId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
+                // بدون شناسه محصول باسلام، محصول متصل نیست؛ حتی اگر وضعیت‌های قدیمی روی محصول مانده باشد.
+                if ($basalamProductStatus && $syncBasalamProductId) {
                     CommonComponents::renderBtn('بروزسانی محصول در باسلام', 'update_product_in_basalam', $post->ID, 'update_product_in_basalam_nonce', true);
                     if ($basalamProductStatus == 2976) {
                         CommonComponents::renderBtn('آرشیو کردن محصول در باسلام', 'archive_exist_product_on_basalam', $post->ID, 'archive_exist_product_on_basalam_nonce', true);
