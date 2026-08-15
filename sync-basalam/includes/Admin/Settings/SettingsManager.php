@@ -46,6 +46,20 @@ class SettingsManager
         return $input;
     }
 
+    public static function isProductUpdateSelectionValid(?array $settings = null): bool
+    {
+        $settings = array_merge(self::getSettings() ?: [], $settings ?: []);
+
+        if (($settings[SettingsConfig::SYNC_PRODUCT_FIELDS] ?? 'all') !== 'custom') return true;
+
+        foreach (SettingsConfig::CUSTOM_PRODUCT_UPDATE_FIELDS as $field) {
+            $value = $settings[$field] ?? null;
+            if ($value === true || $value === 1 || $value === '1') return true;
+        }
+
+        return false;
+    }
+
     public static function getEffectiveTasksPerMinute()
     {
         $isAuto = self::getSettings(SettingsConfig::TASKS_PER_MINUTE_AUTO) == 'true';

@@ -392,6 +392,27 @@ class MigratorService
         update_option('sync_basalam_settings', $settings);
     }
 
+    /**
+     * Variant price/stock used to follow the product price/stock checkboxes of the custom sync mode.
+     * Copy the old values so variable products keep syncing after the new checkboxes are introduced.
+     */
+    public function backfillVariantSyncFields()
+    {
+        $settings = get_option('sync_basalam_settings', []);
+        if (!is_array($settings)) return;
+
+        // The new keys may already have been filled with their "0" default by a settings read.
+        if (empty($settings[SettingsConfig::SYNC_PRODUCT_FIELD_VARIANT_PRICE])) {
+            $settings[SettingsConfig::SYNC_PRODUCT_FIELD_VARIANT_PRICE] = $settings[SettingsConfig::SYNC_PRODUCT_FIELD_PRICE] ?? 0;
+        }
+
+        if (empty($settings[SettingsConfig::SYNC_PRODUCT_FIELD_VARIANT_STOCK])) {
+            $settings[SettingsConfig::SYNC_PRODUCT_FIELD_VARIANT_STOCK] = $settings[SettingsConfig::SYNC_PRODUCT_FIELD_STOCK] ?? 0;
+        }
+
+        update_option('sync_basalam_settings', $settings);
+    }
+
     public function createUploadedMediaTable()
     {
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');

@@ -25,6 +25,7 @@ use SyncBasalam\Services\SystemResourceMonitor;
 use SyncBasalam\Utilities\ProductMetaKey;
 use SyncBasalam\Utilities\ChatWidget;
 use SyncBasalam\Utilities\TicketFlashNotice;
+use SyncBasalam\Admin\Settings\SettingsPageHandler;
 use SyncBasalam\Admin\FinancialManagement\Menu as FinancialManagementMenu;
 use SyncBasalam\Admin\FinancialManagement\BalanceSettlement;
 use SyncBasalam\Admin\FinancialManagement\FinancialManagementHistory;
@@ -273,6 +274,18 @@ class AdminRegistrar implements RegistrarInterface
                 'after'
             );
         }
+
+        $settingsValidationError = SettingsPageHandler::pullValidationError();
+        if ($settingsValidationError !== '') {
+            wp_add_inline_script(
+                "basalam-admin-toast-script",
+                sprintf(
+                    'window.addEventListener("DOMContentLoaded",function(){if(window.BasalamToast){window.BasalamToast.error(%s);}});',
+                    wp_json_encode($settingsValidationError, JSON_UNESCAPED_UNICODE)
+                ),
+                'after'
+            );
+        }
         wp_enqueue_script(
             "basalam-admin-logs-script",
             self::assetsUrl("js/logs.js"),
@@ -329,11 +342,15 @@ class AdminRegistrar implements RegistrarInterface
             $version,
             true
         );
+        $adminScriptPath = syncBasalamPlugin()->pluginPath() . '/assets/js/admin.js';
+        $adminScriptVersion = file_exists($adminScriptPath)
+            ? $version . '-' . filemtime($adminScriptPath)
+            : $version;
         wp_enqueue_script(
             "basalam-admin-script",
             self::assetsUrl("js/admin.js"),
             $shouldLoadPointerTour ? ["jquery", "wp-pointer", "basalam-admin-toast-script"] : ["jquery", "basalam-admin-toast-script"],
-            $version,
+            $adminScriptVersion,
             true
         );
         wp_enqueue_script(

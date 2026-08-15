@@ -14,6 +14,7 @@ use SyncBasalam\Migrations\Versions\Migration_1_8_1;
 use SyncBasalam\Migrations\Versions\Migration_1_8_5;
 use SyncBasalam\Migrations\Versions\Migration_1_8_7;
 use SyncBasalam\Migrations\Versions\Migration_1_10_6;
+use SyncBasalam\Migrations\Versions\Migration_1_10_8;
 
 defined('ABSPATH') || exit;
 
@@ -36,6 +37,7 @@ class MigrationManager
             '1.8.5' => new Migration_1_8_5(),
             '1.8.7' => new Migration_1_8_7(),
             '1.10.6' => new Migration_1_10_6(),
+            '1.10.8' => new Migration_1_10_8(),
         ];
     }
 

@@ -8,6 +8,9 @@ use SyncBasalam\Admin\Product\Data\Validators\ProductExistenceValidator;
 use SyncBasalam\Admin\Product\Data\Validators\ProductStatusValidator;
 use SyncBasalam\Admin\Product\Data\Validators\WeightValidator;
 use SyncBasalam\Admin\Product\ProductDataFactory;
+use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Admin\Settings\SettingsManager;
+use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 use SyncBasalam\Utilities\ProductMetaKey;
 
 defined('ABSPATH') || exit;
@@ -43,7 +46,12 @@ class ProductDataFacade
         $basalamProductId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
         $isUpdate = !empty($basalamProductId);
 
-        $syncFields = syncBasalamSettings()->getSettings(\SyncBasalam\Admin\Settings\SettingsConfig::SYNC_PRODUCT_FIELDS);
+        $settings = SettingsManager::getSettings();
+        $syncFields = $settings[SettingsConfig::SYNC_PRODUCT_FIELDS] ?? 'all';
+
+        if ($isUpdate && !SettingsManager::isProductUpdateSelectionValid($settings)) {
+            throw NonRetryableException::invalidData(SettingsConfig::CUSTOM_PRODUCT_UPDATE_REQUIRED_MESSAGE);
+        }
 
         $strategy = 'create';
         if ($isUpdate) {

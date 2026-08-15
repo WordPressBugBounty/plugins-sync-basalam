@@ -5,7 +5,6 @@ use SyncBasalam\Admin\Components\SettingPageComponents;
 use SyncBasalam\Admin\Components\CommonComponents;
 
 defined('ABSPATH') || exit;
-
 ?>
 <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post">
     <input type="hidden" name="action" value="basalam_update_setting">

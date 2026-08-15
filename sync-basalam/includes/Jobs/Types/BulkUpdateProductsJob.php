@@ -9,6 +9,7 @@ use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 use SyncBasalam\Admin\ProductService;
 use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Admin\Settings\SettingsManager;
 use SyncBasalam\Admin\Product\Data\ProductDataBuilder;
 use SyncBasalam\Services\Products\ProductConnection;
 use SyncBasalam\Logger\Logger;
@@ -55,6 +56,10 @@ class BulkUpdateProductsJob extends AbstractJobType
 
     public function execute(array $payload): JobResult
     {
+        if (!SettingsManager::isProductUpdateSelectionValid()) {
+            throw NonRetryableException::invalidData(SettingsConfig::CUSTOM_PRODUCT_UPDATE_REQUIRED_MESSAGE);
+        }
+
         $lastId = $payload['last_updatable_product_id'] ?? 0;
 
         Logger::alert('شروع بروزرسانی دسته‌ای محصولات از آیدی: ' . $lastId);

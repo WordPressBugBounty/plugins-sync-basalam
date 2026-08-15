@@ -4,6 +4,7 @@ namespace SyncBasalam\Admin\Product\Data\Strategies;
 
 use SyncBasalam\Admin\Product\Data\Handlers\ProductDataHandlerInterface;
 use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Services\Products\UpdateProductVariationsService;
 use SyncBasalam\Utilities\ProductMetaKey;
 
 defined('ABSPATH') || exit;
@@ -46,17 +47,16 @@ class CustomUpdateProductStrategy implements DataStrategyInterface
                 $data['primary_price'] = $handler->getPrice($product);
             }
         }
-        if (!array_key_exists('variants', $data) && $this->shouldSyncField(SettingsConfig::SYNC_PRODUCT_FIELD_PRICE)) {
-            $data['variants'] = $handler->getVariants($product);
-        }
 
         if (!array_key_exists('stock', $data) && $this->shouldSyncField(SettingsConfig::SYNC_PRODUCT_FIELD_STOCK)) {
             if (!$product->is_type('variable')) {
                 $data['stock'] = $handler->getStock($product);
             }
         }
-        if (!array_key_exists('variants', $data) && $this->shouldSyncField(SettingsConfig::SYNC_PRODUCT_FIELD_STOCK)) {
-            $data['variants'] = $handler->getVariants($product);
+
+        if (!array_key_exists('variants', $data) && $product->is_type('variable')) {
+            $variants = $this->collectVariants($product, $handler);
+            if (!empty($variants)) $data['variants'] = $variants;
         }
 
         if (!array_key_exists('weight', $data) && $this->shouldSyncField(SettingsConfig::SYNC_PRODUCT_FIELD_WEIGHT)) {
@@ -74,11 +74,33 @@ class CustomUpdateProductStrategy implements DataStrategyInterface
             $data['product_attribute'] = $handler->getAttributes($product);
         }
 
-        if (!array_key_exists('variants', $data)) {
-            $data['variants'] = [];
-        }
-
         return array_filter($data, fn($value) => $value !== null);
+    }
+
+    private function collectVariants($product, ProductDataHandlerInterface $handler): array
+    {
+        $variants = $handler->getVariants($product);
+        if (empty($variants)) return [];
+
+        // When at least one variation is not connected to Basalam yet, the product is updated with a
+        // single request and the variants section must be complete (properties, price and stock) so
+        // Basalam can match the variations and their ids can be stored.
+        if (!UpdateProductVariationsService::allVariantsHaveBasalamId($variants)) return $variants;
+
+        $syncPrice = $this->shouldSyncField(SettingsConfig::SYNC_PRODUCT_FIELD_VARIANT_PRICE);
+        $syncStock = $this->shouldSyncField(SettingsConfig::SYNC_PRODUCT_FIELD_VARIANT_STOCK);
+
+        if (!$syncPrice && !$syncStock) return [];
+
+        // Connected variations are patched one by one, so only the ticked fields are sent.
+        return array_map(function ($variant) use ($syncPrice, $syncStock) {
+            $selected = ['id' => $variant['id']];
+
+            if ($syncPrice && array_key_exists('primary_price', $variant)) $selected['primary_price'] = $variant['primary_price'];
+            if ($syncStock && array_key_exists('stock', $variant)) $selected['stock'] = $variant['stock'];
+
+            return $selected;
+        }, $variants);
     }
 
     private function shouldSyncField(string $fieldKey): bool

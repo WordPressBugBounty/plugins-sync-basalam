@@ -13,10 +13,12 @@ defined('ABSPATH') || exit;
 class UpdateSingleProductService
 {
     private $apiservice;
+    private $variationsService;
 
     public function __construct()
     {
         $this->apiservice = syncBasalamContainer()->get(ApiServiceManager::class);
+        $this->variationsService = syncBasalamContainer()->get(UpdateProductVariationsService::class);
     }
 
     public function updateProductInBasalam($productData, $productId)
@@ -28,9 +30,19 @@ class UpdateSingleProductService
         do_action('sync_basalam_before_update_product_api', $productId, $productData);
 
         $syncBasalamProductId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
-
         ProductConnection::assertUnique($productId, $syncBasalamProductId);
 
+        // Variable products whose variations are all connected to Basalam are updated with one
+        // request per variation, so price and stock must not be part of the product payload.
+        if ($this->shouldUpdateVariationsSeparately($productId, $productData)) {
+            $this->variationsService->updateVariations($syncBasalamProductId, $productData['variants'], $productId);
+
+            unset($productData['variants'], $productData['primary_price'], $productData['stock']);
+
+            if (!$this->hasProductFieldsToUpdate($productData)) {
+                return $this->finishUpdate($productId, [], 'متغیرهای محصول با موفقیت بروزرسانی شدند.');
+            }
+        }
         $url = sprintf(Endpoints::PRODUCT_UPDATE, $syncBasalamProductId);
 
         $maxDescriptionRetries = 3;
@@ -142,17 +154,39 @@ class UpdateSingleProductService
             }
         }
 
+        return $this->finishUpdate($productId, $body, 'فرایند بروزرسانی محصول با موفقیت انجام شد.');
+    }
+
+    private function finishUpdate($productId, $body, string $message): array
+    {
         update_post_meta($productId, ProductMetaKey::basalamProductSyncStatus(), 'synced');
 
         $result = [
             'success'     => true,
-            'message'     => 'فرایند بروزرسانی محصول با موفقیت انجام شد.',
+            'message'     => $message,
             'status_code' => 200,
         ];
 
         do_action('sync_basalam_after_update_product_api', $productId, $body, $result);
 
         return $result;
+    }
+
+    private function shouldUpdateVariationsSeparately($productId, array $productData): bool
+    {
+        if (empty($productData['variants']) || !is_array($productData['variants'])) return false;
+
+        $product = \wc_get_product($productId);
+        if (!$product || !$product->is_type('variable')) return false;
+
+        return UpdateProductVariationsService::allVariantsHaveBasalamId($productData['variants']);
+    }
+
+    private function hasProductFieldsToUpdate(array $productData): bool
+    {
+        $identifiers = ['id' => true, 'type' => true];
+
+        return !empty(array_diff_key($productData, $identifiers));
     }
 
     private function stripForbiddenDescription(NonRetryableException $e, array &$productData, int $productId, int $attempt): bool

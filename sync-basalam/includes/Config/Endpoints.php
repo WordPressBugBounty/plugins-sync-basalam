@@ -30,6 +30,9 @@ final class Endpoints
     /** PATCH update an existing product — sprintf($url, $basalamProductId) */
     const PRODUCT_UPDATE = self::OPENAPI_BASE . '/v1/products/%d';
 
+    /** PATCH update a single variation of a product — sprintf($url, $basalamProductId, $basalamVariationId) */
+    const PRODUCT_VARIATION_UPDATE = self::CORE_BASE . '/v4/products/%d/variations/%d';
+
     /** POST batch-update products for a vendor */
     const PRODUCT_BATCH_UPDATE = self::OPENAPI_BASE . '/v1/vendors/%d/products/batch-updates?continue_on_error=true';
 

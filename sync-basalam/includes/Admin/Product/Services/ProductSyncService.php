@@ -3,6 +3,7 @@
 namespace SyncBasalam\Admin\Product\Services;
 
 use SyncBasalam\JobManager;
+use SyncBasalam\Admin\Settings\SettingsManager;
 use SyncBasalam\Utilities\ProductMetaKey;
 
 defined('ABSPATH') || exit;
@@ -74,6 +75,8 @@ class ProductSyncService
 
     public function enqueueSelectedForUpdate(array $productIds): void
     {
+        if (!SettingsManager::isProductUpdateSelectionValid()) return;
+
         $validProductIds = $this->filterValidProductsForUpdate($productIds);
 
         foreach ($validProductIds as $productId) {

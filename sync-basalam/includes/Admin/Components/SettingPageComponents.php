@@ -122,7 +122,7 @@ class SettingPageComponents
     public static function renderSyncProduct()
     {
         $current_value = syncBasalamSettings()->getSettings(SettingsConfig::SYNC_PRODUCT_FIELDS);
-        echo '<select class="basalam-select basalam-select-center" name="sync_basalam_settings[' . esc_attr(SettingsConfig::SYNC_PRODUCT_FIELDS) . ']" onchange="BasalamToggleCustomFields(this.value)" id="basalam-sync-type">'
+        echo '<select class="basalam-select basalam-select-center" name="sync_basalam_settings[' . esc_attr(SettingsConfig::SYNC_PRODUCT_FIELDS) . ']" id="basalam-sync-type">'
             . '<option value="all"' . selected($current_value, "all", false) . '>همه اطلاعات</option>'
             . '<option value="price_stock"' . selected($current_value, "price_stock", false) . '>فقط قیمت و موجودی</option>'
             . '<option value="custom"' . selected($current_value, "custom", false) . '>سفارشی</option>'
@@ -292,6 +292,12 @@ class SettingPageComponents
         echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_DESCRIPTION, 'توضیحات'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped inside the component method.
         echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_ATTR, 'ویژگی ها'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped inside the component method.
         echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_VIDEO, 'ویدیو'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped inside the component method.
+        echo '</div>';
+
+        echo '<div class="basalam-margin-top-25-bottom-10">';
+        echo '<label class="basalam-label basalam-p">متغیرها</label><br>';
+        echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_VARIANT_PRICE, 'قیمت متغیرها'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped inside the component method.
+        echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_VARIANT_STOCK, 'موجودی متغیرها'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped inside the component method.
         echo '</div>';
     }
 

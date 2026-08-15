@@ -11,11 +11,18 @@ defined('ABSPATH') || exit;
 
 class SettingsPageHandler
 {
+    private const VALIDATION_ERROR_TRANSIENT_PREFIX = 'sync_basalam_settings_validation_error_';
+
     public static function saveSettings()
     {
         $data = isset($_POST['sync_basalam_settings']) ? array_map('sanitize_text_field', wp_unslash($_POST['sync_basalam_settings'])) : [];
 
         if ($data) {
+            if (!SettingsManager::isProductUpdateSelectionValid($data)) {
+                self::pushValidationError(SettingsConfig::CUSTOM_PRODUCT_UPDATE_REQUIRED_MESSAGE);
+                return false;
+            }
+
             SettingsManager::updateSettings($data);
 
             if (!empty($data[SettingsConfig::DEVELOPER_MODE]) && $data[SettingsConfig::DEVELOPER_MODE] === 'true') {
@@ -29,6 +36,32 @@ class SettingsPageHandler
         if (isset($_POST['get_token']) && $_POST['get_token'] == 1) {
             self::redirectToOAuth();
         }
+
+        return true;
+    }
+
+    public static function pullValidationError(): string
+    {
+        $userId = get_current_user_id();
+        if ($userId <= 0) return '';
+
+        $key = self::VALIDATION_ERROR_TRANSIENT_PREFIX . $userId;
+        $message = get_transient($key);
+        delete_transient($key);
+
+        return is_string($message) ? $message : '';
+    }
+
+    private static function pushValidationError(string $message): void
+    {
+        $userId = get_current_user_id();
+        if ($userId <= 0) return;
+
+        set_transient(
+            self::VALIDATION_ERROR_TRANSIENT_PREFIX . $userId,
+            wp_strip_all_tags($message),
+            2 * MINUTE_IN_SECONDS
+        );
     }
 
     private static function redirectToOAuth()

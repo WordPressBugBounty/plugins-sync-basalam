@@ -6,6 +6,7 @@ use SyncBasalam\Services\Products\ConnectSingleProductService;
 use SyncBasalam\Services\Products\AutoConnectProducts;
 use SyncBasalam\JobManager;
 use SyncBasalam\Admin\Components\SingleProductPageComponents;
+use SyncBasalam\Admin\Settings\SettingsManager;
 
 defined('ABSPATH') || exit;
 
@@ -44,12 +45,14 @@ class ConnectProduct
 
         $connect_status = ConnectSingleProductService::connectProductById($woo_product_id, $sync_basalam_product_id);
 
-        $job_manager = syncBasalamContainer()->get(JobManager::class);
-        $job_manager->createJob(
-            'sync_basalam_update_single_product',
-            'pending',
-            $woo_product_id,
-        );
+        if (SettingsManager::isProductUpdateSelectionValid()) {
+            $job_manager = syncBasalamContainer()->get(JobManager::class);
+            $job_manager->createJob(
+                'sync_basalam_update_single_product',
+                'pending',
+                $woo_product_id,
+            );
+        }
 
         if ($connect_status) {
             return [

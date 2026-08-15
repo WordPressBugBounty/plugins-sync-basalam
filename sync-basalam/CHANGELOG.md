@@ -2,6 +2,23 @@
 
 <details>
 
+<summary>1.10.8 - 2026-08-15</summary>
+
+### Added
+- Added independent settings for updating variation prices and variation stock
+
+### Changed / Improved
+- Connected variations are now updated individually through Core v4
+- Price-only variation updates send only `primary_price`, while stock-only updates send only `stock`
+- Variation price updates work independently from the product price setting
+- Custom update mode now requires at least one selected field and shows the plugin error toast without refreshing the page when none is selected
+- Full, quick, selected, and automatic updates no longer create jobs or API requests when the custom field selection is empty
+- Product admin JavaScript now uses a file-aware cache version so the latest validation behavior is loaded immediately after deployment
+
+</details>
+
+<details>
+
 <summary>1.10.7 - 2026-08-11</summary>
 
 ### Fixed

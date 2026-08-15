@@ -4,6 +4,8 @@ namespace SyncBasalam\Actions\Controller\ProductActions;
 
 use SyncBasalam\JobManager;
 use SyncBasalam\Actions\Controller\ActionController;
+use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Admin\Settings\SettingsManager;
 
 defined('ABSPATH') || exit;
 
@@ -15,6 +17,11 @@ class UpdateAllProducts extends ActionController
         if (!$updateType) {
             return wp_send_json_error(['message' => 'نوع بروزرسانی نامعتبر است.'], 400);
         }
+
+        if (!SettingsManager::isProductUpdateSelectionValid()) {
+            return wp_send_json_error(['message' => SettingsConfig::CUSTOM_PRODUCT_UPDATE_REQUIRED_MESSAGE], 422);
+        }
+
         $jobManager = syncBasalamContainer()->get(JobManager::class);
 
         if ($updateType === 'full') {

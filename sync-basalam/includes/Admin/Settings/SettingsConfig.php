@@ -36,6 +36,21 @@ class SettingsConfig
     public const SYNC_PRODUCT_FIELD_WEIGHT = "sync_product_field_weight";
     public const SYNC_PRODUCT_FIELD_DESCRIPTION = "sync_product_field_description";
     public const SYNC_PRODUCT_FIELD_ATTR = "sync_product_field_attr";
+    public const SYNC_PRODUCT_FIELD_VARIANT_PRICE = "sync_product_field_variant_price";
+    public const SYNC_PRODUCT_FIELD_VARIANT_STOCK = "sync_product_field_variant_stock";
+    public const CUSTOM_PRODUCT_UPDATE_FIELDS = [
+        self::SYNC_PRODUCT_FIELD_NAME,
+        self::SYNC_PRODUCT_FIELD_PHOTOS,
+        self::SYNC_PRODUCT_FIELD_PRICE,
+        self::SYNC_PRODUCT_FIELD_STOCK,
+        self::SYNC_PRODUCT_FIELD_WEIGHT,
+        self::SYNC_PRODUCT_FIELD_DESCRIPTION,
+        self::SYNC_PRODUCT_FIELD_ATTR,
+        self::SYNC_PRODUCT_FIELD_VIDEO,
+        self::SYNC_PRODUCT_FIELD_VARIANT_PRICE,
+        self::SYNC_PRODUCT_FIELD_VARIANT_STOCK,
+    ];
+    public const CUSTOM_PRODUCT_UPDATE_REQUIRED_MESSAGE = 'در حالت سفارشی باید حداقل یک فیلد را برای بروزرسانی انتخاب کنید.';
     public const AUTO_CONFIRM_ORDER = "auto_confirm_order";
     public const ALL_PRODUCTS_WHOLESALE = "all_products_wholesale";
     public const ADD_ATTR_TO_DESC_PRODUCT = "add_attr_to_desc_product";
@@ -90,6 +105,8 @@ class SettingsConfig
             self::SYNC_PRODUCT_FIELD_WEIGHT         => 0,
             self::SYNC_PRODUCT_FIELD_DESCRIPTION    => 0,
             self::SYNC_PRODUCT_FIELD_ATTR           => 0,
+            self::SYNC_PRODUCT_FIELD_VARIANT_PRICE  => 0,
+            self::SYNC_PRODUCT_FIELD_VARIANT_STOCK  => 0,
             self::AUTO_CONFIRM_ORDER                => false,
             self::ALL_PRODUCTS_WHOLESALE            => 'none',
             self::ADD_ATTR_TO_DESC_PRODUCT          => false,

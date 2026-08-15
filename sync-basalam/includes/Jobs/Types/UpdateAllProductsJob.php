@@ -5,6 +5,9 @@ namespace SyncBasalam\Jobs\Types;
 use SyncBasalam\Jobs\AbstractJobType;
 use SyncBasalam\Jobs\JobResult;
 use SyncBasalam\Admin\ProductService;
+use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Admin\Settings\SettingsManager;
+use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 use SyncBasalam\Logger\Logger;
 
 defined('ABSPATH') || exit;
@@ -33,6 +36,10 @@ class UpdateAllProductsJob extends AbstractJobType
 
     public function execute(array $payload): JobResult
     {
+        if (!SettingsManager::isProductUpdateSelectionValid()) {
+            throw NonRetryableException::invalidData(SettingsConfig::CUSTOM_PRODUCT_UPDATE_REQUIRED_MESSAGE);
+        }
+
         $lastId = $payload['last_updatable_product_id'] ?? 0;
 
         try {

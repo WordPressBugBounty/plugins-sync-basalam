@@ -3,6 +3,7 @@
 namespace SyncBasalam\Registrar\ProductListeners;
 
 use SyncBasalam\JobManager;
+use SyncBasalam\Admin\Settings\SettingsManager;
 use SyncBasalam\Utilities\ProductMetaKey;
 
 defined('ABSPATH') || exit;
@@ -18,7 +19,11 @@ class UpdateWooProduct extends ProductListenerAbstract
 
     public function handle($productId)
     {
-        if (!$this->isAvailableProduct($productId) || !$this->isProductSyncEnabled()) {
+        if (
+            !$this->isAvailableProduct($productId) ||
+            !$this->isProductSyncEnabled() ||
+            !SettingsManager::isProductUpdateSelectionValid()
+        ) {
             return;
         }
 

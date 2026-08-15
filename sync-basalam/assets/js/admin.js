@@ -209,12 +209,43 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const select = document.getElementById("basalam-sync-type");
   if (select) {
+    const customFields = document.getElementById("Basalam-custom-fields");
+    const settingsForm = select.closest("form");
+    const validationMessage =
+      "در حالت سفارشی باید حداقل یک فیلد را برای بروزرسانی انتخاب کنید.";
+
     const toggleFields = (val) => {
-      document.getElementById("Basalam-custom-fields").style.display =
-        val === "custom" ? "block" : "none";
+      if (customFields) {
+        customFields.style.display = val === "custom" ? "block" : "none";
+      }
     };
+
+    const hasSelectedCustomField = () =>
+      customFields &&
+      Array.from(
+        customFields.querySelectorAll('input[type="checkbox"]')
+      ).some((checkbox) => checkbox.checked);
+
     toggleFields(select.value);
     select.addEventListener("change", (e) => toggleFields(e.target.value));
+
+    if (settingsForm) {
+      settingsForm.addEventListener("submit", (event) => {
+        if (select.value !== "custom" || hasSelectedCustomField()) return;
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        if (window.BasalamToast) {
+          window.BasalamToast.error(validationMessage);
+        }
+
+        if (customFields) {
+          customFields.scrollIntoView({ behavior: "smooth", block: "center" });
+          customFields.querySelector('input[type="checkbox"]')?.focus();
+        }
+      }, true);
+    }
   }
 
   // Tab functionality for settings modal
