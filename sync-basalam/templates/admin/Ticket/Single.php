@@ -25,6 +25,7 @@ if (empty($ticket)) {
 }
 
 $isTicketClosed = TicketServiceManager::isTicketClosed($ticket);
+$isTicketSiteAccessRejected = TicketServiceManager::isTicketSiteAccessRejected($ticket);
 
 ?>
 <div class="basalam-container">
@@ -54,42 +55,44 @@ $isTicketClosed = TicketServiceManager::isTicketClosed($ticket);
                         <textarea id="ticket-answer-textarea" name="content" class="basalam-input ticket-items__answer-input"></textarea>
                     </div>
 
-                    <div class="create-ticket__extra-info">
-                        <p class="create-ticket__extra-info-title basalam-p">اطلاعات دسترسی (اختیاری)</p>
-                        <div class="ticket-access-grid">
-                            <div class="ticket-access-card ticket-access-card--dashboard">
-                                <p class="ticket-access-card__title basalam-p">اطلاعات پیشخوان</p>
-                                <div class="create-ticket__control">
-                                    <label for="ticket-dashboard-login-url" class="create-ticket__label basalam-p">آدرس لاگین پیشخوان</label>
-                                    <input type="text" name="dashboard_login_url" id="ticket-dashboard-login-url" class="basalam-input create-ticket__input">
+                    <?php if ($isTicketSiteAccessRejected): ?>
+                        <div class="create-ticket__extra-info">
+                            <p class="create-ticket__extra-info-title basalam-p">اطلاعات دسترسی (اختیاری)</p>
+                            <div class="ticket-access-grid">
+                                <div class="ticket-access-card ticket-access-card--dashboard">
+                                    <p class="ticket-access-card__title basalam-p">اطلاعات پیشخوان</p>
+                                    <div class="create-ticket__control">
+                                        <label for="ticket-dashboard-login-url" class="create-ticket__label basalam-p">آدرس لاگین پیشخوان</label>
+                                        <input type="text" name="dashboard_login_url" id="ticket-dashboard-login-url" class="basalam-input create-ticket__input">
+                                    </div>
+                                    <div class="create-ticket__control">
+                                        <label for="ticket-dashboard-username" class="create-ticket__label basalam-p">نام کاربری پیشخوان</label>
+                                        <input type="text" name="dashboard_username" id="ticket-dashboard-username" class="basalam-input create-ticket__input">
+                                    </div>
+                                    <div class="create-ticket__control">
+                                        <label for="ticket-dashboard-password" class="create-ticket__label basalam-p">رمز عبور پیشخوان</label>
+                                        <input type="password" name="dashboard_password" id="ticket-dashboard-password" class="basalam-input create-ticket__input" autocomplete="new-password" spellcheck="false">
+                                    </div>
                                 </div>
-                                <div class="create-ticket__control">
-                                    <label for="ticket-dashboard-username" class="create-ticket__label basalam-p">نام کاربری پیشخوان</label>
-                                    <input type="text" name="dashboard_username" id="ticket-dashboard-username" class="basalam-input create-ticket__input">
-                                </div>
-                                <div class="create-ticket__control">
-                                    <label for="ticket-dashboard-password" class="create-ticket__label basalam-p">رمز عبور پیشخوان</label>
-                                    <input type="password" name="dashboard_password" id="ticket-dashboard-password" class="basalam-input create-ticket__input" autocomplete="new-password" spellcheck="false">
-                                </div>
-                            </div>
 
-                            <div class="ticket-access-card ticket-access-card--host-panel">
-                                <p class="ticket-access-card__title basalam-p">کنترل پنل هاست</p>
-                                <div class="create-ticket__control">
-                                    <label for="ticket-host-panel-login-url" class="create-ticket__label basalam-p">آدرس لاگین کنترل پنل هاست</label>
-                                    <input type="text" name="host_panel_login_url" id="ticket-host-panel-login-url" class="basalam-input create-ticket__input">
-                                </div>
-                                <div class="create-ticket__control">
-                                    <label for="ticket-host-panel-username" class="create-ticket__label basalam-p">نام کاربری کنترل پنل هاست</label>
-                                    <input type="text" name="host_panel_username" id="ticket-host-panel-username" class="basalam-input create-ticket__input">
-                                </div>
-                                <div class="create-ticket__control">
-                                    <label for="ticket-host-panel-password" class="create-ticket__label basalam-p">رمز عبور کنترل پنل هاست</label>
-                                    <input type="password" name="host_panel_password" id="ticket-host-panel-password" class="basalam-input create-ticket__input" autocomplete="new-password" spellcheck="false">
+                                <div class="ticket-access-card ticket-access-card--host-panel">
+                                    <p class="ticket-access-card__title basalam-p">کنترل پنل هاست</p>
+                                    <div class="create-ticket__control">
+                                        <label for="ticket-host-panel-login-url" class="create-ticket__label basalam-p">آدرس لاگین کنترل پنل هاست</label>
+                                        <input type="text" name="host_panel_login_url" id="ticket-host-panel-login-url" class="basalam-input create-ticket__input">
+                                    </div>
+                                    <div class="create-ticket__control">
+                                        <label for="ticket-host-panel-username" class="create-ticket__label basalam-p">نام کاربری کنترل پنل هاست</label>
+                                        <input type="text" name="host_panel_username" id="ticket-host-panel-username" class="basalam-input create-ticket__input">
+                                    </div>
+                                    <div class="create-ticket__control">
+                                        <label for="ticket-host-panel-password" class="create-ticket__label basalam-p">رمز عبور کنترل پنل هاست</label>
+                                        <input type="password" name="host_panel_password" id="ticket-host-panel-password" class="basalam-input create-ticket__input" autocomplete="new-password" spellcheck="false">
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    <?php endif; ?>
 
                     <div class="ticket-items__answer-control">
                         <label class="ticket-items__answer-control-label basalam-p">پیوست تصویر (اختیاری)</label>

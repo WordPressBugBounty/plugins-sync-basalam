@@ -64,6 +64,24 @@ class TicketServiceManager
         return in_array(self::resolveTicketStatus($ticket), ['closed', 'بسته شده'], true);
     }
 
+    public static function resolveTicketSiteAccessStatus(array $ticket): string
+    {
+        $siteAccess = $ticket['data']['site_access'] ?? $ticket['site_access'] ?? null;
+        if (!is_array($siteAccess)) return '';
+
+        $status = $siteAccess['status'] ?? '';
+        if (is_array($status)) {
+            $status = $status['slug'] ?? $status['name'] ?? '';
+        }
+
+        return strtolower(trim((string) $status));
+    }
+
+    public static function isTicketSiteAccessRejected(array $ticket): bool
+    {
+        return in_array(self::resolveTicketSiteAccessStatus($ticket), ['invalid', 'rejected'], true);
+    }
+
     public function __construct()
     {
         $settings = (array) syncBasalamSettings()->getSettings();

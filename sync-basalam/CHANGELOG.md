@@ -2,6 +2,15 @@
 
 <details>
 
+<summary>1.10.9 - 2026-08-16</summary>
+
+### Fixed
+- The ticket reply access form is now shown only after site access is rejected; it stays hidden while access is pending, after approval, and when the status is missing or unknown
+
+</details>
+
+<details>
+
 <summary>1.10.8 - 2026-08-15</summary>
 
 ### Added
