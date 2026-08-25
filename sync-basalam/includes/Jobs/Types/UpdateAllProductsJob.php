@@ -9,6 +9,7 @@ use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Admin\Settings\SettingsManager;
 use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 use SyncBasalam\Logger\Logger;
+use SyncBasalam\Services\VendorSyncPolicy;
 
 defined('ABSPATH') || exit;
 
@@ -36,7 +37,15 @@ class UpdateAllProductsJob extends AbstractJobType
 
     public function execute(array $payload): JobResult
     {
-        if (!SettingsManager::isProductUpdateSelectionValid()) {
+        $vendorSyncPolicy = syncBasalamContainer()->get(VendorSyncPolicy::class);
+        if (!$vendorSyncPolicy->canUpdate()) {
+            return $this->success([
+                'skipped' => true,
+                'reason' => $vendorSyncPolicy->getRestrictionMessage(false),
+            ]);
+        }
+
+        if (!$vendorSyncPolicy->shouldRestrictUpdateFields(false) && !SettingsManager::isProductUpdateSelectionValid()) {
             throw NonRetryableException::invalidData(SettingsConfig::CUSTOM_PRODUCT_UPDATE_REQUIRED_MESSAGE);
         }
 

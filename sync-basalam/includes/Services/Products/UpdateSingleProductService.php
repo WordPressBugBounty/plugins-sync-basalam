@@ -7,6 +7,7 @@ use SyncBasalam\Services\ApiServiceManager;
 use SyncBasalam\Jobs\Exceptions\RetryableException;
 use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 use SyncBasalam\Utilities\ProductMetaKey;
+use SyncBasalam\Services\VendorSyncPolicy;
 
 defined('ABSPATH') || exit;
 
@@ -25,7 +26,13 @@ class UpdateSingleProductService
     {
         if (!get_post_type($productId) === 'product') throw NonRetryableException::invalidData('نوع post محصول نیست.');
 
+        $vendorSyncPolicy = syncBasalamContainer()->get(VendorSyncPolicy::class);
+        if (!$vendorSyncPolicy->canUpdate()) {
+            throw NonRetryableException::invalidData($vendorSyncPolicy->getRestrictionMessage(false));
+        }
+
         $productData = apply_filters('sync_basalam_product_data_before_update', $productData, $productId);
+        $productData = $vendorSyncPolicy->restrictUpdatePayload($productData, false);
 
         do_action('sync_basalam_before_update_product_api', $productId, $productData);
 
@@ -206,6 +213,11 @@ class UpdateSingleProductService
 
     public function updateProductStatus($productId, $status)
     {
+        $vendorSyncPolicy = syncBasalamContainer()->get(VendorSyncPolicy::class);
+        if (!$vendorSyncPolicy->canUpdateProductStatus()) {
+            throw NonRetryableException::invalidData($vendorSyncPolicy->getRestrictionMessage(false));
+        }
+
         $syncBasalamProductId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
 
         ProductConnection::assertUnique($productId, $syncBasalamProductId);

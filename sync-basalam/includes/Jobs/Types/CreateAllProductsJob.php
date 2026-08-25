@@ -6,6 +6,7 @@ use SyncBasalam\Jobs\AbstractJobType;
 use SyncBasalam\Jobs\JobResult;
 use SyncBasalam\Admin\ProductService;
 use SyncBasalam\Logger\Logger;
+use SyncBasalam\Services\VendorSyncPolicy;
 
 defined('ABSPATH') || exit;
 
@@ -33,6 +34,14 @@ class CreateAllProductsJob extends AbstractJobType
 
     public function execute(array $payload): JobResult
     {
+        $vendorSyncPolicy = syncBasalamContainer()->get(VendorSyncPolicy::class);
+        if (!$vendorSyncPolicy->canCreate()) {
+            return $this->success([
+                'skipped' => true,
+                'reason' => $vendorSyncPolicy->getRestrictionMessage(false),
+            ]);
+        }
+
         $lastId = $payload['last_creatable_product_id'] ?? 0;
         $postsPerPage = 100;
         $includeOutOfStock = $payload['include_out_of_stock'] ?? false;

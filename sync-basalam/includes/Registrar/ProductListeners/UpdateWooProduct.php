@@ -5,6 +5,7 @@ namespace SyncBasalam\Registrar\ProductListeners;
 use SyncBasalam\JobManager;
 use SyncBasalam\Admin\Settings\SettingsManager;
 use SyncBasalam\Utilities\ProductMetaKey;
+use SyncBasalam\Services\VendorSyncPolicy;
 
 defined('ABSPATH') || exit;
 
@@ -19,10 +20,13 @@ class UpdateWooProduct extends ProductListenerAbstract
 
     public function handle($productId)
     {
+        $vendorSyncPolicy = syncBasalamContainer()->get(VendorSyncPolicy::class);
+
         if (
+            !$vendorSyncPolicy->canUpdate() ||
             !$this->isAvailableProduct($productId) ||
             !$this->isProductSyncEnabled() ||
-            !SettingsManager::isProductUpdateSelectionValid()
+            (!$vendorSyncPolicy->shouldRestrictUpdateFields(false) && !SettingsManager::isProductUpdateSelectionValid())
         ) {
             return;
         }

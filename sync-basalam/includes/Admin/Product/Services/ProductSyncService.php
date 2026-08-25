@@ -5,6 +5,7 @@ namespace SyncBasalam\Admin\Product\Services;
 use SyncBasalam\JobManager;
 use SyncBasalam\Admin\Settings\SettingsManager;
 use SyncBasalam\Utilities\ProductMetaKey;
+use SyncBasalam\Services\VendorSyncPolicy;
 
 defined('ABSPATH') || exit;
 
@@ -24,6 +25,15 @@ class ProductSyncService
 
     public function enqueueBulkCreate(bool $includeOutOfStock = false, int $postsPerPage = 100): array
     {
+        $vendorSyncPolicy = syncBasalamContainer()->get(VendorSyncPolicy::class);
+        if (!$vendorSyncPolicy->canCreate()) {
+            return [
+                'success' => false,
+                'message' => $vendorSyncPolicy->getRestrictionMessage(false),
+                'status_code' => 409,
+            ];
+        }
+
         $existingJob = $this->jobManager->getJob([
             'job_type' => self::JOB_TYPE_CREATE_ALL,
             'status'   => 'pending',
@@ -57,6 +67,8 @@ class ProductSyncService
 
     public function enqueueSelectedForCreate(array $productIds): void
     {
+        if (!syncBasalamContainer()->get(VendorSyncPolicy::class)->canCreate()) return;
+
         foreach ($productIds as $productId) {
             if (!$this->isValidProductForCreate($productId)) {
                 continue;
@@ -75,7 +87,9 @@ class ProductSyncService
 
     public function enqueueSelectedForUpdate(array $productIds): void
     {
-        if (!SettingsManager::isProductUpdateSelectionValid()) return;
+        $vendorSyncPolicy = syncBasalamContainer()->get(VendorSyncPolicy::class);
+        if (!$vendorSyncPolicy->canUpdate()) return;
+        if (!$vendorSyncPolicy->shouldRestrictUpdateFields(false) && !SettingsManager::isProductUpdateSelectionValid()) return;
 
         $validProductIds = $this->filterValidProductsForUpdate($productIds);
 

@@ -1,6 +1,7 @@
 <?php
 
 use SyncBasalam\Admin\Components\SettingPageComponents;
+use SyncBasalam\Services\VendorSyncPolicy;
 
 defined('ABSPATH') || exit;
 ?>
@@ -15,7 +16,13 @@ defined('ABSPATH') || exit;
                 <p class="basalam-p basalam-font-12 basalam-text-justify">مـحصولات سیـنک شــده با باســلام :</p> <?php echo '<p class="basalam_status_data_number basalam-p">' . esc_html($count_of_synced_basalam_products) . '</p>' ?>
             </div>
         </div>
-        <span class="basalam-badge basalam-badge-success basalam-p">متصل</span>
+        <?php if ($vendorSyncMode === VendorSyncPolicy::MODE_INACTIVE_LIMITED): ?>
+            <span class="basalam-badge basalam-badge-warning basalam-p">غرفه غیرفعال — همگام‌سازی محدود</span>
+        <?php elseif ($vendorSyncMode === VendorSyncPolicy::MODE_INACTIVE_SUSPENDED): ?>
+            <span class="basalam-badge basalam-badge-danger basalam-p">غرفه غیرفعال — همگام‌سازی متوقف</span>
+        <?php else: ?>
+            <span class="basalam-badge basalam-badge-success basalam-p">متصل</span>
+        <?php endif; ?>
     </div>
     <div class="basalam-sync-status">
         <p class="basalam-p basalam-status-info">با فعال کردن همگام‌سازی خودکار، تغییرات محصولات شما به صورت خودکار در باسلام نیز اعمال می‌شود.</p>

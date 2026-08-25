@@ -7,6 +7,7 @@ use SyncBasalam\Jobs\JobResult;
 use SyncBasalam\Jobs\Exceptions\RetryableException;
 use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 use SyncBasalam\Logger\Logger;
+use SyncBasalam\Services\VendorSyncPolicy;
 
 defined('ABSPATH') || exit;
 
@@ -32,6 +33,14 @@ class CreateSingleProductJob extends AbstractJobType
 
     public function execute(array $payload): JobResult
     {
+        $vendorSyncPolicy = syncBasalamContainer()->get(VendorSyncPolicy::class);
+        if (!$vendorSyncPolicy->canCreate()) {
+            return $this->success([
+                'skipped' => true,
+                'reason' => $vendorSyncPolicy->getRestrictionMessage(false),
+            ]);
+        }
+
         $productId = $payload['product_id'] ?? $payload;
 
         if (!$productId) {

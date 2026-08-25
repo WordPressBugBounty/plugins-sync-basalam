@@ -7,11 +7,20 @@
 
         <h3 class="basalam-h basalam-font-20-important">بروزرسانی محصولات در باسلام</h3>
 
-        <?php if (!$has_active_update_jobs): ?>
+        <?php if (!$vendorCanUpdate): ?>
+            <div class="basalam-p basalam-warning-bg">
+                <strong>بروزرسانی محصولات در دسترس نیست.</strong>
+                <p><?php echo esc_html($vendorSyncState['message']); ?></p>
+            </div>
+        <?php elseif (!$has_active_update_jobs): ?>
             <!-- Selection Screen when no jobs are running -->
             <div id="update-type-selection" class="basalam-block">
                 <?php wp_nonce_field('update_products_in_basalam_nonce', '_wpnonce'); ?>
-                <p class="basalam-p basalam-padding-top-normal">لطفا نوع بروزرسانی مورد نظر خود را انتخاب کنید:</p>
+                <p class="basalam-p basalam-padding-top-normal">
+                    <?php echo $vendorUpdateIsLimited
+                        ? 'به دلیل غیرفعال بودن غرفه، فقط قیمت و موجودی بروزرسانی می‌شود.'
+                        : 'لطفا نوع بروزرسانی مورد نظر خود را انتخاب کنید:'; ?>
+                </p>
 
 
 
@@ -24,10 +33,12 @@
                                 فقط قیمت و موجودی محصول بروزرسانی میشود
                             </p>
                         </div>
+                        <?php if (!$vendorUpdateIsLimited): ?>
                         <div class="basalam-flex-1">
                             <h4 class="basalam-h basalam-margin-dark-color">• بروزرسانی کامل:</h4>
                             <p class="basalam-margin-muted">تمام اطلاعات محصولات به صورت تکی بروزرسانی می‌شود.</p>
                         </div>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -36,9 +47,11 @@
                         <span class="basalam-font-15-white">بروزرسانی فوری</span>
                     </button>
 
+                    <?php if (!$vendorUpdateIsLimited): ?>
                     <button type="button" id="full-update-btn" class="basalam-primary-button basalam-p basalam-height-20-flex">
                         <span class="basalam-font-15-white">بروزرسانی کامل</span>
                     </button>
+                    <?php endif; ?>
                 </div>
             </div>
 

@@ -5,6 +5,7 @@ namespace SyncBasalam\Registrar\ProductListeners;
 use SyncBasalam\JobManager;
 use SyncBasalam\Logger\Logger;
 use SyncBasalam\Utilities\ProductMetaKey;
+use SyncBasalam\Services\VendorSyncPolicy;
 
 defined('ABSPATH') || exit;
 
@@ -19,6 +20,7 @@ class CreateWooProduct extends ProductListenerAbstract
 
     public function handle($productId)
     {
+        if (!syncBasalamContainer()->get(VendorSyncPolicy::class)->canCreate()) return;
         if (!$this->isAvailableProduct($productId)) return;
 
         if (!$this->jobManager->hasProductJobInProgress($productId, 'sync_basalam_create_single_product')) {

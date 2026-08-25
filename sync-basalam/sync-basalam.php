@@ -6,13 +6,14 @@ use SyncBasalam\Activator;
 use SyncBasalam\JobsRunner;
 use SyncBasalam\Infrastructure\Container\AppServiceProvider;
 use SyncBasalam\Infrastructure\Container\Container;
+use SyncBasalam\Services\VendorSyncPolicy;
 
 defined('ABSPATH') || exit;
 
 /**
  * Plugin Name: sync basalam | ووسلام
  * Description: با استفاده از پلاگین ووسلام  میتوایند تمامی محصولات ووکامرس را با یک کلیک به غرفه باسلامی خود اضافه کنید‌، همچنین تمامی سفارش باسلامی شما به سایت شما اضافه میگردد.
- * Version: 1.10.9
+ * Version: 1.10.10
  * Author: Woosalam Dev
  * Author URI: https://wp.hamsalam.ir/
  * Plugin URI: https://wp.hamsalam.ir
@@ -27,6 +28,7 @@ defined('ABSPATH') || exit;
 require_once __DIR__ . '/vendor/autoload.php';
 
 register_activation_hook(__FILE__, 'syncBasalamActivatePlugin');
+register_deactivation_hook(__FILE__, 'syncBasalamDeactivatePlugin');
 
 add_action('before_woocommerce_init', function () {
     if (class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
@@ -71,7 +73,14 @@ function syncBasalamSettings()
 function syncBasalamActivatePlugin()
 {
     Activator::activate();
+    syncBasalamContainer()->get(VendorSyncPolicy::class)->ensureScheduled();
     set_transient('sync_basalam_just_activated', true, 10);
 }
 
+function syncBasalamDeactivatePlugin()
+{
+    VendorSyncPolicy::unschedule();
+}
+
 syncBasalamContainer()->get(JobsRunner::class);
+syncBasalamContainer()->get(VendorSyncPolicy::class)->registerHooks();

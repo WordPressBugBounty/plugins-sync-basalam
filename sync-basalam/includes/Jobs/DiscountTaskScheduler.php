@@ -2,6 +2,7 @@
 
 namespace SyncBasalam\Jobs;
 
+use SyncBasalam\Services\VendorSyncPolicy;
 
 defined('ABSPATH') || exit;
 
@@ -16,6 +17,8 @@ class DiscountTaskScheduler
 
     public function process(): void
     {
+        if (!syncBasalamContainer()->get(VendorSyncPolicy::class)->canUpdate()) return;
+
         $cacheKey = 'sync_basalam_discount_tasks_last_run';
         $cacheThreshold = 30;
 

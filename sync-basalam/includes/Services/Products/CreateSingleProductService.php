@@ -9,6 +9,7 @@ use SyncBasalam\Services\ApiServiceManager;
 use SyncBasalam\Jobs\Exceptions\RetryableException;
 use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 use SyncBasalam\Utilities\ProductMetaKey;
+use SyncBasalam\Services\VendorSyncPolicy;
 
 defined('ABSPATH') || exit;
 
@@ -25,6 +26,11 @@ class CreateSingleProductService
 
     public function createProductInBasalam($productData, $productId)
     {
+        $vendorSyncPolicy = syncBasalamContainer()->get(VendorSyncPolicy::class);
+        if (!$vendorSyncPolicy->canCreate()) {
+            throw NonRetryableException::invalidData($vendorSyncPolicy->getRestrictionMessage(false));
+        }
+
         $productData = apply_filters('sync_basalam_product_data_before_create', $productData, $productId);
         $this->ValidCreateProductData($productData, $productId);
 

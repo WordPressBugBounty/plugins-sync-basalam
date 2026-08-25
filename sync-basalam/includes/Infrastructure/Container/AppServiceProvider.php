@@ -25,6 +25,8 @@ use SyncBasalam\Services\Products\Discount\DiscountTaskProcessor;
 use SyncBasalam\Services\Orders\FetchOrdersService;
 use SyncBasalam\Services\Orders\SyncOrderService;
 use SyncBasalam\Services\SystemResourceMonitor;
+use SyncBasalam\Services\VendorInfoService;
+use SyncBasalam\Services\VendorSyncPolicy;
 
 defined('ABSPATH') || exit;
 
@@ -46,6 +48,14 @@ class AppServiceProvider implements ServiceProviderInterface
 
         $container->singleton(ApiServiceManager::class, function () {
             return $this->newInstance(ApiServiceManager::class);
+        });
+
+        $container->singleton(VendorInfoService::class, function () {
+            return new VendorInfoService();
+        });
+
+        $container->singleton(VendorSyncPolicy::class, function (ContainerInterface $container) {
+            return new VendorSyncPolicy($container->get(VendorInfoService::class));
         });
 
         $container->singleton(ProductOperations::class, function () {

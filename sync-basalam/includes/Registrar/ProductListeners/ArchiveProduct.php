@@ -3,6 +3,7 @@
 namespace SyncBasalam\Registrar\ProductListeners;
 
 use SyncBasalam\Admin\Product\ProductOperations;
+use SyncBasalam\Services\VendorSyncPolicy;
 
 defined('ABSPATH') || exit;
 
@@ -17,6 +18,8 @@ class ArchiveProduct extends ProductListenerAbstract
 
     public function handle($productId)
     {
+        if (!syncBasalamContainer()->get(VendorSyncPolicy::class)->canUpdateProductStatus()) return;
+
         $product = wc_get_product($productId);
 
         if (!$product || $product->is_type('variation')) {

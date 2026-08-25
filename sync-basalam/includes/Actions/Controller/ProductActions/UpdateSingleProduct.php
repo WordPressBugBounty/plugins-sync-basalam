@@ -5,6 +5,7 @@ namespace SyncBasalam\Actions\Controller\ProductActions;
 use SyncBasalam\Admin\Product\ProductOperations;
 use SyncBasalam\Actions\Controller\ActionController;
 use SyncBasalam\Logger\Logger;
+use SyncBasalam\Services\VendorSyncPolicy;
 
 defined('ABSPATH') || exit;
 
@@ -12,6 +13,11 @@ class UpdateSingleProduct extends ActionController
 {
     public function __invoke()
     {
+        $vendorSyncPolicy = syncBasalamContainer()->get(VendorSyncPolicy::class);
+        if (!$vendorSyncPolicy->canUpdate()) {
+            return wp_send_json_error(['message' => $vendorSyncPolicy->getRestrictionMessage(false)], 409);
+        }
+
         $productId = isset($_POST['product_id']) ? sanitize_text_field(wp_unslash($_POST['product_id'])) : null;
 
         $productOperations = syncBasalamContainer()->get(ProductOperations::class);

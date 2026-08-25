@@ -2,6 +2,23 @@
 
 <details>
 
+<summary>1.10.10 - 2026-08-25</summary>
+
+### Added
+- Added a daily vendor-status check with persistent inactive-duration tracking and automatic recovery when the vendor becomes active again
+- Added state-specific admin notices, dashboard badges, disabled controls, and explanatory UI for limited and suspended synchronization modes
+
+### Changed / Improved
+- Vendors inactive for less than 21 days can no longer create products; manual, bulk, queued, and automatic updates are restricted to price and stock
+- Vendors inactive for 21 days or longer can no longer create, update, archive, restore, or discount products until the vendor becomes active again
+- Product jobs revalidate the vendor policy at execution time so queued work cannot bypass a later status change
+- Improved background job dispatch and limited admin assets and notices to relevant Woosalam, product, and order screens
+- Aligned the connection-status header, card, and inner synchronization panel across active and inactive states
+
+</details>
+
+<details>
+
 <summary>1.10.9 - 2026-08-16</summary>
 
 ### Fixed

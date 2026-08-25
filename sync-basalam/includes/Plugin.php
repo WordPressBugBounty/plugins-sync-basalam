@@ -15,7 +15,7 @@ defined('ABSPATH') || exit;
 
 class Plugin
 {
-    public const VERSION = '1.10.9';
+    public const VERSION = '1.10.10';
 
     public function __construct()
     {
@@ -53,6 +53,8 @@ class Plugin
     {
         if (!get_option('sync_basalam_review_never_remind')) {
             add_action('admin_notices', function () {
+                if (!AdminRegistrar::isWoosalamRelatedAdminScreen()) return;
+
                 $template = syncBasalamPlugin()->templatePath("notifications/LikeAlert.php");
                 require_once $template;
             });
@@ -60,15 +62,21 @@ class Plugin
 
         if (!syncBasalamSettings()->hasToken()) {
             add_action('admin_notices', function () {
+                if (!AdminRegistrar::isWoosalamRelatedAdminScreen()) return;
+
                 $template = syncBasalamPlugin()->templatePath("notifications/AccessAlert.php");
                 require_once($template);
             });
         }
         add_action('admin_notices', function () {
+            if (!AdminRegistrar::isWoosalamRelatedAdminScreen()) return;
+
             $template = syncBasalamPlugin()->templatePath("notifications/HttpBlock.php");
             require_once($template);
         });
         add_action('admin_notices', function () {
+            if (!AdminRegistrar::isWoosalamRelatedAdminScreen()) return;
+
             $circuitBreaker = new CircuitBreaker();
 
             if ($circuitBreaker->getState() === CircuitBreaker::STATE_CLOSED) return;

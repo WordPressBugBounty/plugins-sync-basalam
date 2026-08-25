@@ -199,8 +199,130 @@ class AdminRegistrar implements RegistrarInterface
         return plugin_dir_url(dirname(__FILE__, 2)) . "assets/" . $path;
     }
 
+    public static function isWoosalamRelatedAdminScreen($hook = ''): bool
+    {
+        return self::isPluginAdminPage($hook)
+            || self::isProductAdminScreen($hook)
+            || self::isOrderAdminScreen($hook);
+    }
+
+    private static function isPluginAdminPage($hook = ''): bool
+    {
+        $page = self::currentAdminPage();
+
+        if ($page !== '' && in_array($page, self::pluginAdminPages(), true)) {
+            return true;
+        }
+
+        return is_string($hook) && strpos($hook, 'sync_basalam') !== false;
+    }
+
+    private static function isProductAdminScreen($hook = ''): bool
+    {
+        $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+
+        if ($screen && isset($screen->post_type) && $screen->post_type === 'product') {
+            return true;
+        }
+
+        $postType = isset($_GET['post_type']) ? sanitize_key(wp_unslash($_GET['post_type'])) : '';
+        if ($postType === 'product') {
+            return true;
+        }
+
+        $postId = isset($_GET['post']) ? absint($_GET['post']) : 0;
+        if ($postId > 0 && function_exists('get_post_type') && get_post_type($postId) === 'product') {
+            return true;
+        }
+
+        return in_array((string) $hook, ['edit-product', 'product'], true);
+    }
+
+    private static function isOrderAdminScreen($hook = ''): bool
+    {
+        $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+
+        if ($screen) {
+            $screenId = isset($screen->id) ? (string) $screen->id : '';
+            $postType = isset($screen->post_type) ? (string) $screen->post_type : '';
+
+            if ($postType === 'shop_order' || $screenId === 'woocommerce_page_wc-orders') {
+                return true;
+            }
+        }
+
+        $page = self::currentAdminPage();
+        if ($page === 'wc-orders') {
+            return true;
+        }
+
+        $postType = isset($_GET['post_type']) ? sanitize_key(wp_unslash($_GET['post_type'])) : '';
+        if ($postType === 'shop_order') {
+            return true;
+        }
+
+        $postId = isset($_GET['post']) ? absint($_GET['post']) : 0;
+        if ($postId > 0 && function_exists('get_post_type') && get_post_type($postId) === 'shop_order') {
+            return true;
+        }
+
+        return in_array((string) $hook, ['edit-shop_order', 'shop_order', 'woocommerce_page_wc-orders'], true);
+    }
+
+    private static function isProductEditScreen($hook = ''): bool
+    {
+        $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+
+        if ($screen && isset($screen->post_type, $screen->base)) {
+            return $screen->post_type === 'product' && in_array($screen->base, ['post', 'post-new'], true);
+        }
+
+        return self::isProductAdminScreen($hook) && in_array((string) $hook, ['post.php', 'post-new.php', 'product'], true);
+    }
+
+    private static function isPluginPage(string $page): bool
+    {
+        return self::currentAdminPage() === $page;
+    }
+
+    private static function isTicketPage(): bool
+    {
+        return in_array(self::currentAdminPage(), [
+            'sync_basalam_tickets',
+            'sync_basalam_ticket',
+            'sync_basalam_new_ticket',
+        ], true);
+    }
+
+    private static function currentAdminPage(): string
+    {
+        return isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
+    }
+
+    private static function pluginAdminPages(): array
+    {
+        return [
+            'sync_basalam',
+            'sync_basalam_logs',
+            'sync_basalam_vendor_info',
+            'sync_basalam_help',
+            'sync_basalam_category_mapping',
+            FinancialManagementMenu::PAGE_SLUG,
+            'basalam-onboarding',
+            'basalam-save-token',
+            'basalam-show-products',
+            'sync_basalam_tickets',
+            'sync_basalam_ticket',
+            'sync_basalam_new_ticket',
+        ];
+    }
+
     public static function adminEnqueueStyles($hook = '')
     {
+        if (!self::isWoosalamRelatedAdminScreen($hook)) {
+            return;
+        }
+
         $version = syncbasalamplugin()->getVersion();
 
         wp_enqueue_style(
@@ -215,24 +337,32 @@ class AdminRegistrar implements RegistrarInterface
             array(),
             $version
         );
-        wp_enqueue_style(
-            "basalam-admin-social-style",
-            self::assetsUrl("css/social.css"),
-            array(),
-            $version
-        );
-        wp_enqueue_style(
-            "basalam-admin-logs-style",
-            self::assetsUrl("css/logs.css"),
-            array(),
-            $version
-        );
-        wp_enqueue_style(
-            "basalam-admin-onboarding-style",
-            self::assetsUrl("css/onboarding.css"),
-            array(),
-            $version
-        );
+        if (self::isPluginPage('sync_basalam_vendor_info')) {
+            wp_enqueue_style(
+                "basalam-admin-social-style",
+                self::assetsUrl("css/social.css"),
+                array(),
+                $version
+            );
+        }
+
+        if (self::isPluginPage('sync_basalam_logs')) {
+            wp_enqueue_style(
+                "basalam-admin-logs-style",
+                self::assetsUrl("css/logs.css"),
+                array(),
+                $version
+            );
+        }
+
+        if (self::isPluginPage('basalam-onboarding')) {
+            wp_enqueue_style(
+                "basalam-admin-onboarding-style",
+                self::assetsUrl("css/onboarding.css"),
+                array(),
+                $version
+            );
+        }
         wp_enqueue_style(
             "basalam-admin-toast-style",
             self::assetsUrl("css/toast.css"),
@@ -248,7 +378,18 @@ class AdminRegistrar implements RegistrarInterface
     public static function adminEnqueueScripts($hook = '')
     {
         $shouldLoadPointerTour = PointerTour::shouldLoadPointerTour((string) $hook);
+        $shouldLoadAssets = self::isWoosalamRelatedAdminScreen($hook);
+
+        if (!$shouldLoadAssets && !$shouldLoadPointerTour) {
+            return;
+        }
+
         $version = syncbasalamplugin()->getVersion();
+        $isPluginPage = self::isPluginAdminPage($hook);
+        $isMainPage = self::isPluginPage('sync_basalam');
+        $isProductScreen = self::isProductAdminScreen($hook);
+        $isProductEditScreen = self::isProductEditScreen($hook);
+        $isOrderScreen = self::isOrderAdminScreen($hook);
 
         if ($shouldLoadPointerTour) {
             wp_enqueue_script('wp-pointer');
@@ -286,109 +427,134 @@ class AdminRegistrar implements RegistrarInterface
                 'after'
             );
         }
-        wp_enqueue_script(
-            "basalam-admin-logs-script",
-            self::assetsUrl("js/logs.js"),
-            ["jquery", "basalam-admin-toast-script"],
-            $version,
-            true
-        );
-        wp_enqueue_script(
-            "basalam-admin-help-script",
-            self::assetsUrl("js/help.js"),
-            ["jquery", "basalam-admin-toast-script"],
-            $version,
-            true
-        );
-        wp_enqueue_script(
-            "basalam-admin-product-fields-script",
-            self::assetsUrl("js/product-fields.js"),
-            ["jquery", "basalam-admin-toast-script"],
-            $version,
-            true
-        );
-        wp_enqueue_script(
-            "basalam-admin-manage-box-script",
-            self::assetsUrl("js/manage-box.js"),
-            ["jquery", "basalam-admin-toast-script"],
-            $version,
-            true
-        );
-        wp_enqueue_script(
-            "basalam-admin-connect-modal-script",
-            self::assetsUrl("js/connect-modal.js"),
-            ["jquery", "basalam-admin-toast-script"],
-            $version,
-            true
-        );
-        wp_enqueue_script(
-            "basalam-round-script",
-            self::assetsUrl("js/round.js"),
-            ["jquery", "basalam-admin-toast-script"],
-            $version,
-            true
-        );
-        wp_enqueue_script(
-            "basalam-get-category-script",
-            self::assetsUrl("js/get-category.js"),
-            ["jquery", "basalam-admin-toast-script"],
-            $version,
-            true
-        );
-        wp_enqueue_script(
-            "basalam-order-script",
-            self::assetsUrl("js/order.js"),
-            ["jquery", "basalam-admin-toast-script"],
-            $version,
-            true
-        );
-        $adminScriptPath = syncBasalamPlugin()->pluginPath() . '/assets/js/admin.js';
-        $adminScriptVersion = file_exists($adminScriptPath)
-            ? $version . '-' . filemtime($adminScriptPath)
-            : $version;
-        wp_enqueue_script(
-            "basalam-admin-script",
-            self::assetsUrl("js/admin.js"),
-            $shouldLoadPointerTour ? ["jquery", "wp-pointer", "basalam-admin-toast-script"] : ["jquery", "basalam-admin-toast-script"],
-            $adminScriptVersion,
-            true
-        );
-        wp_enqueue_script(
-            "basalam-check-sync-script",
-            self::assetsUrl("js/check-sync.js"),
-            ["jquery", "basalam-admin-toast-script"],
-            $version,
-            true
-        );
-        wp_enqueue_script(
-            "basalam-map-category-option-script",
-            self::assetsUrl("js/map-category-option.js"),
-            ["jquery", "basalam-admin-toast-script"],
-            $version,
-            true
-        );
 
-        wp_enqueue_script(
-            "basalam-generate-product-variation-script",
-            self::assetsUrl("js/generate-product-variation.js"),
-            ["jquery", "basalam-admin-toast-script"],
-            $version,
-            true
-        );
+        if (self::isPluginPage('sync_basalam_logs')) {
+            wp_enqueue_script(
+                "basalam-admin-logs-script",
+                self::assetsUrl("js/logs.js"),
+                ["jquery", "basalam-admin-toast-script"],
+                $version,
+                true
+            );
+        }
 
-        $ticketScriptPath = syncBasalamPlugin()->pluginPath() . '/assets/js/ticket.js';
-        $ticketScriptVersion = file_exists($ticketScriptPath)
-            ? $version . '-' . filemtime($ticketScriptPath)
-            : $version;
-        wp_enqueue_script(
-            "basalam-ticket-script",
-            self::assetsUrl("js/ticket.js"),
-            ["basalam-admin-toast-script"],
-            $ticketScriptVersion,
-            true
-        );
+        if (self::isPluginPage('sync_basalam_help')) {
+            wp_enqueue_script(
+                "basalam-admin-help-script",
+                self::assetsUrl("js/help.js"),
+                ["jquery", "basalam-admin-toast-script"],
+                $version,
+                true
+            );
+        }
 
-        if (ChatWidget::shouldLoadWidget()) {
+        if ($isProductEditScreen) {
+            wp_enqueue_script(
+                "basalam-admin-product-fields-script",
+                self::assetsUrl("js/product-fields.js"),
+                ["jquery", "basalam-admin-toast-script"],
+                $version,
+                true
+            );
+            wp_enqueue_script(
+                "basalam-admin-connect-modal-script",
+                self::assetsUrl("js/connect-modal.js"),
+                ["jquery", "basalam-admin-toast-script"],
+                $version,
+                true
+            );
+            wp_enqueue_script(
+                "basalam-get-category-script",
+                self::assetsUrl("js/get-category.js"),
+                ["jquery", "basalam-admin-toast-script"],
+                $version,
+                true
+            );
+            wp_enqueue_script(
+                "basalam-generate-product-variation-script",
+                self::assetsUrl("js/generate-product-variation.js"),
+                ["jquery", "basalam-admin-toast-script"],
+                $version,
+                true
+            );
+        }
+
+        if ($isMainPage) {
+            wp_enqueue_script(
+                "basalam-admin-manage-box-script",
+                self::assetsUrl("js/manage-box.js"),
+                ["jquery", "basalam-admin-toast-script"],
+                $version,
+                true
+            );
+            wp_enqueue_script(
+                "basalam-map-category-option-script",
+                self::assetsUrl("js/map-category-option.js"),
+                ["jquery", "basalam-admin-toast-script"],
+                $version,
+                true
+            );
+        }
+
+        if ($isMainPage || $isProductScreen) {
+            wp_enqueue_script(
+                "basalam-round-script",
+                self::assetsUrl("js/round.js"),
+                ["jquery", "basalam-admin-toast-script"],
+                $version,
+                true
+            );
+        }
+
+        if ($isOrderScreen) {
+            wp_enqueue_script(
+                "basalam-order-script",
+                self::assetsUrl("js/order.js"),
+                ["jquery", "basalam-admin-toast-script"],
+                $version,
+                true
+            );
+        }
+
+        if ($isMainPage || $isOrderScreen) {
+            wp_enqueue_script(
+                "basalam-check-sync-script",
+                self::assetsUrl("js/check-sync.js"),
+                ["jquery", "basalam-admin-toast-script"],
+                $version,
+                true
+            );
+        }
+
+        if ($isPluginPage || $isProductScreen || $isOrderScreen || $shouldLoadPointerTour) {
+            $adminScriptPath = syncBasalamPlugin()->pluginPath() . '/assets/js/admin.js';
+            $adminScriptVersion = file_exists($adminScriptPath)
+                ? $version . '-' . filemtime($adminScriptPath)
+                : $version;
+            wp_enqueue_script(
+                "basalam-admin-script",
+                self::assetsUrl("js/admin.js"),
+                $shouldLoadPointerTour ? ["jquery", "wp-pointer", "basalam-admin-toast-script"] : ["jquery", "basalam-admin-toast-script"],
+                $adminScriptVersion,
+                true
+            );
+        }
+
+        if (self::isTicketPage()) {
+            $ticketScriptPath = syncBasalamPlugin()->pluginPath() . '/assets/js/ticket.js';
+            $ticketScriptVersion = file_exists($ticketScriptPath)
+                ? $version . '-' . filemtime($ticketScriptPath)
+                : $version;
+            wp_enqueue_script(
+                "basalam-ticket-script",
+                self::assetsUrl("js/ticket.js"),
+                ["basalam-admin-toast-script"],
+                $ticketScriptVersion,
+                true
+            );
+        }
+
+        if ($isPluginPage && ChatWidget::shouldLoadWidget()) {
             wp_enqueue_script(
                 "basalam-chat-widget-script",
                 self::assetsUrl("chat/widget-loader.js"),
@@ -402,7 +568,7 @@ class AdminRegistrar implements RegistrarInterface
             wp_localize_script('basalam-admin-script', 'basalamPointerTour', PointerTour::getPointerTourConfig());
         }
 
-        if (AnnouncementCenter::shouldLoadAnnouncement()) {
+        if (wp_script_is('basalam-admin-script', 'enqueued') && AnnouncementCenter::shouldLoadAnnouncement()) {
             wp_localize_script('basalam-admin-script', 'basalamAnnouncements', AnnouncementCenter::getConfig());
         }
     }

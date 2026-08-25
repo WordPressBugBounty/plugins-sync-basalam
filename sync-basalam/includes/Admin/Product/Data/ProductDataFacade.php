@@ -11,6 +11,7 @@ use SyncBasalam\Admin\Product\ProductDataFactory;
 use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Admin\Settings\SettingsManager;
 use SyncBasalam\Jobs\Exceptions\NonRetryableException;
+use SyncBasalam\Services\VendorSyncPolicy;
 use SyncBasalam\Utilities\ProductMetaKey;
 
 defined('ABSPATH') || exit;
@@ -48,14 +49,19 @@ class ProductDataFacade
 
         $settings = SettingsManager::getSettings();
         $syncFields = $settings[SettingsConfig::SYNC_PRODUCT_FIELDS] ?? 'all';
+        $vendorSyncPolicy = syncBasalamContainer()->get(VendorSyncPolicy::class);
 
-        if ($isUpdate && !SettingsManager::isProductUpdateSelectionValid($settings)) {
+        if (
+            $isUpdate
+            && !$vendorSyncPolicy->shouldRestrictUpdateFields(false)
+            && !SettingsManager::isProductUpdateSelectionValid($settings)
+        ) {
             throw NonRetryableException::invalidData(SettingsConfig::CUSTOM_PRODUCT_UPDATE_REQUIRED_MESSAGE);
         }
 
         $strategy = 'create';
         if ($isUpdate) {
-            if ($syncFields === 'price_stock') $strategy = 'quick_update';
+            if ($vendorSyncPolicy->shouldRestrictUpdateFields() || $syncFields === 'price_stock') $strategy = 'quick_update';
             elseif ($syncFields === 'custom') $strategy = 'custom_update';
             else $strategy = 'update';
         }

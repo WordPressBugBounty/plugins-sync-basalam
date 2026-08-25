@@ -33,11 +33,16 @@
                     </p>
                 </div>
             </div>
-        <?php else: ?>
+        <?php elseif ($vendorCanCreate): ?>
             <p class="basalam-p basalam-onboarding-paragraph">آیا مطمئن هستید که می‌خواهید همه محصولات را به باسلام ارسال کنید؟</p>
         <?php endif; ?>
 
-        <?php if (!$has_active_create_jobs): ?>
+        <?php if (!$vendorCanCreate): ?>
+            <div class="basalam-p basalam-warning-bg">
+                <strong>ایجاد محصول در دسترس نیست.</strong>
+                <p><?php echo esc_html($vendorSyncState['message']); ?></p>
+            </div>
+        <?php elseif (!$has_active_create_jobs): ?>
             <form method="POST" action="#" id="basalamAddProductsForm">
                 <?php wp_nonce_field('create_products_to_basalam_nonce', '_wpnonce'); ?>
                 <input type="hidden" name="action" value="create_products_to_basalam">

@@ -7,6 +7,8 @@ use SyncBasalam\Services\Products\UpdateSingleProductService;
 use SyncBasalam\Admin\Product\Data\ProductDataFacade;
 use SyncBasalam\Logger\Logger;
 use SyncBasalam\Services\Products\Discount\DiscountTaskProcessor;
+use SyncBasalam\Jobs\Exceptions\NonRetryableException;
+use SyncBasalam\Services\VendorSyncPolicy;
 
 defined('ABSPATH') || exit;
 
@@ -28,6 +30,11 @@ class UpdateProduct extends AbstractProductOperation
 
     protected function run(int $productId, array $args = []): array
     {
+        $vendorSyncPolicy = syncBasalamContainer()->get(VendorSyncPolicy::class);
+        if (!$vendorSyncPolicy->canUpdate()) {
+            throw NonRetryableException::invalidData($vendorSyncPolicy->getRestrictionMessage(false));
+        }
+
         $categoryIds = $args['category_ids'] ?? null;
 
         $productData = ProductDataFacade::get($productId, $categoryIds);

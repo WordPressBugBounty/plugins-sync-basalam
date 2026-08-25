@@ -5,6 +5,7 @@ namespace SyncBasalam\Admin\Product\elements\ProductList;
 use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Admin\Components\CommonComponents;
 use SyncBasalam\Utilities\ProductMetaKey;
+use SyncBasalam\Services\VendorSyncPolicy;
 
 defined('ABSPATH') || exit;
 
@@ -58,6 +59,8 @@ class MetaBox
         $settings = syncBasalamSettings();
         $BasalamAccessToken = $settings->getSettings(SettingsConfig::TOKEN);
         $syncBasalamVendorId = $settings->getSettings(SettingsConfig::VENDOR_ID);
+        $vendorSyncPolicy = syncBasalamContainer()->get(VendorSyncPolicy::class);
+        $vendorSyncState = $vendorSyncPolicy->getFrontendState();
 
         if ($productStatus == 'publish') {
             if ($basalamProductSyncStatus == 'pending') {
@@ -67,17 +70,31 @@ class MetaBox
             } else {
                 // بدون شناسه محصول باسلام، محصول متصل نیست؛ حتی اگر وضعیت‌های قدیمی روی محصول مانده باشد.
                 if ($basalamProductStatus && $syncBasalamProductId) {
-                    CommonComponents::renderBtn('بروزسانی محصول در باسلام', 'update_product_in_basalam', $post->ID, 'update_product_in_basalam_nonce', true);
-                    if ($basalamProductStatus == 2976) {
-                        CommonComponents::renderBtn('آرشیو کردن محصول در باسلام', 'archive_exist_product_on_basalam', $post->ID, 'archive_exist_product_on_basalam_nonce', true);
+                    if (!empty($vendorSyncState['can_update'])) {
+                        $updateLabel = $vendorSyncState['mode'] === VendorSyncPolicy::MODE_INACTIVE_LIMITED
+                            ? 'بروزرسانی قیمت و موجودی در باسلام'
+                            : 'بروزسانی محصول در باسلام';
+                        CommonComponents::renderBtn($updateLabel, 'update_product_in_basalam', $post->ID, 'update_product_in_basalam_nonce', true);
                     } else {
-                        CommonComponents::renderBtn('بازگردانی محصول در باسلام', 'restore_exist_product_on_basalam', $post->ID, 'restore_exist_product_on_basalam_nonce', true);
+                        echo '<p class="basalam-p basalam-font-12">' . esc_html($vendorSyncState['message']) . '</p>';
+                    }
+
+                    if ($vendorSyncPolicy->canUpdateProductStatus(false)) {
+                        if ($basalamProductStatus == 2976) {
+                            CommonComponents::renderBtn('آرشیو کردن محصول در باسلام', 'archive_exist_product_on_basalam', $post->ID, 'archive_exist_product_on_basalam_nonce', true);
+                        } else {
+                            CommonComponents::renderBtn('بازگردانی محصول در باسلام', 'restore_exist_product_on_basalam', $post->ID, 'restore_exist_product_on_basalam_nonce', true);
+                        }
                     }
                     $link = "https://basalam.com/p/" . $syncBasalamProductId;
                     CommonComponents::renderLink('مشاهده محصول در باسلام', $link);
                     CommonComponents::renderBtn('قطع اتصال محصول', 'disconnect_exist_product_on_basalam', $post->ID, 'disconnect_exist_product_on_basalam_nonce', true);
                 } else {
-                    CommonComponents::renderBtn('اضافه کردن محصول در باسلام', 'create_product_basalam', $post->ID, 'create_product_basalam_nonce', true);
+                    if (!empty($vendorSyncState['can_create'])) {
+                        CommonComponents::renderBtn('اضافه کردن محصول در باسلام', 'create_product_basalam', $post->ID, 'create_product_basalam_nonce', true);
+                    } else {
+                        echo '<p class="basalam-p basalam-font-12">' . esc_html($vendorSyncState['message']) . '</p>';
+                    }
                     require_once syncBasalamPlugin()->templatePath("products/ConnectButton.php");
                 }
             }

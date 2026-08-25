@@ -11,14 +11,22 @@
 
     <div class="basalam-flex-fill">
         <div class="basalam-action-buttons basalam-action-buttons-col">
-            <button type="button" id="basalamOpenAddProductsModal" class="basalam-secondary-button basalam-p">
+            <button type="button" id="basalamOpenAddProductsModal" class="basalam-secondary-button basalam-p<?php echo !$vendorCanCreate ? ' basalam-button-disabled-bg' : ''; ?>"
+                <?php disabled(!$vendorCanCreate); ?>
+                title="<?php echo !$vendorCanCreate ? esc_attr($vendorSyncState['message']) : ''; ?>">
                 <img class="basalam-img-20" src="<?php echo esc_url(syncBasalamPlugin()->assetsUrl() . '/icons/new.svg'); ?>">
                 اضافه کردن همه محصولات به باسلام
             </button>
 
-            <button type="button" id="BasalamOpenUpdateProductsModal" class="basalam-secondary-button basalam-p">
+            <button type="button" id="BasalamOpenUpdateProductsModal" class="basalam-secondary-button basalam-p<?php echo !$vendorCanUpdate ? ' basalam-button-disabled-bg' : ''; ?>"
+                <?php disabled(!$vendorCanUpdate); ?>
+                title="<?php echo !$vendorCanUpdate ? esc_attr($vendorSyncState['message']) : ''; ?>">
                 <img class="basalam-img-20" src="<?php echo esc_url(syncBasalamPlugin()->assetsUrl() . '/icons/update.svg'); ?>">
-                بروزرسانی همه محصولات باسلامی
+                <?php
+                if (!$vendorCanUpdate) echo 'بروزرسانی محصولات متوقف است';
+                elseif ($vendorUpdateIsLimited) echo 'بروزرسانی قیمت و موجودی محصولات';
+                else echo 'بروزرسانی همه محصولات باسلامی';
+                ?>
             </button>
 
             <button type="button" id="BasalamOpenConnectProductsModal" class="basalam-secondary-button basalam-p">

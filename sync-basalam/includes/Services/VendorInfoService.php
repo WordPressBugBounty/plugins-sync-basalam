@@ -24,6 +24,10 @@ class VendorInfoService
 
     public function FetchVendorInfo()
     {
+        // Credentials can change during an OAuth callback in the same request.
+        $this->basalamToken = Settings::getSettings(SettingsConfig::TOKEN);
+        $this->basalamVendorId = Settings::getSettings(SettingsConfig::VENDOR_ID);
+
         if (!$this->basalamToken || !$this->basalamVendorId) {
             return null;
         }

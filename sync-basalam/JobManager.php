@@ -25,7 +25,7 @@ class JobManager
         global $wpdb;
 
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom plugin table; no object cache for these operational queries.
-        return $wpdb->insert(
+        $result = $wpdb->insert(
             $this->jobManagerTableName,
             array(
                 'job_type'      => $jobType,
@@ -36,6 +36,12 @@ class JobManager
                 'created_at'    => time(),
             )
         );
+
+        if ($result !== false) {
+            do_action('sync_basalam_job_created', $jobType, $status, $payload);
+        }
+
+        return $result;
     }
 
     public function getNextEligibleJob(string $jobType): ?object
@@ -58,6 +64,32 @@ class JobManager
     public function hasAnyProcessingJob(): bool
     {
         return $this->getCountJobs(['status' => 'processing']) > 0;
+    }
+
+    public function hasPendingOrStaleProcessingJobs(int $staleProcessingTimeoutSeconds = 120): bool
+    {
+        global $wpdb;
+
+        $now = time();
+        $staleBefore = $now - $staleProcessingTimeoutSeconds;
+
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix, not user input.
+        $result = $wpdb->get_var($wpdb->prepare(
+            "SELECT 1 FROM {$this->jobManagerTableName}
+             WHERE (
+                 status = 'pending'
+                 AND (retry_after IS NULL OR retry_after <= %d)
+             ) OR (
+                 status = 'processing'
+                 AND started_at IS NOT NULL
+                 AND started_at < %d
+             )
+             LIMIT 1",
+            $now,
+            $staleBefore
+        ));
+
+        return (string) $result === '1';
     }
 
     public function getJob($where = array())

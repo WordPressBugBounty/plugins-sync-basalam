@@ -6,6 +6,7 @@ use SyncBasalam\JobManager;
 use SyncBasalam\Actions\Controller\ActionController;
 use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Admin\Settings\SettingsManager;
+use SyncBasalam\Services\VendorSyncPolicy;
 
 defined('ABSPATH') || exit;
 
@@ -18,7 +19,14 @@ class UpdateAllProducts extends ActionController
             return wp_send_json_error(['message' => 'نوع بروزرسانی نامعتبر است.'], 400);
         }
 
-        if (!SettingsManager::isProductUpdateSelectionValid()) {
+        $vendorSyncPolicy = syncBasalamContainer()->get(VendorSyncPolicy::class);
+        if (!$vendorSyncPolicy->canUpdate()) {
+            return wp_send_json_error(['message' => $vendorSyncPolicy->getRestrictionMessage(false)], 409);
+        }
+
+        if ($vendorSyncPolicy->shouldRestrictUpdateFields(false)) {
+            $updateType = 'quick';
+        } elseif (!SettingsManager::isProductUpdateSelectionValid()) {
             return wp_send_json_error(['message' => SettingsConfig::CUSTOM_PRODUCT_UPDATE_REQUIRED_MESSAGE], 422);
         }
 

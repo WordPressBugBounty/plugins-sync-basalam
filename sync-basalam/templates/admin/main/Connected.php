@@ -1,11 +1,18 @@
 <?php
 
 use SyncBasalam\JobManager;
+use SyncBasalam\Services\VendorSyncPolicy;
 use SyncBasalam\Utilities\ProductMetaKey;
 
 defined('ABSPATH') || exit;
 
 global $wpdb;
+
+$vendorSyncState = syncBasalamContainer()->get(VendorSyncPolicy::class)->getFrontendState();
+$vendorSyncMode = $vendorSyncState['mode'];
+$vendorCanCreate = !empty($vendorSyncState['can_create']);
+$vendorCanUpdate = !empty($vendorSyncState['can_update']);
+$vendorUpdateIsLimited = $vendorSyncMode === VendorSyncPolicy::MODE_INACTIVE_LIMITED;
 
 $count_of_published_woocommerce_products = wp_count_posts('product')->publish;
 $productIdMetaKey = ProductMetaKey::basalamProductId();
