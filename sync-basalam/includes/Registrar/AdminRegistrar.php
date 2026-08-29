@@ -377,6 +377,18 @@ class AdminRegistrar implements RegistrarInterface
 
     public static function adminEnqueueScripts($hook = '')
     {
+        $version = syncbasalamplugin()->getVersion();
+
+        if (ChatWidget::shouldLoadWidget()) {
+            wp_enqueue_script(
+                "basalam-chat-widget-script",
+                self::assetsUrl("chat/widget-loader.js"),
+                [],
+                $version,
+                true
+            );
+        }
+
         $shouldLoadPointerTour = PointerTour::shouldLoadPointerTour((string) $hook);
         $shouldLoadAssets = self::isWoosalamRelatedAdminScreen($hook);
 
@@ -384,7 +396,6 @@ class AdminRegistrar implements RegistrarInterface
             return;
         }
 
-        $version = syncbasalamplugin()->getVersion();
         $isPluginPage = self::isPluginAdminPage($hook);
         $isMainPage = self::isPluginPage('sync_basalam');
         $isProductScreen = self::isProductAdminScreen($hook);
@@ -479,7 +490,7 @@ class AdminRegistrar implements RegistrarInterface
             );
         }
 
-        if ($isMainPage) {
+        if ($isMainPage || $isProductEditScreen) {
             wp_enqueue_script(
                 "basalam-admin-manage-box-script",
                 self::assetsUrl("js/manage-box.js"),
@@ -487,6 +498,9 @@ class AdminRegistrar implements RegistrarInterface
                 $version,
                 true
             );
+        }
+
+        if ($isMainPage) {
             wp_enqueue_script(
                 "basalam-map-category-option-script",
                 self::assetsUrl("js/map-category-option.js"),
@@ -550,16 +564,6 @@ class AdminRegistrar implements RegistrarInterface
                 self::assetsUrl("js/ticket.js"),
                 ["basalam-admin-toast-script"],
                 $ticketScriptVersion,
-                true
-            );
-        }
-
-        if ($isPluginPage && ChatWidget::shouldLoadWidget()) {
-            wp_enqueue_script(
-                "basalam-chat-widget-script",
-                self::assetsUrl("chat/widget-loader.js"),
-                [],
-                $version,
                 true
             );
         }

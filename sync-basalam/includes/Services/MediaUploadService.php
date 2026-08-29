@@ -136,19 +136,7 @@ class MediaUploadService
 
     private function detectMimeType(string $filePath): string
     {
-        $fileType = wp_check_filetype($filePath);
-        if (!empty($fileType['type'])) return (string) $fileType['type'];
-
-        if (function_exists('finfo_open')) {
-            $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            if ($finfo) {
-                $mimeType = finfo_file($finfo, $filePath);
-                finfo_close($finfo);
-                if (is_string($mimeType) && $mimeType !== '') return $mimeType;
-            }
-        }
-
-        return 'application/octet-stream';
+        return MediaMimeType::detect($filePath);
     }
 
     private function decodeBody($body): array

@@ -2,6 +2,29 @@
 
 <details>
 
+<summary>1.10.12 - 2026-08-29</summary>
+
+### Fixed
+- Restored the AJAX click handlers for product update, archive, restore, and disconnect actions on the WooCommerce product editor
+
+### Changed / Improved
+- The authenticated Woosalam chat widget now loads on every WordPress admin screen while other Woosalam assets remain scoped to their relevant pages
+
+</details>
+
+<details>
+
+<summary>1.10.11 - 2026-08-26</summary>
+
+### Fixed
+- Product media MIME types are now detected from the actual file contents before checking the filename extension
+- Non-standard image MIME aliases such as `image/jpg`, `image/pjpeg`, and vendor-specific PNG/BMP values are normalized to the canonical values accepted by Basalam Uploadio
+- The media upload request and multipart file transfer now use the same canonical MIME type, preventing valid JPEG images from failing with a `422` unsupported-MIME response
+
+</details>
+
+<details>
+
 <summary>1.10.10 - 2026-08-25</summary>
 
 ### Added

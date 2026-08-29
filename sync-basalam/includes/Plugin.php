@@ -15,7 +15,7 @@ defined('ABSPATH') || exit;
 
 class Plugin
 {
-    public const VERSION = '1.10.10';
+    public const VERSION = '1.10.12';
 
     public function __construct()
     {

@@ -3,6 +3,7 @@
 namespace SyncBasalam\Services\Api;
 
 use SyncBasalam\Logger\Logger;
+use SyncBasalam\Services\MediaMimeType;
 
 defined('ABSPATH') || exit;
 
@@ -48,8 +49,7 @@ class FileUploadApiService
 
     private function uploadWithCurl(string $url, string $filePath, array $data, array $headers, array $options): array
     {
-        $filetypeInfo = wp_check_filetype($filePath);
-        $mimeType = $filetypeInfo['type'] ?? 'application/octet-stream';
+        $mimeType = MediaMimeType::detect($filePath);
         $fields = $data;
         $fields['file'] = new \CURLFile($filePath, $mimeType, basename($filePath));
         $headerLines = [];
@@ -209,8 +209,7 @@ class FileUploadApiService
                 return '';
             }
 
-            $filetypeInfo = wp_check_filetype($localFile);
-            $mimeType = $filetypeInfo['type'] ?? 'application/octet-stream';
+            $mimeType = MediaMimeType::detect($localFile);
 
             $payload .= '--' . $boundary . $eol;
             $payload .= 'Content-Disposition: form-data; name="file"; filename="' . $filename . '"' . $eol;
