@@ -414,6 +414,18 @@ class AdminRegistrar implements RegistrarInterface
             true
         );
 
+        $vendorStatusScriptPath = syncbasalamplugin()->pluginPath() . '/assets/js/vendor-status.js';
+        $vendorStatusScriptVersion = file_exists($vendorStatusScriptPath)
+            ? $version . '-' . filemtime($vendorStatusScriptPath)
+            : $version;
+        wp_enqueue_script(
+            "basalam-vendor-status-script",
+            self::assetsUrl("js/vendor-status.js"),
+            ["basalam-admin-toast-script"],
+            $vendorStatusScriptVersion,
+            true
+        );
+
         $ticketNotice = TicketFlashNotice::pull();
         if ($ticketNotice !== null) {
             wp_add_inline_script(

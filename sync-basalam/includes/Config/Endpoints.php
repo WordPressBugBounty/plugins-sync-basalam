@@ -40,7 +40,7 @@ final class Endpoints
     const VENDOR_INFO = self::OPENAPI_BASE . '/v1/vendors/%d';
 
     /** GET category-detection prediction — append encoded title as query param */
-    const CATEGORY_DETECT = self::CATEGORY_BASE . '/category_detection/api_v1.0/predict/';
+    const CATEGORY_DETECT = self::CATEGORY_BASE . '/category_detection/api_v2.0/predict/';
 
     /** POST initialize a product media upload */
     const MEDIA_UPLOAD_REQUEST = self::UPLOAD_BASE . '/v3/media/upload-request';

@@ -33,6 +33,11 @@ class FetchVersionDetail
 
     public function checkForceUpdate()
     {
+        if (wp_get_environment_type() === 'local') {
+            delete_option('sync_basalam_force_update');
+            return false;
+        }
+
         try {
             $response = $this->Fetch();
 

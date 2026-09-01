@@ -41,6 +41,11 @@ class VendorSyncPolicy
 
     public function ensureScheduled(): void
     {
+        if ($this->isLocalEnvironment()) {
+            self::unschedule();
+            return;
+        }
+
         if (wp_next_scheduled(self::CRON_HOOK) !== false) return;
 
         wp_schedule_event($this->now() + MINUTE_IN_SECONDS, 'daily', self::CRON_HOOK);
@@ -53,6 +58,10 @@ class VendorSyncPolicy
 
     public function getState(bool $refreshIfDue = true): array
     {
+        if ($this->isLocalEnvironment()) {
+            return $this->defaultState((int) Settings::getSettings(SettingsConfig::VENDOR_ID));
+        }
+
         if ($refreshIfDue) return $this->refreshIfDue();
 
         return $this->getStoredState();
@@ -168,6 +177,10 @@ class VendorSyncPolicy
         $state = $this->getStoredState();
         $now = $this->now();
 
+        if ($this->isLocalEnvironment()) {
+            return $this->defaultState($vendorId);
+        }
+
         if (!$vendorId || !$token) {
             $state = $this->defaultState($vendorId);
             update_option(self::OPTION_NAME, $state, false);
@@ -198,6 +211,13 @@ class VendorSyncPolicy
         $now = $this->now();
         $state = $this->getStoredState();
 
+        if ($this->isLocalEnvironment()) {
+            $state = $this->defaultState($vendorId);
+            update_option(self::OPTION_NAME, $state, false);
+
+            return $state;
+        }
+
         if (!$vendorId || !$token) {
             $state = $this->defaultState($vendorId);
             update_option(self::OPTION_NAME, $state, false);
@@ -227,6 +247,7 @@ class VendorSyncPolicy
 
     public function renderAdminNotice(): void
     {
+        if ($this->isLocalEnvironment()) return;
         if (!$this->isRelevantAdminScreen()) return;
 
         $vendorSyncState = $this->getFrontendState();
@@ -362,6 +383,12 @@ class VendorSyncPolicy
     private function now(): int
     {
         return (int) call_user_func($this->clock);
+    }
+
+    private function isLocalEnvironment(): bool
+    {
+        return function_exists('wp_get_environment_type')
+            && wp_get_environment_type() === 'local';
     }
 
     private function isRelevantAdminScreen(): bool

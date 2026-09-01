@@ -2,6 +2,19 @@
 
 <details>
 
+<summary>1.10.13 - 2026-09-01</summary>
+
+### Added
+- Added a manual vendor-status recheck button to inactive-vendor notices so store owners can immediately restore synchronization after reactivating their Basalam booth
+
+### Changed / Improved
+- Local environments now bypass vendor-status checks and inactive-vendor restrictions; the daily vendor-status cron is also unscheduled locally
+- The category detection endpoint now uses API v2.0 while preserving the existing response consumer contract
+
+</details>
+
+<details>
+
 <summary>1.10.12 - 2026-08-29</summary>
 
 ### Fixed

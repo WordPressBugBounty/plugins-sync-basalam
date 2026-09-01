@@ -9,7 +9,7 @@ $inactiveDays = (int) ($vendorSyncState['inactive_days'] ?? 0);
 $statusName = trim((string) ($vendorSyncState['status_name'] ?? ''));
 $noticeClass = $mode === VendorSyncPolicy::MODE_INACTIVE_SUSPENDED ? 'notice-error' : 'notice-warning';
 ?>
-<div class="notice <?php echo esc_attr($noticeClass); ?> sync-basalam-vendor-status-notice">
+<div class="notice <?php echo esc_attr($noticeClass); ?> sync-basalam-vendor-status-notice" id="sync_basalam_vendor_status_notice">
     <?php if ($mode === VendorSyncPolicy::MODE_INACTIVE_LIMITED): ?>
         <p>
             <strong>غرفه باسلام شما غیرفعال است.</strong>
@@ -28,4 +28,14 @@ $noticeClass = $mode === VendorSyncPolicy::MODE_INACTIVE_SUSPENDED ? 'notice-err
     <?php if ($statusName !== ''): ?>
         <p>وضعیت فعلی غرفه در باسلام: <strong><?php echo esc_html($statusName); ?></strong></p>
     <?php endif; ?>
+
+    <p>
+        <button
+            type="button"
+            class="button <?php echo esc_attr($mode === VendorSyncPolicy::MODE_INACTIVE_SUSPENDED ? 'button-primary' : ''); ?>"
+            id="sync_basalam_refresh_vendor_status_btn"
+            data-nonce="<?php echo esc_attr(wp_create_nonce('sync_basalam_refresh_vendor_status_nonce')); ?>">
+            بررسی مجدد وضعیت غرفه
+        </button>
+    </p>
 </div>

@@ -40,6 +40,7 @@ use SyncBasalam\Actions\Controller\CategoryActions\GetMappingStats;
 use SyncBasalam\Actions\Controller\TicketActions\CreateTicket;
 use SyncBasalam\Actions\Controller\TicketActions\CreateTicketItem;
 use SyncBasalam\Actions\Controller\TicketActions\UploadTicketMediaAjax;
+use SyncBasalam\Actions\Controller\RefreshVendorStatus;
 
 defined('ABSPATH') || exit;
 
@@ -92,5 +93,6 @@ class RegisterActions
         ActionHandler::postAjax('sync_basalam_remind_later_review', RemindLaterReview::class);
         ActionHandler::postAjax('sync_basalam_never_remind_review', NeverRemindReview::class);
         ActionHandler::postAjax('sync_basalam_submit_review', SubmitReview::class);
+        ActionHandler::postAjax('sync_basalam_refresh_vendor_status', RefreshVendorStatus::class);
     }
 }
