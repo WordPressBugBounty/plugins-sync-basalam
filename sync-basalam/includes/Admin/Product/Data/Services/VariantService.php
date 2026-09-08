@@ -48,6 +48,11 @@ class VariantService
             'properties' => $this->getVariantProperties($variation, $parentProduct),
         ];
 
+        $sku = trim((string) $variation->get_sku());
+        if ($sku !== '') {
+            $variantData['sku'] = $sku;
+        }
+
         // Add Basalam variant ID if it exists
         if (!empty($basalamVariantId)) {
             $variantData['id'] = $basalamVariantId;

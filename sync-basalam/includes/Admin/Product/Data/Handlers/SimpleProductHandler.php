@@ -49,6 +49,13 @@ class SimpleProductHandler implements ProductDataHandlerInterface
         return mb_substr($name, 0, 120);
     }
 
+    public function getSku($product): ?string
+    {
+        $sku = trim((string) $product->get_sku());
+
+        return $sku !== '' ? $sku : null;
+    }
+
     public function getDescription($product): string
     {
         return $this->attributeService->generateDescription($product);

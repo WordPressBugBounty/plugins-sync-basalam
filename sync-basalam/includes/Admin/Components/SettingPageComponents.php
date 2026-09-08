@@ -285,6 +285,7 @@ class SettingPageComponents
     {
         echo '<div>';
         echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_NAME, 'نام'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped inside the component method.
+        echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_SKU, 'کد محصول (SKU)'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped inside the component method.
         echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_PHOTOS, 'عکس'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped inside the component method.
         echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_PRICE, 'قیمت'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped inside the component method.
         echo self::renderSingleCheckbox(SettingsConfig::SYNC_PRODUCT_FIELD_STOCK, 'موجودی'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML is escaped inside the component method.

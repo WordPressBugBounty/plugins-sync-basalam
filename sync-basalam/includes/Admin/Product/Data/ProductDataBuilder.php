@@ -69,6 +69,7 @@ class ProductDataBuilder
     {
         $this->data = [
             'name' => '',
+            'sku' => null,
             'description' => '',
             'category_id' => null,
             'category_ids' => [],

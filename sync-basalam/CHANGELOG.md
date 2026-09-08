@@ -2,6 +2,18 @@
 
 <details>
 
+<summary>1.10.14 - 2026-09-08</summary>
+
+### Added
+- Product SKUs are now sent to Basalam when creating or updating products, and variation SKUs are sent with variant payloads and per-variation updates; a new "کد محصول (SKU)" option controls the field in custom update mode (enabled by default)
+
+### Fixed
+- The async job runner now dispatches from init instead of shutdown, avoiding database "commands out of sync" errors caused by unread result sets left by other shutdown callbacks
+
+</details>
+
+<details>
+
 <summary>1.10.13 - 2026-09-01</summary>
 
 ### Added

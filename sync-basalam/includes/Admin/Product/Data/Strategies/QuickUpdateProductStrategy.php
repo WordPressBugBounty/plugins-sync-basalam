@@ -17,6 +17,11 @@ class QuickUpdateProductStrategy implements DataStrategyInterface
             'type' => $product->get_type(),
         ];
 
+        $sku = $handler->getSku($product);
+        if ($sku !== null) {
+            $data['sku'] = $sku;
+        }
+
         if (!$product->is_type('variable')) {
             $data['primary_price'] = $handler->getPrice($product);
             $data['stock'] = $handler->getStock($product);

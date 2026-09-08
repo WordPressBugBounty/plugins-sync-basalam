@@ -7,6 +7,7 @@ defined('ABSPATH') || exit;
 interface ProductDataHandlerInterface
 {
     public function getName($product): string;
+    public function getSku($product): ?string;
     public function getDescription($product): string;
     public function getCategoryId($product): ?int;
     public function getCategoryIds($product): array;

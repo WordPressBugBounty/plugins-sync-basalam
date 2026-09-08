@@ -20,4 +20,23 @@ class VariableProductHandler extends SimpleProductHandler
     {
         return $this->variantService->getVariants($product);
     }
+
+    public function getSku($product): ?string
+    {
+        $sku = trim((string) $product->get_sku());
+        if ($sku !== '') return $sku;
+
+        // Variable products keep their SKUs at variation level (the parent SKU field
+        // is usually empty in WooCommerce), so resolve the product-level SKU from
+        // the first variation that has one.
+        foreach ($product->get_children() as $variationId) {
+            $variation = \wc_get_product($variationId);
+            if (!$variation) continue;
+
+            $variationSku = trim((string) $variation->get_sku());
+            if ($variationSku !== '') return $variationSku;
+        }
+
+        return null;
+    }
 }

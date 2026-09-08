@@ -30,6 +30,7 @@ class SettingsConfig
     public const PRODUCT_SUFFIX_TITLE = "product_suffix_title";
     public const SYNC_PRODUCT_FIELDS = "sync_product_fields";
     public const SYNC_PRODUCT_FIELD_NAME = "sync_product_field_name";
+    public const SYNC_PRODUCT_FIELD_SKU = "sync_product_field_sku";
     public const SYNC_PRODUCT_FIELD_PHOTOS = "sync_product_field_photos";
     public const SYNC_PRODUCT_FIELD_PRICE = "sync_product_field_price";
     public const SYNC_PRODUCT_FIELD_STOCK = "sync_product_field_stock";
@@ -40,6 +41,7 @@ class SettingsConfig
     public const SYNC_PRODUCT_FIELD_VARIANT_STOCK = "sync_product_field_variant_stock";
     public const CUSTOM_PRODUCT_UPDATE_FIELDS = [
         self::SYNC_PRODUCT_FIELD_NAME,
+        self::SYNC_PRODUCT_FIELD_SKU,
         self::SYNC_PRODUCT_FIELD_PHOTOS,
         self::SYNC_PRODUCT_FIELD_PRICE,
         self::SYNC_PRODUCT_FIELD_STOCK,
@@ -99,6 +101,7 @@ class SettingsConfig
             self::DEFAULT_STOCK_QUANTITY            => 1,
             self::SYNC_PRODUCT_FIELDS               => 'all',
             self::SYNC_PRODUCT_FIELD_NAME           => 0,
+            self::SYNC_PRODUCT_FIELD_SKU            => 1,
             self::SYNC_PRODUCT_FIELD_PHOTOS         => 0,
             self::SYNC_PRODUCT_FIELD_PRICE          => 0,
             self::SYNC_PRODUCT_FIELD_STOCK          => 0,

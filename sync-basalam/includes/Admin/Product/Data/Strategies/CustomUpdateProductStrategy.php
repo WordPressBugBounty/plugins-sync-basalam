@@ -28,6 +28,13 @@ class CustomUpdateProductStrategy implements DataStrategyInterface
             $data['name'] = $handler->getName($product);
         }
 
+        if (!array_key_exists('sku', $data) && $this->shouldSyncField(SettingsConfig::SYNC_PRODUCT_FIELD_SKU)) {
+            $sku = $handler->getSku($product);
+            if ($sku !== null) {
+                $data['sku'] = $sku;
+            }
+        }
+
         if (!array_key_exists('photo', $data) && $this->shouldSyncField(SettingsConfig::SYNC_PRODUCT_FIELD_PHOTOS)) {
             $data['photo'] = $handler->getMainPhoto($product);
         }
@@ -89,15 +96,17 @@ class CustomUpdateProductStrategy implements DataStrategyInterface
 
         $syncPrice = $this->shouldSyncField(SettingsConfig::SYNC_PRODUCT_FIELD_VARIANT_PRICE);
         $syncStock = $this->shouldSyncField(SettingsConfig::SYNC_PRODUCT_FIELD_VARIANT_STOCK);
+        $syncSku = $this->shouldSyncField(SettingsConfig::SYNC_PRODUCT_FIELD_SKU);
 
-        if (!$syncPrice && !$syncStock) return [];
+        if (!$syncPrice && !$syncStock && !$syncSku) return [];
 
         // Connected variations are patched one by one, so only the ticked fields are sent.
-        return array_map(function ($variant) use ($syncPrice, $syncStock) {
+        return array_map(function ($variant) use ($syncPrice, $syncStock, $syncSku) {
             $selected = ['id' => $variant['id']];
 
             if ($syncPrice && array_key_exists('primary_price', $variant)) $selected['primary_price'] = $variant['primary_price'];
             if ($syncStock && array_key_exists('stock', $variant)) $selected['stock'] = $variant['stock'];
+            if ($syncSku && array_key_exists('sku', $variant)) $selected['sku'] = $variant['sku'];
 
             return $selected;
         }, $variants);

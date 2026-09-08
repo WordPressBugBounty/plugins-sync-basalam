@@ -18,6 +18,12 @@ class CreateProductStrategy implements DataStrategyInterface
         if (!array_key_exists('name', $data)) {
             $data['name'] = $handler->getName($product);
         }
+        if (!array_key_exists('sku', $data)) {
+            $sku = $handler->getSku($product);
+            if ($sku !== null) {
+                $data['sku'] = $sku;
+            }
+        }
         if (!array_key_exists('description', $data)) {
             $data['description'] = $handler->getDescription($product);
         }

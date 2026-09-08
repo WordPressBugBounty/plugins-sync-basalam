@@ -29,8 +29,10 @@ class JobsRunner
     ) {
         add_action('wp_ajax_' . self::ASYNC_ACTION, [$this, 'handleAsyncRequest']);
         add_action('wp_ajax_nopriv_' . self::ASYNC_ACTION, [$this, 'handleAsyncRequest']);
-        add_action('shutdown', [$this, 'maybeDispatchAsyncRequest'], PHP_INT_MAX);
-        add_action('sync_basalam_job_created', [$this, 'maybeDispatchAsyncRequest']);
+        // Keep database work out of shutdown, where another callback may have
+        // left the shared mysqli connection with an unread result set.
+        add_action('init', [$this, 'maybeDispatchAsyncRequest'], 10, 0);
+        add_action('sync_basalam_job_created', [$this, 'maybeDispatchAsyncRequest'], 10, 0);
 
         $this->jobManager = $jobManager;
         $this->jobExecutor = $jobExecutor;
@@ -40,19 +42,22 @@ class JobsRunner
 
     public function maybeDispatchAsyncRequest(): void
     {
+        // Retain a guard for third-party callers that may still invoke this
+        // method during shutdown even though no shutdown hook is registered.
+        if (function_exists('did_action') && did_action('shutdown')) return;
         if ($this->isCurrentAsyncRequest()) return;
         if ($this->CheckHttpBlockService->SyncBasalamHttpBlock()) return;
         if (get_transient(self::ASYNC_DISPATCH_LOCK_TRANSIENT)) return;
+
+        if (!$this->jobManager->hasPendingOrStaleProcessingJobs(self::STALE_PROCESSING_TIMEOUT_SECONDS)) {
+            return;
+        }
 
         set_transient(
             self::ASYNC_DISPATCH_LOCK_TRANSIENT,
             1,
             self::ASYNC_DISPATCH_LOCK_SECONDS
         );
-
-        if (!$this->jobManager->hasPendingOrStaleProcessingJobs(self::STALE_PROCESSING_TIMEOUT_SECONDS)) {
-            return;
-        }
 
         $this->dispatchAsyncRequest();
     }

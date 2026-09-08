@@ -13,7 +13,7 @@ defined('ABSPATH') || exit;
 class UpdateProductVariationsService
 {
     /** Variant fields that are sent to the single-variation endpoint. */
-    private const VARIATION_FIELDS = ['primary_price', 'stock'];
+    private const VARIATION_FIELDS = ['primary_price', 'stock', 'sku'];
 
     private $apiservice;
 
