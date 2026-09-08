@@ -11,7 +11,10 @@ class JobsRunner
 {
     private const ASYNC_ACTION = 'sync_basalam_run_jobs_async';
     private const ASYNC_DISPATCH_LOCK_TRANSIENT = 'sync_basalam_jobs_runner_async_dispatch_lock';
-    private const ASYNC_DISPATCH_LOCK_SECONDS = 1;
+    // Keep the dispatch lease longer than a normal async batch. Without this,
+    // every frontend request can boot another full WordPress AJAX worker while
+    // a large product queue is active.
+    private const ASYNC_DISPATCH_LOCK_SECONDS = 25;
     private const ASYNC_TIME_LIMIT_SECONDS = 20;
     private const GLOBAL_RUNNER_LAST_RUN_OPTION = 'sync_basalam_jobs_runner_last_run';
     private const STALE_PROCESSING_TIMEOUT_SECONDS = 120;
@@ -95,34 +98,46 @@ class JobsRunner
 
     private function runAsyncBatch(): int
     {
+        if ($this->CheckHttpBlockService->SyncBasalamHttpBlock()) return 0;
+
+        // Hold the advisory lock for the whole batch, including rate-limit
+        // waits. Previously it was released after every job, so duplicate
+        // async requests could pile up and sleep in parallel until the next
+        // job became eligible, exhausting the site's PHP workers.
+        if (!$this->jobExecutor->acquireGlobalJobsLock(0)) return 0;
+
         $processed = 0;
         $deadline = microtime(true) + (float) apply_filters(
             'sync_basalam_jobs_runner_async_time_limit',
             self::ASYNC_TIME_LIMIT_SECONDS
         );
 
-        while (microtime(true) < $deadline) {
-            if (!$this->jobManager->hasPendingOrStaleProcessingJobs(self::STALE_PROCESSING_TIMEOUT_SECONDS)) {
-                break;
+        try {
+            while (microtime(true) < $deadline) {
+                if (!$this->jobManager->hasPendingOrStaleProcessingJobs(self::STALE_PROCESSING_TIMEOUT_SECONDS)) {
+                    break;
+                }
+
+                $ranJob = $this->runEligibleJobs();
+
+                if ($ranJob) {
+                    $processed++;
+                }
+
+                $delay = $this->secondsUntilNextAllowedRun();
+                if ($delay <= 0.0) {
+                    if (!$ranJob) break;
+                    continue;
+                }
+
+                if ((microtime(true) + $delay) >= $deadline) {
+                    break;
+                }
+
+                usleep((int) ($delay * 1000000));
             }
-
-            $ranJob = $this->checkAndRunJobs();
-
-            if ($ranJob) {
-                $processed++;
-            }
-
-            $delay = $this->secondsUntilNextAllowedRun();
-            if ($delay <= 0.0) {
-                if (!$ranJob) break;
-                continue;
-            }
-
-            if ((microtime(true) + $delay) >= $deadline) {
-                break;
-            }
-
-            usleep((int) ($delay * 1000000));
+        } finally {
+            $this->jobExecutor->releaseGlobalJobsLock();
         }
 
         return $processed;

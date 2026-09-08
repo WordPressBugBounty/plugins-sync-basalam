@@ -6,6 +6,7 @@ use SyncBasalam\Activator;
 use SyncBasalam\JobsRunner;
 use SyncBasalam\Infrastructure\Container\AppServiceProvider;
 use SyncBasalam\Infrastructure\Container\Container;
+use SyncBasalam\Services\ForceUpdateGate;
 use SyncBasalam\Services\VendorSyncPolicy;
 
 defined('ABSPATH') || exit;
@@ -13,7 +14,7 @@ defined('ABSPATH') || exit;
 /**
  * Plugin Name: sync basalam | ووسلام
  * Description: با استفاده از پلاگین ووسلام  میتوایند تمامی محصولات ووکامرس را با یک کلیک به غرفه باسلامی خود اضافه کنید‌، همچنین تمامی سفارش باسلامی شما به سایت شما اضافه میگردد.
- * Version: 1.10.14
+ * Version: 1.10.15
  * Author: Woosalam Dev
  * Author URI: https://wp.hamsalam.ir/
  * Plugin URI: https://wp.hamsalam.ir
@@ -36,12 +37,19 @@ add_action('before_woocommerce_init', function () {
     }
 });
 
-if (get_option('sync_basalam_force_update')) {
+$forceUpdate = get_option('sync_basalam_force_update');
+$installedVersion = (string) (get_option('sync_basalam_version') ?: '0.0.0');
+
+if (ForceUpdateGate::shouldBlock($forceUpdate, $installedVersion, Plugin::VERSION)) {
     add_action('admin_notices', function () {
         $template = __DIR__ . '/templates/notifications/ForceUpdateAlert.php';
         require_once $template;
      });
     return;
+}
+
+if ($forceUpdate) {
+    delete_option('sync_basalam_force_update');
 }
 
 add_action('init', 'syncBasalamPlugin');

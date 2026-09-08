@@ -82,7 +82,7 @@ class JobsRunnerTest extends TestCase
             [[
                 'name' => self::DISPATCH_LOCK,
                 'value' => 1,
-                'expiration' => 1,
+                'expiration' => 25,
             ]],
             $this->state()['transient_writes']
         );
@@ -185,16 +185,49 @@ class JobsRunnerTest extends TestCase
         $this->assertNoQueueLockOrDispatchActivity($jobManager);
     }
 
+    public function testAsyncBatchExitsImmediatelyWhenAnotherRunnerOwnsTheGlobalLock(): void
+    {
+        $jobManager = new FakeJobManager([true]);
+        $jobExecutor = new FakeJobExecutor(false);
+        $runner = $this->newRunner($jobManager, null, $jobExecutor);
+
+        self::assertSame(0, $this->invokeRunAsyncBatch($runner));
+        self::assertSame(1, $jobExecutor->acquireCalls);
+        self::assertSame(0, $jobExecutor->releaseCalls);
+        self::assertSame([], $jobManager->timeouts);
+    }
+
+    public function testAsyncBatchReleasesTheGlobalLockWhenTheQueueIsEmpty(): void
+    {
+        $jobManager = new FakeJobManager([false]);
+        $jobExecutor = new FakeJobExecutor(true);
+        $runner = $this->newRunner($jobManager, null, $jobExecutor);
+
+        self::assertSame(0, $this->invokeRunAsyncBatch($runner));
+        self::assertSame(1, $jobExecutor->acquireCalls);
+        self::assertSame(1, $jobExecutor->releaseCalls);
+        self::assertSame([120], $jobManager->timeouts);
+    }
+
     private function newRunner(
         ?FakeJobManager $jobManager = null,
-        ?FakeHttpBlockService $httpBlockService = null
+        ?FakeHttpBlockService $httpBlockService = null,
+        $jobExecutor = null
     ): JobsRunner {
         return new JobsRunner(
             $jobManager ?? new FakeJobManager(),
-            new \stdClass(),
+            $jobExecutor ?? new FakeJobExecutor(),
             new \stdClass(),
             $httpBlockService ?? new FakeHttpBlockService(false)
         );
+    }
+
+    private function invokeRunAsyncBatch(JobsRunner $runner): int
+    {
+        $method = new \ReflectionMethod($runner, 'runAsyncBatch');
+        $method->setAccessible(true);
+
+        return $method->invoke($runner);
     }
 
     private function assertNoQueueLockOrDispatchActivity(FakeJobManager $jobManager): void
@@ -247,5 +280,32 @@ class FakeHttpBlockService
         $this->calls++;
 
         return $this->blocked;
+    }
+}
+
+class FakeJobExecutor
+{
+    public $acquireCalls = 0;
+    public $releaseCalls = 0;
+
+    private $canAcquire;
+
+    public function __construct(bool $canAcquire = true)
+    {
+        $this->canAcquire = $canAcquire;
+    }
+
+    public function acquireGlobalJobsLock(int $timeout = 0): bool
+    {
+        $this->acquireCalls++;
+
+        return $this->canAcquire;
+    }
+
+    public function releaseGlobalJobsLock(): bool
+    {
+        $this->releaseCalls++;
+
+        return true;
     }
 }

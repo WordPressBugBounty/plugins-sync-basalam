@@ -5,6 +5,7 @@ namespace SyncBasalam\Services;
 use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Logger\Logger;
 use SyncBasalam\Services\ApiServiceManager;
+use SyncBasalam\Services\ForceUpdateGate;
 
 defined('ABSPATH') || exit;
 
@@ -49,7 +50,11 @@ class FetchVersionDetail
                 return false;
             }
 
-            if (!empty($data['force_update'])) {
+            if (ForceUpdateGate::shouldHonorRemoteFlag(
+                $data['force_update'],
+                $this->version,
+                isset($data['latest_version']) ? (string) $data['latest_version'] : null
+            )) {
                 update_option('sync_basalam_force_update', true);
                 return true;
             }

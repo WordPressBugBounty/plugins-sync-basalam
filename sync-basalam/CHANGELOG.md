@@ -2,6 +2,18 @@
 
 <details>
 
+<summary>1.10.15 - 2026-09-08</summary>
+
+### Fixed
+- Large product queues no longer spawn overlapping AJAX runners from normal site traffic; one runner now owns the entire processing batch and duplicate workers exit immediately
+- Async runner dispatches are leased for 25 seconds instead of one second, preventing PHP worker exhaustion and storefront 503/504 errors during full or quick product updates
+- Installing a newer plugin package now clears the previous version's force-update gate, allowing migrations, hooks, and the background jobs runner to start normally
+- Hotfix builds newer than the latest published package are no longer disabled when the version API has not registered them yet
+
+</details>
+
+<details>
+
 <summary>1.10.14 - 2026-09-08</summary>
 
 ### Added
