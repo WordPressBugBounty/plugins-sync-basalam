@@ -2,6 +2,26 @@
 
 <details>
 
+<summary>1.10.17 - 2026-09-09</summary>
+
+### Fixed
+- Async job dispatch runs during shutdown again, keeping queue probes and loopback requests out of the storefront response path
+- The dispatch lease is reserved before checking the queue, preventing concurrent requests from launching duplicate async runners
+
+</details>
+
+<details>
+
+<summary>1.10.16 - 2026-09-08</summary>
+
+### Fixed
+- Installing a newer plugin package now clears the previous version's force-update gate, allowing migrations, hooks, and the background jobs runner to start normally
+- Hotfix builds newer than the latest published package are no longer disabled when the version API has not registered them yet
+
+</details>
+
+<details>
+
 <summary>1.10.15 - 2026-09-08</summary>
 
 ### Fixed

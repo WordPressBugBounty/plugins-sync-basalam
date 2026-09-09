@@ -42,16 +42,16 @@ class JobsRunnerTest extends TestCase
         unset($GLOBALS['sync_basalam_jobs_runner_test_state']);
     }
 
-    public function testRegistersDispatcherOnInitAndNeverOnShutdown(): void
+    public function testRegistersDispatcherOnShutdownAndNeverOnInit(): void
     {
         $runner = $this->newRunner();
         $actions = $this->state()['actions'];
 
-        self::assertArrayHasKey('init', $actions);
-        self::assertSame([$runner, 'maybeDispatchAsyncRequest'], $actions['init'][0]['callback']);
-        self::assertSame(10, $actions['init'][0]['priority']);
-        self::assertSame(0, $actions['init'][0]['accepted_args']);
-        self::assertArrayNotHasKey('shutdown', $actions);
+        self::assertArrayHasKey('shutdown', $actions);
+        self::assertSame([$runner, 'maybeDispatchAsyncRequest'], $actions['shutdown'][0]['callback']);
+        self::assertSame(PHP_INT_MAX, $actions['shutdown'][0]['priority']);
+        self::assertSame(1, $actions['shutdown'][0]['accepted_args']);
+        self::assertArrayNotHasKey('init', $actions);
 
         self::assertSame(
             [$runner, 'maybeDispatchAsyncRequest'],
@@ -65,7 +65,7 @@ class JobsRunnerTest extends TestCase
         );
     }
 
-    public function testEligibleQueueIsConfirmedBeforeWritingLockAndDispatching(): void
+    public function testDispatchLeaseIsWrittenBeforeQueueProbeAndDispatching(): void
     {
         $jobManager = new FakeJobManager([true]);
         $runner = $this->newRunner($jobManager);
@@ -74,7 +74,7 @@ class JobsRunnerTest extends TestCase
         $runner->maybeDispatchAsyncRequest();
 
         self::assertSame(
-            ['get_transient', 'has_pending_jobs', 'set_transient', 'remote_post'],
+            ['get_transient', 'set_transient', 'has_pending_jobs', 'remote_post'],
             $this->state()['events']
         );
         self::assertSame([120], $jobManager->timeouts);
@@ -100,34 +100,41 @@ class JobsRunnerTest extends TestCase
         self::assertSame($_COOKIE, $requests[0]['args']['cookies']);
     }
 
-    public function testEmptyQueueDoesNotWriteLockOrDispatch(): void
+    public function testEmptyQueueStillReservesDispatchLease(): void
     {
         $jobManager = new FakeJobManager([false]);
         $runner = $this->newRunner($jobManager);
 
         $runner->maybeDispatchAsyncRequest();
 
-        self::assertSame(['get_transient', 'has_pending_jobs'], $this->state()['events']);
+        self::assertSame(['get_transient', 'set_transient', 'has_pending_jobs'], $this->state()['events']);
         self::assertSame([120], $jobManager->timeouts);
-        self::assertSame([], $this->state()['transient_writes']);
+        self::assertSame(
+            [[
+                'name' => self::DISPATCH_LOCK,
+                'value' => 1,
+                'expiration' => 25,
+            ]],
+            $this->state()['transient_writes']
+        );
         self::assertSame([], $this->state()['remote_requests']);
     }
 
-    public function testJobCreatedAfterAnEmptyInitCanStillDispatch(): void
+    public function testEmptyQueueLeasePreventsASecondProbeInTheSameRequest(): void
     {
         $jobManager = new FakeJobManager([false, true]);
         $runner = $this->newRunner($jobManager);
 
-        // The init probe sees no work and must not reserve the dispatch lock.
+        // The shutdown probe reserves the lease even when no work is found.
         $runner->maybeDispatchAsyncRequest();
-        self::assertSame([], $this->state()['transient_writes']);
-
-        // A job created later in the same request must still wake the runner.
-        $runner->maybeDispatchAsyncRequest();
-
-        self::assertSame([120, 120], $jobManager->timeouts);
         self::assertCount(1, $this->state()['transient_writes']);
-        self::assertCount(1, $this->state()['remote_requests']);
+
+        // A second callback in the same request must observe that lease.
+        $runner->maybeDispatchAsyncRequest();
+
+        self::assertSame([120], $jobManager->timeouts);
+        self::assertCount(1, $this->state()['transient_writes']);
+        self::assertCount(0, $this->state()['remote_requests']);
     }
 
     public function testExistingLockSkipsQueueCheckAndDispatch(): void
@@ -168,20 +175,6 @@ class JobsRunnerTest extends TestCase
         $runner->maybeDispatchAsyncRequest();
 
         self::assertSame(1, $httpBlockService->calls);
-        $this->assertNoQueueLockOrDispatchActivity($jobManager);
-    }
-
-    public function testShutdownGuardPreventsEveryDispatchSideEffect(): void
-    {
-        $GLOBALS['sync_basalam_jobs_runner_test_state']['did_actions']['shutdown'] = 1;
-
-        $jobManager = new FakeJobManager([true]);
-        $httpBlockService = new FakeHttpBlockService(false);
-        $runner = $this->newRunner($jobManager, $httpBlockService);
-
-        $runner->maybeDispatchAsyncRequest();
-
-        self::assertSame(0, $httpBlockService->calls);
         $this->assertNoQueueLockOrDispatchActivity($jobManager);
     }
 
