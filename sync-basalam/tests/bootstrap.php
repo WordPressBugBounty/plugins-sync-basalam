@@ -28,4 +28,5 @@ require_once dirname(__DIR__) . '/includes/Services/MediaMimeType.php';
 require_once dirname(__DIR__) . '/includes/Services/MediaUploadService.php';
 require_once dirname(__DIR__) . '/includes/Services/VendorSyncPolicy.php';
 require_once dirname(__DIR__) . '/includes/Services/ForceUpdateGate.php';
+require_once dirname(__DIR__) . '/includes/Services/Products/ProductSkuRetry.php';
 require_once dirname(__DIR__) . '/JobsRunner.php';

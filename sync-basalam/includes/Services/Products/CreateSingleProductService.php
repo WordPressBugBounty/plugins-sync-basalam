@@ -42,22 +42,41 @@ class CreateSingleProductService
 
         $maxDescriptionRetries = 3;
         $descriptionRetry = 0;
+        $skuRetry = false;
 
         while (true) {
             try {
                 $request = $this->apiservice->post($url, $productData);
-                break;
             } catch (RetryableException $e) {
+                if ($this->retryWithoutDuplicateSku($productData, $e, $skuRetry)) {
+                    continue;
+                }
+
                 throw $e;
             } catch (NonRetryableException $e) {
+                if ($this->retryWithoutDuplicateSku($productData, $e, $skuRetry)) {
+                    continue;
+                }
+
                 if ($descriptionRetry < $maxDescriptionRetries && $this->stripForbiddenDescription($e, $productData, $productId, $descriptionRetry)) {
                     $descriptionRetry++;
                     continue;
                 }
                 throw $e;
             } catch (\Exception $e) {
+                if ($this->retryWithoutDuplicateSku($productData, $e, $skuRetry)) {
+                    continue;
+                }
+
                 throw new \Exception(esc_html($e->getMessage()));
             }
+
+            // Some API adapters return a non-2xx response instead of throwing it.
+            if ($this->retryWithoutDuplicateSku($productData, $request, $skuRetry)) {
+                continue;
+            }
+
+            break;
         }
 
         if ($request['status_code'] != 201 && isset($request['status_code'])) {
@@ -194,6 +213,17 @@ class CreateSingleProductService
         if ($cleaned === $productData['description']) return false;
 
         $productData['description'] = $cleaned;
+
+        return true;
+    }
+
+    private function retryWithoutDuplicateSku(array &$productData, $error, bool &$retried): bool
+    {
+        if ($retried || !ProductSkuRetry::hasSku($productData)) return false;
+        if (!ProductSkuRetry::isDuplicateSkuError($error)) return false;
+
+        $productData = ProductSkuRetry::withoutSkus($productData);
+        $retried = true;
 
         return true;
     }

@@ -63,7 +63,7 @@ defined('ABSPATH') || exit;
                                 <img src="<?php echo esc_url(syncBasalamPlugin()->assetsUrl('/images/aparat.png')); ?>" alt="aparat" class="basalam-contact-img-40">
                             </div>
                         </a>
-                        <a href="https://wp.hamsalam.ir/help" target="_blank">
+                        <a href="https://hamsalam.ir/wp/help" target="_blank">
                             <div class="basalam-contact-btn basalam-btn-contact__blue">
                                 <img src="<?php echo esc_url(syncBasalamPlugin()->assetsUrl('/images/help.svg')); ?>" alt="help page" class="basalam-contact-img-70">
                             </div>

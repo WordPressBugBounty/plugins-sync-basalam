@@ -2,6 +2,16 @@
 
 <details>
 
+<summary>1.10.18 - 2026-09-12</summary>
+
+### Fixed
+- Public plugin metadata, help, terms, and privacy links now use the live canonical Hamsalam and Basalam URLs instead of the retired `wp.hamsalam.ir` host
+- Product create and update requests now retry once without product or variation SKUs when Basalam rejects a duplicate SKU
+
+</details>
+
+<details>
+
 <summary>1.10.17 - 2026-09-09</summary>
 
 ### Fixed

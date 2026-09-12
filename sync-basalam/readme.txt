@@ -4,7 +4,7 @@ Tags: woocommerce, basalam, woosalam, integration
 Requires at least: 6.0  
 Tested up to: 7.0
 Requires PHP: 7.4 
-Stable tag: 1.10.17
+Stable tag: 1.10.18
 License: GPL-2.0-or-later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -21,7 +21,7 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 - 💬 [گروه پشتیبانی تلگرام](https://t.me/woosalam_group)
 - 📧 [ایمیل پشتیبانی](mailto:info.hamsalam.ir@gmail.com)
-- 🌐 [راهنمای نصب و استفاده](https://wp.hamsalam.ir/help)
+- 🌐 [راهنمای نصب و استفاده](https://hamsalam.ir/wp/help)
 
 == Description ==
 
@@ -75,8 +75,8 @@ These APIs are used for:
 
 This plugin depends on Basalam’s platform and services. By using the plugin, you agree to their terms and privacy policy:
 
-- [Basalam Terms of Service](https://wp.hamsalam.ir/terms)  
-- [Basalam Privacy Policy](https://wp.hamsalam.ir/privacy)
+- [Basalam Terms of Service](https://basalam.com/about/terms-of-use)
+- [Basalam Privacy Information](https://basalam.com/about/terms-of-use)
 
 == Installation ==
 
@@ -91,7 +91,7 @@ If you need help or have questions, please contact us via:
 
 - 💬 [Support Telegram Group](https://t.me/woosalam_group)
 - 📧 [Email](mailto:info.hamsalam.ir@gmail.com)
-- 🌐 [Help Center](https://wp.hamsalam.ir/help)
+- 🌐 [Help Center](https://hamsalam.ir/wp/help)
 
 
 == Frequently Asked Questions ==

@@ -61,7 +61,7 @@ class UpdateProductVariationsService
             $url = sprintf(Endpoints::PRODUCT_VARIATION_UPDATE, $basalamProductId, $variant['id']);
 
             try {
-                $this->apiservice->patch($url, $data);
+                $this->sendVariationUpdate($url, $data);
                 $updated++;
             } catch (RetryableException $e) {
                 throw $e;
@@ -84,5 +84,45 @@ class UpdateProductVariationsService
         }
 
         return ['updated' => $updated, 'skipped' => $skipped, 'failed' => $failed];
+    }
+
+    private function sendVariationUpdate(string $url, array $data): void
+    {
+        $skuRetry = false;
+
+        while (true) {
+            try {
+                $response = $this->apiservice->patch($url, $data);
+            } catch (RetryableException $e) {
+                if ($this->retryWithoutDuplicateSku($data, $e, $skuRetry)) continue;
+
+                throw $e;
+            } catch (\Exception $e) {
+                if ($this->retryWithoutDuplicateSku($data, $e, $skuRetry)) continue;
+
+                throw $e;
+            }
+
+            if ($this->retryWithoutDuplicateSku($data, $response, $skuRetry)) continue;
+
+            // API adapters normally throw client errors, but keep the fallback
+            // bounded if an adapter returns the error response directly.
+            if (ProductSkuRetry::isDuplicateSkuError($response)) {
+                throw NonRetryableException::permanent('SKU متغیر محصول در باسلام تکراری است.');
+            }
+
+            return;
+        }
+    }
+
+    private function retryWithoutDuplicateSku(array &$data, $error, bool &$retried): bool
+    {
+        if ($retried || !ProductSkuRetry::hasSku($data)) return false;
+        if (!ProductSkuRetry::isDuplicateSkuError($error)) return false;
+
+        $data = ProductSkuRetry::withoutSkus($data);
+        $retried = true;
+
+        return true;
     }
 }

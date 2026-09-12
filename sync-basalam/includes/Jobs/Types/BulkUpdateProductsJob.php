@@ -12,6 +12,7 @@ use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Admin\Settings\SettingsManager;
 use SyncBasalam\Admin\Product\Data\ProductDataBuilder;
 use SyncBasalam\Services\Products\ProductConnection;
+use SyncBasalam\Services\Products\ProductSkuRetry;
 use SyncBasalam\Logger\Logger;
 use SyncBasalam\Services\VendorSyncPolicy;
 
@@ -142,6 +143,7 @@ class BulkUpdateProductsJob extends AbstractJobType
 
             update_option(self::LAST_REQUEST_AT_OPTION, microtime(true), false);
             $res = $this->apiService->patch($url, ['data' => $productsData]);
+            $this->retryDuplicateSkuBatchItems($url, $productsData, $res);
 
             if ($res['status_code'] == 202) {
                 Logger::info('بروزرسانی دسته جمعی محصولات با موفقیت انجام شد.');
@@ -174,6 +176,59 @@ class BulkUpdateProductsJob extends AbstractJobType
             ]);
             throw $e;
         }
+    }
+
+    /**
+     * Batch updates return HTTP 202 even when one item fails. Retry only the
+     * failed duplicate-SKU items, so successful items are not sent twice.
+     */
+    private function retryDuplicateSkuBatchItems(string $url, array $productsData, $response): void
+    {
+        if (!is_array($response) || !array_key_exists('body', $response)) return;
+
+        $results = $this->decodeBatchResults($response['body']);
+        if (empty($results)) return;
+
+        $productsById = [];
+        foreach ($productsData as $productData) {
+            if (isset($productData['id'])) $productsById[(string) $productData['id']] = $productData;
+        }
+
+        $retryProducts = [];
+        $retriedIds = [];
+
+        foreach ($results as $result) {
+            if (!is_array($result) || !isset($result['id'])) continue;
+
+            $productId = (string) $result['id'];
+            if (isset($retriedIds[$productId]) || !isset($productsById[$productId])) continue;
+            if (!ProductSkuRetry::isDuplicateSkuError($result)) continue;
+            if (!ProductSkuRetry::hasSku($productsById[$productId])) continue;
+
+            $retryProducts[] = ProductSkuRetry::withoutSkus($productsById[$productId]);
+            $retriedIds[$productId] = true;
+        }
+
+        if (empty($retryProducts)) return;
+
+        Logger::info('Retrying batch product updates without duplicate SKUs: ' . count($retryProducts));
+        $this->apiService->patch($url, ['data' => $retryProducts]);
+    }
+
+    private function decodeBatchResults($body): array
+    {
+        if (is_string($body)) $body = json_decode($body, true);
+        if (!is_array($body)) return [];
+
+        foreach (['data', 'results', 'items'] as $key) {
+            if (isset($body[$key]) && is_array($body[$key])) return $body[$key];
+        }
+
+        foreach (array_keys($body) as $key) {
+            if (!is_int($key)) return [];
+        }
+
+        return $body;
     }
 
     private function currentProcessingJobExists(): bool

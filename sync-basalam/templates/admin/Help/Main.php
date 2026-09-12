@@ -13,7 +13,7 @@ defined('ABSPATH') || exit;
             <div>
                 <h1 class="basalam-h basalam-text-justify">راهنمای استفاده از افزونه باسلام</h1>
                 <p class="basalam-p basalam-margin-top-17 basalam-text-right">در این صفحه می‌توانید پاسخ سوالات متداول و راهنمای استفاده از افزونه را مشاهده کنید.</p>
-                <p class="basalam-p basalam-text-justify basalam-text-right">برای مشاهده ویدیو های آموزشی پلاگین <b> <a href="https://wp.hamsalam.ir/help" target="_blank">کلیک</a></b> کنید.</p>
+                <p class="basalam-p basalam-text-justify basalam-text-right">برای مشاهده ویدیو های آموزشی پلاگین <b> <a href="https://hamsalam.ir/wp/help" target="_blank">کلیک</a></b> کنید.</p>
             </div>
         </div>
     </div>

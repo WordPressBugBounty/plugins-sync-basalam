@@ -54,22 +54,42 @@ class UpdateSingleProductService
 
         $maxDescriptionRetries = 3;
         $descriptionRetry = 0;
+        $skuRetry = false;
 
         while (true) {
             try {
                 $request = $this->apiservice->patch($url, $productData);
-                break;
             } catch (RetryableException $e) {
+                if ($this->retryWithoutDuplicateSku($productData, $e, $skuRetry)) {
+                    continue;
+                }
+
                 throw $e;
             } catch (NonRetryableException $e) {
+                if ($this->retryWithoutDuplicateSku($productData, $e, $skuRetry)) {
+                    continue;
+                }
+
                 if ($descriptionRetry < $maxDescriptionRetries && $this->stripForbiddenDescription($e, $productData, $productId, $descriptionRetry)) {
                     $descriptionRetry++;
                     continue;
                 }
+
                 throw $e;
             } catch (\Exception $e) {
+                if ($this->retryWithoutDuplicateSku($productData, $e, $skuRetry)) {
+                    continue;
+                }
+
                 throw new \Exception(esc_html('خطا در ارتباط با API باسلام: ' . $e->getMessage()));
             }
+
+            // Some API adapters return a non-2xx response instead of throwing it.
+            if ($this->retryWithoutDuplicateSku($productData, $request, $skuRetry)) {
+                continue;
+            }
+
+            break;
         }
 
         $body = $request['body'] ?? '';
@@ -96,6 +116,15 @@ class UpdateSingleProductService
         }
 
         if (is_wp_error($request)) throw NonRetryableException::permanent('خطایی در ارتباط با سرور رخ داد.');
+
+        // Basalam may return a successful response with a stale/null product SKU
+        // when another product field (most commonly a long description) is
+        // present in the same patch.  Send the SKU on its own when the response
+        // does not contain the value we requested, so the product-level SKU is
+        // not lost for variable products.
+        // When the duplicate-SKU fallback was used, deliberately keep the
+        // second request SKU-free; do not issue a follow-up SKU-only patch.
+        if (!$skuRetry) $this->ensureProductSkuUpdated($url, $productData, $body);
 
         $product = \wc_get_product($productId);
         if ($product && $product->is_type('variable')) {
@@ -211,6 +240,17 @@ class UpdateSingleProductService
         return true;
     }
 
+    private function retryWithoutDuplicateSku(array &$productData, $error, bool &$retried): bool
+    {
+        if ($retried || !ProductSkuRetry::hasSku($productData)) return false;
+        if (!ProductSkuRetry::isDuplicateSkuError($error)) return false;
+
+        $productData = ProductSkuRetry::withoutSkus($productData);
+        $retried = true;
+
+        return true;
+    }
+
     public function updateProductStatus($productId, $status)
     {
         $vendorSyncPolicy = syncBasalamContainer()->get(VendorSyncPolicy::class);
@@ -256,5 +296,24 @@ class UpdateSingleProductService
         }
 
         throw NonRetryableException::permanent("تغییر وضعیت محصول در باسلام ناموفق بود.");
+    }
+
+    private function ensureProductSkuUpdated(string $url, array $productData, $responseBody): void
+    {
+        if (!array_key_exists('sku', $productData) || $productData['sku'] === null) return;
+
+        $requestedSku = (string) $productData['sku'];
+        $responseSku = null;
+
+        if (is_array($responseBody) && array_key_exists('sku', $responseBody)) {
+            $responseSku = $responseBody['sku'];
+        }
+
+        if ($responseSku !== null && (string) $responseSku === $requestedSku) return;
+
+        $skuRequest = $this->apiservice->patch($url, ['sku' => $productData['sku']]);
+        if (!is_array($skuRequest) || (int) ($skuRequest['status_code'] ?? 0) !== 200) {
+            throw NonRetryableException::permanent('بروزرسانی شناسه محصول (SKU) در باسلام ناموفق بود.');
+        }
     }
 }
