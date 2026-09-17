@@ -28,7 +28,7 @@ class UpdateSingleProductJob extends AbstractJobType
 
     public function getPriority(): int
     {
-        return 3;
+        return 1;
     }
 
     public function execute(array $payload): JobResult

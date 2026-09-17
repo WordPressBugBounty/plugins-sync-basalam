@@ -46,7 +46,7 @@ class BulkUpdateProductsJob extends AbstractJobType
 
     public function getPriority(): int
     {
-        return 1;
+        return 2;
     }
 
     public function canRun(): bool

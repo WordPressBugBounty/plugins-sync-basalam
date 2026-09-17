@@ -9,8 +9,8 @@ defined('ABSPATH') || exit;
 
 class OAuthManager
 {
-    /** Prefix for the per-user transient holding a pending OAuth authorization. */
-    const OAUTH_STATE_TRANSIENT = 'sync_basalam_oauth_state_';
+    /** Signed, browser-bound proof that an administrator started OAuth. */
+    const OAUTH_STATE_COOKIE = 'sync_basalam_oauth_state';
 
     /** Lifetime of a pending OAuth authorization — the SSO round-trip window. */
     const OAUTH_STATE_TTL = 600; // 10 * MINUTE_IN_SECONDS
@@ -19,15 +19,27 @@ class OAuthManager
      * Remember that the current admin has just started an OAuth authorization.
      *
      * This is called only from the nonce-protected initiation flow, so the
-     * marker it stores cannot be planted by a forged cross-site request. The
-     * callback later requires (and consumes) this marker, which is what turns
+     * cookie it stores cannot be planted by a forged cross-site request. The
+     * callback later requires (and consumes) this cookie, which is what turns
      * the token-saving callback from "always forgeable" into "only valid for a
      * flow this admin actually started".
+     *
+     * The proof deliberately lives in a signed HttpOnly cookie instead of a
+     * WordPress transient. Sites with a persistent object-cache drop-in route
+     * transients through Redis/Memcached, where a failed write, eviction, or
+     * cache flush during the OAuth round trip would otherwise invalidate a
+     * legitimate callback.
      */
     public static function issueOauthState()
     {
-        $state = wp_generate_password(64, false);
-        set_transient(self::OAUTH_STATE_TRANSIENT . get_current_user_id(), $state, self::OAUTH_STATE_TTL);
+        $userId = get_current_user_id();
+        if ($userId <= 0) return false;
+
+        $state     = wp_generate_password(64, false);
+        $expiresAt = time() + self::OAUTH_STATE_TTL;
+        $value     = self::buildOauthStateCookieValue($state, $userId, $expiresAt);
+
+        if (! self::writeOauthStateCookie($value, $expiresAt)) return false;
 
         return $state;
     }
@@ -35,20 +47,110 @@ class OAuthManager
     /**
      * Validate and consume the pending OAuth authorization for the current user.
      *
-     * Single use: the marker is deleted whether or not it was present, so a
+     * Single use: the cookie is deleted whether or not it was valid, so a
      * replayed or forged callback cannot reuse it.
      */
     private static function verifyOauthState()
     {
-        $key      = self::OAUTH_STATE_TRANSIENT . get_current_user_id();
-        $expected = get_transient($key);
-        delete_transient($key);
+        $value = isset($_COOKIE[self::OAUTH_STATE_COOKIE])
+            ? (string) wp_unslash($_COOKIE[self::OAUTH_STATE_COOKIE])
+            : '';
 
-        // The token exchange is routed back through the Hamsalam proxy, which
-        // consumes the SSO "state" (the site URL) and does not forward a secret
-        // we control. The single-use marker set during the authenticated
-        // initiation is therefore the value that authorises the write.
-        return ! empty($expected);
+        self::clearOauthStateCookie();
+
+        return self::isOauthStateCookieValid(
+            $value,
+            get_current_user_id(),
+            time()
+        );
+    }
+
+    private static function buildOauthStateCookieValue($state, $userId, $expiresAt)
+    {
+        $payload = json_encode([
+            'state'      => (string) $state,
+            'user_id'    => (int) $userId,
+            'expires_at' => (int) $expiresAt,
+        ]);
+
+        if (! is_string($payload)) return '';
+
+        $encodedPayload = rtrim(strtr(base64_encode($payload), '+/', '-_'), '=');
+        $signature      = hash_hmac('sha256', $encodedPayload, wp_salt('auth'));
+
+        return $encodedPayload . '.' . $signature;
+    }
+
+    private static function isOauthStateCookieValid($value, $userId, $now)
+    {
+        if (! is_string($value) || $value === '' || (int) $userId <= 0) return false;
+
+        $parts = explode('.', $value, 2);
+        if (count($parts) !== 2) return false;
+
+        [$encodedPayload, $signature] = $parts;
+        $expectedSignature = hash_hmac('sha256', $encodedPayload, wp_salt('auth'));
+
+        if (! hash_equals($expectedSignature, $signature)) return false;
+
+        $padding = strlen($encodedPayload) % 4;
+        if ($padding !== 0) $encodedPayload .= str_repeat('=', 4 - $padding);
+
+        $payload = base64_decode(strtr($encodedPayload, '-_', '+/'), true);
+        $data    = is_string($payload) ? json_decode($payload, true) : null;
+
+        if (! is_array($data)) return false;
+
+        return ! empty($data['state'])
+            && (int) ($data['user_id'] ?? 0) === (int) $userId
+            && (int) ($data['expires_at'] ?? 0) >= (int) $now;
+    }
+
+    private static function writeOauthStateCookie($value, $expiresAt)
+    {
+        if (! is_string($value) || $value === '' || headers_sent()) return false;
+
+        $written = setcookie(self::OAUTH_STATE_COOKIE, $value, [
+            'expires'  => (int) $expiresAt,
+            'path'     => self::oauthStateCookiePath(),
+            'domain'   => self::oauthStateCookieDomain(),
+            'secure'   => is_ssl(),
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
+
+        // Keep the current request internally consistent for callers and tests.
+        if ($written) $_COOKIE[self::OAUTH_STATE_COOKIE] = $value;
+
+        return $written;
+    }
+
+    private static function clearOauthStateCookie()
+    {
+        unset($_COOKIE[self::OAUTH_STATE_COOKIE]);
+
+        if (headers_sent()) return;
+
+        setcookie(self::OAUTH_STATE_COOKIE, '', [
+            'expires'  => time() - HOUR_IN_SECONDS,
+            'path'     => self::oauthStateCookiePath(),
+            'domain'   => self::oauthStateCookieDomain(),
+            'secure'   => is_ssl(),
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
+    }
+
+    private static function oauthStateCookiePath()
+    {
+        return defined('ADMIN_COOKIE_PATH') && ADMIN_COOKIE_PATH
+            ? ADMIN_COOKIE_PATH
+            : '/wp-admin';
+    }
+
+    private static function oauthStateCookieDomain()
+    {
+        return defined('COOKIE_DOMAIN') ? (string) COOKIE_DOMAIN : '';
     }
 
     public function getOauthData()

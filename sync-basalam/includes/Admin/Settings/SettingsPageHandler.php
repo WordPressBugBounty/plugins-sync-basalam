@@ -72,7 +72,13 @@ class SettingsPageHandler
         // Mark this authorization as started by the current (authenticated) admin
         // so the OAuth callback can reject forged requests. This runs only after
         // the nonce-protected settings POST, so it cannot be triggered cross-site.
-        OAuthManager::issueOauthState();
+        if (! OAuthManager::issueOauthState()) {
+            wp_die(
+                esc_html__('امکان شروع فرایند دریافت دسترسی وجود ندارد. لطفاً دوباره تلاش کنید.', 'sync-basalam'),
+                esc_html__('خطای دریافت دسترسی', 'sync-basalam'),
+                ['response' => 500]
+            );
+        }
 
         wp_redirect($oauthUrls['url_req_token']); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect -- Intentional external/user-provided redirect.
         exit();

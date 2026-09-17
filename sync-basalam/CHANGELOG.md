@@ -2,6 +2,24 @@
 
 <details>
 
+<summary>1.10.20 - 2026-09-17</summary>
+
+### Fixed
+- Basalam authorization callbacks no longer fail when Redis or Memcached drops the temporary OAuth marker; the single-use authorization proof is now carried in a signed, time-limited HttpOnly cookie
+
+</details>
+
+<details>
+
+<summary>1.10.19 - 2026-09-17</summary>
+
+### Changed / Improved
+- Single-product update jobs now run before bulk and full-update coordinator jobs
+
+</details>
+
+<details>
+
 <summary>1.10.18 - 2026-09-12</summary>
 
 ### Fixed
