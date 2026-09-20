@@ -2,6 +2,17 @@
 
 <details>
 
+<summary>1.10.21 - 2026-09-17</summary>
+
+### Fixed
+- "All fields" and "price & stock" update modes always send one complete product request with the variants array (without Basalam variation ids), matching earlier major versions; the dedicated variation endpoint is only used in "custom" mode with the variation price/stock fields enabled
+- Product updates now recover automatically when WooCommerce contains stale Basalam variation IDs, rebuilding and saving the current variation mapping instead of repeatedly failing with HTTP 404
+- Commission lookup now uses Basalam's product-specific commission API for products already connected to Basalam; new or unconnected products continue to use category-based commission lookup, with product commission responses cached during the sync request
+
+</details>
+
+<details>
+
 <summary>1.10.20 - 2026-09-17</summary>
 
 ### Fixed

@@ -57,6 +57,9 @@ final class Endpoints
     /** GET commission percentage */
     const COMMISSION = self::CORE_BASE . '/api_v2/commission/get_percent';
 
+    /** GET commission percentage for an existing product — sprintf($url, $basalamProductId) */
+    const PRODUCT_COMMISSION = self::CORE_BASE . '/api_v2/commission/products/%d/percent';
+
     /** GET full category tree with max preparation days (core v3) */
     const CATEGORIES_PREPARATION = self::CORE_BASE . '/v3/categories';
 

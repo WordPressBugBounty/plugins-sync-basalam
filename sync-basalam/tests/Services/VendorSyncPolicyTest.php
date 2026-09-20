@@ -183,7 +183,7 @@ class VendorSyncPolicyTest extends TestCase
 
         self::assertSame(['id', 'type', 'primary_price', 'stock', 'variants'], array_keys($restricted));
         self::assertCount(1, $restricted['variants']);
-        self::assertSame(['id', 'primary_price', 'stock'], array_keys($restricted['variants'][0]));
+        self::assertSame(['id', 'primary_price', 'stock', 'properties'], array_keys($restricted['variants'][0]));
         self::assertSame(0, $restricted['stock']);
     }
 

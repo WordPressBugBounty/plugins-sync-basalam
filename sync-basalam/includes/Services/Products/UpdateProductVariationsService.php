@@ -5,6 +5,7 @@ namespace SyncBasalam\Services\Products;
 use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 use SyncBasalam\Jobs\Exceptions\RetryableException;
+use SyncBasalam\Jobs\Exceptions\StaleVariationException;
 use SyncBasalam\Logger\Logger;
 use SyncBasalam\Services\ApiServiceManager;
 
@@ -17,9 +18,9 @@ class UpdateProductVariationsService
 
     private $apiservice;
 
-    public function __construct()
+    public function __construct($apiservice = null)
     {
-        $this->apiservice = syncBasalamContainer()->get(ApiServiceManager::class);
+        $this->apiservice = $apiservice ?: syncBasalamContainer()->get(ApiServiceManager::class);
     }
 
     /**
@@ -65,16 +66,24 @@ class UpdateProductVariationsService
                 $updated++;
             } catch (RetryableException $e) {
                 throw $e;
+            } catch (NonRetryableException $e) {
+                // A missing remote variation means the local mapping is stale,
+                // not that the whole product is missing. Abort this per-variant
+                // pass immediately so the caller can rebuild all mappings in a
+                // single product update.
+                if ((int) $e->getCode() === 404) {
+                    throw new StaleVariationException($basalamProductId, $variant['id'], $e);
+                }
+
+                $failed++;
+                $firstError = $firstError ?: $e->getMessage();
+
+                $this->logVariationError($e, $productId, $basalamProductId, $variant['id']);
             } catch (\Exception $e) {
                 $failed++;
                 $firstError = $firstError ?: $e->getMessage();
 
-                Logger::error('خطا در بروزرسانی متغیر محصول در باسلام: ' . $e->getMessage(), [
-                    'operation'            => 'بروزرسانی متغیر محصول',
-                    'product_id'           => $productId,
-                    'basalam_product_id'   => $basalamProductId,
-                    'basalam_variation_id' => $variant['id'],
-                ]);
+                $this->logVariationError($e, $productId, $basalamProductId, $variant['id']);
             }
         }
 
@@ -84,6 +93,16 @@ class UpdateProductVariationsService
         }
 
         return ['updated' => $updated, 'skipped' => $skipped, 'failed' => $failed];
+    }
+
+    private function logVariationError(\Throwable $error, $productId, $basalamProductId, $basalamVariationId): void
+    {
+        Logger::error('خطا در بروزرسانی متغیر محصول در باسلام: ' . $error->getMessage(), [
+            'operation'            => 'بروزرسانی متغیر محصول',
+            'product_id'           => $productId,
+            'basalam_product_id'   => $basalamProductId,
+            'basalam_variation_id' => $basalamVariationId,
+        ]);
     }
 
     private function sendVariationUpdate(string $url, array $data): void

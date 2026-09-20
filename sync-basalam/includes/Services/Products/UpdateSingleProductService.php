@@ -2,10 +2,15 @@
 
 namespace SyncBasalam\Services\Products;
 
+use SyncBasalam\Admin\Product\Data\Services\VariantService;
+use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Admin\Settings\SettingsManager;
 use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Services\ApiServiceManager;
 use SyncBasalam\Jobs\Exceptions\RetryableException;
 use SyncBasalam\Jobs\Exceptions\NonRetryableException;
+use SyncBasalam\Jobs\Exceptions\StaleVariationException;
+use SyncBasalam\Logger\Logger;
 use SyncBasalam\Utilities\ProductMetaKey;
 use SyncBasalam\Services\VendorSyncPolicy;
 
@@ -15,11 +20,17 @@ class UpdateSingleProductService
 {
     private $apiservice;
     private $variationsService;
+    private $variantDataService;
 
-    public function __construct()
+    public function __construct(
+        $apiservice = null,
+        $variationsService = null,
+        $variantDataService = null
+    )
     {
-        $this->apiservice = syncBasalamContainer()->get(ApiServiceManager::class);
-        $this->variationsService = syncBasalamContainer()->get(UpdateProductVariationsService::class);
+        $this->apiservice = $apiservice ?: syncBasalamContainer()->get(ApiServiceManager::class);
+        $this->variationsService = $variationsService ?: syncBasalamContainer()->get(UpdateProductVariationsService::class);
+        $this->variantDataService = $variantDataService ?: new VariantService();
     }
 
     public function updateProductInBasalam($productData, $productId)
@@ -39,17 +50,54 @@ class UpdateSingleProductService
         $syncBasalamProductId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
         ProductConnection::assertUnique($productId, $syncBasalamProductId);
 
-        // Variable products whose variations are all connected to Basalam are updated with one
-        // request per variation, so price and stock must not be part of the product payload.
+        // The dedicated variation endpoint is only used in the "custom" update mode with the
+        // variation price/stock settings ticked. Every other mode (and every not-yet-connected
+        // variation) sends the complete variants section inside one product PATCH, exactly like
+        // earlier major versions: no Basalam variation ids in the payload, and the response
+        // mapping stores the current ids.
         if ($this->shouldUpdateVariationsSeparately($productId, $productData)) {
-            $this->variationsService->updateVariations($syncBasalamProductId, $productData['variants'], $productId);
+            $variationMappingRecovered = false;
 
-            unset($productData['variants'], $productData['primary_price'], $productData['stock']);
+            try {
+                $this->variationsService->updateVariations($syncBasalamProductId, $productData['variants'], $productId);
+            } catch (StaleVariationException $e) {
+                // Core v4 returns 404 when Basalam has recreated/replaced a
+                // variation but WooCommerce still holds its old id. This is not
+                // an error for the user: rebuild a complete variants payload and
+                // let the normal product PATCH return the current ids, so the
+                // next custom-field update finds fresh variation ids again.
+                $productData = $this->prepareVariationRemapPayload($productId, $productData);
+                $variationMappingRecovered = true;
+
+                Logger::warning('شناسه‌های قدیمی متغیرهای باسلام شناسایی شد؛ نگاشت متغیرها به‌صورت خودکار بازسازی می‌شود.', [
+                    'product_id'                    => $productId,
+                    'basalam_product_id'            => $e->getBasalamProductId(),
+                    'stale_basalam_variation_id'    => $e->getBasalamVariationId(),
+                ]);
+            }
+
+            // A stale mapping keeps the rebuilt variants in the product PATCH.
+            // The ordinary successful path has already updated each variation,
+            // so duplicate price/stock fields must still be removed.
+            if (!$variationMappingRecovered) {
+                unset($productData['variants'], $productData['primary_price'], $productData['stock']);
+            }
 
             if (!$this->hasProductFieldsToUpdate($productData)) {
                 return $this->finishUpdate($productId, [], 'متغیرهای محصول با موفقیت بروزرسانی شدند.');
             }
         }
+
+        // The complete variants section must not carry Basalam variation ids: the API
+        // matches variations by their properties and returns the current ids, which
+        // are stored after the request. This is exactly the pre-1.10.4 behaviour.
+        if (isset($productData['variants']) && is_array($productData['variants'])) {
+            foreach ($productData['variants'] as &$variant) {
+                if (is_array($variant)) unset($variant['id']);
+            }
+            unset($variant);
+        }
+
         $url = sprintf(Endpoints::PRODUCT_UPDATE, $syncBasalamProductId);
 
         $maxDescriptionRetries = 3;
@@ -187,6 +235,13 @@ class UpdateSingleProductService
                         update_post_meta($wcVarId, 'sync_basalam_variation_id', $syncBasalamVariations[$key]);
                     }
                 }
+
+                // Some legacy products have a single empty Basalam property
+                // value, so neither side produces a usable property key. A
+                // one-to-one mapping is unambiguous and safe in that case.
+                if (count($variations) === 1 && count($body['variants']) === 1 && !empty($body['variants'][0]['id'])) {
+                    update_post_meta($variations[0], 'sync_basalam_variation_id', $body['variants'][0]['id']);
+                }
             }
         }
 
@@ -215,7 +270,56 @@ class UpdateSingleProductService
         $product = \wc_get_product($productId);
         if (!$product || !$product->is_type('variable')) return false;
 
+        $vendorSyncPolicy = syncBasalamContainer()->get(VendorSyncPolicy::class);
+
+        // A limited inactive vendor still uses the product endpoint. Its variants
+        // payload contains price/stock plus the unchanged properties needed to
+        // identify each variant; it must not fall back to one request per stored
+        // variation id because those ids can be recreated by Basalam.
+        if ($vendorSyncPolicy->shouldRestrictUpdateFields(false)) return false;
+
+        // Only the "custom" mode with the variation price/stock fields ticked uses the
+        // dedicated variation endpoint. "All fields" and "price & stock" always send
+        // the complete product payload, exactly like earlier major versions.
+        $syncFields = SettingsManager::getSettings(SettingsConfig::SYNC_PRODUCT_FIELDS);
+        if ($syncFields !== 'custom') return false;
+
+        $syncVariantPrice = SettingsManager::getSettings(SettingsConfig::SYNC_PRODUCT_FIELD_VARIANT_PRICE);
+        $syncVariantStock = SettingsManager::getSettings(SettingsConfig::SYNC_PRODUCT_FIELD_VARIANT_STOCK);
+        if ($syncVariantPrice != 1 && $syncVariantStock != 1) return false;
+
+        // A variation that is not connected to Basalam yet must be created through
+        // the product payload, not the variation endpoint.
         return UpdateProductVariationsService::allVariantsHaveBasalamId($productData['variants']);
+    }
+
+    private function prepareVariationRemapPayload(int $productId, array $productData): array
+    {
+        $product = \wc_get_product($productId);
+        if (!$product || !$product->is_type('variable')) {
+            throw NonRetryableException::invalidData('محصول متغیر برای بازسازی نگاشت‌ها یافت نشد.');
+        }
+
+        $variants = $this->variantDataService->getVariants($product);
+        if (empty($variants)) {
+            throw NonRetryableException::invalidData('اطلاعات متغیرهای محصول برای بازسازی نگاشت‌ها کامل نیست.');
+        }
+
+        foreach ($variants as &$variant) {
+            unset($variant['id']);
+        }
+        unset($variant);
+
+        // Clear every old id only after the complete replacement payload has
+        // been built. If the following API request fails, the next job retries
+        // the safe full-product remapping path instead of the stale endpoint.
+        foreach ($product->get_children() as $variationId) {
+            delete_post_meta($variationId, 'sync_basalam_variation_id');
+        }
+
+        $productData['variants'] = $variants;
+
+        return $productData;
     }
 
     private function hasProductFieldsToUpdate(array $productData): bool

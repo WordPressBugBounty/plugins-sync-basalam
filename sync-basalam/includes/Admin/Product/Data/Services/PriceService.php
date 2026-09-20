@@ -6,6 +6,7 @@ use SyncBasalam\Admin\Product\elements\SingleProduct\PriceChangeField;
 use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Logger\Logger;
 use SyncBasalam\Services\Products\FetchCommission;
+use SyncBasalam\Utilities\ProductMetaKey;
 use SyncBasalam\Utilities\PriceAdjustment;
 
 defined('ABSPATH') || exit;
@@ -17,8 +18,7 @@ class PriceService
         $price = $this->getBasePrice($product);
         if (!$price) return null;
 
-        $categoryIds = $this->getCategoryIds($product);
-        return $this->applyPriceCalculations($price, $categoryIds, $product);
+        return $this->applyPriceCalculations($price, $product);
     }
 
     private function getBasePrice($product)
@@ -39,7 +39,7 @@ class PriceService
         return null;
     }
 
-    private function applyPriceCalculations(float $price, array $categoryIds, $product): ?int
+    private function applyPriceCalculations(float $price, $product): ?int
     {
         $priceChangeValue = $this->getPriceChangeValue($product);
         $roundMode = syncBasalamSettings()->getSettings(SettingsConfig::ROUND_PRICE);
@@ -49,7 +49,7 @@ class PriceService
         if (!$finalPrice) return null;
 
 
-        if ($priceChangeValue !== '' && $priceChangeValue !== '0') $finalPrice = $this->applyPriceChange($finalPrice, $priceChangeValue, $categoryIds);
+        if ($priceChangeValue !== '' && $priceChangeValue !== '0') $finalPrice = $this->applyPriceChange($finalPrice, $priceChangeValue, $product);
 
         if ($roundMode && $roundMode != 'none') $finalPrice = $this->applyRounding($finalPrice, $roundMode);
 
@@ -94,9 +94,9 @@ class PriceService
         return $price;
     }
 
-    private function applyPriceChange(float $price, string $priceChangeValue, array $categoryIds): float
+    private function applyPriceChange(float $price, string $priceChangeValue, $product = null): float
     {
-        if (PriceAdjustment::isCommission($priceChangeValue)) return $this->applyCommissionCalculation($price, $categoryIds);
+        if (PriceAdjustment::isCommission($priceChangeValue)) return $this->applyCommissionCalculation($price, $product);
 
         $value = intval($priceChangeValue);
 
@@ -105,19 +105,29 @@ class PriceService
         return $price + ($value * 10);
     }
 
-    private function applyCommissionCalculation(float $price, array $categoryIds): float
+    private function applyCommissionCalculation(float $price, $product = null): float
     {
-        $categoryPercent = floatval(FetchCommission::fetchCategoryCommission($categoryIds));
+        $basalamProductId = $this->getBasalamProductId($product);
+        $categoryIds = [];
 
-        if ($categoryPercent <= 0 || $categoryPercent >= 100) return $price;
+        if ($basalamProductId !== null) {
+            $commissionPercent = FetchCommission::fetchProductCommission($basalamProductId);
+        } else {
+            $categoryIds = $this->getCategoryIds($product);
+            $commissionPercent = FetchCommission::fetchCategoryCommission($categoryIds);
+        }
 
-        $multiplier = 1 / (1 - ($categoryPercent / 100));
+        $commissionPercent = floatval($commissionPercent);
+
+        if ($commissionPercent <= 0 || $commissionPercent >= 100) return $price;
+
+        $multiplier = 1 / (1 - ($commissionPercent / 100));
         $maxMultiplier = 1 + (PriceAdjustment::MAX_PERCENT / 100);
 
         if ($multiplier > $maxMultiplier) {
             Logger::warning('کارمزد دسته‌بندی باسلام خارج از بازه منطقی بود و افزایش قیمت به سقف مجاز محدود شد.', [
                 'category_ids'     => $categoryIds,
-                'commission_percent' => $categoryPercent,
+                'commission_percent' => $commissionPercent,
                 'max_percent'      => PriceAdjustment::MAX_PERCENT,
             ]);
 
@@ -125,6 +135,40 @@ class PriceService
         }
 
         return $price * $multiplier;
+    }
+
+    /**
+     * Resolve the remote product id used by the product commission endpoint.
+     * Variations inherit the connection from their parent product.
+     */
+    private function getBasalamProductId($product): ?int
+    {
+        if (!is_object($product)) return null;
+
+        $postIds = [];
+
+        if (method_exists($product, 'get_parent_id')) {
+            $parentId = intval($product->get_parent_id());
+            if ($parentId > 0) {
+                $postIds[] = $parentId;
+            }
+        }
+
+        if (empty($postIds) && method_exists($product, 'get_id')) {
+            $productId = intval($product->get_id());
+            if ($productId > 0) $postIds[] = $productId;
+        }
+
+        $metaKey = ProductMetaKey::basalamProductId();
+        foreach (array_unique($postIds) as $postId) {
+            $basalamProductId = get_post_meta($postId, $metaKey, true);
+
+            if (is_numeric($basalamProductId) && intval($basalamProductId) > 0) {
+                return intval($basalamProductId);
+            }
+        }
+
+        return null;
     }
 
     private function applyRounding(float $price, $mode): float

@@ -92,7 +92,7 @@ class ApiResponseHandler
             $bodyMessage = $this->extractErrorMessageFromBody($body);
             $base = $bodyMessage ?: $clientErrors[$statusCode];
             $reason = RequestStatusTracker::describeHttpStatusFa($statusCode);
-            throw NonRetryableException::permanent(esc_html($base . $reason))
+            throw (new NonRetryableException(esc_html($base . $reason), $statusCode))
                 ->setResponseData($this->decodeBody($body));
         }
 

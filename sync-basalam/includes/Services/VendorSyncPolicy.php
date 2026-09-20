@@ -117,6 +117,11 @@ class VendorSyncPolicy
                 'id' => true,
                 'primary_price' => true,
                 'stock' => true,
+                // Product PATCH identifies a variant by its properties. Keep
+                // those properties as identity data even in the limited mode;
+                // they are not mutable fields, and the API's variants schema
+                // requires them when the single product endpoint is used.
+                'properties' => true,
             ];
 
             $restricted['variants'] = array_map(function ($variant) use ($variantFields) {
