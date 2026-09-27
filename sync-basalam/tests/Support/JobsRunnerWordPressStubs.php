@@ -20,6 +20,22 @@ if (!function_exists('did_action')) {
     }
 }
 
+if (!function_exists('current_filter')) {
+    function current_filter()
+    {
+        return $GLOBALS['sync_basalam_jobs_runner_test_state']['current_filter'] ?? '';
+    }
+}
+
+if (!function_exists('fastcgi_finish_request')) {
+    function fastcgi_finish_request()
+    {
+        $GLOBALS['sync_basalam_jobs_runner_test_state']['events'][] = 'fastcgi_finish_request';
+
+        return true;
+    }
+}
+
 if (!function_exists('wp_doing_ajax')) {
     function wp_doing_ajax()
     {

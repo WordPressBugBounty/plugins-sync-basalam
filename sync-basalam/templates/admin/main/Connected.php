@@ -21,21 +21,7 @@ $count_of_synced_basalam_products = intval($wpdb->get_var($wpdb->prepare("SELECT
 
 $job_manager = new JobManager();
 
-$quick_update_processing_job = $job_manager->getJob(['job_type' => 'sync_basalam_bulk_update_products', 'status' => 'processing'])
-    ?: $job_manager->getJob(['job_type' => 'sync_basalam_bulk_update_products', 'status' => 'pending']);
-
-$full_update_job = $job_manager->getJob(['job_type' => 'sync_basalam_update_all_products', 'status' => 'pending']);
-$full_update_processing_job = $job_manager->getJob(['job_type' => 'sync_basalam_update_all_products', 'status' => 'processing']);
-
-$single_update_count = $job_manager->getCountJobs(['job_type' => 'sync_basalam_update_single_product', 'status' => ['pending', 'processing']]);
-
-$has_active_update_jobs = ($quick_update_processing_job || $full_update_job || $full_update_processing_job || $single_update_count > 0);
-$active_update_type = '';
-if ($quick_update_processing_job) {
-    $active_update_type = 'quick';
-} elseif ($full_update_job || $full_update_processing_job || $single_update_count > 0) {
-    $active_update_type = 'full';
-}
+$update_queue_status = $job_manager->getProductUpdateStatus();
 
 $create_products_job = $job_manager->getJob(['job_type' => 'sync_basalam_create_all_products', 'status' => 'pending']);
 $create_products_processing_job = $job_manager->getJob(['job_type' => 'sync_basalam_create_all_products', 'status' => 'processing']);

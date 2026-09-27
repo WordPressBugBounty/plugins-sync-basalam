@@ -2,6 +2,23 @@
 
 <details>
 
+<summary>1.10.22 - 2026-09-27</summary>
+
+### Added
+- Added an optional recurring full product update every 24 or 48 hours, configured beside the product sync control; new and existing stores default to 48 hours and can turn the schedule off
+
+### Changed / Improved
+- Automatic product connection now searches for safe title matches among Basalam products after scanning the vendor catalog
+- Aligned the dashboard controls and advanced settings on narrow screens, and centered the add and update product dialogs at matching mobile sizes
+
+### Fixed
+- The product update dialog now reads live queue status when opened and while visible, clearing completed-job messages without a page reload
+- Empty-queue probes no longer hold the async dispatch lease, so newly created jobs can start promptly while shutdown dispatch continues to repair the database connection
+
+</details>
+
+<details>
+
 <summary>1.10.21 - 2026-09-17</summary>
 
 ### Fixed

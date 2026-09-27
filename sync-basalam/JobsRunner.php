@@ -11,10 +11,12 @@ class JobsRunner
 {
     private const ASYNC_ACTION = 'sync_basalam_run_jobs_async';
     private const ASYNC_DISPATCH_LOCK_TRANSIENT = 'sync_basalam_jobs_runner_async_dispatch_lock';
+    private const ASYNC_IDLE_PROBE_TRANSIENT = 'sync_basalam_jobs_runner_idle_probe_lock';
     // Keep the dispatch lease longer than a normal async batch. Without this,
     // every frontend request can boot another full WordPress AJAX worker while
     // a large product queue is active.
     private const ASYNC_DISPATCH_LOCK_SECONDS = 25;
+    private const ASYNC_IDLE_PROBE_SECONDS = 5;
     private const ASYNC_TIME_LIMIT_SECONDS = 20;
     private const GLOBAL_RUNNER_LAST_RUN_OPTION = 'sync_basalam_jobs_runner_last_run';
     private const STALE_PROCESSING_TIMEOUT_SECONDS = 120;
@@ -32,9 +34,8 @@ class JobsRunner
     ) {
         add_action('wp_ajax_' . self::ASYNC_ACTION, [$this, 'handleAsyncRequest']);
         add_action('wp_ajax_nopriv_' . self::ASYNC_ACTION, [$this, 'handleAsyncRequest']);
-        // Probe and dispatch after the response path so normal storefront
-        // requests never pay for the queue query or loopback HTTP request.
-        add_action('shutdown', [$this, 'maybeDispatchAsyncRequest'], PHP_INT_MAX);
+        // Run before later shutdown callbacks can leave an unread mysqli result.
+        add_action('shutdown', [$this, 'maybeDispatchAsyncRequest'], 2);
         add_action('sync_basalam_job_created', [$this, 'maybeDispatchAsyncRequest'], 10, 0);
 
         $this->jobManager = $jobManager;
@@ -46,23 +47,58 @@ class JobsRunner
     public function maybeDispatchAsyncRequest(): void
     {
         if ($this->isCurrentAsyncRequest()) return;
+
+        if ($this->isShutdownCallback()) {
+            $this->finishFastCgiResponse();
+            $this->repairDatabaseConnection();
+        }
+
         if ($this->CheckHttpBlockService->SyncBasalamHttpBlock()) return;
+        $isNewJob = function_exists('current_filter') && current_filter() === 'sync_basalam_job_created';
+        if (!$isNewJob && get_transient(self::ASYNC_IDLE_PROBE_TRANSIENT)) return;
         if (get_transient(self::ASYNC_DISPATCH_LOCK_TRANSIENT)) return;
 
-        // Reserve the dispatch lease before probing the queue. This keeps
-        // concurrent shutdown callbacks from all running the queue query and
-        // dispatching duplicate async workers.
-        set_transient(
-            self::ASYNC_DISPATCH_LOCK_TRANSIENT,
-            1,
-            self::ASYNC_DISPATCH_LOCK_SECONDS
-        );
-
         if (!$this->jobManager->hasPendingOrStaleProcessingJobs(self::STALE_PROCESSING_TIMEOUT_SECONDS)) {
+            if (!$isNewJob) {
+                set_transient(self::ASYNC_IDLE_PROBE_TRANSIENT, 1, self::ASYNC_IDLE_PROBE_SECONDS);
+            }
             return;
         }
 
+        // An empty-queue probe must not block a job created moments later.
+        // The global database lock still prevents duplicate workers from
+        // processing the same queue when requests race here.
+        if (get_transient(self::ASYNC_DISPATCH_LOCK_TRANSIENT)) return;
+        set_transient(self::ASYNC_DISPATCH_LOCK_TRANSIENT, 1, self::ASYNC_DISPATCH_LOCK_SECONDS);
+
         $this->dispatchAsyncRequest();
+    }
+
+    private function isShutdownCallback(): bool
+    {
+        return function_exists('current_filter') && current_filter() === 'shutdown';
+    }
+
+    private function finishFastCgiResponse(): void
+    {
+        if (function_exists('fastcgi_finish_request')) {
+            fastcgi_finish_request();
+        }
+    }
+
+    private function repairDatabaseConnection(): void
+    {
+        global $wpdb;
+
+        if (!isset($wpdb) || !is_object($wpdb)) return;
+
+        if (method_exists($wpdb, 'flush')) {
+            $wpdb->flush();
+        }
+
+        if (method_exists($wpdb, 'check_connection')) {
+            $wpdb->check_connection(false);
+        }
     }
 
     public function handleAsyncRequest(): void

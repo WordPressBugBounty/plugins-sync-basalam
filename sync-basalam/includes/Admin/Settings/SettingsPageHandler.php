@@ -6,6 +6,7 @@ use SyncBasalam\Queue\Tasks\Debug;
 use SyncBasalam\Actions\Controller\ProductActions\CancelDebug;
 use SyncBasalam\Services\WebhookService;
 use SyncBasalam\Services\VendorInfoService;
+use SyncBasalam\Services\ScheduledProductSync;
 
 defined('ABSPATH') || exit;
 
@@ -25,11 +26,17 @@ class SettingsPageHandler
 
             SettingsManager::updateSettings($data);
 
-            if (!empty($data[SettingsConfig::DEVELOPER_MODE]) && $data[SettingsConfig::DEVELOPER_MODE] === 'true') {
-                $debugTask = new Debug();
-                $debugTask->schedule();
-            } else {
-                (new CancelDebug())();
+            if (array_key_exists(SettingsConfig::AUTO_FULL_UPDATE_INTERVAL, $data)) {
+                (new ScheduledProductSync())->ensureScheduled();
+            }
+
+            if (array_key_exists(SettingsConfig::DEVELOPER_MODE, $data)) {
+                if ($data[SettingsConfig::DEVELOPER_MODE] === 'true') {
+                    $debugTask = new Debug();
+                    $debugTask->schedule();
+                } else {
+                    (new CancelDebug())();
+                }
             }
         }
 

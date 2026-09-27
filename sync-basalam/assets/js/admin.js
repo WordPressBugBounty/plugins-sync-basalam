@@ -23,7 +23,60 @@ document.addEventListener("DOMContentLoaded", function () {
     },
   ];
 
+  const updateModal = document.getElementById("BasalamUpdateProductsModal");
+  let updateStatusPoller = null;
+  let updateStatusInFlight = false;
+
+  const showUpdatePanel = (panelId) => {
+    ["update-status-loading", "update-status-error", "update-type-selection", "quick-update-in-progress", "active-jobs-info"].forEach((id) => {
+      const panel = document.getElementById(id);
+      if (panel) panel.hidden = id !== panelId;
+    });
+  };
+
+  const refreshUpdateStatus = () => {
+    if (!updateModal || !document.getElementById("update-type-selection") || updateStatusInFlight) return;
+
+    updateStatusInFlight = true;
+    const formData = new FormData();
+    formData.append("action", "get_update_queue_status");
+    formData.append("_wpnonce", updateModal.dataset.statusNonce || "");
+
+    return fetch(ajaxurl, { method: "POST", body: formData, cache: "no-store" })
+      .then((response) => response.json())
+      .then((response) => {
+        if (!response.success || !response.data) throw new Error("Update status unavailable");
+
+        const status = response.data;
+        if (!status.active) {
+          showUpdatePanel("update-type-selection");
+        } else if (status.type === "quick") {
+          const badge = document.getElementById("quick-update-status");
+          if (badge) badge.textContent = status.status === "processing" ? "در حال پردازش" : "در انتظار";
+          showUpdatePanel("quick-update-in-progress");
+        } else {
+          const count = Number(status.count) || 0;
+          const countRow = document.getElementById("update-queue-count-row");
+          const countBadge = document.getElementById("update-queue-count");
+          if (countRow) countRow.hidden = count === 0;
+          if (countBadge) countBadge.textContent = `${count} محصول`;
+          showUpdatePanel("active-jobs-info");
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching product update status:", error);
+        showUpdatePanel("update-status-error");
+      })
+      .finally(() => {
+        updateStatusInFlight = false;
+      });
+  };
+
   const closeModal = () => {
+    if (updateStatusPoller) {
+      clearInterval(updateStatusPoller);
+      updateStatusPoller = null;
+    }
     document.querySelectorAll(".basalam-modal").forEach((modal) => {
       modal.style.display = "none";
     });
@@ -41,13 +94,12 @@ document.addEventListener("DOMContentLoaded", function () {
         document.body.style.overflow = "hidden";
 
         if (modalId === "BasalamUpdateProductsModal") {
-          const selectionDiv = document.getElementById("update-type-selection");
-          const quickConfirm = document.getElementById("quick-update-confirm");
-          const fullConfirm = document.getElementById("full-update-confirm");
-
-          if (selectionDiv) selectionDiv.style.display = "block";
-          if (quickConfirm) quickConfirm.style.display = "none";
-          if (fullConfirm) fullConfirm.style.display = "none";
+          if (document.getElementById("update-type-selection")) {
+            showUpdatePanel("update-status-loading");
+            refreshUpdateStatus();
+            if (updateStatusPoller) clearInterval(updateStatusPoller);
+            updateStatusPoller = setInterval(refreshUpdateStatus, 5000);
+          }
         }
       });
     }
@@ -76,6 +128,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       });
     }
+  });
+
+  document.getElementById("update-status-retry")?.addEventListener("click", () => {
+    showUpdatePanel("update-status-loading");
+    refreshUpdateStatus();
   });
 
   setTimeout(() => {

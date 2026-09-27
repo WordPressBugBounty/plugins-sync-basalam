@@ -42,6 +42,8 @@ class SettingsManager
         $input[SettingsConfig::DEFAULT_WEIGHT] = absint($input[SettingsConfig::DEFAULT_WEIGHT]);
         $input[SettingsConfig::DEFAULT_PREPARATION] = absint($input[SettingsConfig::DEFAULT_PREPARATION]);
         $input[SettingsConfig::DISCOUNT_REDUCTION_PERCENT] = min(100, absint($input[SettingsConfig::DISCOUNT_REDUCTION_PERCENT]));
+        $interval = absint($input[SettingsConfig::AUTO_FULL_UPDATE_INTERVAL] ?? 0);
+        $input[SettingsConfig::AUTO_FULL_UPDATE_INTERVAL] = in_array($interval, [24, 48], true) ? $interval : 0;
 
         return $input;
     }

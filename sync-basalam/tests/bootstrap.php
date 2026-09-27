@@ -26,6 +26,7 @@ require_once __DIR__ . '/Support/JobsRunnerWordPressStubs.php';
 require_once __DIR__ . '/Support/FetchCommissionStubs.php';
 
 require_once dirname(__DIR__) . '/includes/Services/MediaMimeType.php';
+require_once dirname(__DIR__) . '/includes/Admin/Settings.php';
 require_once dirname(__DIR__) . '/includes/Services/MediaUploadService.php';
 require_once dirname(__DIR__) . '/includes/Services/VendorSyncPolicy.php';
 require_once dirname(__DIR__) . '/includes/Services/ForceUpdateGate.php';

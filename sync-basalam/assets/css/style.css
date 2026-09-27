@@ -249,6 +249,43 @@
   -o-transition: all 0.3s ease;
 }
 
+.basalam-action-cards > .basalam-action-card,
+.basalam-action-cards > form,
+.basalam-action-cards > form > .basalam-action-card {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+#sync-basalam-onboarding-products .basalam-action-buttons-col,
+#sync-basalam-onboarding-orders .basalam-action-buttons-col,
+#sync-basalam-onboarding-orders .basalam-action-buttons-col > form {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+#sync-basalam-onboarding-products .basalam-action-buttons-col > button,
+#sync-basalam-onboarding-orders .basalam-action-buttons-col > form > button,
+#sync-basalam-onboarding-settings .basalam-center > button,
+#sync-basalam-onboarding-settings .basalam-center-margin > button {
+  width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+
+#sync-basalam-onboarding-products .basalam-flex-fill > .basalam-flex {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+}
+
+#sync-basalam-onboarding-products .basalam-flex-fill > .basalam-flex > a {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
 .basalam-action-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -1539,9 +1576,9 @@
 
 @media screen and (max-width: 768px) {
   .basalam-header {
-    margin: 0 15px;
+    margin: 0 auto 24px;
     padding: 20px;
-    width: 86%;
+    width: 90%;
     box-sizing: border-box;
   }
 
@@ -1633,7 +1670,7 @@
   }
 
   .basalam-header {
-    margin: 0 10px;
+    margin: 0 auto 24px;
     padding: 16px;
   }
 
@@ -2394,7 +2431,8 @@ input[type="number"]::-webkit-outer-spin-button {
   }
 
   .basalam-dashboard {
-    padding: 10px;
+    padding: 0;
+    box-sizing: border-box;
     margin: 0 auto;
   }
 
@@ -3995,6 +4033,10 @@ body>.basalam-info-modal {
   display: none;
 }
 
+#BasalamUpdateProductsModal [hidden] {
+  display: none !important;
+}
+
 .basalam-block {
   display: block;
 }
@@ -4252,6 +4294,298 @@ body>.basalam-info-modal {
 /* Form utilities */
 .basalam-form-margin-0 {
   margin: 0;
+}
+
+/* Scheduled full product updates beside the existing product sync control. */
+#sync-basalam-onboarding-status .basalam-sync-status {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 400px);
+  align-items: center;
+  direction: rtl;
+  gap: 12px;
+  padding: 0;
+  background: transparent;
+}
+
+#sync-basalam-onboarding-status .basalam-sync-intro {
+  display: flex;
+  grid-column: 1;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border-radius: 8px;
+  background: #f0f6fc;
+  box-sizing: border-box;
+}
+
+#sync-basalam-onboarding-status .basalam-sync-intro .basalam-status-info {
+  flex: 1 1 auto;
+  width: auto;
+  margin: 0;
+  text-align: right;
+}
+
+#sync-basalam-onboarding-status .basalam-sync-controls {
+  display: grid;
+  grid-column: 2;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  align-items: stretch;
+  direction: rtl;
+  gap: 12px;
+  width: 100%;
+}
+
+#sync-basalam-onboarding-status .basalam-sync-controls > form,
+#sync-basalam-onboarding-status .basalam-schedule-control {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+#sync-basalam-onboarding-status .basalam-sync-controls > form > button {
+  width: 100%;
+  min-height: 44px;
+  height: 100%;
+  margin: 0;
+  box-sizing: border-box;
+  text-align: center !important;
+}
+
+#sync-basalam-onboarding-status .basalam-schedule-control {
+  position: relative;
+}
+
+#sync-basalam-onboarding-status .basalam-schedule-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 7px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-sizing: border-box;
+  list-style: none;
+  white-space: nowrap;
+  margin: 0;
+}
+
+#sync-basalam-onboarding-status .basalam-schedule-trigger::-webkit-details-marker {
+  display: none;
+}
+
+#sync-basalam-onboarding-status .basalam-schedule-trigger:hover,
+#sync-basalam-onboarding-status .basalam-schedule-trigger:focus-visible,
+#sync-basalam-onboarding-status .basalam-schedule-control[open] .basalam-schedule-trigger {
+  border-color: var(--basalam-primary-color);
+  color: var(--basalam-primary-color);
+  background: #f8fbff;
+}
+
+#sync-basalam-onboarding-status .basalam-schedule-badge {
+  padding: 3px 5px;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 10px;
+}
+
+#sync-basalam-onboarding-status .basalam-schedule-badge-off {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+#sync-basalam-onboarding-status .basalam-schedule-panel {
+  position: absolute;
+  z-index: 100;
+  top: calc(100% + 8px);
+  left: 0;
+  width: min(320px, calc(100vw - 64px));
+  padding: 18px;
+  border: 1px solid #dbe3ec;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
+  box-sizing: border-box;
+  text-align: right;
+}
+
+#sync-basalam-onboarding-status .basalam-schedule-panel,
+#sync-basalam-onboarding-status .basalam-schedule-panel * {
+  font-family: "PelakFA", Tahoma, sans-serif;
+}
+
+#sync-basalam-onboarding-status .basalam-schedule-panel h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+#sync-basalam-onboarding-status .basalam-schedule-panel > p {
+  margin: 0 0 14px;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+#sync-basalam-onboarding-status .basalam-schedule-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  border: 1px solid #dbe3ec;
+  border-radius: 8px;
+  box-sizing: border-box;
+  min-height: 58px;
+  width: 100%;
+  cursor: pointer;
+}
+
+#sync-basalam-onboarding-status .basalam-schedule-option:has(input:checked) {
+  border-color: var(--basalam-primary-color);
+  background: #f0f7ff;
+}
+
+#sync-basalam-onboarding-status .basalam-schedule-option input {
+  margin: 0;
+  accent-color: var(--basalam-primary-color);
+}
+
+#sync-basalam-onboarding-status .basalam-schedule-option span {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+#sync-basalam-onboarding-status .basalam-schedule-option strong {
+  font-size: 12px;
+  color: #1e293b;
+}
+
+#sync-basalam-onboarding-status .basalam-schedule-option small {
+  font-size: 11px;
+  color: #64748b;
+}
+
+#sync-basalam-onboarding-status .basalam-schedule-save {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 4px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--basalam-primary-color);
+  color: #fff;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+#sync-basalam-onboarding-status .basalam-schedule-save:hover {
+  background: var(--basalam-primary-hover);
+}
+
+#sync-basalam-onboarding-status .basalam-schedule-disable-form {
+  margin: 9px 0 0;
+  text-align: center;
+}
+
+#sync-basalam-onboarding-status .basalam-schedule-disable {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background: #fff;
+  color: #b42318;
+  font-size: 12px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+#sync-basalam-onboarding-status .basalam-schedule-disable:hover {
+  background: #fff5f5;
+}
+
+@media (min-width: 701px) and (max-width: 900px) {
+  #sync-basalam-onboarding-status .basalam-sync-status {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  #sync-basalam-onboarding-status .basalam-sync-status {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #sync-basalam-onboarding-status .basalam-sync-intro,
+  #sync-basalam-onboarding-status .basalam-sync-controls {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 900px) {
+  #sync-basalam-onboarding-status .basalam-sync-controls {
+    gap: 8px;
+  }
+
+  #sync-basalam-onboarding-status .basalam-sync-controls > form > button,
+  #sync-basalam-onboarding-status .basalam-schedule-trigger {
+    min-height: 48px;
+    margin: 0 !important;
+  }
+
+  #sync-basalam-onboarding-status .basalam-sync-controls > form > button {
+    gap: 4px;
+    padding: 6px 4px;
+    font-size: 10px !important;
+    line-height: 1.4;
+  }
+
+  #sync-basalam-onboarding-status .basalam-sync-controls > form > button img {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+  }
+
+  #sync-basalam-onboarding-status .basalam-schedule-trigger {
+    flex-wrap: nowrap;
+    gap: 4px;
+    padding: 5px 4px;
+    font-size: 10px !important;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  #sync-basalam-onboarding-status .basalam-schedule-trigger img {
+    display: none;
+  }
+
+  #sync-basalam-onboarding-status .basalam-schedule-badge {
+    padding: 2px 3px;
+    font-size: 9px;
+    white-space: nowrap;
+  }
+
+}
+
+@media (max-width: 400px) {
+  #sync-basalam-onboarding-status .basalam-sync-controls {
+    grid-template-columns: minmax(0, 3fr) minmax(116px, 2fr);
+  }
+
+  #sync-basalam-onboarding-status .basalam-sync-controls > form > button {
+    font-size: 9px !important;
+  }
 }
 
 .basalam-form-no-margin {
@@ -7846,5 +8180,273 @@ body.sync-basalam-announcement-open {
   .basalam-price-change-field .basalam-price-change-field__control {
     float: none;
     width: 100%;
+  }
+}
+
+/* Keep the advanced settings form inside its modal at narrow widths. */
+#basalam-modal #sep-section {
+  box-sizing: border-box;
+  max-width: min(800px, calc(100vw - 24px));
+}
+
+#basalam-modal #basalam-advanced-settings-form,
+#basalam-modal .basalam-tab-content {
+  min-width: 0;
+  max-width: 100%;
+}
+
+#basalam-modal section#sep-section .basalam-form-row {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+#basalam-modal #sep-section .basalam-form-group {
+  width: 100% !important;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+#basalam-modal #sep-section .basalam-form-group .basalam-input,
+#basalam-modal #sep-section .basalam-form-group .basalam-select {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+#basalam-modal #sep-section .basalam-input-container {
+  min-width: 0;
+}
+
+#basalam-modal #sep-section .basalam-input-container .percentage-input {
+  flex: 1 1 0;
+}
+
+#basalam-modal #sep-section .percentage-unit {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+#basalam-modal #Basalam-map-option-form,
+#basalam-modal .options_mapping_section {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media screen and (max-width: 900px) {
+  #basalam-modal section#sep-section .basalam-form-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  #basalam-modal #sep-section {
+    width: calc(100% - 24px) !important;
+    max-width: calc(100% - 24px) !important;
+    margin: 12px auto !important;
+    padding: 32px 12px 16px !important;
+  }
+
+  #basalam-modal #sep-section .basalam-form-group {
+    padding: 6px !important;
+  }
+
+  #basalam-modal #sep-section .basalam-form-group .basalam-input,
+  #basalam-modal #sep-section .basalam-form-group .basalam-select {
+    height: 34px !important;
+    padding: 5px 7px !important;
+    font-size: 11px !important;
+  }
+
+  #basalam-modal #sep-section .basalam-form-group input[type="checkbox"] {
+    width: auto !important;
+    height: auto !important;
+    padding: 0 !important;
+    flex: 0 0 auto;
+  }
+
+  #basalam-modal #Basalam-map-option-form input,
+  #basalam-modal #Basalam-map-option-form button {
+    width: 100% !important;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  #basalam-modal .options_mapping_section .basalam-table {
+    min-width: 0;
+    table-layout: fixed;
+  }
+
+  #basalam-modal .options_mapping_section .basalam-table th,
+  #basalam-modal .options_mapping_section .basalam-table td {
+    overflow-wrap: anywhere;
+    padding: 5px !important;
+    font-size: 10px !important;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  #basalam-modal section#sep-section .basalam-form-row {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+#basalam-modal #Basalam-map-option-form {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-areas:
+    "woo-label basalam-label"
+    "woo-input basalam-input"
+    "save save";
+  gap: 8px 12px !important;
+  align-items: start;
+  width: 100% !important;
+}
+
+#basalam-modal #Basalam-map-option-form label[for="woo-option-name"] {
+  grid-area: woo-label;
+}
+
+#basalam-modal #Basalam-map-option-form label[for="Basalam-option-name"] {
+  grid-area: basalam-label;
+}
+
+#basalam-modal #Basalam-map-option-form #woo-option-name {
+  grid-area: woo-input;
+}
+
+#basalam-modal #Basalam-map-option-form #Basalam-option-name {
+  grid-area: basalam-input;
+}
+
+#basalam-modal #Basalam-map-option-form label,
+#basalam-modal #Basalam-map-option-form input {
+  width: 100% !important;
+  min-width: 0;
+  margin: 0 !important;
+  box-sizing: border-box;
+}
+
+#basalam-modal #Basalam-map-option-form #Basalam-map-option-submit {
+  grid-area: save;
+  width: 100% !important;
+  max-width: 100%;
+  margin: 8px 0 0 !important;
+  box-sizing: border-box;
+}
+
+@media screen and (max-width: 900px) {
+  #sync-basalam-onboarding-status .basalam-status-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "badge title"
+      "data data";
+    direction: ltr;
+    align-items: center;
+    text-align: right;
+  }
+
+  #sync-basalam-onboarding-status .basalam-status-header > .basalam-h {
+    width: auto;
+    min-width: 0;
+    margin: 0;
+    text-align: right;
+  }
+
+  #sync-basalam-onboarding-status .basalam-status-header > .basalam-badge {
+    max-width: 100%;
+    margin: 0 !important;
+    white-space: normal;
+  }
+
+  #sync-basalam-onboarding-status .basalam-status-header > .basalam_status_data_container {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  #BasalamUpdateProductsModal .basalam-modal-content,
+  #basalamAddProductsModal .basalam-modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-sizing: border-box;
+    width: min(340px, calc(100vw - 24px));
+    max-width: calc(100vw - 24px);
+    min-height: min(260px, calc(100dvh - 32px));
+    max-height: calc(100dvh - 32px);
+    margin: 0;
+    padding: 16px;
+  }
+
+  #BasalamUpdateProductsModal .basalam-modal-close,
+  #basalamAddProductsModal .basalam-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    float: none;
+    margin: 0;
+  }
+
+  #BasalamUpdateProductsModal .basalam-modal-content > h3,
+  #basalamAddProductsModal .basalam-modal-content > h3 {
+    padding: 0 20px;
+    font-size: 16px !important;
+    line-height: 1.4;
+  }
+
+  #BasalamUpdateProductsModal #update-type-selection > p {
+    padding-top: 10px;
+    font-size: 11px !important;
+  }
+
+  #BasalamUpdateProductsModal .basalam-bg-light-warning-margin {
+    padding: 10px;
+    margin-top: 8px !important;
+  }
+
+  #BasalamUpdateProductsModal .basalam-display-flex-gap-20 {
+    gap: 8px;
+  }
+
+  #BasalamUpdateProductsModal .basalam-flex-1 {
+    min-width: 0;
+  }
+
+  #BasalamUpdateProductsModal .basalam-display-flex-gap-20 h4 {
+    font-size: 12px !important;
+    line-height: 1.5;
+  }
+
+  #BasalamUpdateProductsModal .basalam-margin-muted {
+    font-size: 10px;
+    line-height: 1.5;
+  }
+
+  #BasalamUpdateProductsModal .basalam-display-flex-gap-10-margin {
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  #BasalamUpdateProductsModal #quick-update-btn,
+  #BasalamUpdateProductsModal #full-update-btn {
+    box-sizing: border-box;
+    min-width: 0;
+    min-height: 38px;
+    height: auto;
+    padding: 8px 6px;
+  }
+
+  #BasalamUpdateProductsModal #quick-update-btn span,
+  #BasalamUpdateProductsModal #full-update-btn span {
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  #BasalamUpdateProductsModal .basalam-bg-warning-info-margin {
+    padding: 12px;
+    margin-top: 10px;
   }
 }

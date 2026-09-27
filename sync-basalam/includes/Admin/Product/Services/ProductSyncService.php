@@ -106,7 +106,21 @@ class ProductSyncService
 
     public function enqueueAutoConnect($cursor = null): void
     {
-        $payload['cursor'] = $cursor;
+        $pendingJob = $this->jobManager->getJob([
+            'job_type' => self::JOB_TYPE_AUTO_CONNECT,
+            'status'   => 'pending',
+        ]);
+        $processingJob = $this->jobManager->getJob([
+            'job_type' => self::JOB_TYPE_AUTO_CONNECT,
+            'status'   => 'processing',
+        ]);
+
+        if ($pendingJob || $processingJob) return;
+
+        $payload = ['mode' => 'vendor'];
+        if ($cursor !== null) {
+            $payload['cursor'] = $cursor;
+        }
         $data = $this->jobManager->createJob(
             self::JOB_TYPE_AUTO_CONNECT,
             'pending',

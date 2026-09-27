@@ -1,6 +1,6 @@
 <?php defined('ABSPATH') || exit; ?>
 
-<div id="BasalamUpdateProductsModal" class="basalam-modal basalam-hidden">
+<div id="BasalamUpdateProductsModal" class="basalam-modal basalam-hidden" data-status-nonce="<?php echo esc_attr(wp_create_nonce('get_update_queue_status_nonce')); ?>">
     <div class="basalam-modal-content basalam-max-width-500">
         <span class="basalam-modal-close"> <img class="basalam-img-20" src="<?php echo esc_url(syncBasalamPlugin()->assetsUrl() . '/icons/close.svg'); ?>">
         </span>
@@ -12,9 +12,13 @@
                 <strong>بروزرسانی محصولات در دسترس نیست.</strong>
                 <p><?php echo esc_html($vendorSyncState['message']); ?></p>
             </div>
-        <?php elseif (!$has_active_update_jobs): ?>
-            <!-- Selection Screen when no jobs are running -->
-            <div id="update-type-selection" class="basalam-block">
+        <?php else: ?>
+            <div id="update-status-loading" class="basalam-p basalam-padding-top-normal" hidden>در حال بررسی وضعیت بروزرسانی...</div>
+            <div id="update-status-error" class="basalam-p basalam-padding-top-normal" hidden>
+                دریافت وضعیت بروزرسانی ممکن نشد.
+                <button type="button" id="update-status-retry" class="basalam-primary-button basalam-p">تلاش دوباره</button>
+            </div>
+            <div id="update-type-selection" class="basalam-block" <?php echo $update_queue_status['active'] ? 'hidden' : ''; ?>>
                 <?php wp_nonce_field('update_products_in_basalam_nonce', '_wpnonce'); ?>
                 <p class="basalam-p basalam-padding-top-normal">
                     <?php echo $vendorUpdateIsLimited
@@ -55,8 +59,7 @@
                 </div>
             </div>
 
-        <?php elseif ($quick_update_processing_job): ?>
-            <div id="quick-update-in-progress" class="basalam-display-block-10">
+            <div id="quick-update-in-progress" class="basalam-display-block-10" <?php echo $update_queue_status['type'] === 'quick' ? '' : 'hidden'; ?>>
                 <div class="basalam-bg-warning-info-margin basalam-p">
                     <h4 class="basalam-h basalam-margin-warning-header">
                         بروزرسانی فوری در حال اجرا است
@@ -68,8 +71,8 @@
 
                     <p class="basalam-margin-warning">
                         <strong>وضعیت:</strong>
-                        <span class="basalam-badge-warning">
-                            <?php echo $quick_update_processing_job ? 'در حال پردازش' : 'در انتظار'; ?>
+                        <span id="quick-update-status" class="basalam-badge-warning">
+                            <?php echo $update_queue_status['status'] === 'processing' ? 'در حال پردازش' : 'در انتظار'; ?>
                         </span>
                     </p>
 
@@ -79,7 +82,7 @@
                 </div>
 
                 <!-- Cancel button for quick update -->
-                <form method="POST" action="<?php echo esc_url(admin_url('admin-post.php')) ?>" id="BasalamCancelUpdateJobs">
+                <form method="POST" action="<?php echo esc_url(admin_url('admin-post.php')) ?>" id="BasalamCancelQuickUpdateJobs">
                     <?php wp_nonce_field('cancel_update_jobs_nonce', '_wpnonce'); ?>
                     <input type="hidden" name="action" value="cancel_update_jobs">
                     <button type="submit" class="basalam-primary-button basalam-p basalam-width-danger-margin">
@@ -89,32 +92,22 @@
                 </form>
 
             </div>
-        <?php elseif ($has_active_update_jobs): ?>
-            <!-- Display when jobs are running -->
-            <div id="active-jobs-info" class="basalam-display-block-10">
+            <div id="active-jobs-info" class="basalam-display-block-10" <?php echo $update_queue_status['type'] === 'full' ? '' : 'hidden'; ?>>
                 <div class="basalam-bg-warning-info-margin basalam-p">
                     <h4 class="basalam-h basalam-margin-warning-header">
                         عملیات بروزرسانی در حال اجرا است
                     </h4>
 
-                    <?php if ($active_update_type === 'quick'): ?>
-                        <p class="basalam-margin-warning">
-                            <strong>نوع عملیات:</strong> بروزرسانی فوری قیمت و موجودی
-                        </p>
-                    <?php elseif ($active_update_type === 'full'): ?>
-                        <p class="basalam-margin-warning">
-                            <strong>نوع عملیات:</strong> بروزرسانی کامل اطلاعات محصولات
-                        </p>
-                    <?php endif; ?>
+                    <p class="basalam-margin-warning">
+                        <strong>نوع عملیات:</strong> بروزرسانی کامل اطلاعات محصولات
+                    </p>
 
-                    <?php if ($single_update_count > 0): ?>
-                        <p class="basalam-margin-warning">
+                        <p id="update-queue-count-row" class="basalam-margin-warning" <?php echo $update_queue_status['count'] > 0 ? '' : 'hidden'; ?>>
                             <strong>تعداد محصولات در صف:</strong>
-                            <span class="basalam-badge-warning">
-                                <?php echo esc_html($single_update_count); ?> محصول
+                            <span id="update-queue-count" class="basalam-badge-warning">
+                                <?php echo esc_html($update_queue_status['count']); ?> محصول
                             </span>
                         </p>
-                    <?php endif; ?>
 
                     <p class="basalam-margin-warning-justify-10">
                         لطفاً تا پایان عملیات جاری صبر کنید. می‌توانید پیشرفت را از صفحه لاگ‌ها مشاهده کنید.
@@ -122,7 +115,7 @@
                 </div>
 
                 <!-- Cancel button for new job system -->
-                <form method="POST" action="<?php echo esc_url(admin_url('admin-post.php')) ?>" id="BasalamCancelUpdateJobs">
+                <form method="POST" action="<?php echo esc_url(admin_url('admin-post.php')) ?>" id="BasalamCancelFullUpdateJobs">
                     <?php wp_nonce_field('cancel_update_jobs_nonce', '_wpnonce'); ?>
                     <input type="hidden" name="action" value="cancel_update_jobs">
                     <button type="submit" class="basalam-primary-button basalam-p basalam-width-danger-margin">

@@ -66,6 +66,25 @@ class JobManager
         return $this->getCountJobs(['status' => 'processing']) > 0;
     }
 
+    public function getProductUpdateStatus(): array
+    {
+        $quickJob = $this->getJob(['job_type' => 'sync_basalam_bulk_update_products', 'status' => 'processing'])
+            ?: $this->getJob(['job_type' => 'sync_basalam_bulk_update_products', 'status' => 'pending']);
+        $fullJob = $this->getJob(['job_type' => 'sync_basalam_update_all_products', 'status' => 'processing'])
+            ?: $this->getJob(['job_type' => 'sync_basalam_update_all_products', 'status' => 'pending']);
+        $singleCount = $this->getCountJobs([
+            'job_type' => 'sync_basalam_update_single_product',
+            'status' => ['pending', 'processing'],
+        ]);
+
+        return [
+            'active' => (bool) ($quickJob || $fullJob || $singleCount > 0),
+            'type' => $quickJob ? 'quick' : (($fullJob || $singleCount > 0) ? 'full' : ''),
+            'status' => $quickJob ? $quickJob->status : ($fullJob ? $fullJob->status : ''),
+            'count' => $singleCount,
+        ];
+    }
+
     public function hasPendingOrStaleProcessingJobs(int $staleProcessingTimeoutSeconds = 120): bool
     {
         global $wpdb;
