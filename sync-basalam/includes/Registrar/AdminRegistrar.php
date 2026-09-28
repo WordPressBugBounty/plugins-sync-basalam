@@ -606,9 +606,17 @@ class AdminRegistrar implements RegistrarInterface
         );
 
         wp_enqueue_script(
+            'sync-basalam-finance-access-lock',
+            self::assetsUrl('js/finance-access-lock.js'),
+            [],
+            $version,
+            true
+        );
+
+        wp_enqueue_script(
             'sync-basalam-finance-history-pagination',
             self::assetsUrl('js/finance-history-pagination.js'),
-            [],
+            ['sync-basalam-finance-access-lock'],
             $version,
             true
         );
@@ -624,7 +632,7 @@ class AdminRegistrar implements RegistrarInterface
         wp_enqueue_script(
             'sync-basalam-finance-balance-settlement',
             self::assetsUrl('js/finance-balance-settlement.js'),
-            [],
+            ['sync-basalam-finance-access-lock'],
             $version,
             true
         );

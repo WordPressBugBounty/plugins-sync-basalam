@@ -15,6 +15,9 @@ $historyPage = isset($_GET['sbp_history_page']) ? max(1, absint(wp_unslash($_GET
 $balanceResult = $service->getBalance();
 $activeSettlementsResult = $service->getActiveSettlements($activePage, $perPage);
 $historyResult = $service->getSettlementHistory($historyPage, $perPage);
+$accessDenied = (int) ($balanceResult['status_code'] ?? 0) === 403
+    || (int) ($activeSettlementsResult['status_code'] ?? 0) === 403
+    || (int) ($historyResult['status_code'] ?? 0) === 403;
 
 $balanceData = (isset($balanceResult['data']) && is_array($balanceResult['data'])) ? $balanceResult['data'] : [];
 $activeSettlementsData = (isset($activeSettlementsResult['data']) && is_array($activeSettlementsResult['data'])) ? $activeSettlementsResult['data'] : [];
@@ -160,8 +163,8 @@ $activeTitle = 'درخواست‌های تسویه فعال';
 $historyTitle = 'ترازهای تسویه شده';
 ?>
 
-<div class="basalam-container">
-    <div class="basalam-dashboard">
+<div class="basalam-container basalam-finance-page<?php echo $accessDenied ? ' is-locked' : ''; ?>">
+    <div class="basalam-dashboard"<?php echo $accessDenied ? ' inert aria-hidden="true"' : ''; ?>>
 
         <!-- Balance Section -->
         <div class="basalam-status-card">
@@ -315,6 +318,20 @@ $historyTitle = 'ترازهای تسویه شده';
         ]);
         ?>
 
+    </div>
+
+    <div class="basalam-finance-lock" role="alert" aria-live="assertive">
+        <div class="basalam-finance-lock__card">
+            <span class="dashicons dashicons-lock" aria-hidden="true"></span>
+            <h2>دسترسی به اطلاعات مالی نیاز به احراز هویت دارد</h2>
+            <p>برای دریافت صحیح اطلاعات، مجدداً احراز هویت را انجام دهید.</p>
+            <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post">
+                <input type="hidden" name="action" value="basalam_update_setting">
+                <input type="hidden" name="get_token" value="1">
+                <?php wp_nonce_field('basalam_update_setting_nonce', '_wpnonce'); ?>
+                <button type="submit" class="basalam-finance-lock__button">ورود به باسلام</button>
+            </form>
+        </div>
     </div>
 
     <!-- Settlement Modal -->

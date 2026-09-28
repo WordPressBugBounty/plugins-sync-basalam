@@ -66,6 +66,11 @@
             body: body.toString()
         })
             .then(function (response) {
+                if (response.status === 403) {
+                    window.syncBasalamFinanceLock();
+                    throw new Error(config.errorMessage);
+                }
+
                 if (!response.ok) {
                     throw new Error(config.errorMessage);
                 }
@@ -88,6 +93,9 @@
             })
             .catch(function (error) {
                 setLoadingState(section, false);
+                if (document.querySelector('.basalam-finance-page.is-locked')) {
+                    return;
+                }
                 window.alert(error.message || config.errorMessage);
             });
     });

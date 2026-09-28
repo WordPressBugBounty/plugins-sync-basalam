@@ -115,6 +115,10 @@
         body: body.toString(),
       })
       .then(function (response) {
+        if (response.status === 403) {
+          window.syncBasalamFinanceLock();
+          throw new Error(config.bankAccountsError);
+        }
         return response.json();
       })
       .then(function (payload) {
@@ -127,6 +131,9 @@
         renderBankAccounts(accounts);
       })
       .catch(function (error) {
+        if (document.querySelector('.basalam-finance-page.is-locked')) {
+          return;
+        }
         bankAccountsList.innerHTML = "";
         bankAccountsError.textContent = error.message || config.bankAccountsError;
         bankAccountsError.style.display = "block";
@@ -322,6 +329,10 @@
       body: body.toString(),
     })
       .then(function (response) {
+        if (response.status === 403) {
+          window.syncBasalamFinanceLock();
+          throw new Error(config.errorMessage);
+        }
         return response.json();
       })
       .then(function (payload) {
@@ -344,6 +355,9 @@
   submitBtn.addEventListener("click", function () {
     setLoading(true);
     submitSettlement().catch(function (error) {
+      if (document.querySelector('.basalam-finance-page.is-locked')) {
+        return;
+      }
       setLoading(false);
       showError(error.message || config.errorMessage);
     });
@@ -356,6 +370,9 @@
     }
     setBankLoading(true);
     submitSettlement().catch(function (error) {
+      if (document.querySelector('.basalam-finance-page.is-locked')) {
+        return;
+      }
       setBankLoading(false);
       bankAccountsError.textContent = error.message || config.errorMessage;
       bankAccountsError.style.display = "block";

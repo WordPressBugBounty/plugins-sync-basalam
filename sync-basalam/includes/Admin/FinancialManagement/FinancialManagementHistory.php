@@ -179,6 +179,11 @@ class FinancialManagementHistory
         $activePage = isset($_POST['active_page']) ? max(1, absint(wp_unslash($_POST['active_page']))) : 1;
         $historyPage = isset($_POST['history_page']) ? max(1, absint(wp_unslash($_POST['history_page']))) : 1;
         $viewData = self::buildViewData($activePage, $historyPage);
+        if ((int) ($viewData['historyResult']['status_code'] ?? 0) === 403) {
+            wp_send_json_error([
+                'message' => 'برای دریافت صحیح اطلاعات، مجدداً احراز هویت را انجام دهید.',
+            ], 403);
+        }
         $currentPage = max(1, (int) ($viewData['historyData']['current_page'] ?? $historyPage));
 
         wp_send_json_success([

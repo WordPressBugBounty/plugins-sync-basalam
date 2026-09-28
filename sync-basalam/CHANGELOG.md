@@ -2,6 +2,21 @@
 
 <details>
 
+<summary>1.10.23 - 2026-09-28</summary>
+
+### Added
+- Request the `vendor.financial.read` and `vendor.financial.write` scopes when connecting to Basalam
+
+### Changed / Improved
+- Blur and lock the financial management page when a financial API request returns HTTP 403, with a direct button to reconnect to Basalam
+
+### Note
+- Existing connections must reauthenticate to grant the new financial scopes
+
+</details>
+
+<details>
+
 <summary>1.10.22 - 2026-09-27</summary>
 
 ### Added
