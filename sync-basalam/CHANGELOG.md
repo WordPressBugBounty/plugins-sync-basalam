@@ -2,6 +2,30 @@
 
 <details>
 
+<summary>1.10.25 - 2026-09-30</summary>
+
+### Changed / Improved
+- Revoke the stored Basalam vendor authorization on upgrade so every store reconnects and grants the currently required scopes
+
+### Note
+- Existing connections must reauthenticate after updating to this version
+
+</details>
+
+<details>
+
+<summary>1.10.24 - 2026-09-30</summary>
+
+### Added
+- Request the `vendor.product.read` scope when connecting to Basalam
+
+### Note
+- Existing connections must reauthenticate to grant the new product read scope
+
+</details>
+
+<details>
+
 <summary>1.10.23 - 2026-09-28</summary>
 
 ### Added
