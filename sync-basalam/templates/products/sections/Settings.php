@@ -145,11 +145,11 @@ defined('ABSPATH') || exit;
                         <?php SettingPageComponents::renderSuffixProductTitle(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">
-                        <?php echo CommonComponents::renderLabelWithTooltip('پسوند از ویژگی محصول', 'با فعال کردن این گزینه، می‌توانید یکی از ویژگی‌های محصول را به عنوان پسوند به نام محصول اضافه کنید (مثلا نام ناشر کتاب).'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('پسوند از ویژگی محصول', 'با فعال کردن این گزینه، می‌توانید مقدار یک یا چند ویژگی محصول را به عنوان پسوند به نام محصول اضافه کنید (مثلا نام ناشر و نویسنده کتاب).'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderAttributeSuffixEnabled(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p basalam-attribute-suffix-container">
-                        <?php echo CommonComponents::renderLabelWithTooltip('نام ویژگی برای پسوند', 'نام ویژگی محصول که می‌خواهید به عنوان پسوند به نام محصول اضافه شود.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
+                        <?php echo CommonComponents::renderLabelWithTooltip('نام ویژگی برای پسوند', 'نام ویژگی‌ها را به ترتیب دلخواه با کاما (انگلیسی یا فارسی) جدا کنید؛ مثلا «ناشر, نویسنده». مقدار ویژگی‌های موجود با کاما داخل پرانتز به انتهای نام محصول اضافه می‌شود.'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
                         <?php SettingPageComponents::renderAttributeSuffixPriority(); ?>
                     </div>
                     <div class="basalam-form-group basalam-p">

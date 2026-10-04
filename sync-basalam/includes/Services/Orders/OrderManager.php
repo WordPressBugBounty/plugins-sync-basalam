@@ -290,47 +290,7 @@ class OrderManager
             }
             if (isset($data['items']) && is_array($data['items'])) {
                 foreach ($data['items'] as $item) {
-                    $sync_basalam_product_id = $item['product']['id'] ?? null;
-                    $quantity = $item['quantity'] ?? 1;
-                    $item_id = $item['id'] ?? null;
-
-                    if ($sync_basalam_product_id) {
-                        try {
-                            if (!empty($item['variation']['id'])) {
-                                $woo_product_id = self::getWooProductVariableId($item['variation']['id']);
-                            } else {
-                                $woo_product_id = self::getWooProductSimpleId($sync_basalam_product_id);
-                            }
-
-                            if ($woo_product_id) {
-                                $product = wc_get_product($woo_product_id);
-                                if ($product) {
-                                    $order_item_id = $order->add_product($product, $quantity);
-                                    if ($item_id && $order_item_id) {
-                                        $order->update_meta_data('_sync_basalam_item_id_' . $order_item_id, $item_id);
-                                    }
-
-                                    self::set_item_price_from_financial_report($order, $order_item_id, $item, $quantity);
-                                }
-                            } else {
-                                $placeholder_product_id = self::getPlaceholderProductId();
-                                if ($placeholder_product_id) {
-                                    $placeholder_product = wc_get_product($placeholder_product_id);
-                                    if ($placeholder_product) {
-                                        $order_item_id = $order->add_product($placeholder_product, $quantity);
-
-                                        if ($item_id && $order_item_id) {
-                                            $order->update_meta_data('_sync_basalam_item_id_' . $order_item_id, $item_id);
-                                        }
-
-                                        self::set_item_price_from_financial_report($order, $order_item_id, $item, $quantity);
-                                    }
-                                }
-                            }
-                        } catch (\Exception $e) {
-                            Logger::error('خطا در ایجاد سفارش: ' . $e->getMessage());
-                        }
-                    }
+                    self::addBasalamItemToOrder($order, $item);
                 }
             }
 
@@ -698,6 +658,110 @@ class OrderManager
         );
 
         return $product_id ? $product_id : false;
+    }
+
+    public const BASALAM_ITEM_NAME_META_KEY = 'نام محصول در باسلام';
+    public const BASALAM_ITEM_LINK_META_KEY = 'لینک محصول در باسلام';
+
+    public static function addBasalamItemToOrder(\WC_Order $order, array $item)
+    {
+        $sync_basalam_product_id = $item['product']['id'] ?? null;
+        $quantity = $item['quantity'] ?? 1;
+        $item_id = $item['id'] ?? null;
+
+        if (!$sync_basalam_product_id) {
+            return;
+        }
+
+        try {
+            $basalam_item_name = self::extractBasalamItemName($item);
+
+            if (!empty($item['variation']['id'])) {
+                $woo_product_id = self::getWooProductVariableId($item['variation']['id']);
+            } else {
+                $woo_product_id = self::getWooProductSimpleId($sync_basalam_product_id);
+            }
+
+            $product = null;
+
+            if ($woo_product_id) {
+                $product = wc_get_product($woo_product_id);
+            }
+
+
+            
+            if (!$product) {
+                $placeholder_product_id = self::getPlaceholderProductId();
+
+                if ($placeholder_product_id) {
+                    $product = wc_get_product($placeholder_product_id);
+                }
+            }
+
+            if (!$product) {
+                return;
+            }
+
+            $order_item_id = $order->add_product($product, $quantity);
+
+            if ($item_id && $order_item_id) {
+                $order->update_meta_data('_sync_basalam_item_id_' . $order_item_id, $item_id);
+            }
+
+            self::setBasalamItemNameOnOrderItem($order, $order_item_id, $basalam_item_name, $sync_basalam_product_id);
+            self::set_item_price_from_financial_report($order, $order_item_id, $item, $quantity);
+        } catch (\Exception $e) {
+            Logger::error('خطا در ایجاد سفارش: ' . $e->getMessage());
+        }
+    }
+
+    public static function extractBasalamItemName(array $item): string
+    {
+        $product = is_array($item['product'] ?? null) ? $item['product'] : [];
+        $productTitle = trim((string) ($product['title'] ?? ($product['name'] ?? '')));
+
+        if ($productTitle === '') {
+            return '';
+        }
+
+        $variationTitle = '';
+        if (is_array($item['variation'] ?? null)) {
+            $variationTitle = trim((string) ($item['variation']['title'] ?? ($item['variation']['name'] ?? '')));
+        }
+
+        if ($variationTitle !== '' && mb_stripos($productTitle, $variationTitle) === false) {
+            return $productTitle . ' - ' . $variationTitle;
+        }
+
+        return $productTitle;
+    }
+
+    public static function setBasalamItemNameOnOrderItem($order, $order_item_id, $basalam_item_name, $basalam_product_id = null)
+    {
+        $basalam_item_name = trim((string) $basalam_item_name);
+
+        if (empty($order_item_id) || $basalam_item_name === '' || !$order instanceof \WC_Order) {
+            return false;
+        }
+
+        $order_item = $order->get_item($order_item_id);
+        if (!$order_item instanceof \WC_Order_Item_Product) {
+            return false;
+        }
+
+        $order_item->update_meta_data(self::BASALAM_ITEM_NAME_META_KEY, $basalam_item_name);
+
+        if ($basalam_product_id) {
+            $link = 'https://basalam.com/p/' . (int) $basalam_product_id;
+            $order_item->update_meta_data(
+                self::BASALAM_ITEM_LINK_META_KEY,
+                '<a href="' . esc_url($link) . '" target="_blank" rel="noopener">' . esc_html($basalam_item_name) . '</a>'
+            );
+        }
+
+        $order_item->save();
+
+        return true;
     }
 
     private static function set_item_price_from_financial_report($order, $order_item_id, $item, $quantity)

@@ -44,7 +44,7 @@ class SimpleProductHandler implements ProductDataHandlerInterface
         $name = $suffix ? "{$name} {$suffix}" : $name;
 
         $attributeSuffix = $this->attributeService->getAttributeSuffix($product);
-        if ($attributeSuffix) $name .= " ({$attributeSuffix})";
+        if ($attributeSuffix !== null && $attributeSuffix !== '') $name .= " ({$attributeSuffix})";
 
         return mb_substr($name, 0, 120);
     }

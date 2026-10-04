@@ -25,17 +25,29 @@ class AttributeService
 
         if ($isEnabled !== 'yes') return null;
 
-        $attributeName = trim(syncBasalamSettings()->getSettings(SettingsConfig::PRODUCT_ATTRIBUTE_SUFFIX_PRIORITY));
+        $configuredNames = (string) syncBasalamSettings()->getSettings(SettingsConfig::PRODUCT_ATTRIBUTE_SUFFIX_PRIORITY);
+        $attributeNames = array_unique(array_filter(
+            array_map('trim', preg_split('/[,،]/u', $configuredNames)),
+            static function ($name) { return $name !== ''; }
+        ));
 
-        if (empty($attributeName)) return null;
+        if (empty($attributeNames)) return null;
 
         $wooAttributes = $this->getWooCommerceAttributes($product);
+        $suffixValues = [];
 
-        foreach ($wooAttributes as $attribute) {
-            if (trim($attribute['title']) === $attributeName && !empty($attribute['value'])) return $attribute['value'];
+        // Follow the configured order, regardless of the product's attribute order.
+        foreach ($attributeNames as $attributeName) {
+            foreach ($wooAttributes as $attribute) {
+                $value = trim($attribute['value']);
+                if (trim($attribute['title']) === $attributeName && $value !== '') {
+                    $suffixValues[] = $value;
+                    break;
+                }
+            }
         }
 
-        return null;
+        return empty($suffixValues) ? null : implode(', ', $suffixValues);
     }
 
     public function generateDescription($product): string

@@ -2,6 +2,25 @@
 
 <details>
 
+<summary>1.10.27 - 2026-10-04</summary>
+
+### Changed / Improved
+- Support comma-separated attribute names for product title suffixes, including Persian commas, while preserving the configured order and skipping empty, duplicate, or missing attribute names
+
+</details>
+
+<details>
+
+<summary>1.10.26 - 2026-10-01</summary>
+
+### Added
+- Show the Basalam product name as visible order item meta (`نام محصول در باسلام`) on WooCommerce orders, for both mapped products and the "not defined in your site" placeholder product
+- Show a clickable link to the Basalam product page (`لینک محصول در باسلام`) as visible order item meta
+
+</details>
+
+<details>
+
 <summary>1.10.25 - 2026-09-30</summary>
 
 ### Changed / Improved

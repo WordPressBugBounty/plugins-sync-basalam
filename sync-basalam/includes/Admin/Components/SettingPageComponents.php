@@ -264,7 +264,7 @@ class SettingPageComponents
         $is_enabled = syncBasalamSettings()->getSettings(SettingsConfig::PRODUCT_ATTRIBUTE_SUFFIX_ENABLED) == 'yes';
         $disabled = $is_enabled ? '' : 'disabled';
 
-        echo '<input type="text" name="sync_basalam_settings[' . esc_attr(SettingsConfig::PRODUCT_ATTRIBUTE_SUFFIX_PRIORITY) . ']" value="' . esc_attr($current_value) . '" class="basalam-input basalam-p basalam-attribute-suffix-priority basalam-max-width-80 basalam-font-12" placeholder="مثال: ناشر" ' . esc_attr($disabled) . '>';
+        echo '<input type="text" name="sync_basalam_settings[' . esc_attr(SettingsConfig::PRODUCT_ATTRIBUTE_SUFFIX_PRIORITY) . ']" value="' . esc_attr($current_value) . '" class="basalam-input basalam-p basalam-attribute-suffix-priority basalam-max-width-80 basalam-font-12" placeholder="مثال: ناشر, نویسنده" ' . esc_attr($disabled) . '>';
     }
 
     public static function renderMapOptionsProduct()
