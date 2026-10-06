@@ -6,6 +6,10 @@ use SyncBasalam\Services\VendorSyncPolicy;
 
 defined('ABSPATH') || exit;
 $scheduledInterval = (int) ($settings[SettingsConfig::AUTO_FULL_UPDATE_INTERVAL] ?? 48);
+$syncStatusProduct = !empty($settings[SettingsConfig::SYNC_STATUS_PRODUCT]);
+$productSyncButtonLabel = $syncStatusProduct ? 'توقف همگام‌سازی محصولات' : 'همگام‌سازی محصولات';
+$productSyncButtonIcon = $syncStatusProduct ? 'unsync.svg' : 'sync.svg';
+$productSyncButtonClass = $syncStatusProduct ? 'basalam-product-sync-is-active' : 'basalam-product-sync-is-inactive';
 ?>
 <div id="sync-basalam-onboarding-status" class="basalam-status-card">
     <div class="basalam-status-header">
@@ -28,7 +32,7 @@ $scheduledInterval = (int) ($settings[SettingsConfig::AUTO_FULL_UPDATE_INTERVAL]
     </div>
     <div class="basalam-sync-status">
         <div class="basalam-sync-intro">
-            <p class="basalam-p basalam-status-info">با فعال کردن همگام‌سازی خودکار، تغییرات محصولات شما به صورت خودکار در باسلام نیز اعمال می‌شود.</p>
+            <p class="basalam-p basalam-status-info">عملیات خودکار مربوط به ایجاد و بروزرسانی محصولات را مطابق نیاز انتخاب کنید.</p>
             <div class="basalam-info-icon basalam-info-icon-small">
                 <a href="https://www.aparat.com/v/vja08ql" target="_blank" rel="noopener noreferrer">
                     <img src="<?php echo esc_url(syncBasalamPlugin()->assetsUrl() . "/icons/info-black.svg"); ?>" alt="اطلاعات" class="basalam-img-22 basalam-cursor-pointer">
@@ -36,21 +40,28 @@ $scheduledInterval = (int) ($settings[SettingsConfig::AUTO_FULL_UPDATE_INTERVAL]
             </div>
         </div>
         <div class="basalam-sync-controls">
-            <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" class="Basalam-form basalam-form-margin-0">
+            <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" class="Basalam-form basalam-form-margin-0 basalam-product-sync-form">
                 <input type="hidden" name="action" value="basalam_update_setting">
                 <?php wp_nonce_field('basalam_update_setting_nonce', '_wpnonce'); ?>
-                <?php SettingPageComponents::syncStatusProduct(); ?>
-                <?php if ($syncStatusProduct == true): ?>
-                    <button type="submit" class="basalam-danger-button basalam-p">
-                        <img class="basalam-img-20" src="<?php echo esc_url(syncBasalamPlugin()->assetsUrl() . '/icons/unsync.svg'); ?>" alt="">
-                        توقف همگام‌سازی محصولات
-                    </button>
-                <?php else: ?>
-                    <button type="submit" class="basalam-primary-button basalam-p basalam-btn-small">
-                        <img class="basalam-img-20" src="<?php echo esc_url(syncBasalamPlugin()->assetsUrl() . '/icons/sync.svg'); ?>" alt="">
-                        همگام‌سازی محصولات
-                    </button>
-                <?php endif; ?>
+                <div class="basalam-product-sync-wrapper">
+                    <div class="basalam-product-sync-button-group <?php echo esc_attr($productSyncButtonClass); ?>">
+                        <button type="submit" name="sync_basalam_toggle_product" value="1" class="basalam-primary-button basalam-p basalam-product-sync-submit" title="<?php echo esc_attr($productSyncButtonLabel); ?>">
+                            <img class="basalam-img-20" src="<?php echo esc_url(syncBasalamPlugin()->assetsUrl() . '/icons/' . $productSyncButtonIcon); ?>" alt="">
+                            <span><?php echo esc_html($productSyncButtonLabel); ?></span>
+                            <span class="basalam-btn-separator" aria-hidden="true"></span>
+                        </button>
+                        <button type="button" class="basalam-primary-button basalam-p basalam-product-sync-arrow-btn" title="انتخاب نوع همگام‌سازی" aria-label="انتخاب نوع همگام‌سازی" aria-expanded="false" aria-controls="basalam-product-sync-dropdown">
+                            <img src="<?php echo esc_url(syncBasalamPlugin()->assetsUrl() . '/icons/arrow.svg'); ?>" alt="" class="basalam-dropdown-arrow-img">
+                        </button>
+                    </div>
+                    <div id="basalam-product-sync-dropdown" class="basalam-product-sync-dropdown" style="display: none;">
+                        <fieldset>
+                            <legend class="basalam-p">همگام‌سازی خودکار محصولات</legend>
+                            <?php SettingPageComponents::renderProductSyncOperations(); ?>
+                            <button type="submit" name="sync_basalam_save_product" value="1" class="basalam-product-sync-save basalam-p">ذخیره</button>
+                        </fieldset>
+                    </div>
+                </div>
             </form>
 
             <details class="basalam-schedule-control">

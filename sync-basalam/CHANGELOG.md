@@ -2,6 +2,16 @@
 
 <details>
 
+<summary>1.10.28 - 2026-10-06</summary>
+
+### Added
+- Separate automatic product creation and update synchronization, with independent controls in the admin panel
+- Split synchronization button with a shared toggle and detailed operation settings
+
+</details>
+
+<details>
+
 <summary>1.10.27 - 2026-10-04</summary>
 
 ### Changed / Improved

@@ -4296,7 +4296,7 @@ body>.basalam-info-modal {
   margin: 0;
 }
 
-/* Scheduled full product updates beside the existing product sync control. */
+/* Automatic product operations and scheduled full product updates. */
 #sync-basalam-onboarding-status .basalam-sync-status {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 400px);
@@ -4331,7 +4331,7 @@ body>.basalam-info-modal {
   display: grid;
   grid-column: 2;
   grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-  align-items: stretch;
+  align-items: start;
   direction: rtl;
   gap: 12px;
   width: 100%;
@@ -4531,6 +4531,10 @@ body>.basalam-info-modal {
   #sync-basalam-onboarding-status .basalam-sync-controls {
     grid-column: 1;
   }
+
+  #sync-basalam-onboarding-status .basalam-sync-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 @media (max-width: 900px) {
@@ -4580,7 +4584,7 @@ body>.basalam-info-modal {
 
 @media (max-width: 400px) {
   #sync-basalam-onboarding-status .basalam-sync-controls {
-    grid-template-columns: minmax(0, 3fr) minmax(116px, 2fr);
+    grid-template-columns: minmax(0, 1fr);
   }
 
   #sync-basalam-onboarding-status .basalam-sync-controls > form > button {
@@ -4590,6 +4594,230 @@ body>.basalam-info-modal {
 
 .basalam-form-no-margin {
   margin-bottom: 0px !important;
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-form fieldset {
+  min-width: 0;
+  margin: 0 0 10px;
+  padding: 0;
+  border: 0;
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-button-group {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--basalam-primary-color);
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-button-group.basalam-product-sync-is-active {
+  background: #fff5f5;
+  border: 1px solid var(--basalam-danger-color);
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-button-group > button {
+  min-height: 44px;
+  height: 100%;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-sizing: border-box;
+  transform: none;
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-submit {
+  position: relative;
+  display: inline-flex;
+  flex: 1 1 auto;
+  width: auto;
+  padding: 10px 16px;
+  gap: 4px;
+  line-height: 1.4;
+  white-space: nowrap;
+  background: var(--basalam-primary-color);
+  color: #fff;
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-submit > span:not(.basalam-btn-separator) {
+  white-space: nowrap;
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-is-active .basalam-product-sync-submit,
+#sync-basalam-onboarding-status .basalam-product-sync-is-active .basalam-product-sync-arrow-btn {
+  background: #fff5f5;
+  color: var(--basalam-danger-color);
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-is-active .basalam-product-sync-submit img {
+  filter: brightness(0) saturate(100%) invert(31%) sepia(79%) saturate(1902%) hue-rotate(326deg) brightness(91%) contrast(91%);
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-is-active .basalam-product-sync-submit:hover,
+#sync-basalam-onboarding-status .basalam-product-sync-is-active .basalam-product-sync-submit:focus,
+#sync-basalam-onboarding-status .basalam-product-sync-is-active .basalam-product-sync-arrow-btn:hover,
+#sync-basalam-onboarding-status .basalam-product-sync-is-active .basalam-product-sync-arrow-btn:focus,
+#sync-basalam-onboarding-status .basalam-product-sync-is-active .basalam-product-sync-arrow-btn[aria-expanded="true"] {
+  background: var(--basalam-danger-color);
+  color: #fff;
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-is-active .basalam-product-sync-submit:hover img,
+#sync-basalam-onboarding-status .basalam-product-sync-is-active .basalam-product-sync-submit:focus img {
+  filter: brightness(0) invert(1);
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-submit:hover,
+#sync-basalam-onboarding-status .basalam-product-sync-submit:focus {
+  background: var(--basalam-primary-hover);
+  color: #fff;
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-arrow-btn {
+  display: inline-flex;
+  flex: 0 0 46px;
+  width: 46px;
+  padding: 0 !important;
+  background: var(--basalam-primary-color);
+  color: #fff;
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-arrow-btn:hover,
+#sync-basalam-onboarding-status .basalam-product-sync-arrow-btn:focus,
+#sync-basalam-onboarding-status .basalam-product-sync-arrow-btn[aria-expanded="true"] {
+  background: var(--basalam-primary-hover);
+  color: #fff;
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-button-group .basalam-btn-separator {
+  left: 0;
+  height: 60%;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-is-active .basalam-btn-separator {
+  background: rgba(220, 53, 69, 0.35);
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-is-active .basalam-product-sync-submit:hover .basalam-btn-separator,
+#sync-basalam-onboarding-status .basalam-product-sync-is-active .basalam-product-sync-submit:focus .basalam-btn-separator {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-arrow-btn .basalam-dropdown-arrow-img {
+  width: 20px;
+  height: 20px;
+  transform: rotate(90deg);
+  filter: brightness(0) invert(1);
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-is-active .basalam-product-sync-arrow-btn .basalam-dropdown-arrow-img {
+  filter: brightness(0) saturate(100%) invert(31%) sepia(79%) saturate(1902%) hue-rotate(326deg) brightness(91%) contrast(91%);
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-is-active .basalam-product-sync-arrow-btn:hover .basalam-dropdown-arrow-img,
+#sync-basalam-onboarding-status .basalam-product-sync-is-active .basalam-product-sync-arrow-btn:focus .basalam-dropdown-arrow-img,
+#sync-basalam-onboarding-status .basalam-product-sync-is-active .basalam-product-sync-arrow-btn[aria-expanded="true"] .basalam-dropdown-arrow-img {
+  filter: brightness(0) invert(1);
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-dropdown {
+  position: absolute;
+  z-index: 120;
+  top: calc(100% + 8px);
+  right: 0;
+  width: min(360px, 100%);
+  padding: 18px;
+  border: 1px solid #dbe3ec;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
+  box-sizing: border-box;
+  text-align: right;
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-dropdown fieldset {
+  margin: 0;
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-dropdown,
+#sync-basalam-onboarding-status .basalam-product-sync-dropdown * {
+  font-family: "PelakFA", Tahoma, sans-serif;
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-form legend {
+  width: 100%;
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: right;
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 7px 9px;
+  border: 1px solid #dbe3ec;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-option:has(input:checked) {
+  border-color: var(--basalam-primary-color);
+  background: #f0f7ff;
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-option input {
+  flex: 0 0 auto;
+  margin: 3px 0 0;
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-option span {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: right;
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-option strong {
+  font-size: 11px;
+  color: #1e293b;
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-option small {
+  font-size: 10px;
+  line-height: 1.6;
+  color: #64748b;
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 36px;
+  margin-top: 3px;
+  padding: 7px 12px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--basalam-primary-color);
+  color: #fff;
+  cursor: pointer;
+  font-size: 11px !important;
+}
+
+#sync-basalam-onboarding-status .basalam-product-sync-save:hover,
+#sync-basalam-onboarding-status .basalam-product-sync-save:focus {
+  background: var(--basalam-primary-hover);
+  color: #fff;
 }
 
 /* Badge styling */

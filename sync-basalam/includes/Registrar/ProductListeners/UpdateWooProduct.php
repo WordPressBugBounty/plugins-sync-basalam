@@ -20,12 +20,20 @@ class UpdateWooProduct extends ProductListenerAbstract
 
     public function handle($productId)
     {
+        $product = wc_get_product($productId);
+        if (!$product || $product->is_type('variation') || get_post_type($productId) !== 'product') return;
+
+        if (!get_post_meta($productId, ProductMetaKey::basalamProductId(), true)) {
+            // Editing an unconnected product is a create operation in Basalam.
+            (new CreateWooProduct($this->jobManager))->handle($productId);
+            return;
+        }
+
         $vendorSyncPolicy = syncBasalamContainer()->get(VendorSyncPolicy::class);
 
         if (
             !$vendorSyncPolicy->canUpdate() ||
-            !$this->isAvailableProduct($productId) ||
-            !$this->isProductSyncEnabled() ||
+            !$this->isProductUpdateSyncEnabled() ||
             (!$vendorSyncPolicy->shouldRestrictUpdateFields(false) && !SettingsManager::isProductUpdateSelectionValid())
         ) {
             return;
@@ -35,18 +43,8 @@ class UpdateWooProduct extends ProductListenerAbstract
             $this->jobManager->createJob(
                 'sync_basalam_update_single_product',
                 'pending',
-                json_encode(['product_id' => $productId]),
+                json_encode(['product_id' => $productId, 'automatic' => true]),
             );
         }
-    }
-
-    private function isAvailableProduct($productId)
-    {
-        $product = wc_get_product($productId);
-        $syncBasalamProductId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
-
-        if (!$product || $product->is_type('variation') || !$syncBasalamProductId) return false;
-
-        return true;
     }
 }

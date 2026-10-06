@@ -21,15 +21,153 @@ class VariantService
     {
         if (!$product instanceof \WC_Product_Variable) return [];
 
-        $variants = [];
-        $variationIds = $product->get_children();
+        return array_column($this->getVariantEntries($product), 'data');
+    }
 
-        foreach ($variationIds as $variationId) {
+    private function getVariantEntries($product): array
+    {
+        $entries = [];
+        $seen = [];
+
+        // Children follow WooCommerce's menu order: the first matching variation
+        // owns a combination when a specific variation overlaps an "Any" one.
+        foreach ($product->get_children() as $variationId) {
+            $variation = wc_get_product($variationId);
+            if (!$variation || $variation->get_status() !== 'publish') continue;
+
+            $combinations = $this->expandVariationAttributes($variation, $product);
             $variant = $this->createVariant($variationId, $product);
-            if ($variant) $variants[] = $variant;
+            $mapping = get_post_meta($variationId, 'sync_basalam_variation_map', true);
+            $isWildcard = $this->isWildcardVariation($variation, $product);
+
+            foreach ($combinations as $attributes) {
+                $keyAttributes = $attributes;
+                ksort($keyAttributes);
+                $key = wp_json_encode($keyAttributes);
+                if (isset($seen[$key])) continue;
+                $seen[$key] = true;
+                if (!$variant) continue;
+
+                $data = $variant;
+                $data['properties'] = $this->getVariantProperties($variation, $product, $attributes);
+                $propertyKey = $this->getPropertyKey($data['properties']);
+                if (is_array($mapping)) {
+                    unset($data['id']);
+                    if (!empty($mapping[$propertyKey])) $data['id'] = $mapping[$propertyKey];
+                } elseif ($isWildcard) {
+                    // Rebuild legacy empty-property variants through a product PATCH.
+                    unset($data['id']);
+                }
+
+                $entries[] = ['variation_id' => $variationId, 'data' => $data];
+            }
         }
 
-        return $variants;
+        return $entries;
+    }
+
+    private function expandVariationAttributes($variation, $product): array
+    {
+        $selected = $variation->get_variation_attributes();
+        if (!$product->get_variation_attributes()) return [];
+        $combinations = [[]];
+
+        foreach ($product->get_variation_attributes() as $name => $options) {
+            $attributeName = 'attribute_' . sanitize_title($name);
+            $value = $selected[$attributeName] ?? '';
+            $values = $value === '' ? $options : [$value];
+            $values = array_values(array_unique(array_filter($values, static function ($option) {
+                return trim((string) $option) !== '';
+            })));
+
+            $expanded = [];
+            foreach ($combinations as $combination) {
+                foreach ($values as $option) {
+                    $expanded[] = array_merge($combination, [$attributeName => (string) $option]);
+                }
+            }
+            $combinations = $expanded;
+        }
+
+        return $combinations;
+    }
+
+    private function isWildcardVariation($variation, $product): bool
+    {
+        $attributes = $variation->get_variation_attributes();
+        foreach ($product->get_variation_attributes() as $name => $options) {
+            if (($attributes['attribute_' . sanitize_title($name)] ?? '') === '') return true;
+        }
+
+        return false;
+    }
+
+    private function needsExpandedMapping($product): bool
+    {
+        if (!$product instanceof \WC_Product_Variable) return false;
+
+        foreach ($product->get_children() as $variationId) {
+            $variation = wc_get_product($variationId);
+            if (!$variation) continue;
+            if ($this->isWildcardVariation($variation, $product)) return true;
+            if (get_post_meta($variationId, 'sync_basalam_variation_map', true)) return true;
+        }
+
+        return false;
+    }
+
+    /** Map every expanded remote variant back to its original WooCommerce variation. */
+    public function syncExpandedVariationIds($product, array $variants): void
+    {
+        if (!$this->needsExpandedMapping($product)) return;
+
+        $remoteIds = [];
+        foreach ($variants as $variant) {
+            if (!empty($variant['id'])) {
+                $remoteIds[$this->getPropertyKey($variant['properties'] ?? [])] = $variant['id'];
+            }
+        }
+
+        $mappings = [];
+        foreach ($this->getVariantEntries($product) as $entry) {
+            $key = $this->getPropertyKey($entry['data']['properties']);
+            if (isset($remoteIds[$key])) $mappings[$entry['variation_id']][$key] = $remoteIds[$key];
+        }
+
+        foreach ($product->get_children() as $variationId) {
+            delete_post_meta($variationId, 'sync_basalam_variation_id');
+            delete_post_meta($variationId, 'sync_basalam_variation_map');
+            if (empty($mappings[$variationId])) continue;
+
+            update_post_meta($variationId, 'sync_basalam_variation_map', $mappings[$variationId]);
+            // Separate rows keep the existing order lookup working for every id.
+            foreach (array_unique($mappings[$variationId]) as $remoteId) {
+                add_post_meta($variationId, 'sync_basalam_variation_id', $remoteId);
+            }
+        }
+    }
+
+    private function getPropertyKey(array $properties): string
+    {
+        $values = [];
+        foreach ($properties as $property) {
+            $name = $property['property'] ?? '';
+            $value = $property['value'] ?? '';
+            if (is_array($name)) $name = $name['title'] ?? $name['name'] ?? '';
+            if (is_array($value)) $value = $value['title'] ?? $value['name'] ?? '';
+            $values[$this->normalizeProperty($name)] = $this->normalizeProperty($value);
+        }
+        ksort($values);
+
+        return wp_json_encode($values);
+    }
+
+    private function normalizeProperty(string $value): string
+    {
+        $value = mb_strtolower(trim(rawurldecode($value)), 'UTF-8');
+        $value = str_replace(['ي', 'ك', '-', '_', '–', '—'], ['ی', 'ک', ' ', ' ', ' ', ' '], $value);
+
+        return preg_replace('/\s+/u', ' ', $value);
     }
 
     private function createVariant(int $variationId, $parentProduct): ?array
@@ -98,10 +236,10 @@ class VariantService
         return [$stock, $stockStatus];
     }
 
-    private function getVariantProperties($variation, $parentProduct): array
+    private function getVariantProperties($variation, $parentProduct, ?array $attributes = null): array
     {
         $properties = [];
-        $variationData = $variation->get_variation_attributes();
+        $variationData = $attributes ?? $variation->get_variation_attributes();
 
         foreach ($variationData as $attributeName => $attributeValue) {
             $taxonomyName = str_replace('attribute_', '', $attributeName);

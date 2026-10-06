@@ -3,7 +3,6 @@
 namespace SyncBasalam\Registrar\ProductListeners;
 
 use SyncBasalam\JobManager;
-use SyncBasalam\Logger\Logger;
 use SyncBasalam\Utilities\ProductMetaKey;
 use SyncBasalam\Services\VendorSyncPolicy;
 
@@ -20,6 +19,7 @@ class CreateWooProduct extends ProductListenerAbstract
 
     public function handle($productId)
     {
+        if (!$this->isProductCreationSyncEnabled()) return;
         if (!syncBasalamContainer()->get(VendorSyncPolicy::class)->canCreate()) return;
         if (!$this->isAvailableProduct($productId)) return;
 
@@ -27,7 +27,7 @@ class CreateWooProduct extends ProductListenerAbstract
             $this->jobManager->createJob(
                 'sync_basalam_create_single_product',
                 'pending',
-                json_encode(['product_id' => $productId]),
+                json_encode(['product_id' => $productId, 'automatic' => true]),
             );
         }
     }
@@ -37,10 +37,9 @@ class CreateWooProduct extends ProductListenerAbstract
         $product = wc_get_product($productId);
         $postType = get_post_type($productId);
         $postStatus = get_post_status($productId);
-        $syncStatus = $this->isProductSyncEnabled();
         $syncBasalamProductId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
 
-        if (!$product || $product->is_type('variation') || $postType !== 'product' || !$syncStatus || $syncBasalamProductId || $postStatus !== 'publish') return false;
+        if (!$product || $product->is_type('variation') || $postType !== 'product' || $syncBasalamProductId || $postStatus !== 'publish') return false;
 
         return true;
     }

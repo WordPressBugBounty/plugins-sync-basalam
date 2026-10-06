@@ -242,6 +242,10 @@ class UpdateSingleProductService
                 if (count($variations) === 1 && count($body['variants']) === 1 && !empty($body['variants'][0]['id'])) {
                     update_post_meta($variations[0], 'sync_basalam_variation_id', $body['variants'][0]['id']);
                 }
+
+                if ($product instanceof \WC_Product_Variable) {
+                    (new VariantService())->syncExpandedVariationIds($product, $body['variants']);
+                }
             }
         }
 
@@ -315,6 +319,9 @@ class UpdateSingleProductService
         // the safe full-product remapping path instead of the stale endpoint.
         foreach ($product->get_children() as $variationId) {
             delete_post_meta($variationId, 'sync_basalam_variation_id');
+            if (get_post_meta($variationId, 'sync_basalam_variation_map', true)) {
+                delete_post_meta($variationId, 'sync_basalam_variation_map');
+            }
         }
 
         $productData['variants'] = $variants;

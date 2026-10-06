@@ -3,6 +3,7 @@
 namespace SyncBasalam\Services\Products;
 
 use SyncBasalam\Admin\Product\Data\Validators\CreateProductDataValidator;
+use SyncBasalam\Admin\Product\Data\Services\VariantService;
 use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Services\ApiServiceManager;
@@ -180,6 +181,8 @@ class CreateSingleProductService
                             update_post_meta($wcVarId, 'sync_basalam_variation_id', $syncBasalamVariations[$key]);
                         }
                     }
+
+                    (new VariantService())->syncExpandedVariationIds($product, $responseData['variants']);
                 }
             }
 

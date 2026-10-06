@@ -17,9 +17,26 @@ class SettingsPageHandler
     public static function saveSettings()
     {
         $data = isset($_POST['sync_basalam_settings']) ? array_map('sanitize_text_field', wp_unslash($_POST['sync_basalam_settings'])) : [];
+        $toggleProductSync = !empty($_POST['sync_basalam_toggle_product']);
+
+        if ($toggleProductSync) {
+            $nextStatus = !SettingsManager::getSettings(SettingsConfig::SYNC_STATUS_PRODUCT);
+            $nextValue = $nextStatus ? '1' : '0';
+            $data[SettingsConfig::SYNC_STATUS_PRODUCT] = $nextValue;
+            $data[SettingsConfig::SYNC_STATUS_PRODUCT_CREATE] = $nextValue;
+            $data[SettingsConfig::SYNC_STATUS_PRODUCT_UPDATE] = $nextValue;
+        }
 
         if ($data) {
-            if (!SettingsManager::isProductUpdateSelectionValid($data)) {
+            $syncToggleSubmitted = array_key_exists(SettingsConfig::SYNC_STATUS_PRODUCT, $data)
+                || array_key_exists(SettingsConfig::SYNC_STATUS_PRODUCT_CREATE, $data)
+                || array_key_exists(SettingsConfig::SYNC_STATUS_PRODUCT_UPDATE, $data);
+            $candidateSettings = SettingsManager::sanitizeSettings($data);
+
+            if (
+                (!$syncToggleSubmitted || $candidateSettings[SettingsConfig::SYNC_STATUS_PRODUCT_UPDATE])
+                && !SettingsManager::isProductUpdateSelectionValid($data)
+            ) {
                 self::pushValidationError(SettingsConfig::CUSTOM_PRODUCT_UPDATE_REQUIRED_MESSAGE);
                 return false;
             }

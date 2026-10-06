@@ -26,7 +26,7 @@ class ArchiveProduct extends ProductListenerAbstract
             return;
         }
 
-        $syncStatus = $this->isProductSyncEnabled();
+        $syncStatus = $this->isProductUpdateSyncEnabled();
 
         if (!$syncStatus || !wc_get_product($productId)) {
             return;

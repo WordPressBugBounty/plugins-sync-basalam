@@ -15,6 +15,7 @@ class ListenerRegistrar implements RegistrarInterface
     public static function register(): void
     {
         $listeners = [
+            'woocommerce_new_product'    => CreateWooProduct::class,
             'woocommerce_update_product' => UpdateWooProduct::class,
             'save_post'                  => CreateWooProduct::class,
             'untrashed_post'             => RestoreProduct::class,

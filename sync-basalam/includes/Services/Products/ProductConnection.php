@@ -33,6 +33,7 @@ class ProductConnection
 
         foreach (self::variationIds($productId) as $variationId) {
             delete_post_meta($variationId, ProductMetaKey::basalamVariationId());
+            delete_post_meta($variationId, 'sync_basalam_variation_map');
         }
     }
 

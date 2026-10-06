@@ -137,12 +137,15 @@ class DiscountTaskProcessor
             $activeDays = $item['active_days'] ?? $this->settingsAccessor->getSettings(SettingsConfig::DISCOUNT_DURATION) ?? 7;
 
             $basalamProductId = null;
-            $basalamVariationId = null;
+            $basalamVariationIds = [null];
 
             if ($wcProductId) $basalamProductId = get_post_meta($wcProductId, ProductMetaKey::basalamProductId(), true);
-            if ($wcVariationId) $basalamVariationId = get_post_meta($wcVariationId, 'sync_basalam_variation_id', true);
+            if ($wcVariationId) {
+                $basalamVariationIds = array_unique(array_filter((array) get_post_meta($wcVariationId, 'sync_basalam_variation_id', false)));
+            }
 
-            if ($basalamProductId || $basalamVariationId) {
+            foreach ($basalamVariationIds as $basalamVariationId) {
+                if (!$basalamProductId && !$basalamVariationId) continue;
                 $taskData = [
                     'product_id'       => $basalamProductId,
                     'variation_id'     => $basalamVariationId,

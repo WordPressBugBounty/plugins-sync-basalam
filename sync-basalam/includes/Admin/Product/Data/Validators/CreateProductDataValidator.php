@@ -24,6 +24,14 @@ class CreateProductDataValidator
             ];
         }
 
+        $product = wc_get_product($productId);
+        if ($product && $product->is_type('variable') && empty($productData['variants'])) {
+            return [
+                'valid' => false,
+                'message' => 'محصول متغیر فاقد تنوع معتبر است؛ گزینه‌های ویژگی‌ها و قیمت تنوع‌ها را بررسی کنید.',
+            ];
+        }
+
         return [
             'valid' => true,
             'message' => sprintf('اطلاعات ایجاد محصول %d معتبر است.', $productId),

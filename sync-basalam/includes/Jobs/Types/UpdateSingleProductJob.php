@@ -8,6 +8,7 @@ use SyncBasalam\Jobs\Exceptions\RetryableException;
 use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 use SyncBasalam\Logger\Logger;
 use SyncBasalam\Services\VendorSyncPolicy;
+use SyncBasalam\Admin\Settings\SettingsManager;
 
 defined('ABSPATH') || exit;
 
@@ -33,6 +34,10 @@ class UpdateSingleProductJob extends AbstractJobType
 
     public function execute(array $payload): JobResult
     {
+        if (!empty($payload['automatic']) && !SettingsManager::isProductUpdateSyncEnabled()) {
+            return $this->success(['skipped' => true, 'reason' => 'همگام‌سازی خودکار بروزرسانی محصول غیرفعال است.']);
+        }
+
         $vendorSyncPolicy = syncBasalamContainer()->get(VendorSyncPolicy::class);
         if (!$vendorSyncPolicy->canUpdate()) {
             return $this->success([

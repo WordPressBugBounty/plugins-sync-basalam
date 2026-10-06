@@ -18,8 +18,8 @@ class VariableProductDiscount implements DiscountInterface
         foreach ($product->get_children() as $variation_id) {
             $variation = wc_get_product($variation_id);
             if (!$variation) continue;
-            $basalam_id = get_post_meta($variation_id, 'sync_basalam_variation_id', true);
-            if (!$basalam_id) continue;
+            $basalam_ids = array_filter((array) get_post_meta($variation_id, 'sync_basalam_variation_id', false));
+            if (!$basalam_ids) continue;
 
             $regular = $variation->get_regular_price();
             $sale = $variation->get_sale_price();
@@ -27,7 +27,7 @@ class VariableProductDiscount implements DiscountInterface
             if (!$regular || !$sale) continue;
 
             $discount = $this->discountService->calculateDiscountPercent($regular, $sale);
-            $this->discountService->apply($discount, null, [$basalam_id], null);
+            $this->discountService->apply($discount, null, $basalam_ids, null);
         }
     }
 
@@ -35,8 +35,7 @@ class VariableProductDiscount implements DiscountInterface
     {
         $basalam_ids = [];
         foreach ($product->get_children() as $variation_id) {
-            $basalam_id = get_post_meta($variation_id, 'sync_basalam_variation_id', true);
-            if ($basalam_id) $basalam_ids[] = $basalam_id;
+            $basalam_ids = array_merge($basalam_ids, array_filter((array) get_post_meta($variation_id, 'sync_basalam_variation_id', false)));
         }
         if (!empty($basalam_ids)) $this->discountService->remove(null, $basalam_ids);
     }

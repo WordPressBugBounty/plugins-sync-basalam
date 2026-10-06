@@ -8,10 +8,34 @@ jQuery(document).ready(function ($) {
     $dropdown.toggle();
   });
 
+  // Toggle product synchronization options from the split-button arrow.
+  $(document).on("click", ".basalam-product-sync-arrow-btn", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const $btn = $(this);
+    const $wrapper = $btn.closest(".basalam-product-sync-wrapper");
+    const $dropdown = $wrapper.find(".basalam-product-sync-dropdown");
+    const isOpen = $dropdown.is(":visible");
+
+    $(".basalam-product-sync-dropdown").hide();
+    $(".basalam-product-sync-arrow-btn").attr("aria-expanded", "false");
+
+    if (!isOpen) {
+      $dropdown.show();
+      $btn.attr("aria-expanded", "true");
+    }
+  });
+
   // Close dropdown when clicking outside
   $(document).on("click", function (e) {
     if (!$(e.target).closest(".basalam-orders-fetch-wrapper").length) {
       $(".basalam-orders-fetch-dropdown").hide();
+    }
+
+    if (!$(e.target).closest(".basalam-product-sync-wrapper").length) {
+      $(".basalam-product-sync-dropdown").hide();
+      $(".basalam-product-sync-arrow-btn").attr("aria-expanded", "false");
     }
   });
 

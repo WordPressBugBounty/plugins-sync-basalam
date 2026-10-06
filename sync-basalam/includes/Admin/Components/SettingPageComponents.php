@@ -21,6 +21,23 @@ class SettingPageComponents
         echo '<input type="hidden" name="sync_basalam_settings[' . esc_attr(SettingsConfig::SYNC_STATUS_PRODUCT) . ']" value="' . esc_attr($value) . '">';
     }
 
+    public static function renderProductSyncOperations()
+    {
+        $operations = [
+            SettingsConfig::SYNC_STATUS_PRODUCT_CREATE => 'ایجاد محصول در باسلام',
+            SettingsConfig::SYNC_STATUS_PRODUCT_UPDATE => 'بروزرسانی محصول در باسلام',
+        ];
+
+        foreach ($operations as $setting => $label) {
+            $enabled = syncBasalamSettings()->getSettings($setting);
+            echo '<input type="hidden" name="sync_basalam_settings[' . esc_attr($setting) . ']" value="0">';
+            echo '<label class="basalam-product-sync-option">';
+            echo '<input type="checkbox" name="sync_basalam_settings[' . esc_attr($setting) . ']" value="1"' . checked($enabled, true, false) . '>';
+            echo '<span><strong>' . esc_html($label) . '</strong></span>';
+            echo '</label>';
+        }
+    }
+
     public static function syncStatusOrder()
     {
         $value = syncBasalamSettings()->getSettings(SettingsConfig::SYNC_STATUS_ORDER) == true ? false : true;

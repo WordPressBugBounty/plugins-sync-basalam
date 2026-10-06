@@ -20,6 +20,8 @@ class SettingsConfig
     public const VENDOR_ID = "vendor_id";
     public const IS_VENDOR = "is_vendor";
     public const SYNC_STATUS_PRODUCT = "sync_status_product";
+    public const SYNC_STATUS_PRODUCT_CREATE = "sync_status_product_create";
+    public const SYNC_STATUS_PRODUCT_UPDATE = "sync_status_product_update";
     public const AUTO_FULL_UPDATE_INTERVAL = "auto_full_update_interval";
     public const SYNC_STATUS_ORDER = "sync_status_order";
     public const DEVELOPER_MODE = "developer_mode";
@@ -88,6 +90,8 @@ class SettingsConfig
             self::WEBHOOK_HEADER_TOKEN              => Settings::generateToken(),
             self::REFRESH_TOKEN                     => null,
             self::SYNC_STATUS_PRODUCT               => false,
+            self::SYNC_STATUS_PRODUCT_CREATE        => false,
+            self::SYNC_STATUS_PRODUCT_UPDATE        => false,
             self::AUTO_FULL_UPDATE_INTERVAL         => 48,
             self::SYNC_STATUS_ORDER                 => false,
             self::DEVELOPER_MODE                    => false,
