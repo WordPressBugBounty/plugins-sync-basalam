@@ -67,6 +67,35 @@ if (!function_exists('get_transient')) {
     }
 }
 
+if (!function_exists('get_option')) {
+    function get_option($name, $default = false)
+    {
+        return $GLOBALS['sync_basalam_test_options'][$name] ?? $default;
+    }
+}
+
+if (!function_exists('update_option')) {
+    function update_option($name, $value, $autoload = null)
+    {
+        $GLOBALS['sync_basalam_test_options'][$name] = $value;
+        return true;
+    }
+}
+
+if (!function_exists('wp_using_ext_object_cache')) {
+    function wp_using_ext_object_cache()
+    {
+        return $GLOBALS['sync_basalam_jobs_runner_test_state']['external_object_cache'] ?? false;
+    }
+}
+
+if (!function_exists('wp_installing')) {
+    function wp_installing()
+    {
+        return false;
+    }
+}
+
 if (!function_exists('set_transient')) {
     function set_transient($transient, $value, $expiration = 0)
     {
@@ -77,6 +106,9 @@ if (!function_exists('set_transient')) {
             'expiration' => $expiration,
         ];
         $GLOBALS['sync_basalam_jobs_runner_test_state']['transients'][$transient] = $value;
+        if ($expiration > 0) {
+            $GLOBALS['sync_basalam_test_options']['_transient_timeout_' . $transient] = time() + $expiration;
+        }
 
         return true;
     }

@@ -33,4 +33,5 @@ require_once dirname(__DIR__) . '/includes/Services/ForceUpdateGate.php';
 require_once dirname(__DIR__) . '/includes/Config/Endpoints.php';
 require_once dirname(__DIR__) . '/includes/Services/Products/FetchCommission.php';
 require_once dirname(__DIR__) . '/includes/Services/Products/ProductSkuRetry.php';
+require_once dirname(__DIR__) . '/includes/Services/AsyncWorkerHealth.php';
 require_once dirname(__DIR__) . '/JobsRunner.php';

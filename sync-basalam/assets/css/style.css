@@ -26,9 +26,14 @@
   align-items: center;
 }
 
-.basalam-header {
+.basalam-header,
+.basalam-container > .basalam-setup-wizard {
   width: 90%;
   max-width: 1080px;
+  box-sizing: border-box;
+}
+
+.basalam-header {
   margin: 0 auto 24px;
   background: white;
   border-radius: 12px;
@@ -2594,7 +2599,8 @@ input[type="number"]::-webkit-outer-spin-button {
   }
 
   .basalam-status-card,
-  .basalam-header {
+  .basalam-header,
+  .basalam-container > .basalam-setup-wizard {
     max-width: 810px !important;
   }
 

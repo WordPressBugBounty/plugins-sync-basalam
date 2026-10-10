@@ -1,0 +1,7 @@
+:80 {
+    root * /var/www/html
+    php_fastcgi caddy-fpm:9000 {
+        read_timeout 90s
+    }
+    file_server
+}

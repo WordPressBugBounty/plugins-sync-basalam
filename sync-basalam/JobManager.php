@@ -111,6 +111,21 @@ class JobManager
         return (string) $result === '1';
     }
 
+    public function getStaleProcessingJob(int $timeoutSeconds = 120): ?object
+    {
+        global $wpdb;
+
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom queue table; identifier from the WordPress prefix, values prepared.
+        return $wpdb->get_row($wpdb->prepare(
+            "SELECT id, started_at FROM {$this->jobManagerTableName}
+             WHERE status = 'processing'
+               AND started_at IS NOT NULL
+               AND started_at < %d
+             ORDER BY started_at ASC, id ASC LIMIT 1",
+            time() - $timeoutSeconds
+        ));
+    }
+
     public function getJob($where = array())
     {
         global $wpdb;

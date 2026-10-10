@@ -4,7 +4,7 @@ Tags: woocommerce, basalam, woosalam, integration
 Requires at least: 6.0  
 Tested up to: 7.0
 Requires PHP: 7.4 
-Stable tag: 1.10.28
+Stable tag: 1.10.29
 License: GPL-2.0-or-later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -110,3 +110,12 @@ Yes. All API calls use secure HTTPS connections. No data is sent until you expli
 
 == Screenshots ==
 1. تنظیمات اولیه افزونه در وردپرس
+
+== Changelog ==
+
+= 1.10.29 =
+* Fixed queues remaining blocked when a background dispatch lock loses its expiry.
+* Store background lock deadlines in their values to keep dispatch bounded.
+* Run the shutdown dispatcher without calling fastcgi_finish_request().
+* Show admin notices for interrupted background workers and missing LiteSpeed noabort protection.
+* Load shared admin styles and fonts on the Pro Digikala importer page.

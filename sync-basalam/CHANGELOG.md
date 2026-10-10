@@ -2,6 +2,20 @@
 
 <details>
 
+<summary>1.10.29 - 2026-10-10</summary>
+
+### Fixed
+- Run the jobs dispatcher without calling `fastcgi_finish_request()` during shutdown
+- Resume queued jobs when an old dispatch or idle-probe lock has lost its expiry, and store new lock deadlines in their values
+- Load shared admin styles and fonts on the Pro Digikala importer page
+
+### Added
+- Show an admin notice when a background synchronization worker stops mid-job or its LiteSpeed noabort protection cannot be confirmed
+
+</details>
+
+<details>
+
 <summary>1.10.28 - 2026-10-06</summary>
 
 ### Added

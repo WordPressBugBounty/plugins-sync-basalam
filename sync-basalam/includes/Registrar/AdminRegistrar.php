@@ -314,6 +314,7 @@ class AdminRegistrar implements RegistrarInterface
             'sync_basalam_tickets',
             'sync_basalam_ticket',
             'sync_basalam_new_ticket',
+            'import_digikala_product',
         ];
     }
 
@@ -325,11 +326,16 @@ class AdminRegistrar implements RegistrarInterface
 
         $version = syncbasalamplugin()->getVersion();
 
+        $adminStylePath = syncbasalamplugin()->pluginPath() . '/assets/css/style.css';
+        $adminStyleVersion = file_exists($adminStylePath)
+            ? $version . '-' . filemtime($adminStylePath)
+            : $version;
+
         wp_enqueue_style(
             "basalam-admin-style",
             self::assetsUrl("css/style.css"),
             array(),
-            $version
+            $adminStyleVersion
         );
         wp_enqueue_style(
             "basalam-admin-font-style",

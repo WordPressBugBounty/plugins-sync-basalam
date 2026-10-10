@@ -238,6 +238,7 @@ namespace {
     require dirname(__DIR__) . '/includes/Jobs/LockManager.php';
     require dirname(__DIR__) . '/includes/Jobs/JobRegistry.php';
     require dirname(__DIR__) . '/includes/Jobs/JobExecutor.php';
+    require dirname(__DIR__) . '/includes/Services/AsyncWorkerHealth.php';
     require dirname(__DIR__) . '/JobsRunner.php';
 
     $wpdb = new \wpdb('bench', 'bench', 'bench', 'sync-basalam-bench-db');

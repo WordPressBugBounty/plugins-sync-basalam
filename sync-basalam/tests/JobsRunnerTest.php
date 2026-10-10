@@ -15,6 +15,8 @@ class JobsRunnerTest extends TestCase
     private $originalCookie;
     private $originalWpdb;
     private $hadOriginalWpdb;
+    private $originalOptions;
+    private $hadOriginalOptions;
 
     protected function setUp(): void
     {
@@ -22,9 +24,12 @@ class JobsRunnerTest extends TestCase
         $this->originalCookie = $_COOKIE;
         $this->hadOriginalWpdb = array_key_exists('wpdb', $GLOBALS);
         $this->originalWpdb = $GLOBALS['wpdb'] ?? null;
+        $this->hadOriginalOptions = array_key_exists('sync_basalam_test_options', $GLOBALS);
+        $this->originalOptions = $GLOBALS['sync_basalam_test_options'] ?? null;
 
         $_REQUEST = [];
         $_COOKIE = [];
+        $GLOBALS['sync_basalam_test_options'] = [];
 
         $GLOBALS['sync_basalam_jobs_runner_test_state'] = [
             'actions' => [],
@@ -52,6 +57,11 @@ class JobsRunnerTest extends TestCase
         }
 
         unset($GLOBALS['sync_basalam_jobs_runner_test_state']);
+        if ($this->hadOriginalOptions) {
+            $GLOBALS['sync_basalam_test_options'] = $this->originalOptions;
+        } else {
+            unset($GLOBALS['sync_basalam_test_options']);
+        }
     }
 
     public function testRegistersDispatcherOnShutdownAndNeverOnInit(): void
@@ -83,6 +93,7 @@ class JobsRunnerTest extends TestCase
         $runner = $this->newRunner($jobManager);
 
         $_COOKIE = ['wordpress_test_cookie' => 'cookie-value'];
+        $before = time();
         $runner->maybeDispatchAsyncRequest();
 
         self::assertSame(
@@ -90,14 +101,12 @@ class JobsRunnerTest extends TestCase
             $this->state()['events']
         );
         self::assertSame([120], $jobManager->timeouts);
-        self::assertSame(
-            [[
-                'name' => self::DISPATCH_LOCK,
-                'value' => 1,
-                'expiration' => 25,
-            ]],
-            $this->state()['transient_writes']
-        );
+        $writes = $this->state()['transient_writes'];
+        self::assertCount(1, $writes);
+        self::assertSame(self::DISPATCH_LOCK, $writes[0]['name']);
+        self::assertSame(25, $writes[0]['expiration']);
+        self::assertGreaterThanOrEqual($before + 25, $writes[0]['value']);
+        self::assertLessThanOrEqual(time() + 25, $writes[0]['value']);
 
         $requests = $this->state()['remote_requests'];
         self::assertCount(1, $requests);
@@ -112,7 +121,7 @@ class JobsRunnerTest extends TestCase
         self::assertSame($_COOKIE, $requests[0]['args']['cookies']);
     }
 
-    public function testShutdownRepairsDatabaseBeforeUsingQueueApis(): void
+    public function testShutdownRepairsDatabaseWithoutFinishingFastCgiResponse(): void
     {
         $GLOBALS['sync_basalam_jobs_runner_test_state']['current_filter'] = 'shutdown';
         $GLOBALS['wpdb'] = new FakeWpdb();
@@ -124,7 +133,6 @@ class JobsRunnerTest extends TestCase
 
         self::assertSame(
             [
-                'fastcgi_finish_request',
                 'db_flush',
                 'db_check_connection',
                 'get_transient',
@@ -142,18 +150,17 @@ class JobsRunnerTest extends TestCase
         $jobManager = new FakeJobManager([false]);
         $runner = $this->newRunner($jobManager);
 
+        $before = time();
         $runner->maybeDispatchAsyncRequest();
 
         self::assertSame(['get_transient', 'get_transient', 'has_pending_jobs', 'set_transient'], $this->state()['events']);
         self::assertSame([120], $jobManager->timeouts);
-        self::assertSame(
-            [[
-                'name' => self::IDLE_PROBE_LOCK,
-                'value' => 1,
-                'expiration' => 5,
-            ]],
-            $this->state()['transient_writes']
-        );
+        $writes = $this->state()['transient_writes'];
+        self::assertCount(1, $writes);
+        self::assertSame(self::IDLE_PROBE_LOCK, $writes[0]['name']);
+        self::assertSame(5, $writes[0]['expiration']);
+        self::assertGreaterThanOrEqual($before + 5, $writes[0]['value']);
+        self::assertLessThanOrEqual(time() + 5, $writes[0]['value']);
         self::assertSame([], $this->state()['remote_requests']);
     }
 
@@ -175,7 +182,7 @@ class JobsRunnerTest extends TestCase
 
     public function testExistingLockSkipsQueueCheckAndDispatch(): void
     {
-        $GLOBALS['sync_basalam_jobs_runner_test_state']['transients'][self::DISPATCH_LOCK] = 1;
+        $GLOBALS['sync_basalam_jobs_runner_test_state']['transients'][self::DISPATCH_LOCK] = time() + 25;
         $jobManager = new FakeJobManager([true]);
         $runner = $this->newRunner($jobManager);
 
@@ -185,6 +192,100 @@ class JobsRunnerTest extends TestCase
         self::assertSame([], $jobManager->timeouts);
         self::assertSame([], $this->state()['transient_writes']);
         self::assertSame([], $this->state()['remote_requests']);
+    }
+
+    /** @dataProvider inactiveLeaseCases */
+    public function testExpiredOrOrphanedLeaseResumesDispatch(
+        string $name,
+        string $format,
+        int $leaseOffset,
+        ?int $timeoutOffset
+    ): void {
+        $this->setLease($name, $format, $leaseOffset, $timeoutOffset);
+        $jobManager = new FakeJobManager([true]);
+        $runner = $this->newRunner($jobManager);
+
+        $runner->maybeDispatchAsyncRequest();
+
+        self::assertSame([120], $jobManager->timeouts);
+        self::assertCount(1, $this->state()['remote_requests']);
+        self::assertSame(self::DISPATCH_LOCK, $this->state()['transient_writes'][0]['name']);
+        self::assertGreaterThan(time(), $this->state()['transient_writes'][0]['value']);
+    }
+
+    public function inactiveLeaseCases(): array
+    {
+        $cases = [];
+        foreach ([self::DISPATCH_LOCK, self::IDLE_PROBE_LOCK] as $name) {
+            $cases[$name . ': legacy without timeout'] = [$name, 'legacy', 0, null];
+            $cases[$name . ': legacy string without timeout'] = [$name, 'legacy_string', 0, null];
+            $cases[$name . ': legacy with expired timeout'] = [$name, 'legacy', 0, -1];
+            $cases[$name . ': expired deadline without timeout'] = [$name, 'deadline', -1, null];
+            $cases[$name . ': expired stored deadline without timeout'] = [$name, 'deadline_string', -1, null];
+            $cases[$name . ': expired deadline with future timeout'] = [$name, 'deadline', -1, 999];
+            $cases[$name . ': deadline expires at current second'] = [$name, 'deadline', 0, null];
+        }
+        return $cases;
+    }
+
+    /** @dataProvider activeLeaseCases */
+    public function testActiveLeasePreservesDispatchThrottle(
+        string $name,
+        string $format,
+        ?int $timeoutOffset,
+        bool $externalCache
+    ): void {
+        $this->setLease($name, $format, 25, $timeoutOffset);
+        $GLOBALS['sync_basalam_jobs_runner_test_state']['external_object_cache'] = $externalCache;
+        $jobManager = new FakeJobManager([true]);
+        $runner = $this->newRunner($jobManager);
+
+        $runner->maybeDispatchAsyncRequest();
+
+        self::assertSame([], $jobManager->timeouts);
+        self::assertSame([], $this->state()['transient_writes']);
+        self::assertSame([], $this->state()['remote_requests']);
+    }
+
+    public function activeLeaseCases(): array
+    {
+        $cases = [];
+        foreach ([self::DISPATCH_LOCK, self::IDLE_PROBE_LOCK] as $name) {
+            $cases[$name . ': legacy with valid timeout'] = [$name, 'legacy', 25, false];
+            $cases[$name . ': legacy string with valid timeout'] = [$name, 'legacy_string', 25, false];
+            $cases[$name . ': deadline without timeout'] = [$name, 'deadline', null, false];
+            $cases[$name . ': stored deadline without timeout'] = [$name, 'deadline_string', null, false];
+            $cases[$name . ': cached legacy without database timeout'] = [$name, 'legacy', null, true];
+        }
+        return $cases;
+    }
+
+    public function testLosingTimeoutDoesNotReleaseAnActiveDispatchLease(): void
+    {
+        $jobManager = new FakeJobManager([true, true]);
+        $runner = $this->newRunner($jobManager);
+        $runner->maybeDispatchAsyncRequest();
+        unset($GLOBALS['sync_basalam_test_options']['_transient_timeout_' . self::DISPATCH_LOCK]);
+
+        $runner->maybeDispatchAsyncRequest();
+
+        self::assertSame([120], $jobManager->timeouts);
+        self::assertCount(1, $this->state()['remote_requests']);
+    }
+
+    public function testDispatchRechecksLeaseAfterProbingQueue(): void
+    {
+        $jobManager = new FakeJobManager([true]);
+        $jobManager->onProbe = static function (): void {
+            $GLOBALS['sync_basalam_jobs_runner_test_state']['transients'][self::DISPATCH_LOCK] = time() + 25;
+        };
+        $runner = $this->newRunner($jobManager);
+
+        $runner->maybeDispatchAsyncRequest();
+
+        self::assertSame([120], $jobManager->timeouts);
+        self::assertSame([], $this->state()['remote_requests']);
+        self::assertSame([], $this->state()['transient_writes']);
     }
 
     public function testSelfAsyncRequestReturnsBeforeQueueAndLockChecks(): void
@@ -251,6 +352,16 @@ class JobsRunnerTest extends TestCase
         );
     }
 
+    private function setLease(string $name, string $format, int $leaseOffset, ?int $timeoutOffset): void
+    {
+        $value = in_array($format, ['deadline', 'deadline_string'], true) ? time() + $leaseOffset : 1;
+        if (in_array($format, ['legacy_string', 'deadline_string'], true)) $value = (string) $value;
+        $GLOBALS['sync_basalam_jobs_runner_test_state']['transients'][$name] = $value;
+        if ($timeoutOffset !== null) {
+            $GLOBALS['sync_basalam_test_options']['_transient_timeout_' . $name] = (string) (time() + $timeoutOffset);
+        }
+    }
+
     private function invokeRunAsyncBatch(JobsRunner $runner): int
     {
         $method = new \ReflectionMethod($runner, 'runAsyncBatch');
@@ -276,6 +387,7 @@ class JobsRunnerTest extends TestCase
 class FakeJobManager
 {
     public $timeouts = [];
+    public $onProbe;
 
     private $pendingResults;
 
@@ -288,6 +400,7 @@ class FakeJobManager
     {
         $GLOBALS['sync_basalam_jobs_runner_test_state']['events'][] = 'has_pending_jobs';
         $this->timeouts[] = $timeout;
+        if ($this->onProbe) ($this->onProbe)();
 
         return (bool) array_shift($this->pendingResults);
     }
