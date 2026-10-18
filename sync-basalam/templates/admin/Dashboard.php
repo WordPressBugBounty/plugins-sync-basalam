@@ -10,7 +10,7 @@ $syncStatusOrder = $settings[SettingsConfig::SYNC_STATUS_ORDER];
 $autoConfirmOrder = $settings[SettingsConfig::AUTO_CONFIRM_ORDER];
 defined('ABSPATH') || exit;
 ?>
-<div class="basalam-container">
+<div class="basalam-container basalam-home">
     <div class="basalam-header">
         <div class="basalam-header-data">
             <img src="<?php echo esc_url(syncBasalamPlugin()->assetsUrl() . "/images/basalam.svg") ?>" alt="Basalam">

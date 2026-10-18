@@ -1,0 +1,19 @@
+.salam-gate-order-box .sg-order-source{margin:0 0 16px;padding:14px;border:1px solid #cbd5e1;border-radius:14px;background:#f8fafc;color:#334155;line-height:1.8}
+.salam-gate-order-box .sg-order-source__heading{display:flex;align-items:center;gap:7px;font-size:12px;color:#334155}
+.salam-gate-order-box .sg-order-source__heading>.dashicons{color:#0891b2;flex:none}
+.salam-gate-order-box .sg-order-source__refresh{display:inline-flex;align-items:center;justify-content:center;flex:none;margin-inline-start:auto;padding:5px;border:1px solid #cbd5e1;border-radius:8px;background:white;color:#475569;cursor:pointer}
+.salam-gate-order-box .sg-order-source__refresh:focus-visible{outline:2px solid #0284c7;outline-offset:3px}
+.salam-gate-order-box .sg-order-source__refresh:disabled{opacity:.5;cursor:wait}
+.salam-gate-order-box .sg-order-source__badge{display:inline-flex;margin-top:10px;padding:3px 9px;border-radius:7px;background:#e0f2fe;color:#075985;font-size:12px;font-weight:600}
+.salam-gate-order-box .sg-order-source__message{margin:10px 0 5px;font-size:12px;overflow-wrap:anywhere}
+.salam-gate-order-box .sg-order-source__note{margin:8px 0;color:#64748b;font-size:11px}
+.salam-gate-order-box .sg-order-source__link{display:inline-flex;align-items:center;gap:5px;font-size:11px;text-decoration:none}
+.salam-gate-order-box .sg-order-source.is-cancelled{border-color:#fecaca;background:#fff7f7}
+.salam-gate-order-box .sg-order-source.is-cancelled .sg-order-source__badge{background:#fee2e2;color:#991b1b}
+.salam-gate-order-box .sg-order-source.is-cancelled .sg-order-source__heading>.dashicons{color:#dc2626}
+.salam-gate-order-box .sg-order-source.is-unavailable{border-color:#fed7aa;background:#fffbeb}
+.salam-gate-order-box .sg-order-source.is-unavailable .sg-order-source__badge{background:#fef3c7;color:#92400e}
+.salam-gate-order-box .sg-order-source.is-loading .sg-order-source__refresh>.dashicons{animation:sg-source-spin 1s linear infinite}
+.sg-order-modal-source-note{margin:0 0 12px;padding:12px 14px;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;color:#9a3412;font-size:12px;line-height:1.9}
+@keyframes sg-source-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.salam-gate-order-box .sg-order-source.is-loading .sg-order-source__refresh>.dashicons{animation:none}}

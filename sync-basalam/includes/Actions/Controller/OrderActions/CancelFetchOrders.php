@@ -4,6 +4,7 @@ namespace SyncBasalam\Actions\Controller\OrderActions;
 
 use SyncBasalam\JobManager;
 use SyncBasalam\Actions\Controller\ActionController;
+use SyncBasalam\Services\AsyncWorkerHealth;
 
 defined('ABSPATH') || exit;
 
@@ -15,6 +16,7 @@ class CancelFetchOrders extends ActionController
 
         $jobManager->deleteJob(['job_type' => 'sync_basalam_fetch_orders', 'status' => 'pending']);
         $jobManager->deleteJob(['job_type' => 'sync_basalam_fetch_orders', 'status' => 'processing']);
+        (new AsyncWorkerHealth())->clearInterruption();
 
         wp_send_json_success([
             'message' => 'فرآیند همگام‌سازی سفارشات لغو شد.'

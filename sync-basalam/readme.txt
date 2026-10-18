@@ -4,7 +4,7 @@ Tags: woocommerce, basalam, woosalam, integration
 Requires at least: 6.0  
 Tested up to: 7.0
 Requires PHP: 7.4 
-Stable tag: 1.10.29
+Stable tag: 1.10.30
 License: GPL-2.0-or-later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -18,6 +18,21 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 - محصولات ووکامرس را به غرفه باسلام اضافه و مدیریت کنید  
 - سفارش‌های ثبت‌شده در باسلام را به صورت خودکار در ووکامرس دریافت و مدیریت کنید  
 - قیمت و موجودی کالاها را به صورت لحظه‌ای همگام سازی کنید  
+- سفارش‌های فروشگاه، باسلام و مبدأهای مستقل را با سلام‌گیت برای ارسال پستی آماده و هزینه ارسال را پرداخت کنید
+
+== ارسال مرسوله با سلام‌گیت / SalamGate shipping ==
+
+سلام‌گیت از منوی «ووسلام ← ارسال مرسوله» و صفحه سفارش‌های ووکامرس، بدون نیاز به فعال‌بودن افزونه پرو، در دسترس است. ثبت و فعال‌سازی حساب، انتخاب آدرس فرستنده، ماشین‌حساب، مراکز تحویل، ارسال تکی و گروهی، ادامه پرداخت، چاپ لیبل و لغو مجاز مرسوله غیرباسلامی پشتیبانی می‌شوند. برای این بخش PHP 8.2 یا بالاتر روی معماری ۶۴بیتی، WordPress 6.5 یا بالاتر و WooCommerce 10.0 یا بالاتر لازم است؛ روی محیط ناسازگار فقط بخش ارسال فعال نمی‌شود.
+
+هزینه ارسال سفارش باسلامی با روش ۱۹ از همان سفارش اصلی کسر می‌شود؛ مبدأهای دیگر از تراز غرفه یا کیف پول باسلام، روش ۲۰/۲۱، استفاده می‌کنند. گروه مختلط، چند پرداخت مستقل و متوالی است، نه یک تراکنش مشترک. فروشنده وزن نهایی را مرور و تأیید می‌کند؛ دریافت نرخ به‌تنهایی پرداخت نیست. نتیجه قطع‌شده مالی نیاز به بررسی دارد و خودکار تکرار نمی‌شود. رسید معتبر شرط چاپ است؛ لغو پستی، سفارش ووکامرس یا پرداخت خریدار را لغو نمی‌کند.
+
+اگر پروِ دارای سلام‌گیت هم فعال باشد، همان پرو تنها مسئول این بخش می‌ماند و اجرای تکراری انجام نمی‌شود. با غیرفعال‌شدن پرو، نسخه عادی از همان نگاشت‌ها و سوابق موجود استفاده می‌کند؛ اطلاعات مرسوله و محافظ مالی پاک یا جابه‌جا نمی‌شوند. اتصال از حساب عادی ووسلام انجام می‌شود و برای اعطای مجوزهای جدید سلام‌گیت ممکن است اتصال مجدد و تأیید دسترسی کلاینت عادی از سمت باسلام لازم باشد؛ داشتن توکن به‌تنهایی اعطای این مجوزها را تضمین نمی‌کند.
+
+SalamGate is available in ordinary WooSalam without Pro. It supports account onboarding, sender settings, estimates, delivery centers, single/mixed bulk shipping, reviewed payment, eligible PDF labels and guarded non-Basalam cancellation. Shipping requires PHP 8.2+/64-bit, WordPress 6.5+ and WooCommerce 10.0+; unsupported environments keep the other base features. Legacy Pro remains the sole shipping owner while active, avoiding duplicate handlers. Existing shipment mappings and financial guards are preserved when ownership changes.
+
+Native Basalam shipping uses payment method 19 from its original order; other origins use vendor balance 20 or wallet 21. Bulk payments are sequential, not one atomic debit. Lost financial responses require read-only reconciliation, never automatic replay. Real payment/activation/refund needs deliberate authorization; automated tests are not proof of a live financial result. Current base OAuth renewal has no operational shared-client refresh adapter; reconnect remains the fallback. The ordinary OAuth client/callback are not replaced with Pro credentials.
+
+Postal tracking is offered only through the dedicated tracking tab, which submits a validated 24-digit barcode to https://tracking.post.ir/. Shipping service selection by buyers at customer checkout is not provided. A cancelled source order cannot start fresh shipping; a voided postal receipt cannot print a valid label.
 
 - 💬 [گروه پشتیبانی تلگرام](https://t.me/woosalam_group)
 - 📧 [ایمیل پشتیبانی](mailto:info.hamsalam.ir@gmail.com)
@@ -31,9 +46,10 @@ With this plugin, you can:
 - Sync WooCommerce products to your Basalam vendor panel
 - Automatically receive and update orders from Basalam in WooCommerce
 - Keep product prices, inventory, and stock levels in sync in real-time
+- Prepare, pay for and print eligible SalamGate shipments from the store's order screen or shipping menu, without requiring Pro
 
 **Note:**  
-This plugin connects to Basalam’s external APIs. No data is sent or received until the site administrator configures their vendor credentials.
+This plugin connects to Basalam’s external APIs. Authenticated synchronization and shipping use the account configured by the administrator. Public geography/packaging references and an explicitly requested postage estimate can use public SalamGate endpoints without vendor credentials.
 
 == External Services ==
 
@@ -48,6 +64,8 @@ This plugin communicates with several external APIs provided and hosted by Basal
 - `revision.basalam.com`  
 - `integration.basalam.com`  
 - `uploadio.basalam.com`  
+- `salam-gate.basalam.com` — shipping account, parcel, quote, payment and label APIs
+- `tracking.post.ir` — browser navigation from the postal tracking tab, with the entered postal barcode
 
 **Purpose:**  
 These APIs are used for:
@@ -55,21 +73,27 @@ These APIs are used for:
 - Creating and updating orders from Basalam  
 - Predicting product categories and validating uploaded images  
 - Authenticating vendors and managing account credentials  
+- Registering/reviewing postal parcels, selecting shipping rates, paying postage, generating authorized labels and requesting eligible cancellation
 
-**Data Sent (only after authentication):**
+**Data Sent (authenticated operations):**
 - Product data: title, price, stock, description, categories, images (on sync)  
 - Order data: order ID, status, invoice number (on order updates)  
 - Site metadata: vendor ID, domain, webhook URLs (during setup or manual sync)
+- Shipping data when the seller prepares a parcel: recipient name, phone, postal address/code, city, goods description, declared value, packaged weight/dimensions and the required order/native-parcel identifiers. Selected quote/funding information is sent when the seller explicitly confirms the financial action.
+
+Public reference requests contain no recipient details. Calculator input consists of route city IDs, package weight/value, packaging and service parameters. The tracking form sends only its entered barcode to the official postal website.
 
 **Data Received:**
 - Orders placed by customers on Basalam  
 - Product inventory updates  
 - Vendor authentication tokens and sync status
+- Shipping account/shop state, rates and cost breakdown, parcel/invoice status, postal barcode, delivery-center data and authorized PDF label links
 
 **Security Measures:**  
 - All communications occur over secure HTTPS connections  
-- No external communication happens until valid API credentials are entered  
-- Data transfer is strictly limited to syncing functions initiated by the site administrator
+- Authenticated shipping requires account ownership, local permissions and a valid nonce; public references/calculator are separate
+- Shipping status can be checked by the configured read-only background synchronization; financial actions are never silently performed by that scheduler
+- No shared OAuth client secret is distributed; uncertain creation/payment/cancellation records are retained to prevent blind retries
 
 **Terms and Privacy:**
 
@@ -97,21 +121,28 @@ If you need help or have questions, please contact us via:
 == Frequently Asked Questions ==
 
 = What data does this plugin share? =  
-Only the data necessary for syncing products and orders with your Basalam vendor account is shared. No unnecessary or private user data is transmitted.
+Product/order synchronization shares the data needed for the configured Basalam account. Preparing a postal shipment also shares the recipient and package information required by SalamGate, as described under External Services.
 
 = Is customer data transmitted? =  
-No. Customer data from your WooCommerce store is **not** sent to any external API.
+For a postal shipment explicitly prepared by the seller, the recipient and package information necessary for shipping is sent to SalamGate. The whole customer database is not exported. Public calculator/reference requests do not require recipient names, addresses or phones. Using the tracking tab sends the entered postal barcode to tracking.post.ir.
 
 = Can I choose which products get synced? =  
 Yes. You have full control over which products are synced via the plugin’s settings.
 
 = Is my data safe? =  
-Yes. All API calls use secure HTTPS connections. No data is sent until you explicitly authorize API access.
+API calls use HTTPS. Authenticated operations use the configured account and checked permissions; public reference/calculator requests are described above. Review the recipient/package data and final amount before confirming a shipment or payment.
 
 == Screenshots ==
 1. تنظیمات اولیه افزونه در وردپرس
 
 == Changelog ==
+
+= 1.10.30 =
+* Add the complete SalamGate shipping workflow to ordinary WooSalam, including onboarding, shipping estimates, reviewed payment, eligible labels and tracking.
+* Keep Basalam product names and links out of formatted order item details used by SMS plugins.
+* Display Basalam item details separately in the order admin, including on existing orders.
+* Avoid false interrupted-worker/LiteSpeed warnings when Apache exposes the LSAPI SAPI.
+* Match the documented LiteSpeed noabort rule to the Woosalam async queue action and clear stale protection alerts after explicit queue cancellation.
 
 = 1.10.29 =
 * Fixed queues remaining blocked when a background dispatch lock loses its expiry.

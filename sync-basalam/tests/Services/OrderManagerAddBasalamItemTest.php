@@ -118,6 +118,11 @@ namespace {
                 return $this->meta;
             }
 
+            public function delete_meta_data($key)
+            {
+                unset($this->meta[$key]);
+            }
+
             public function set_subtotal($value)
             {
             }
@@ -347,7 +352,7 @@ namespace SyncBasalam\Tests\Services {
                 $item->get_meta_data()[OrderManager::BASALAM_ITEM_NAME_META_KEY] ?? null
             );
             self::assertSame(
-                '<a href="https://basalam.com/p/777" target="_blank" rel="noopener">مشاهده</a>',
+                'https://basalam.com/p/777',
                 $item->get_meta_data()[OrderManager::BASALAM_ITEM_LINK_META_KEY] ?? null
             );
         }
@@ -384,7 +389,7 @@ namespace SyncBasalam\Tests\Services {
                 $item->get_meta_data()[OrderManager::BASALAM_ITEM_NAME_META_KEY] ?? null
             );
             self::assertSame(
-                '<a href="https://basalam.com/p/888" target="_blank" rel="noopener">مشاهده</a>',
+                'https://basalam.com/p/888',
                 $item->get_meta_data()[OrderManager::BASALAM_ITEM_LINK_META_KEY] ?? null
             );
         }

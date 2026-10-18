@@ -1,0 +1,1927 @@
+/* SalamGate shares the font faces loaded by Woosalam's assets/css/font.css. */
+:root {
+  --sg-font-body: "PelakFA", Tahoma, sans-serif;
+  --sg-font-heading: "Morabba", "PelakFA", Tahoma, sans-serif;
+}
+
+:where(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-bulk-shipping-modal, .sg-help, .sg-connection-lock, .sg-picker-dialog, .sg-product-search, .sg-load-indicator, .woosalam-sg-feedback .basalam-toast) {
+  font-family: var(--sg-font-body);
+}
+
+:where(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-bulk-shipping-modal, .sg-help, .sg-connection-lock, .sg-picker-dialog, .sg-product-search, .woosalam-sg-feedback .basalam-toast) :is(input, select, option, optgroup, textarea, button, label, legend, summary) {
+  font-family: var(--sg-font-body);
+}
+
+:where(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-bulk-shipping-modal, .sg-help, .sg-connection-lock) :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--sg-font-heading);
+}
+
+/* ===================== Salam Gate ===================== */
+
+.salam-gate-page .salam-gate-section {
+  padding: 16px;
+}
+
+.salam-gate-section__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.salam-gate-section__title {
+  font-weight: 700;
+  margin: 0;
+}
+
+.salam-gate-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 12px;
+}
+
+.salam-gate-card {
+  border: 1px solid var(--basalam-gray-300, #e5e7eb);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.salam-gate-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.salam-gate-card__title {
+  font-weight: 700;
+  margin: 0;
+}
+
+.salam-gate-badge {
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.salam-gate-card__rows {
+  margin: 0 0 10px;
+}
+
+.salam-gate-card__row {
+  display: flex;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 0.85rem;
+}
+
+.salam-gate-card__row dt {
+  min-width: 110px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.salam-gate-card__row dd {
+  margin: 0;
+}
+
+.salam-gate-guide {
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px dashed var(--basalam-gray-300, #e5e7eb);
+  border-radius: 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.salam-gate-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 520px;
+}
+
+.salam-gate-form__row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.salam-gate-form__row label {
+  font-size: 0.85rem;
+}
+
+.salam-gate-form__row select,
+.salam-gate-form__row input[type="number"] {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--basalam-gray-300, #e5e7eb);
+  border-radius: 8px;
+}
+
+.salam-gate-form__row--check {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.salam-gate-form__row--check label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.salam-gate-sync-interval {
+  padding: 4px 6px;
+  border: 1px solid var(--basalam-gray-300, #e5e7eb);
+  border-radius: 8px;
+}
+
+.salam-gate-notice {
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin: 0 0 14px;
+  font-size: 0.9rem;
+}
+
+.salam-gate-notice--success {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+.salam-gate-notice--error {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+/* ---------- Salam Gate — order parcel modal ---------- */
+
+.salam-gate-summary {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.85rem;
+}
+
+.salam-gate-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.salam-gate-modal {
+  background: #fff;
+  border-radius: 14px;
+  width: min(680px, 92vw);
+  max-height: 88vh;
+  overflow: auto;
+}
+
+.salam-gate-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--basalam-gray-300, #e5e7eb);
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 1;
+}
+
+.salam-gate-modal__header h3 {
+  margin: 0;
+}
+
+.salam-gate-modal__close {
+  background: none;
+  border: 0;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.salam-gate-modal__body {
+  padding: 16px 18px;
+}
+
+.salam-gate-fieldset {
+  border: 1px solid var(--basalam-gray-300, #e5e7eb);
+  border-radius: 10px;
+  padding: 12px;
+  margin: 0 0 14px;
+}
+
+.salam-gate-fieldset legend {
+  font-weight: 700;
+  padding: 0 6px;
+}
+
+.salam-gate-modal .salam-gate-form__row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.salam-gate-modal .salam-gate-form__row label {
+  font-size: 0.85rem;
+}
+
+.salam-gate-modal .salam-gate-form__row input[type="text"],
+.salam-gate-modal .salam-gate-form__row input[type="number"],
+.salam-gate-modal .salam-gate-form__row select,
+.salam-gate-modal .salam-gate-form__row textarea {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--basalam-gray-300, #e5e7eb);
+  border-radius: 8px;
+}
+
+.salam-gate-form__row--pair {
+  display: flex;
+  gap: 10px;
+}
+
+.salam-gate-form__row--checks {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 0;
+}
+
+.salam-gate-form__row--checks label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.salam-gate-items {
+  width: 100%;
+}
+
+.salam-gate-items input[type="number"] {
+  width: 100%;
+}
+
+.salam-gate-quote {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--basalam-gray-300, #e5e7eb);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.salam-gate-quote.is-disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.salam-gate-quote__main {
+  flex: 1;
+}
+
+.salam-gate-quote__title {
+  font-weight: 700;
+}
+
+.salam-gate-quote__rows {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.salam-gate-quote__discount {
+  font-size: 0.72rem;
+  color: #059669;
+}
+
+.salam-gate-quote__error {
+  font-size: 0.75rem;
+  color: #b91c1c;
+}
+
+.salam-gate-quote__total {
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.salam-gate-modal__actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* ---------- Salam Gate — parcel modal (v2 — matches vendor panel) ---------- */
+
+.salam-gate-modal .salam-gate-fieldset {
+  border: 1px solid var(--basalam-gray-300, #e5e7eb);
+  border-radius: 10px;
+  padding: 14px;
+  margin: 0 0 14px;
+}
+
+.salam-gate-modal .salam-gate-fieldset legend {
+  font-weight: 700;
+  padding: 0 8px;
+  font-size: 0.9rem;
+}
+
+.salam-gate-modal .basalam-form-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.salam-gate-modal .basalam-form-row-two-col > .basalam-form-group {
+  flex: 1;
+}
+
+.salam-gate-modal .basalam-form-group-full {
+  flex: 1;
+}
+
+.salam-gate-modal .basalam-input,
+.salam-gate-modal .basalam-select {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--basalam-gray-300, #e5e5e5);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  min-height: 34px;
+}
+
+.salam-gate-modal .basalam-label {
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+  display: block;
+  color: #555;
+}
+
+.sg-check-row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.sg-check-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.sg-check-label input[type="checkbox"] {
+  margin: 0;
+}
+
+.sg-non-standard-toggle {
+  padding: 8px 12px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sg-non-standard-hint {
+  display: block;
+  font-size: 0.72rem;
+  color: #92400e;
+  margin-top: 2px;
+}
+
+.sg-items-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.sg-items-table th {
+  text-align: right;
+  padding: 6px 8px;
+  background: #f8f9fa;
+  border: 1px solid #e5e5e5;
+  font-weight: 600;
+}
+
+.sg-items-table td {
+  padding: 4px 8px;
+  border: 1px solid #e5e5e5;
+}
+
+.sg-items-table input[type="number"] {
+  width: 100%;
+  padding: 3px 6px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.sg-dims-inputs {
+  display: flex;
+  gap: 8px;
+}
+
+.sg-dims-inputs .basalam-input {
+  flex: 1;
+}
+
+/* Quote cards */
+.sg-quotes-cards {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.sg-quote-card {
+  flex: 1;
+  min-width: 140px;
+  border: 2px solid #e5e5e5;
+  border-radius: 10px;
+  padding: 12px;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.2s, background 0.2s;
+  background: #fff;
+}
+
+.sg-quote-card:hover {
+  border-color: #3b82f6;
+}
+
+.sg-quote-card.is-selected {
+  border-color: #16a34a;
+  background: #f0fdf4;
+}
+
+.sg-quote-card.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sg-quote-card__header {
+  margin-bottom: 6px;
+}
+
+.sg-quote-card__name {
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: block;
+}
+
+.sg-quote-card__discount {
+  font-size: 0.7rem;
+  color: #059669;
+}
+
+.sg-quote-card__price {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #1f2937;
+}
+
+.sg-quote-card__rows {
+  font-size: 0.7rem;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.sg-quote-card__error {
+  font-size: 0.72rem;
+  color: #dc2626;
+  margin-top: 4px;
+}
+
+.sg-quote-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+/* ---------- Salam Gate — paid parcel states ---------- */
+
+.salam-gate-tracking {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 4px;
+}
+
+.salam-gate-tracking__code {
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.salam-gate-post-link {
+  display: inline-block;
+  margin-bottom: 8px;
+  font-size: 0.8rem;
+  text-decoration: none;
+}
+
+.salam-gate-label-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.salam-gate-label-row select {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 6px;
+  border: 1px solid var(--basalam-gray-300, #e5e7eb);
+  border-radius: 8px;
+}
+
+.salam-gate-track-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  border: 1px dashed var(--basalam-gray-300, #e5e7eb);
+  border-radius: 8px;
+  max-height: 200px;
+  overflow: auto;
+  font-size: 0.78rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ---------- Salam Gate — parcels page (part 5) ---------- */
+
+.salam-gate-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.salam-gate-filters select,
+.salam-gate-filters input[type="text"] {
+  padding: 5px 8px;
+  border: 1px solid var(--basalam-gray-300, #e5e7eb);
+  border-radius: 8px;
+}
+
+.salam-gate-bulk-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.salam-gate-bulk-bar select {
+  padding: 5px 8px;
+  border: 1px solid var(--basalam-gray-300, #e5e7eb);
+  border-radius: 8px;
+}
+
+.salam-gate-parcels-table {
+  margin-top: 4px;
+}
+
+.salam-gate-parcels-table .sg-check {
+  width: 30px;
+  text-align: center;
+}
+
+.salam-gate-parcels-table .sg-actions {
+  white-space: nowrap;
+}
+
+.salam-gate-pagination {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.salam-gate-parcels-table td {
+  font-size: 0.82rem;
+  vertical-align: middle;
+}
+
+/* ===================== Salam Gate v2 — router & intro (part 3) ===================== */
+/* همه قواعد این بخش scoped به .salam-gate-page هستند؛ رنگ از توکن‌های ووسلام،
+   عنوان Morabba و بدنه PelakFA. هیچ قاعده سراسری وردپرس/ووسلام تغییر نمی‌کند. */
+
+.salam-gate-page.sg-router {
+  max-width: 960px;
+  font-family: PelakFA, Vazirmatn, tahoma, sans-serif;
+}
+
+.salam-gate-page.sg-router,
+.salam-gate-page.sg-router * {
+  box-sizing: border-box;
+}
+
+.salam-gate-page .sg-router__head {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.salam-gate-page .sg-router__title {
+  margin: 0;
+  font-family: Morabba, PelakFA, tahoma, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1d2327;
+}
+
+.salam-gate-page .sg-router__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: Morabba, PelakFA, tahoma, sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1d2327;
+  text-decoration: none;
+}
+
+.salam-gate-page .sg-router__back:hover,
+.salam-gate-page .sg-router__back:focus-visible {
+  color: var(--basalam-primary-color, #ff5c35);
+}
+
+.salam-gate-page .sg-router__back-arrow {
+  width: 22px;
+  height: 22px;
+  display: inline-block;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M8.6 4.6 7.2 6l6 6-6 6 1.4 1.4 7.4-7.4z'/></svg>") center / contain no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M8.6 4.6 7.2 6l6 6-6 6 1.4 1.4 7.4-7.4z'/></svg>") center / contain no-repeat;
+  transform: scaleX(-1);
+}
+
+.sg-router__back:hover,
+.salam-gate-page .sg-router__back:focus-visible {
+  text-decoration: underline;
+}
+
+.salam-gate-page .sg-card {
+  background: #fff;
+  border: 1px solid var(--basalam-gray-200, #e5e7eb);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.salam-gate-page .sg-card--error {
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.salam-gate-page .sg-card__title {
+  margin: 0;
+  font-family: Morabba, PelakFA, tahoma, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.salam-gate-page .sg-card--error .sg-card__title {
+  color: #991b1b;
+}
+
+.salam-gate-page .sg-card__text {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: #374151;
+}
+
+.salam-gate-page .sg-card__detail {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.salam-gate-page .sg-card__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.salam-gate-page .sg-shop-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--basalam-gray-100, #f8f9fa);
+  border-radius: 8px;
+}
+
+.salam-gate-page .sg-shop-row__id {
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+/* دکمه‌های اختصاصی سلام‌گیت — ارتفاع صریح برای اجتناب از برخورد 40/52px پایه */
+.salam-gate-page .sg-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font-family: PelakFA, tahoma, sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.salam-gate-page .sg-button--lg {
+  height: 52px;
+  font-size: 1rem;
+  padding: 0 28px;
+}
+
+.salam-gate-page .sg-button--primary {
+  background: var(--basalam-primary-color, #ff5c35);
+  color: #fff;
+}
+
+.sg-button--primary:hover,
+.salam-gate-page .sg-button--primary:focus-visible {
+  background: var(--basalam-primary-hover, #e54e2a);
+  color: #fff;
+}
+
+.salam-gate-page .sg-button--secondary {
+  background: #fff;
+  color: var(--basalam-primary-color, #ff5c35);
+  border-color: var(--basalam-primary-color, #ff5c35);
+}
+
+.sg-button--secondary:hover,
+.salam-gate-page .sg-button--secondary:focus-visible {
+  background: #fff7f4;
+  color: var(--basalam-primary-hover, #e54e2a);
+  border-color: var(--basalam-primary-hover, #e54e2a);
+}
+
+.sg-router .sg-button:focus-visible,
+.sg-state .sg-button:focus-visible,
+.sg-hero .sg-button:focus-visible,
+.salam-gate-page .sg-cta .sg-button:focus-visible {
+  outline: 2px solid var(--basalam-primary-color, #ff5c35);
+  outline-offset: 2px;
+}
+
+.salam-gate-page .sg-dev-note {
+  font-size: 0.78rem;
+  color: #92400e;
+  background: #fffbeb;
+  border: 1px dashed #fde68a;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+/* ---------- معرفی (intro) ---------- */
+
+.salam-gate-page .sg-hero {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  background: linear-gradient(180deg, #fff 0%, #fff7f4 100%);
+  border: 1px solid var(--basalam-gray-200, #e5e7eb);
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.salam-gate-page .sg-hero__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.salam-gate-page .sg-hero__title {
+  margin: 0;
+  font-family: Morabba, PelakFA, tahoma, sans-serif;
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #1d2327;
+  line-height: 1.6;
+}
+
+.salam-gate-page .sg-hero__desc {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.9;
+  color: #374151;
+  max-width: 560px;
+}
+
+.salam-gate-page .sg-hero__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.salam-gate-page .sg-hero__art {
+  flex: 0 0 180px;
+  color: var(--basalam-primary-color, #ff5c35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.salam-gate-page .sg-hero__art svg {
+  width: 100%;
+  height: auto;
+}
+
+.salam-gate-page .sg-section {
+  background: #fff;
+  border: 1px solid var(--basalam-gray-200, #e5e7eb);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.salam-gate-page .sg-section--highlight {
+  background: #fff7f4;
+  border-color: #ffd9cc;
+}
+
+.salam-gate-page .sg-section__title {
+  margin: 0 0 6px;
+  font-family: Morabba, PelakFA, tahoma, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.salam-gate-page .sg-section__desc {
+  margin: 0 0 12px;
+  font-size: 0.88rem;
+  color: #4b5563;
+  line-height: 1.8;
+}
+
+.salam-gate-page .sg-benefits {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+.salam-gate-page .sg-benefit {
+  border: 1px solid var(--basalam-gray-200, #e5e7eb);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.salam-gate-page .sg-benefit__title {
+  font-size: 0.92rem;
+  color: var(--basalam-primary-color, #ff5c35);
+}
+
+.salam-gate-page .sg-benefit__text {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.8;
+  color: #4b5563;
+}
+
+.salam-gate-page .sg-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.salam-gate-page .sg-step {
+  border: 1px solid var(--basalam-gray-200, #e5e7eb);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--basalam-gray-100, #f8f9fa);
+}
+
+.salam-gate-page .sg-step__num {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--basalam-primary-color, #ff5c35);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.salam-gate-page .sg-step__title {
+  font-size: 0.92rem;
+}
+
+.salam-gate-page .sg-step__text {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.8;
+  color: #4b5563;
+}
+
+.salam-gate-page .sg-faq {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.salam-gate-page .sg-faq__item {
+  border: 1px solid var(--basalam-gray-200, #e5e7eb);
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: #fff;
+}
+
+.salam-gate-page .sg-faq__q {
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.salam-gate-page .sg-faq__q:focus-visible {
+  outline: 2px solid var(--basalam-primary-color, #ff5c35);
+  outline-offset: 2px;
+}
+
+.salam-gate-page .sg-faq__a {
+  margin: 8px 0 2px;
+  font-size: 0.82rem;
+  line-height: 1.9;
+  color: #4b5563;
+}
+
+.salam-gate-page .sg-faq__more {
+  margin: 12px 0 0;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.salam-gate-page .sg-faq__more a {
+  color: var(--basalam-primary-color, #ff5c35);
+  text-decoration: none;
+}
+
+.salam-gate-page .sg-faq__more a:hover {
+  text-decoration: underline;
+}
+
+.salam-gate-page .sg-cta {
+  background: #fff;
+  border: 2px solid var(--basalam-primary-color, #ff5c35);
+  border-radius: 14px;
+  padding: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.salam-gate-page .sg-cta__text {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+/* ---------- بارگذاری/فوتر ---------- */
+
+.salam-gate-page .sg-loading-spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid var(--basalam-gray-200, #e5e7eb);
+  border-top-color: var(--basalam-primary-color, #ff5c35);
+  border-radius: 50%;
+  animation: sg-spin 0.8s linear infinite;
+  display: inline-block;
+}
+
+@keyframes sg-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.salam-gate-page .sg-router__footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.salam-gate-page .sg-refresh-state__spinner {
+  float: none;
+  margin: 0;
+}
+
+.salam-gate-page .sg-refresh-state__msg {
+  font-size: 0.8rem;
+  color: var(--basalam-danger-color, #dc3545);
+}
+
+/* ---------- موبایل ---------- */
+
+@media (max-width: 782px) {
+  .salam-gate-page .sg-hero {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .salam-gate-page .sg-hero__art {
+    flex-basis: auto;
+    max-width: 200px;
+    margin: 0 auto;
+  }
+
+  .salam-gate-page .sg-cta {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .salam-gate-page .sg-cta .sg-button {
+    width: 100%;
+  }
+}
+
+/* ===================== Salam Gate v2 — onboarding wizard (part 4) ===================== */
+
+.salam-gate-page .sg-wizard__steps {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.salam-gate-page .sg-wizard__steps li {
+  flex: 1;
+  min-width: 110px;
+  text-align: center;
+  font-size: 0.78rem;
+  padding: 8px 6px;
+  border: 1px solid var(--basalam-gray-200, #e5e7eb);
+  border-radius: 8px;
+  color: #6b7280;
+  background: var(--basalam-gray-100, #f8f9fa);
+}
+
+.salam-gate-page .sg-wizard__steps li.is-active {
+  border-color: var(--basalam-primary-color, #ff5c35);
+  color: var(--basalam-primary-color, #ff5c35);
+  font-weight: 700;
+}
+
+.salam-gate-page .sg-wizard__steps li.is-done {
+  color: var(--basalam-success-color, #28a745);
+  border-color: var(--basalam-success-color, #28a745);
+}
+
+.salam-gate-page .sg-wizard__step {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.salam-gate-page .sg-wizard__step.is-active {
+  display: flex;
+}
+
+.salam-gate-page .sg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+}
+
+.salam-gate-page .sg-field__label {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.salam-gate-page .sg-req {
+  color: var(--basalam-danger-color, #dc3545);
+}
+
+.salam-gate-page .sg-field__input,
+.salam-gate-page .sg-field__select {
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 1px solid var(--basalam-gray-300, #d1d5db);
+  border-radius: 8px;
+  font-family: PelakFA, tahoma, sans-serif;
+  font-size: 0.88rem;
+  background: #fff;
+}
+
+.salam-gate-page .sg-field__input:focus-visible,
+.salam-gate-page .sg-field__select:focus-visible {
+  outline: 2px solid var(--basalam-primary-color, #ff5c35);
+  outline-offset: 1px;
+}
+
+.salam-gate-page .sg-field__input--invalid {
+  border-color: var(--basalam-danger-color, #dc3545);
+}
+
+.salam-gate-page .sg-field__hint {
+  margin: 0;
+  font-size: 0.74rem;
+  color: #6b7280;
+}
+
+.salam-gate-page .sg-field__error {
+  margin: 0;
+  font-size: 0.76rem;
+  color: var(--basalam-danger-color, #dc3545);
+  display: none;
+}
+
+.salam-gate-page .sg-field__error:not(:empty) {
+  display: block;
+}
+
+.salam-gate-page .sg-field__state {
+  margin: 0;
+  font-size: 0.76rem;
+  color: #6b7280;
+}
+
+.salam-gate-page .sg-field__state--error {
+  color: var(--basalam-danger-color, #dc3545);
+}
+
+.salam-gate-page .sg-wizard__date-row,
+.salam-gate-page .sg-wizard__row2 {
+  display: grid;
+  gap: 8px;
+}
+
+.salam-gate-page .sg-wizard__date-row {
+  grid-template-columns: 1fr 1.4fr 1fr;
+}
+
+.salam-gate-page .sg-wizard__row2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.salam-gate-page .sg-radio,
+.salam-gate-page .sg-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.salam-gate-page .sg-wizard__radios {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding: 6px 0;
+}
+
+.salam-gate-page .sg-wizard__radios a,
+.salam-gate-page .sg-check a {
+  color: var(--basalam-primary-color, #ff5c35);
+}
+
+.salam-gate-page .sg-wizard__review {
+  margin: 0;
+  border: 1px solid var(--basalam-gray-200, #e5e7eb);
+  border-radius: 10px;
+  padding: 6px 14px;
+  background: var(--basalam-gray-100, #f8f9fa);
+}
+
+.salam-gate-page .sg-wizard__review-row {
+  display: flex;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px dashed var(--basalam-gray-200, #e5e7eb);
+  font-size: 0.84rem;
+}
+
+.salam-gate-page .sg-wizard__review-row:last-child {
+  border-bottom: none;
+}
+
+.salam-gate-page .sg-wizard__review dt {
+  min-width: 130px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.salam-gate-page .sg-wizard__review dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.salam-gate-page .sg-wizard__cost {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.salam-gate-page .sg-wizard__cost strong {
+  color: var(--basalam-primary-color, #ff5c35);
+  font-size: 1.25rem;
+}
+
+.salam-gate-page .sg-wizard__notice {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.84rem;
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.salam-gate-page .sg-wizard__notice--ok {
+  background: #ecfdf5;
+  color: #065f46;
+  border-color: #a7f3d0;
+}
+
+.salam-gate-page .sg-wizard__nav {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 782px) {
+  .salam-gate-page .sg-wizard__date-row,
+  .salam-gate-page .sg-wizard__row2 {
+    grid-template-columns: 1fr;
+  }
+
+  .salam-gate-page .sg-wizard__nav .sg-button {
+    flex: 1;
+  }
+}
+
+/* ===================== Salam Gate v2 — dashboard & settings (part 5) ===================== */
+
+.salam-gate-page .sg-dash-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.salam-gate-page .sg-dash-nav--secondary {
+  margin-top: 24px;
+}
+
+.salam-gate-page .sg-dash-nav__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 17px 20px;
+  background: #fff;
+  border: 1px solid var(--basalam-gray-200, #e5e7eb);
+  border-radius: 12px;
+  text-decoration: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.salam-gate-page .sg-dash-nav__row:hover,
+.salam-gate-page .sg-dash-nav__row:focus-visible {
+  border-color: var(--basalam-gray-300, #d1d5db);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+.salam-gate-page .sg-dash-nav__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1d2327;
+}
+
+.salam-gate-page .sg-dash-nav__chevron {
+  width: 18px;
+  height: 18px;
+  background: #9ca3af;
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M9.3 4.7 8 6l6 6-6 6 1.3 1.3L16.6 12z'/></svg>") center / contain no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M9.3 4.7 8 6l6 6-6 6 1.3 1.3L16.6 12z'/></svg>") center / contain no-repeat;
+}
+
+.salam-gate-page .sg-dash-section-title {
+  margin: 0 0 12px;
+  font-family: Morabba, PelakFA, tahoma, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1d2327;
+}
+
+.salam-gate-page .sg-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.salam-gate-page .sg-stats--mini {
+  gap: 6px;
+}
+
+.salam-gate-page .sg-stats__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid var(--basalam-gray-200, #e5e7eb);
+  border-radius: 12px;
+  padding: 13px 18px;
+}
+
+.salam-gate-page .sg-stats__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #eef4ff;
+  flex: 0 0 40px;
+  position: relative;
+}
+
+.salam-gate-page .sg-stats__icon::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 20px;
+  height: 20px;
+  background: #3b6ef5;
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2zm-4 17h8v2a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2z'/></svg>") center / contain no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2zm-4 17h8v2a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2z'/></svg>") center / contain no-repeat;
+}
+
+.salam-gate-page .sg-stats__icon--book::after {
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M6 2h9a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm2 2v16h7a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H8z'/></svg>") center / contain no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M6 2h9a3 3 0 0 1 3 3v14a3 3 0 0 1-3 3H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm2 2v16h7a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H8z'/></svg>") center / contain no-repeat;
+}
+
+.salam-gate-page .sg-stats__icon--percent::after {
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M7 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm10 10a3 3 0 1 1 0 6 3 3 0 0 1 0-6zM19.7 4.3l-16 16-1.4-1.4 16-16z'/></svg>") center / contain no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M7 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6zm10 10a3 3 0 1 1 0 6 3 3 0 0 1 0-6zM19.7 4.3l-16 16-1.4-1.4 16-16z'/></svg>") center / contain no-repeat;
+}
+
+.salam-gate-page .sg-stats__label {
+  font-size: 0.88rem;
+  color: #1d2327;
+  flex: 1;
+}
+
+.salam-gate-page .sg-stats__value {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #1d2327;
+}
+
+.salam-gate-page .sg-stats__state {
+  margin: 8px 0 0;
+  font-size: 0.78rem;
+  color: var(--basalam-danger-color, #dc3545);
+  display: none;
+}
+
+.salam-gate-page .sg-stats__state:not(:empty) {
+  display: block;
+}
+
+.salam-gate-page .sg-dash-links {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ---------- تنظیمات ---------- */
+
+.salam-gate-page .sg-section--tight {
+  margin-bottom: 0;
+  padding: 14px 0;
+  border: none;
+  border-top: 1px solid var(--basalam-gray-200, #e5e7eb);
+}
+
+.salam-gate-page .sg-settings__sub {
+  margin: 10px 0 8px;
+  font-size: 0.9rem;
+  font-family: Morabba, PelakFA, tahoma, sans-serif;
+}
+
+.salam-gate-page .sg-settings__shop,
+.salam-gate-page .sg-settings__addr {
+  border: 1px solid var(--basalam-gray-200, #e5e7eb);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: var(--basalam-gray-100, #f8f9fa);
+}
+
+.salam-gate-page .sg-settings__shop-head,
+.salam-gate-page .sg-settings__addr-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.salam-gate-page .sg-settings__addr-body p {
+  margin: 3px 0;
+  font-size: 0.84rem;
+}
+
+.salam-gate-page .sg-settings__date {
+  color: #6b7280;
+  font-size: 0.76rem;
+}
+
+.salam-gate-page .sg-settings__loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 0;
+  color: #6b7280;
+  font-size: 0.84rem;
+}
+
+.salam-gate-page .sg-card__detail--error {
+  color: var(--basalam-danger-color, #dc3545);
+}
+
+.salam-gate-page .sg-check--radio {
+  display: inline-flex;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #4b5563;
+  cursor: pointer;
+}
+
+/* ---------- مودال عمومی ---------- */
+
+.salam-gate-page .sg-modal-overlay,
+.sg-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sg-modal-overlay .sg-modal {
+  background: #fff;
+  border-radius: 14px;
+  width: min(520px, 92vw);
+  max-height: 85vh;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  font-family: PelakFA, tahoma, sans-serif;
+}
+
+.sg-modal-overlay .sg-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--basalam-gray-200, #e5e7eb);
+}
+
+.sg-modal-overlay .sg-modal__header h4 {
+  margin: 0;
+  font-family: Morabba, PelakFA, tahoma, sans-serif;
+  font-size: 1rem;
+}
+
+.sg-modal-overlay .sg-modal__close {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 4px 8px;
+}
+
+.sg-modal-overlay .sg-modal__close:focus-visible {
+  outline: 2px solid var(--basalam-primary-color, #ff5c35);
+  outline-offset: 1px;
+  border-radius: 4px;
+}
+
+.sg-modal-overlay .sg-modal__body {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.sg-modal-overlay .sg-modal__footer {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding: 12px 18px;
+  border-top: 1px solid var(--basalam-gray-200, #e5e7eb);
+}
+
+/* ---------- مراکز تحویل ---------- */
+
+.salam-gate-page .sg-po-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.salam-gate-page .sg-po-card {
+  border: 1px solid var(--basalam-gray-200, #e5e7eb);
+  border-radius: 10px;
+  padding: 14px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.salam-gate-page .sg-po-card__title {
+  font-size: 0.92rem;
+}
+
+/* ---------- ماشین‌حساب ---------- */
+
+.salam-gate-page .sg-calc-result {
+  margin-top: 14px;
+}
+
+.salam-gate-page .sg-calc-disclaimer {
+  font-size: 0.76rem;
+  color: #6b7280;
+  margin: 0 0 8px;
+}
+
+.salam-gate-page .sg-calc-quote {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.salam-gate-page .sg-calc-quote__item {
+  flex: 1;
+  min-width: 160px;
+  border: 1px solid var(--basalam-gray-200, #e5e7eb);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #fff;
+}
+
+.salam-gate-page .sg-calc-quote__item--error {
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.salam-gate-page .sg-calc-quote__price {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--basalam-primary-color, #ff5c35);
+}
+
+.salam-gate-page .sg-calc-quote__discount {
+  font-size: 0.72rem;
+  color: #059669;
+}
+
+.salam-gate-page .sg-calc-result--error {
+  color: var(--basalam-danger-color, #dc3545);
+}
+
+@media (max-width: 782px) {
+  .salam-gate-page .sg-stats__row {
+    flex-wrap: wrap;
+  }
+}
+
+/* ===================== Salam Gate v2 — send page (part 6) ===================== */
+
+.salam-gate-page .sg-send__markets {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 6px 0;
+}
+
+.salam-gate-page .sg-radio--market {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid var(--basalam-gray-300, #d1d5db);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  background: #fff;
+  transition: border-color 0.2s;
+}
+
+.salam-gate-page .sg-radio--market:has(input:checked) {
+  border-color: var(--basalam-primary-color, #ff5c35);
+  color: var(--basalam-primary-color, #ff5c35);
+}
+
+.salam-gate-page .sg-send__receiver-card {
+  border: 1px solid var(--basalam-gray-200, #e5e7eb);
+  border-radius: 10px;
+  padding: 14px;
+  background: var(--basalam-gray-100, #f8f9fa);
+}
+
+.salam-gate-page .sg-send__receiver-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.salam-gate-page .sg-send__receiver-info p {
+  margin: 0;
+  font-size: 0.84rem;
+}
+
+.salam-gate-page .sg-send__dims .sg-dims-inputs {
+  display: flex;
+  gap: 8px;
+}
+
+.salam-gate-page .sg-send__dims .sg-dims-inputs .sg-field__input {
+  flex: 1;
+}
+
+.salam-gate-page .sg-send__quotes {
+  margin-top: 16px;
+}
+
+.salam-gate-page .sg-send__quotes h4 {
+  margin: 0 0 10px;
+  font-family: Morabba, PelakFA, tahoma, sans-serif;
+}
+
+.salam-gate-page .sg-send .sg-items-table {
+  margin: 6px 0;
+}
+
+.salam-gate-page .sg-send .sg-items-table input {
+  width: 100%;
+  min-height: 34px;
+  padding: 4px 8px;
+  border: 1px solid var(--basalam-gray-300, #d1d5db);
+  border-radius: 6px;
+  font-size: 0.82rem;
+}
+
+@media (max-width: 782px) {
+  .salam-gate-page .sg-send__dims .sg-dims-inputs {
+    flex-direction: column;
+  }
+}
+
+
+/* ===================== Salam Gate v2 — parcels list (part 8) ===================== */
+
+.salam-gate-parcels-page.salam-gate-page {
+  font-family: PelakFA, Vazirmatn, tahoma, sans-serif;
+}
+
+.salam-gate-page .sgp-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.salam-gate-page .sgp-title {
+  margin: 0;
+  font-family: Morabba, PelakFA, tahoma, sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1d2327;
+}
+
+.salam-gate-page .sgp-print-btn {
+  height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--basalam-primary-color, #ff5c35);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--basalam-primary-color, #ff5c35);
+  font-family: PelakFA, tahoma, sans-serif;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.salam-gate-page .sgp-print-btn:hover {
+  background: #fff7f4;
+}
+
+.salam-gate-page .sgp-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--basalam-gray-200, #e5e7eb);
+  margin-bottom: 14px;
+}
+
+.salam-gate-page .sgp-tab {
+  padding: 10px 18px;
+  font-size: 0.88rem;
+  color: #6b7280;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+}
+
+.salam-gate-page .sgp-tab.is-active {
+  color: var(--basalam-primary-color, #ff5c35);
+  font-weight: 700;
+  border-bottom-color: var(--basalam-primary-color, #ff5c35);
+}
+
+.salam-gate-page .sgp-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.salam-gate-page .sgp-filter-btn {
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--basalam-gray-300, #d1d5db);
+  border-radius: 8px;
+  background: #fff;
+  font-family: PelakFA, tahoma, sans-serif;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: #1d2327;
+}
+
+.salam-gate-page .sgp-sort {
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--basalam-gray-300, #d1d5db);
+  border-radius: 8px;
+  background: #fff;
+  font-family: PelakFA, tahoma, sans-serif;
+  font-size: 0.8rem;
+}
+
+.salam-gate-page .sgp-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--basalam-gray-200, #e5e7eb);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.salam-gate-page .sgp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.salam-gate-page .sgp-table th {
+  text-align: right;
+  padding: 12px 10px;
+  background: var(--basalam-gray-100, #f8f9fa);
+  color: #6b7280;
+  font-weight: 600;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--basalam-gray-200, #e5e7eb);
+}
+
+.salam-gate-page .sgp-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid var(--basalam-gray-100, #f0f1f2);
+  vertical-align: middle;
+}
+
+.salam-gate-page .sgp-table tr:hover td {
+  background: #fafbfc;
+}
+
+.salam-gate-page .sgp-table .sgp-check {
+  width: 34px;
+  text-align: center;
+}
+
+.salam-gate-page .sgp-table small {
+  color: #6b7280;
+}
+
+.salam-gate-page .sgp-empty {
+  text-align: center;
+  padding: 32px 12px;
+  color: #6b7280;
+  font-size: 0.88rem;
+}
+
+.salam-gate-page .sgp-state--error {
+  color: var(--basalam-danger-color, #dc3545);
+}
+
+.salam-gate-page .sgp-track {
+  color: #1d4ed8;
+  text-decoration: none;
+  font-size: 0.8rem;
+}
+
+.salam-gate-page .sgp-track:hover {
+  text-decoration: underline;
+}
+
+.salam-gate-page .sgp-actions {
+  white-space: nowrap;
+}
+
+.salam-gate-page .sgp-pagination {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+.salam-gate-page .sgp-label-status {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: var(--basalam-gray-100, #f8f9fa);
+  font-size: 0.84rem;
+}
+
+/* رادیو مودال فیلتر */
+.sg-modal-overlay .sg-modal .sg-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 4px;
+  font-size: 0.88rem;
+  cursor: pointer;
+}

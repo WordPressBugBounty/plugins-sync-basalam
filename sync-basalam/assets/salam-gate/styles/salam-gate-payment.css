@@ -1,0 +1,75 @@
+/* Shared payment controls: scoped to SalamGate, not WooCommerce's own checkout. */
+:is(.salam-gate-page, .salam-gate-order-box) .sg-payment-picker { min-width: 0; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-payment-picker-title { margin: 0 0 8px; font-size: 12px; color: #475569; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-payment-cards { display: none; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-payment-ready .sg-payment-native-select { display: none !important; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-payment-ready .sg-payment-cards,
+.salam-gate-page .sg-send-payment-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-payment-card {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 108px;
+  margin: 0 !important;
+  padding: 16px;
+  border: 1px solid #dfe5ee;
+  border-radius: 14px;
+  background: #fff;
+  cursor: pointer;
+  color: #334155 !important;
+  text-align: right;
+  line-height: 1.7;
+  transition: border-color .16s ease, background-color .16s ease, box-shadow .16s ease;
+}
+:is(.salam-gate-page, .salam-gate-order-box) .sg-payment-card:hover { border-color: #fbad94; background: #fffaf7; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-payment-card.is-selected { border-color: #f66b43; background: #fff7f2; box-shadow: 0 0 0 1px #f66b43; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-payment-card:focus-within { outline: 2px solid #f66b43; outline-offset: 3px; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-payment-card input[type=radio] { position: absolute; inset-inline-start: 15px; top: 15px; width: 17px; height: 17px; opacity: 0; margin: 0; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-payment-card__icon { display: inline-flex; flex: 0 0 42px; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 12px; color: #c74e2c; background: #fff0e7; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-payment-card__icon svg { width: 25px; height: 25px; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-payment-card__content { display: grid; gap: 4px; flex: 1; min-width: 0; padding-inline-end: 18px; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-payment-card__content strong,
+.salam-gate-page .sg-payment-card .sg-send-payment-option__label { display: block; color: #253347; font-size: 14px; font-weight: 700; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-payment-card__content small,
+.salam-gate-page .sg-payment-card .sg-send-payment-option__description { display: block; color: #64748b; font-size: 11px; font-weight: 400; line-height: 1.8; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-payment-card__check { position: absolute; top: 14px; inset-inline-end: 14px; display: flex; align-items: center; justify-content: center; width: 19px; height: 19px; border: 1px solid #cbd5e1; border-radius: 50%; color: transparent; font-size: 12px; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-payment-card.is-selected .sg-payment-card__check { border-color: #ee653d; background: #ee653d; color: #fff; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-payment-card.is-disabled { cursor: not-allowed; opacity: .55; box-shadow: none; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-wallet-status { display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin-top: 14px; padding: 12px 14px; background: #f7f9fc; border: 1px solid #e4eaf2; border-radius: 12px; line-height: 1.7; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-wallet-status > div { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 10px; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-wallet-status > .sg-wallet-status__actions { align-items: center; justify-content: flex-end; gap: 8px; margin-inline-start: auto; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-wallet-status__title { color: #475569; font-size: 12px; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-wallet-status__amount { color: #253347; font-size: 17px; font-weight: 700; font-variant-numeric: tabular-nums; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-wallet-status:is(.is-loading, .is-unavailable) .sg-wallet-status__amount { color: #64748b; font-size: 12px; font-weight: 500; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-wallet-status small { flex-basis: 100%; color: #64748b; font-size: 11px; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-wallet-status :is(a, .sg-wallet-status__retry, .sg-wallet-status__refresh) { display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex-shrink: 0; min-height: 35px; padding: 5px 10px; border: 1px solid #fed5c6; border-radius: 9px; background: #fff; color: #b74628; text-decoration: none; font: inherit; font-size: 12px; cursor: pointer; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-wallet-status :is(a, .sg-wallet-status__retry, .sg-wallet-status__refresh):hover { background: #fff0e9; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-wallet-status :is(a, .sg-wallet-status__retry, .sg-wallet-status__refresh):focus-visible { outline: 2px solid #ef7047; outline-offset: 2px; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-wallet-status [hidden] { display: none !important; }
+/* A metabox is narrow even when the main admin viewport is wide. */
+.salam-gate-order-box .sg-payment-ready .sg-payment-cards { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.salam-gate-order-box .sg-payment-card { min-height: 84px; padding: 12px; }
+.salam-gate-order-box .sg-wallet-status { padding: 10px; }
+.salam-gate-order-box .sg-wallet-status a { width: 100%; }
+@media (max-width: 600px) {
+  :is(.salam-gate-page, .salam-gate-order-box) .sg-payment-ready .sg-payment-cards,
+  .salam-gate-page .sg-send-payment-options { grid-template-columns: minmax(0, 1fr); gap: 9px; }
+  :is(.salam-gate-page, .salam-gate-order-box) .sg-payment-card { min-height: 92px; }
+  :is(.salam-gate-page, .salam-gate-order-box) .sg-wallet-status a { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(.salam-gate-page, .salam-gate-order-box) .sg-payment-card { transition: none; }
+}
+
+:is(.salam-gate-page, .salam-gate-order-box) .sg-payment-card[data-sg-balance-blocked="true"] { opacity: 1; color: #64748b; background: #f5f7fa; border-color: #e2e8f0; cursor: not-allowed; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-payment-card[data-sg-balance-blocked="true"] :is(.sg-payment-card__icon, .sg-payment-card__content strong, .sg-send-payment-option__label) { color: #64748b; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-payment-card[data-sg-balance-blocked="true"] .sg-payment-card__icon { background: #e9edf3; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-wallet-status.is-loading::before { content: ""; flex: 0 0 18px; width: 18px; height: 18px; border: 2px solid #ffe1d6; border-top-color: #ff5c35; border-radius: 50%; animation: sg-balance-spin .8s linear infinite; }
+@keyframes sg-balance-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { :is(.salam-gate-page, .salam-gate-order-box) .sg-wallet-status.is-loading::before { animation: none; } }
+
+:is(.salam-gate-page, .salam-gate-order-box) .sg-wallet-status__refresh .dashicons { width:16px; height:16px; font-size:16px; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-wallet-status__refresh:disabled { opacity:.6; cursor:wait; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-wallet-status__actions a { width: auto; }

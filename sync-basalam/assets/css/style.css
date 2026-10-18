@@ -6035,6 +6035,149 @@ body>.basalam-info-modal {
   margin: 24px !important;
 }
 
+/* Dashboard only: keep the introduction and account connection panel aligned. */
+.basalam-home > .basalam-header,
+.basalam-home > .sg-connection-lock[data-connection-surface="woosalam"] {
+  width: 90%;
+  max-width: 1080px;
+  box-sizing: border-box;
+  border: 1px solid var(--basalam-gray-300);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(45, 55, 72, 0.04);
+}
+
+.basalam-home > .basalam-header {
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.basalam-home .basalam-header-data {
+  padding: 24px 28px;
+  gap: 24px;
+}
+
+.basalam-home .basalam-header-data img {
+  flex: 0 0 64px;
+  width: 64px;
+  height: 80px;
+  object-fit: contain;
+  margin: 0;
+}
+
+.basalam-home .basalam-header-data .basalam-description {
+  min-width: 0;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 2;
+  text-align: right !important;
+}
+
+.basalam-home > .sg-connection-lock[data-connection-surface="woosalam"] {
+  min-height: 350px;
+  box-shadow: none;
+  font-family: "PelakFA", Tahoma, sans-serif;
+}
+
+.basalam-home .sg-connection-lock__preview {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  opacity: 0.52;
+}
+
+/* Keep the real content in normal flow so long messages and zoom cannot clip it. */
+.basalam-home .sg-connection-lock__overlay {
+  position: relative;
+  inset: auto;
+  min-height: inherit;
+  box-sizing: border-box;
+  padding: 32px 24px;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.basalam-home .sg-connection-lock__panel {
+  width: 100%;
+  max-width: 520px;
+}
+
+.basalam-home .sg-connection-lock__icon {
+  width: 56px;
+  height: 56px;
+  border: 0;
+  border-radius: 16px;
+}
+
+.basalam-home .sg-connection-lock__icon::before {
+  content: "";
+  width: 30px;
+  height: 30px;
+  background-color: currentColor;
+  -webkit-mask: url("../salam-gate/images/salam-gate-icons/lock.svg") center / contain no-repeat;
+  mask: url("../salam-gate/images/salam-gate-icons/lock.svg") center / contain no-repeat;
+}
+
+.basalam-home .sg-connection-lock__title {
+  margin: 16px 0 10px;
+  font: 600 22px/1.6 "Morabba", "PelakFA", Tahoma, sans-serif;
+}
+
+.basalam-home .sg-connection-lock__message {
+  margin: 0 0 20px;
+  font: 400 14px/1.9 "PelakFA", Tahoma, sans-serif;
+  color: var(--basalam-gray-700);
+}
+
+.basalam-home .sg-connection-lock__button {
+  min-width: 180px;
+  border-radius: 10px;
+  font: 600 14px/1.7 "PelakFA", Tahoma, sans-serif;
+}
+
+@media screen and (min-width: 901px) and (max-width: 1200px) {
+  .basalam-home > .sg-connection-lock[data-connection-surface="woosalam"] {
+    max-width: 810px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .basalam-home > .basalam-header,
+  .basalam-home > .sg-connection-lock[data-connection-surface="woosalam"] {
+    width: 100%;
+  }
+
+  .basalam-home .basalam-header-data {
+    gap: 16px;
+    padding: 20px;
+  }
+
+  .basalam-home .basalam-header-data img {
+    flex-basis: auto;
+    width: 56px;
+    height: 70px;
+  }
+
+  .basalam-home .basalam-header-data .basalam-description {
+    margin: 0 !important;
+    font-size: 13px !important;
+    text-align: center !important;
+  }
+
+  .basalam-home .sg-connection-lock__overlay {
+    padding: 28px 20px;
+  }
+
+  .basalam-home .sg-connection-lock__title {
+    font-size: 20px;
+  }
+}
+
+@media (forced-colors: active) {
+  .basalam-home .sg-connection-lock__overlay {
+    background: Canvas;
+  }
+}
+
 .basalam-description-justify-important {
   text-align: justify !important;
 }

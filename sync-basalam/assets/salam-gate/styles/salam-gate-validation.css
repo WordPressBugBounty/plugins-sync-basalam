@@ -1,0 +1,27 @@
+[data-sg-validate].sg-validation-invalid {
+  border-color: #dc2649 !important;
+  box-shadow: 0 0 0 1px #dc2649 !important;
+}
+
+[data-sg-validate].sg-validation-invalid:focus {
+  border-color: #dc2649 !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 73, .13) !important;
+  outline: none;
+}
+
+.sg-validation-label-invalid {
+  color: #c91d3f !important;
+}
+
+.sg-validation-message {
+  display: block;
+  margin: 6px 0 0;
+  color: #c91d3f;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.8;
+  direction: rtl;
+  text-align: start;
+  overflow-wrap: anywhere;
+}

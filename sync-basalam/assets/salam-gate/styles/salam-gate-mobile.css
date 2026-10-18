@@ -1,0 +1,159 @@
+/* Shared SalamGate mobile layout, including dialogs opened from Woo orders.
+   Keep the desktop layout and WooCommerce's own controls untouched. */
+@media (max-width: 600px), (max-width: 900px) and (max-height: 500px) {
+  body.woosalam-sg-feedback:has(.salam-gate-page .sg-modal-overlay[aria-hidden='false'], #salam-gate-parcel-modal[aria-hidden='false'], .sg-picker-overlay) { overflow: hidden; }
+  .salam-gate-page.sg-router { width: calc(100% - 16px); margin: 12px auto; }
+  .salam-gate-page .sg-page-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .salam-gate-page .sg-page-nav__item { min-width: 0; min-height: 44px; padding: 8px 4px; font-size: 12px; text-align: center; }
+  .salam-gate-page :is(.sg-card, .sg-section) { min-width: 0; padding: 16px; }
+  .salam-gate-page .sg-section--tight { padding-inline: 0; }
+  .salam-gate-page :is(.sg-card__title, .sg-section__title, .sg-send__section-title) { overflow-wrap: anywhere; }
+  .salam-gate-page :is(.sg-button, .sgp-tool, .sg-check, .sg-faq__q),
+  .salam-gate-order-box :is(.sg-order-primary, .sg-order-secondary, .sg-native-parcel__action) { min-height: 44px; }
+  /* 16px editable text also avoids automatic input zoom on iOS. */
+  :is(.salam-gate-page, .salam-gate-order-box) :is(.sg-field__input, .basalam-input),
+  #salam-gate-parcel-modal :is(.basalam-input, .sg-item-weight),
+  .salam-gate-page .sgp-search input[type='search'],
+  .sg-picker-overlay input.sg-picker-search__input { font-size: 16px; }
+  .salam-gate-page :is(.sg-send__addresses, .sg-wizard__row2) { gap: 14px; }
+  .salam-gate-page .sg-send__address-card { padding: 14px; }
+  .salam-gate-page .sg-send .sg-items-table input { min-height: 44px; font-size: 16px; }
+  .salam-gate-page .sg-send .sg-items-table td[data-label='عملیات'] button.button { min-width: 44px; min-height: 44px; }
+  .salam-gate-page .sg-send__markets { gap: 8px; }
+  .salam-gate-page .sg-send__markets input[type='radio'] { width: 18px; height: 18px; min-width: 18px; margin: 0; }
+  .salam-gate-page .sg-basalam-orders { padding: 14px 10px; }
+  .salam-gate-page .sg-basalam-order { gap: 10px; padding: 12px; }
+  .salam-gate-page .sg-basalam-order__action .sg-button { min-height: 44px; }
+  .salam-gate-page .sg-po-filters { padding: 14px; }
+  .salam-gate-page .sg-po-result-heading { flex-wrap: wrap; gap: 8px; }
+  .salam-gate-page .sg-po-card { padding: 14px; }
+  .salam-gate-page .sg-po-card__details { gap: 12px 10px; }
+  .salam-gate-page .sg-po-card__details a { display: inline-flex; align-items: center; min-height: 44px; }
+  .salam-gate-page .sg-view--settings .sg-settings__addr { padding: 14px; }
+  .salam-gate-page .sg-view--settings .sg-card__title { font-size: 16px; }
+  .salam-gate-page .sg-view--activation .sg-wizard { padding: 14px; }
+  .salam-gate-page .sg-view--activation .sg-field__input { font-size: 16px; }
+
+  /* A parcel remains one card with its original controls and eligibility. */
+  .salam-gate-page .sgp-section .sgp-table tr[data-parcel-id] { padding: 14px; gap: 12px; box-shadow: 0 3px 12px #25334806; }
+  .salam-gate-page .sgp-section .sgp-table tr[data-parcel-id].sgp-row--paid { border-inline-start: 3px solid #54a980; background: #f9fdfb; }
+  .salam-gate-page .sgp-section .sgp-row--paid > td,
+  .salam-gate-page .sgp-section .sgp-row--paid > td:first-child { background: transparent; box-shadow: none; }
+  .salam-gate-page .sgp-section .sgp-table td:nth-child(1) { order: 1; }
+  .salam-gate-page .sgp-section .sgp-table td:nth-child(2) { order: 2; }
+  .salam-gate-page .sgp-section .sgp-table td:nth-child(3) { order: 3; }
+  .salam-gate-page .sgp-section .sgp-table td:nth-child(4) { order: 4; }
+  .salam-gate-page .sgp-section .sgp-table td:nth-child(6) { order: 5; }
+  .salam-gate-page .sgp-section .sgp-table td:nth-child(5) { order: 6; grid-column: 1 / -1; }
+  .salam-gate-page .sgp-section .sgp-table td:nth-child(7) { order: 7; grid-column: 1 / -1; }
+  .salam-gate-page .sgp-section .sgp-table td:nth-child(8) { order: 8; }
+  .salam-gate-page .sgp-section .sgp-table td:has(> .sgp-tracking-empty) { display: none; }
+  .salam-gate-page .sgp-section .sgp-status { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .salam-gate-page .sgp-section .sgp-table td.sgp-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding-top: 12px; border-top: 1px solid #e8edf3; }
+  .salam-gate-page .sgp-section .sgp-table td.sgp-actions::before { display: none; }
+  .salam-gate-page .sgp-section .sgp-actions__buttons { grid-column: 1 / -1; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .salam-gate-page .sgp-section .sgp-actions__buttons > :only-child { grid-column: 1 / -1; }
+  .salam-gate-page .sgp-section .sgp-table .sgp-actions .sgp-actions__buttons > button { width: 100%; min-height: 44px; height: auto; }
+  .salam-gate-page .sgp-section .sgp-detail__text { opacity: 1; }
+  .salam-gate-page .sgp-section .sgp-actions .sgp-row-select { grid-column: 1 / -1; min-height: 44px; }
+  .salam-gate-page .sgp-section .sgp-tracking-cell .sgp-track { min-height: 44px; }
+  .salam-gate-page .sgp-section .sgp-tool { flex-basis: 44px; width: 44px; height: 44px; }
+  .salam-gate-page .sgp-search { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 0; margin: 12px 0; }
+  .salam-gate-page .sgp-search input[type='search'] { width: 100%; grid-column: 1; padding: 10px 12px; }
+  .salam-gate-page .sgp-search__clear { grid-column: 2; grid-row: 1; width: 32px; height: 44px; }
+  .salam-gate-page .sgp-search > .sg-button { grid-column: 1 / -1; min-height: 44px; }
+  .salam-gate-page .sgp-selection__actions > button { flex: 1 1 100%; }
+
+  /* Keep the close button and footer visible; only the dialog body scrolls. */
+  .salam-gate-page .sg-modal-overlay,
+  .salam-gate-page.salam-gate-modal-overlay { padding: 8px; padding-top: max(8px, env(safe-area-inset-top)); padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+  .salam-gate-page .sg-modal-overlay .sg-modal,
+  .salam-gate-page.salam-gate-modal-overlay .salam-gate-modal { min-width: 0; max-width: 100%; max-height: calc(100vh - 16px); max-height: calc(100dvh - max(8px, env(safe-area-inset-top)) - max(8px, env(safe-area-inset-bottom))); border-radius: 14px; }
+  .salam-gate-page .sg-modal-overlay :is(.sg-modal__header, .sg-modal__body, .sg-modal__footer),
+  .salam-gate-page.salam-gate-modal-overlay :is(.salam-gate-modal__header, .salam-gate-modal__body) { padding: 12px 14px; }
+  .salam-gate-page .sg-modal-overlay .sg-modal__header { gap: 8px; }
+  .salam-gate-page .sg-modal-overlay .sg-modal__header :is(h3, h4) { min-width: 0; font-size: 15px; overflow-wrap: anywhere; }
+  .salam-gate-page .sg-modal-overlay .sg-modal__close,
+  .salam-gate-page.salam-gate-modal-overlay .basalam-modal-close-abs { flex: 0 0 44px; width: 44px; height: 44px; min-height: 44px; }
+  .salam-gate-page .sg-modal-overlay .sg-modal__body,
+  .salam-gate-page.salam-gate-modal-overlay .salam-gate-modal__body { min-height: 0; overscroll-behavior: contain; scrollbar-width: thin; }
+  .salam-gate-page .sg-modal-overlay .sg-modal__footer { flex-wrap: wrap; gap: 8px; }
+  .salam-gate-page .sg-modal-overlay .sg-modal__footer .sg-button { min-width: 0; min-height: 44px; margin: 0; padding: 8px 10px; white-space: normal; line-height: 1.8; }
+  .salam-gate-page #sgp-detail-modal .sgd-section { padding: 12px; }
+  .salam-gate-page #sgp-detail-modal .sgd-items .sg-wizard__review-row { flex-wrap: wrap; gap: 4px 12px; }
+  .salam-gate-page #sgp-detail-modal .sgd-items dt { min-width: 0; overflow-wrap: anywhere; }
+  .salam-gate-page #sgp-checkout-modal [data-sgpc-summary] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .salam-gate-page #sgp-checkout-modal [data-sgpc-summary] > :last-child { grid-column: 1 / -1; }
+
+  #salam-gate-parcel-modal :is(.salam-gate-modal__header, .salam-gate-modal__body) { padding: 12px 14px; }
+  #salam-gate-parcel-modal.is-confirm-stage .salam-gate-modal__body { padding: 12px 14px; }
+  #salam-gate-parcel-modal .sg-order-steps { gap: 6px; margin-bottom: 12px; }
+  #salam-gate-parcel-modal .sg-order-checkout-footer { margin: 4px -14px -12px; padding: 10px 14px; }
+  #salam-gate-parcel-modal .sg-order-steps button { height: 100%; min-height: 66px; padding: 6px 3px; }
+  #salam-gate-parcel-modal .salam-gate-fieldset { padding: 12px; }
+  #salam-gate-parcel-modal .sg-order-information-panels { gap: 12px; }
+  #salam-gate-parcel-modal .sg-order-information-panels :is(.sg-order-receiver-summary, .sg-order-sender-details) { padding: 10px; gap: 8px 12px; grid-auto-rows: auto; }
+  #salam-gate-parcel-modal .sg-order-receiver-edit { min-height: 44px; padding: 6px 10px; }
+  #salam-gate-parcel-modal .sg-order-form-actions { bottom: -12px; margin: 12px -14px -12px; padding: 10px 14px; gap: 8px; }
+  #salam-gate-parcel-modal .sg-order-form-actions > p { flex-basis: 100%; }
+  #salam-gate-parcel-modal .sg-order-form-actions > button { flex: 1 1 auto; min-width: 0; min-height: 44px; white-space: normal; }
+  #salam-gate-parcel-modal.is-confirm-stage .sg-order-form-actions,
+  #salam-gate-parcel-modal .sg-order-checkout-footer { position: sticky; bottom: -12px; z-index: 2; margin: 12px -14px -12px; padding: 10px 14px; background: #fff; border-top: 1px solid #e2e8f0; }
+  #salam-gate-parcel-modal .sg-order-checkout-footer { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  #salam-gate-parcel-modal .sg-order-checkout-total { gap: 8px; flex-wrap: wrap; }
+  #salam-gate-parcel-modal .sg-order-checkout-total strong { font-size: 16px; }
+  #salam-gate-parcel-modal .sg-quote-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  #salam-gate-parcel-modal .sg-quote-actions > button { width: 100%; min-width: 0; min-height: 44px; padding: 8px; white-space: normal; }
+  #salam-gate-parcel-modal .sg-order-checkout-footer .salam-gate-select-quote { min-width: 0; }
+  #salam-gate-parcel-modal .sg-items-table tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; padding: 12px 0; }
+  #salam-gate-parcel-modal .sg-items-table td { min-width: 0; padding: 0; }
+  #salam-gate-parcel-modal .sg-items-table input { font-size: 16px; }
+  #salam-gate-parcel-modal .sg-items-table td:is(:first-child, :nth-child(4), :last-child) { grid-column: 1 / -1; }
+  #salam-gate-parcel-modal .sg-items-table td:last-child:empty,
+  #salam-gate-parcel-modal .sg-items-table td:has([data-sg-order-remove-item]:disabled) { display: none; }
+  #salam-gate-parcel-modal .sg-order-cost-row,
+  #salam-gate-parcel-modal .sg-order-cost-payable { flex-wrap: wrap; gap: 4px 10px; }
+  #salam-gate-parcel-modal .sg-order-cost-payable strong { font-size: 17px; }
+  #salam-gate-parcel-modal .sg-order-cost-row dd,
+  #salam-gate-parcel-modal .sg-order-cost-payable strong { margin-inline-start: auto; }
+  #salam-gate-parcel-modal .sg-order-remove-dialog button { min-height: 44px; }
+
+  .sg-picker-overlay { padding: 8px; }
+  .sg-picker-dialog { max-height: calc(100vh - 16px); max-height: calc(100dvh - 16px); padding: 14px; }
+  .sg-picker-dialog__header { position: sticky; top: -14px; z-index: 2; padding-block: 4px; background: #fff; }
+  .sg-picker-dialog__close { flex-basis: 44px; width: 44px; height: 44px; }
+  .sg-picker-dialog__title { overflow-wrap: anywhere; }
+  .sg-picker-option { min-height: 44px; }
+  .sg-calendar__nav-button { width: 44px; height: 44px; }
+  .woosalam-sg-feedback .basalam-toast { padding: 12px; }
+  .woosalam-sg-feedback .basalam-toast__close { min-width: 44px; min-height: 44px; }
+  .woosalam-sg-feedback .basalam-toast__message { overflow-wrap: anywhere; }
+}
+
+@media (max-width: 360px) {
+  .salam-gate-page :is(.sg-card, .sg-section) { padding: 14px; }
+  .salam-gate-page .sg-section--tight { padding-inline: 0; }
+  .salam-gate-page .sg-modal-overlay .sg-modal__footer { flex-direction: column; align-items: stretch; }
+  .salam-gate-page .sg-modal-overlay .sg-modal__footer .sg-button { flex: 0 0 auto; width: 100%; }
+  .salam-gate-page #sgp-detail-modal .sg-modal__footer { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .salam-gate-page .sg-order-preview__recipient-fields,
+  .salam-gate-page #sgp-detail-modal .sgd-grid { gap: 10px 8px; }
+  .salam-gate-page .sgp-section .sgp-table tr[data-parcel-id] { padding: 12px; gap: 10px; }
+  .salam-gate-page .sgp-section .sgp-actions__buttons { grid-template-columns: minmax(0, 1fr); }
+  #salam-gate-parcel-modal.is-confirm-stage .sg-order-form-actions { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .sg-picker-dialog { padding: 12px; }
+}
+
+/* Landscape phones and short desktop windows need room for the content too. */
+@media (max-height: 500px) and (min-width: 601px) {
+  #sg-bulk-shipping-modal { padding: 8px; }
+  #sg-bulk-shipping-modal .sgb-dialog { max-height: calc(100dvh - 16px); }
+  #sg-bulk-shipping-modal .sgb-header { padding: 8px 14px; }
+  #sg-bulk-shipping-modal .sgb-steps { padding-block: 6px; }
+  #sg-bulk-shipping-modal .sgb-footer { padding: 8px 14px; }
+  #salam-gate-parcel-modal { padding: 8px; }
+  #salam-gate-parcel-modal .salam-gate-modal { max-height: calc(100dvh - 16px); }
+  #salam-gate-parcel-modal .salam-gate-modal__header { padding: 8px 14px; }
+  #salam-gate-parcel-modal .sg-order-steps { margin-bottom: 10px; }
+  #salam-gate-parcel-modal .sg-order-steps button { min-height: 38px; }
+}

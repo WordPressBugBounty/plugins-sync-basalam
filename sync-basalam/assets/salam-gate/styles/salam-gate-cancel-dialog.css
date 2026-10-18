@@ -1,0 +1,46 @@
+#sgp-detail-modal .sg-parcel-cancel-dialog {
+  width: min(440px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 40px);
+  margin: auto;
+  padding: 28px 24px 24px;
+  box-sizing: border-box;
+  border: 1px solid #e3e8ef;
+  border-radius: 18px;
+  background: #fff;
+  color: #334155;
+  font-family: inherit;
+  direction: rtl;
+  box-shadow: 0 24px 80px #17203333;
+  overflow: auto;
+}
+#sgp-detail-modal .sg-parcel-cancel-dialog::backdrop { background: #17203366; backdrop-filter: blur(5px); }
+#sgp-detail-modal .sg-parcel-cancel-dialog[open] { animation: sg-cancel-dialog-in .16s ease-out; }
+#sgp-detail-modal .sg-parcel-cancel-dialog__close {
+  position: absolute; top: 12px; inset-inline-end: 12px;
+  display: grid; place-items: center; width: 32px; height: 32px; padding: 0;
+  border: 1px solid #e4eaf1; border-radius: 9px; background: #fff;
+  color: #64748b; font: inherit; font-size: 23px; line-height: 1; cursor: pointer;
+}
+#sgp-detail-modal .sg-parcel-cancel-dialog__close:hover { background: #f8fafc; color: #334155; }
+#sgp-detail-modal .sg-parcel-cancel-dialog .sgd-cancel-review {
+  display: block; margin: 0; padding: 0; border: 0; background: none; text-align: center;
+}
+#sgp-detail-modal .sg-parcel-cancel-dialog .sgd-cancel-review > .dashicons {
+  display: grid; place-items: center; width: 50px; height: 50px; margin: 0 auto 14px;
+  border-radius: 15px; background: #fff0ee; color: #b42318; font-size: 26px;
+}
+#sgp-detail-modal .sg-parcel-cancel-dialog .sgd-cancel-review h5 { margin: 0 0 10px; color: #263348; font-size: 18px; line-height: 1.8; }
+#sgp-detail-modal .sg-parcel-cancel-dialog .sgd-cancel-review p { color: #64748b; font-size: 13px; line-height: 2; }
+#sgp-detail-modal .sg-parcel-cancel-dialog .sgd-cancel-review__actions { display: flex; gap: 10px; margin-top: 22px; }
+#sgp-detail-modal .sg-parcel-cancel-dialog .sgd-cancel-review__actions .sg-button { flex: 1; min-height: 42px; padding: 9px 12px; justify-content: center; font-size: 12px; }
+#sgp-detail-modal .sg-parcel-cancel-dialog .sgd-cancel-danger { background: #b42318; border-color: #b42318; color: #fff; }
+#sgp-detail-modal .sg-parcel-cancel-dialog .sgd-cancel-danger:hover:not(:disabled) { background: #912018; border-color: #912018; }
+#sgp-detail-modal .sg-parcel-cancel-dialog button:focus-visible { outline: 2px solid #b42318; outline-offset: 3px; }
+#sgp-detail-modal .sg-parcel-cancel-dialog button:disabled { opacity: .6; cursor: wait; }
+@keyframes sg-cancel-dialog-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 480px) {
+  #sgp-detail-modal .sg-parcel-cancel-dialog { padding: 26px 18px 18px; }
+  #sgp-detail-modal .sg-parcel-cancel-dialog .sgd-cancel-review__actions { gap: 8px; }
+}
+@media (prefers-reduced-motion: reduce) { #sgp-detail-modal .sg-parcel-cancel-dialog[open] { animation: none; } }

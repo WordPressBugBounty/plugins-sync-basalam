@@ -4,6 +4,7 @@ namespace SyncBasalam\Actions\Controller\ProductActions;
 
 use SyncBasalam\JobManager;
 use SyncBasalam\Actions\Controller\ActionController;
+use SyncBasalam\Services\AsyncWorkerHealth;
 
 defined('ABSPATH') || exit;
 
@@ -37,5 +38,6 @@ class CancelCreateProducts extends ActionController
             }
         }
         delete_option('sync_basalam_last_creatable_product_id');
+        (new AsyncWorkerHealth())->clearInterruption();
     }
 }

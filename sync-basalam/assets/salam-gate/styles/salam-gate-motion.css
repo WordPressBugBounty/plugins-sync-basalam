@@ -1,0 +1,73 @@
+/* The existing menu truck, animated locally with CSS; no library, timer or remote asset. */
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-bulk-shipping-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sgp-checkout-modal) :is(.sg-loading-spinner, .sg-order-loading__spinner, .sg-list-native-loading__spinner, .sg-order-preview__spinner, [data-calc-spinner])[hidden] { display: none !important; }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-bulk-shipping-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sgp-checkout-modal) :is(.sg-loading-spinner, .sg-order-loading__spinner, .sg-list-native-loading__spinner, .sg-order-preview__spinner, [data-calc-spinner]),
+.salam-gate-order-box .sg-order-box-loader::before,
+.salam-gate-order-box .sg-native-parcels.is-loading .sg-native-parcels__message::before,
+:is(.salam-gate-page, .salam-gate-order-box) .sg-wallet-status.is-loading::before,
+.salam-gate-order-box .sg-order-source.is-loading .sg-order-source__refresh > .dashicons {
+  display: inline-block;
+  position: relative;
+  width: 112px;
+  height: 76px;
+  min-width: 0;
+  min-height: 0;
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  color: #ff5c35;
+  font-size: 0;
+  background: url('../images/salam-gate-truck.svg') right center / 88px 72px no-repeat;
+  opacity: 1;
+  visibility: visible;
+  animation: sg-truck-hustle .48s ease-in-out infinite;
+}
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-bulk-shipping-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sgp-checkout-modal) :is(.sg-loading-spinner, .sg-order-loading__spinner, .sg-list-native-loading__spinner, .sg-order-preview__spinner, [data-calc-spinner])::before {
+  content: '';
+  position: absolute;
+  inset-inline-end: auto;
+  left: 0;
+  top: 38%;
+  width: 22%;
+  height: 26%;
+  background: linear-gradient(#ff5c35, #ff5c35) 100% 0 / 70% 2px no-repeat,
+    linear-gradient(#ff5c35, #ff5c35) 0 50% / 100% 2px no-repeat,
+    linear-gradient(#ff5c35, #ff5c35) 100% 100% / 55% 2px no-repeat;
+  animation: sg-truck-wind .6s linear infinite;
+}
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-bulk-shipping-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sgp-checkout-modal) :is(.sg-loading-spinner, .sg-order-loading__spinner, .sg-list-native-loading__spinner, .sg-order-preview__spinner, [data-calc-spinner])::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: repeating-linear-gradient(90deg, #ffb296 0 12px, transparent 12px 20px);
+  animation: sg-truck-road .5s linear infinite;
+}
+.sg-load-indicator .sg-loading-spinner { margin: 0 0 8px; }
+.salam-gate-order-box .sg-order-box-loader::before { display: block; margin: 0 auto 10px; }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-wallet-status.is-loading::before,
+.salam-gate-order-box .sg-native-parcels.is-loading .sg-native-parcels__message::before,
+.salam-gate-order-box .sg-order-source.is-loading .sg-order-source__refresh > .dashicons,
+.salam-gate-page .sg-refresh-state__spinner,
+.salam-gate-page [data-calc-spinner] {
+  width: 44px; height: 30px; background-size: 34px 28px; vertical-align: middle;
+}
+.salam-gate-order-box .sg-native-parcels.is-loading .sg-native-parcels__message::before { margin-inline-end: 8px; }
+.sg-load-indicator [data-sg-load-message]:empty,
+.sg-state--loading [data-sg-account-load-message]:empty { display: none; }
+@keyframes sg-truck-hustle { 0%, 100% { transform: translateY(0); } 35% { transform: translateY(-2px) rotate(-1deg); } 70% { transform: translateY(1px); } }
+@keyframes sg-truck-wind { from { transform: translateX(4px); opacity: .8; } to { transform: translateX(-8px); opacity: .1; } }
+@keyframes sg-truck-road { to { background-position: -20px 0; } }
+@media (prefers-reduced-motion: reduce) {
+  :is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-bulk-shipping-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sgp-checkout-modal) :is(.sg-loading-spinner, .sg-order-loading__spinner, .sg-list-native-loading__spinner, .sg-order-preview__spinner, [data-calc-spinner]),
+  :is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-bulk-shipping-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sgp-checkout-modal) :is(.sg-loading-spinner, .sg-order-loading__spinner, .sg-list-native-loading__spinner, .sg-order-preview__spinner, [data-calc-spinner])::before,
+  :is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-bulk-shipping-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sgp-checkout-modal) :is(.sg-loading-spinner, .sg-order-loading__spinner, .sg-list-native-loading__spinner, .sg-order-preview__spinner, [data-calc-spinner])::after,
+  .salam-gate-order-box .sg-order-box-loader::before,
+  .salam-gate-order-box .sg-native-parcels.is-loading .sg-native-parcels__message::before,
+  :is(.salam-gate-page, .salam-gate-order-box) .sg-wallet-status.is-loading::before,
+  .salam-gate-order-box .sg-order-source.is-loading .sg-order-source__refresh > .dashicons { animation: none; transform: none; }
+}

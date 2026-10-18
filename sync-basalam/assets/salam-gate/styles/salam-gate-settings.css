@@ -1,0 +1,99 @@
+/* Sender settings and guide are scoped to SalamGate, including their dialogs. */
+.salam-gate-page .sg-view--settings .sg-settings { gap: 20px; }
+.salam-gate-page .sg-view--settings .sg-settings__group { scroll-margin-top: 76px; }
+.salam-gate-page .sg-view--settings .sg-card__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--sg-font-body);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.8;
+}
+.salam-gate-page .sg-view--settings .sg-card__title > .dashicons { color: var(--sg-accent); }
+.salam-gate-page .sg-view--settings .sg-card__detail,
+.salam-gate-page .sg-view--settings .sg-section__desc { font-size: 14px; line-height: 2; }
+.salam-gate-page .sg-view--settings .sg-settings__nav { gap: 12px; }
+.salam-gate-page .sg-view--settings .sg-settings__nav a {
+  padding: 16px;
+  background: #fafbfc;
+  border-radius: 14px;
+  text-decoration: none;
+}
+.salam-gate-page .sg-view--settings .sg-settings__nav strong { font-size: 14px; font-weight: 700; }
+.salam-gate-page .sg-view--settings .sg-settings__nav small { font-size: 12px; line-height: 1.8; }
+.salam-gate-page .sg-view--settings .sg-settings__address-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+.salam-gate-page .sg-view--settings .sg-settings__addr {
+  min-width: 0;
+  margin: 0;
+  padding: 22px;
+  border: 1px solid var(--sg-border);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 3px 14px #2d374806;
+}
+.salam-gate-page .sg-view--settings .sg-settings__addr-head {
+  padding-bottom: 15px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--sg-border);
+}
+.salam-gate-page .sg-view--settings .sg-settings__addr-body > strong { font-size: 16px; font-weight: 700; }
+.salam-gate-page .sg-view--settings .sg-settings__addr-body .sg-card__detail { margin: 8px 0 0; }
+.salam-gate-page .sg-view--settings .sg-settings__addr .sg-card__actions { margin-top: 18px; }
+.salam-gate-page .sg-view--settings .sg-settings__tools { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 14px; }
+.salam-gate-page .sg-view--settings .sg-settings__tools a {
+  padding: 20px;
+  min-height: 94px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 3px 14px #2d374805;
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+.salam-gate-page .sg-view--settings .sg-settings__tools a:hover {
+  transform: translateY(-3px);
+  border-color: #ffc3b2;
+  box-shadow: 0 7px 18px #ff5c350e;
+  background: #fffaf7;
+}
+.salam-gate-page .sg-view--settings .sg-settings__tools strong { font-size: 15px; font-weight: 700; }
+.salam-gate-page .sg-view--settings .sg-settings__tools small { font-size: 12px; line-height: 1.9; }
+.salam-gate-page .sg-view--settings .sg-settings__help .sg-section__title {
+  font-family: var(--sg-font-body);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.9;
+}
+.salam-gate-page .sg-view--settings .sg-faq__item { border-radius: 12px; background: #fafbfc; }
+.salam-gate-page .sg-view--settings .sg-faq__q { padding: 15px 18px; font-size: 14px; font-weight: 600; }
+.salam-gate-page .sg-view--settings .sg-faq__a { margin: 0; padding: 0 18px 16px; font-size: 13px; line-height: 2; }
+.salam-gate-page [data-sg-address-details-modal] .sg-modal.sg-address-details { width: min(640px, 100%); border-radius: 18px; }
+.salam-gate-page [data-sg-address-details-modal] .sg-modal__header { padding: 20px 26px; }
+.salam-gate-page [data-sg-address-details-modal] .sg-modal__body { padding: 24px 26px; gap: 22px; }
+.salam-gate-page [data-sg-address-details-modal] .sg-modal__header h4,
+.salam-gate-page [data-sg-address-edit-modal] .sg-modal__header h4 { font-family: var(--sg-font-body); font-size: 17px; font-weight: 700; }
+.salam-gate-page [data-sg-address-details-modal] .sg-address-details__location { display: grid; gap: 12px; margin: 0 0 4px; padding-bottom: 18px; border-bottom: 1px solid var(--sg-border); }
+.salam-gate-page [data-sg-address-details-modal] .sg-address-details__location > div { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.salam-gate-page [data-sg-address-details-modal] .sg-address-details__location dt { color: var(--sg-muted); font-size: 13px; }
+.salam-gate-page [data-sg-address-details-modal] .sg-address-details__location dd { margin: 0; font-size: 14px; font-weight: 700; }
+.salam-gate-page [data-sg-address-details-modal] .sg-field__label { font-size: 14px; font-weight: 600; }
+.salam-gate-page [data-sg-address-details-modal] .sg-field__input { min-height: 48px; font-size: 14px; font-weight: 500; }
+.salam-gate-page [data-sg-address-details-modal] textarea.sg-field__input { min-height: 88px; line-height: 1.9; }
+.salam-gate-page [data-sg-address-details-modal] .sg-address-details__field-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.salam-gate-page [data-sg-address-details-modal] [data-sg-address-length] { color: var(--sg-muted); font-size: 11px; white-space: nowrap; }
+@media (max-width: 782px) {
+  .salam-gate-page .sg-view--settings .sg-settings__tools { grid-template-columns: minmax(0, 1fr); }
+  .salam-gate-page .sg-view--settings .sg-settings__addr { padding: 18px; }
+}
+@media (max-width: 480px) {
+  .salam-gate-page [data-sg-address-details-modal] .sg-modal__body,
+  .salam-gate-page [data-sg-address-details-modal] .sg-modal__header { padding: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .salam-gate-page .sg-view--settings .sg-settings__tools a { transition: none; }
+  .salam-gate-page .sg-view--settings .sg-settings__tools a:hover { transform: none; }
+}

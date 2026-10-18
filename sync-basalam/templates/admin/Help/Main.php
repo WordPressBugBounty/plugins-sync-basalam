@@ -27,10 +27,12 @@ defined('ABSPATH') || exit;
             <button class="basalam-category-tab" data-category="محصولات">مدیریت محصولات</button>
             <button class="basalam-category-tab" data-category="سفارشات">مدیریت سفارشات</button>
             <button class="basalam-category-tab" data-category="همگام‌سازی">همگام‌سازی</button>
+            <?php do_action('sync_basalam_help_categories'); ?>
         </div>
 
         <div class="basalam-faq-sections">
             <?php CommonComponents::renderFaqByCategory(Faq::getCategories()) ?>
+            <?php do_action('sync_basalam_help_sections'); ?>
         </div>
     </div>
 

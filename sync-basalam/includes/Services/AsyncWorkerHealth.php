@@ -54,6 +54,14 @@ class AsyncWorkerHealth
         $this->save($state);
     }
 
+    /** Clear a warning after an administrator explicitly cancels the queue. */
+    public function clearInterruption(): void
+    {
+        $state = $this->getState();
+        unset($state['interruption'], $state['interrupted_at'], $state['litespeed']);
+        $this->save($state);
+    }
+
     public function getNotice(): ?array
     {
         $state = $this->getState();
@@ -88,6 +96,27 @@ class AsyncWorkerHealth
 
     protected function isLiteSpeed(): bool
     {
+        // Apache can use LSAPI; PHP_SAPI alone does not identify the web server.
+        // The server sets this marker only for the queue endpoint inside !LiteSpeed.
+        foreach (['SYNCBASALAM_NOT_LITESPEED', 'REDIRECT_SYNCBASALAM_NOT_LITESPEED'] as $name) {
+            if ((string) ($_SERVER[$name] ?? '') === '1' || (string) getenv($name) === '1') {
+                return false;
+            }
+        }
+
+        // Some Apache+LSAPI hosts do not preserve the scoped marker. A clear
+        // Apache server signature is still stronger evidence than PHP_SAPI,
+        // which LSAPI reports as "litespeed" even when LiteSpeed is absent.
+        $serverSoftware = strtolower((string) (
+            $_SERVER['SERVER_SOFTWARE'] ?? getenv('SERVER_SOFTWARE') ?? ''
+        ));
+        if ($serverSoftware !== ''
+            && strpos($serverSoftware, 'apache') !== false
+            && strpos($serverSoftware, 'litespeed') === false
+        ) {
+            return false;
+        }
+
         return PHP_SAPI === 'litespeed';
     }
 

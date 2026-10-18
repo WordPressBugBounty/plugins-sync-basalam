@@ -1,0 +1,19 @@
+/* Feedback is floating; field validation remains linked for assistive technology. */
+.woosalam-sg-feedback .basalam-toast-container { position: fixed; top: 50px; right: 20px; left: auto; z-index: 999999; max-width: 430px; gap: 10px; }
+.woosalam-sg-feedback .basalam-toast { border-radius: 16px; padding: 18px; box-shadow: 0 12px 40px #172b4d22; border: 1px solid #e4eaf2; border-inline-start: 4px solid #ff5c35; }
+.woosalam-sg-feedback .basalam-toast--error { border-inline-start-color: #d8394d; }
+.woosalam-sg-feedback .basalam-toast--success { border-inline-start-color: #168765; }
+.woosalam-sg-feedback .basalam-toast--warning { border-inline-start-color: #d48b13; }
+.woosalam-sg-feedback .basalam-toast__icon { width: 34px; height: 34px; border-radius: 10px; background: #f7f9fc; margin-top: 0; }
+.woosalam-sg-feedback .basalam-toast__message { line-height: 1.9; }
+.woosalam-sg-feedback .basalam-toast__close { min-width: 28px; min-height: 28px; border-radius: 8px; }
+.woosalam-sg-feedback #woosalam-notification-fallback { position: fixed; top: 54px; right: 20px; z-index: 999999; width: min(400px, calc(100vw - 40px)); box-sizing: border-box; padding: 18px 20px; border: 1px solid #e3eaf4; border-inline-start: 4px solid #ff5c35; border-radius: 16px; background: #fff; box-shadow: 0 12px 40px #172b4d22; direction: rtl; font: 14px/1.9 var(--sg-font-body); }
+.woosalam-sg-feedback #woosalam-notification-fallback.notice-error { border-inline-start-color: #d8394d; }
+.woosalam-sg-feedback :is(.salam-gate-page, .salam-gate-modal) .sg-field__error,
+.woosalam-sg-feedback :is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal) .sg-validation-message:not(.sg-validation-limit),
+.woosalam-sg-feedback .sg-feedback-actions > p { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; clip: rect(0, 0, 0, 0); clip-path: inset(50%); overflow: hidden !important; white-space: nowrap; border: 0 !important; }
+.woosalam-sg-feedback .sg-feedback-toast-only { display: none !important; }
+.woosalam-sg-feedback .sg-feedback-actions { border: 0 !important; background: transparent !important; padding: 8px 0 !important; margin: 0 !important; }
+@media (max-width: 782px) { .woosalam-sg-feedback .basalam-toast-container, .woosalam-sg-feedback #woosalam-notification-fallback { top: 62px; } }
+@media (max-width: 600px) { .woosalam-sg-feedback .basalam-toast-container { right: 12px; left: 12px; width: auto; max-width: none; } }
+@media (prefers-reduced-motion: reduce) { .woosalam-sg-feedback .basalam-toast { transition: none; transform: none; } .woosalam-sg-feedback .basalam-toast__progress-bar { animation: none; } }

@@ -4,6 +4,7 @@ namespace SyncBasalam\Actions\Controller\ProductActions;
 
 use SyncBasalam\JobManager;
 use SyncBasalam\Actions\Controller\ActionController;
+use SyncBasalam\Services\AsyncWorkerHealth;
 
 defined('ABSPATH') || exit;
 
@@ -26,6 +27,7 @@ class CancelUpdateProducts extends ActionController
 
         $this->deleteAllBatches();
         $this->clearAllLocks();
+        (new AsyncWorkerHealth())->clearInterruption();
     }
 
     private function deleteAllBatches()

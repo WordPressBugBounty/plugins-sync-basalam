@@ -1,0 +1,127 @@
+/* Gentlecons by Konstantin Filatov, CC BY 4.0. Attribution and original URLs:
+ * ../images/salam-gate-icons/README.md. All assets are local and inherit color.
+ * Preserve existing decorative icon containers and JavaScript class contracts.
+ */
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) :is(.dashicons-admin-home, .dashicons-admin-page, .dashicons-admin-tools, .dashicons-admin-users, .dashicons-archive, .dashicons-arrow-left-alt2, .dashicons-arrow-right-alt2, .dashicons-book-alt, .dashicons-calculator, .dashicons-car, .dashicons-chart-line, .dashicons-clipboard, .dashicons-clock, .dashicons-controls-repeat, .dashicons-download, .dashicons-edit, .dashicons-info-outline, .dashicons-list-view, .dashicons-location, .dashicons-location-alt, .dashicons-lock, .dashicons-money-alt, .dashicons-no-alt, .dashicons-plus-alt2, .dashicons-printer, .dashicons-search, .dashicons-shield, .dashicons-store, .dashicons-trash, .dashicons-update, .dashicons-upload, .dashicons-visibility, .dashicons-yes, .dashicons-yes-alt, .dashicons-airplane, .dashicons-admin-generic, .dashicons-admin-network)::before {
+  content: "";
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+  vertical-align: middle;
+  background-color: currentColor;
+  -webkit-mask: var(--sg-icon) center / contain no-repeat;
+  mask: var(--sg-icon) center / contain no-repeat;
+}
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-admin-home { --sg-icon: url("../images/salam-gate-icons/home.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-admin-page { --sg-icon: url("../images/salam-gate-icons/copy.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-admin-tools { --sg-icon: url("../images/salam-gate-icons/wrench.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-admin-users { --sg-icon: url("../images/salam-gate-icons/user.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-archive { --sg-icon: url("../images/salam-gate-icons/box.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-arrow-left-alt2 { --sg-icon: url("../images/salam-gate-icons/arrow-left.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-arrow-right-alt2 { --sg-icon: url("../images/salam-gate-icons/arrow-right.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-book-alt { --sg-icon: url("../images/salam-gate-icons/book.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-calculator { --sg-icon: url("../images/salam-gate-icons/calculator.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-car { --sg-icon: url("../images/salam-gate-icons/truck.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-chart-line { --sg-icon: url("../images/salam-gate-icons/chart-line.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-clipboard { --sg-icon: url("../images/salam-gate-icons/invoice.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-clock { --sg-icon: url("../images/salam-gate-icons/time.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-controls-repeat { --sg-icon: url("../images/salam-gate-icons/refresh.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-download { --sg-icon: url("../images/salam-gate-icons/download.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-edit { --sg-icon: url("../images/salam-gate-icons/edit.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-info-outline { --sg-icon: url("../images/salam-gate-icons/info.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-list-view { --sg-icon: url("../images/salam-gate-icons/view-list.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-location { --sg-icon: url("../images/salam-gate-icons/map-tag.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-location-alt { --sg-icon: url("../images/salam-gate-icons/map-tag.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-lock { --sg-icon: url("../images/salam-gate-icons/lock.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-money-alt { --sg-icon: url("../images/salam-gate-icons/cash.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-no-alt { --sg-icon: url("../images/salam-gate-icons/close.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-plus-alt2 { --sg-icon: url("../images/salam-gate-icons/plus.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-printer { --sg-icon: url("../images/salam-gate-icons/printer.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-search { --sg-icon: url("../images/salam-gate-icons/search.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-shield { --sg-icon: url("../images/salam-gate-icons/shield.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-store { --sg-icon: url("../images/salam-gate-icons/shop.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-trash { --sg-icon: url("../images/salam-gate-icons/trash.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-update { --sg-icon: url("../images/salam-gate-icons/refresh.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-upload { --sg-icon: url("../images/salam-gate-icons/upload.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-visibility { --sg-icon: url("../images/salam-gate-icons/eye-show.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-yes { --sg-icon: url("../images/salam-gate-icons/checkmark.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-yes-alt { --sg-icon: url("../images/salam-gate-icons/circle-checkmark.svg"); }
+
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-airplane { --sg-icon: url("../images/salam-gate-icons/send.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-admin-generic { --sg-icon: url("../images/salam-gate-icons/settings.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) .dashicons-admin-network { --sg-icon: url("../images/salam-gate-icons/user.svg"); }
+
+/* Upload/download marks in address headings mean sender/receiver. */
+#salam-gate-parcel-modal .sg-order-sender .dashicons-upload { --sg-icon: url("../images/salam-gate-icons/send.svg"); }
+#salam-gate-parcel-modal .sg-order-receiver .dashicons-download { --sg-icon: url("../images/salam-gate-icons/receive.svg"); }
+
+/* Existing inline SVG boxes retain their dimensions and accessibility metadata. */
+:is(.salam-gate-page, .salam-gate-order-box, #sg-bulk-shipping-modal, .sg-order-shipping, .woosalam-sg-feedback) :is(
+  .sg-send__address-icon, .sg-payment-card__icon svg, .sg-basalam-orders__icon svg,
+  .sg-basalam-orders__refresh svg, .sg-basalam-order__action svg, .sgp-tool > svg,
+  .sg-picker-trigger__icon svg, .sg-date-trigger > svg, .sg-order-history-icon,
+  .sg-order-shipping__icon, .sgb-brand svg, .sgb-payment-icon svg, .basalam-toast__icon svg
+) {
+  background-color: currentColor;
+  -webkit-mask: var(--sg-icon) center / contain no-repeat;
+  mask: var(--sg-icon) center / contain no-repeat;
+}
+:is(.salam-gate-page, .salam-gate-order-box, #sg-bulk-shipping-modal, .sg-order-shipping, .woosalam-sg-feedback) :is(
+  .sg-send__address-icon, .sg-payment-card__icon svg, .sg-basalam-orders__icon svg,
+  .sg-basalam-orders__refresh svg, .sg-basalam-order__action svg, .sgp-tool > svg,
+  .sg-picker-trigger__icon svg, .sg-date-trigger > svg, .sg-order-history-icon,
+  .sg-order-shipping__icon, .sgb-brand svg, .sgb-payment-icon svg, .basalam-toast__icon svg
+) > * { visibility: hidden; }
+
+.salam-gate-page .sg-send__recipient-card .sg-send__address-icon { --sg-icon: url("../images/salam-gate-icons/receive.svg"); }
+.salam-gate-page .sg-send__sender-card .sg-send__address-icon { --sg-icon: url("../images/salam-gate-icons/send.svg"); }
+.salam-gate-page .sg-payment-card__icon svg { --sg-icon: url("../images/salam-gate-icons/shop.svg"); }
+.salam-gate-page .sg-payment-card:has(input[value="21"]) .sg-payment-card__icon svg { --sg-icon: url("../images/salam-gate-icons/wallet.svg"); }
+.salam-gate-page .sg-basalam-orders__icon svg { --sg-icon: url("../images/salam-gate-icons/shop.svg"); }
+.salam-gate-page .sg-basalam-orders__refresh svg { --sg-icon: url("../images/salam-gate-icons/refresh.svg"); }
+.salam-gate-page .sg-basalam-order__action svg { --sg-icon: url("../images/salam-gate-icons/arrow-left.svg"); }
+.salam-gate-page .sgp-tool > svg { --sg-icon: url("../images/salam-gate-icons/filter.svg"); }
+.salam-gate-page .sgp-tool > .sgp-tool__sort-icon { --sg-icon: url("../images/salam-gate-icons/sort.svg"); }
+.salam-gate-page .sg-picker-trigger__icon svg { --sg-icon: url("../images/salam-gate-icons/arrow-down.svg"); }
+.salam-gate-page .sg-date-trigger > svg { --sg-icon: url("../images/salam-gate-icons/calendar.svg"); }
+:is(.salam-gate-page, .salam-gate-order-box) .sg-order-history-icon { --sg-icon: url("../images/salam-gate-icons/time.svg"); }
+.sg-order-shipping__icon { --sg-icon: url("../images/salam-gate-icons/box.svg"); }
+.sg-order-shipping--sent .sg-order-shipping__icon { --sg-icon: url("../images/salam-gate-icons/circle-checkmark.svg"); }
+.sg-order-shipping--cancelled .sg-order-shipping__icon { --sg-icon: url("../images/salam-gate-icons/close.svg"); }
+.sg-order-shipping--waiting .sg-order-shipping__icon { --sg-icon: url("../images/salam-gate-icons/time.svg"); }
+#sg-bulk-shipping-modal .sgb-brand svg { --sg-icon: url("../images/salam-gate-icons/truck.svg"); }
+#sg-bulk-shipping-modal .sgb-payment-icon svg { --sg-icon: url("../images/salam-gate-icons/shop.svg"); }
+#sg-bulk-shipping-modal .sgb-payment-card:has(input[value="21"]) .sgb-payment-icon svg { --sg-icon: url("../images/salam-gate-icons/wallet.svg"); }
+.woosalam-sg-feedback .basalam-toast__icon svg { --sg-icon: url("../images/salam-gate-icons/info.svg"); }
+.woosalam-sg-feedback .basalam-toast--error .basalam-toast__icon svg,
+.woosalam-sg-feedback .basalam-toast--warning .basalam-toast__icon svg { --sg-icon: url("../images/salam-gate-icons/attention.svg"); }
+.woosalam-sg-feedback .basalam-toast--success .basalam-toast__icon svg { --sg-icon: url("../images/salam-gate-icons/circle-checkmark.svg"); }
+
+/* Close controls already carry accessible labels; keep the surrounding hit area. */
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) :is(.sg-modal__close, .salam-gate-modal__close, .sg-picker-dialog__close, .sgb-close),
+.woosalam-sg-feedback .basalam-toast__close { font-size: 0 !important; }
+:is(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-order-preview-modal, #sg-order-list-native-modal, #sg-bulk-shipping-modal, .sg-picker-overlay, .sg-help, .sg-help-tab, .sg-order-list-action) :is(.sg-modal__close, .salam-gate-modal__close, .sg-picker-dialog__close, .sgb-close)::before,
+.woosalam-sg-feedback .basalam-toast__close::before {
+  content: "";
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+  background-color: currentColor;
+  -webkit-mask: url("../images/salam-gate-icons/close.svg") center / contain no-repeat;
+  mask: url("../images/salam-gate-icons/close.svg") center / contain no-repeat;
+}
+#salam-gate-parcel-modal :is(.sg-order-form-actions, .sg-quote-actions) :is(.basalam-primary-button, .basalam-secondary-button):disabled::before {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-color: currentColor;
+  -webkit-mask: url("../images/salam-gate-icons/lock.svg") center / contain no-repeat;
+  mask: url("../images/salam-gate-icons/lock.svg") center / contain no-repeat;
+}
+
+/* The loading animation uses the same bundled truck, not a second overlaid glyph. */
+.salam-gate-order-box .sg-order-source.is-loading .sg-order-source__refresh > .dashicons::before,
+.wp-list-table .sg-order-list-action.is-loading > .dashicons::before { content: none; }

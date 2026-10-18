@@ -315,6 +315,9 @@ class AdminRegistrar implements RegistrarInterface
             'sync_basalam_ticket',
             'sync_basalam_new_ticket',
             'import_digikala_product',
+            'salam_gate',
+            'salam_gate_parcels',
+            'salam_gate_status',
         ];
     }
 

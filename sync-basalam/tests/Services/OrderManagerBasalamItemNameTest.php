@@ -118,6 +118,11 @@ namespace {
                 return $this->meta;
             }
 
+            public function delete_meta_data($key)
+            {
+                unset($this->meta[$key]);
+            }
+
             public function set_subtotal($value)
             {
             }
@@ -331,13 +336,13 @@ namespace SyncBasalam\Tests\Services {
             self::assertSame('', OrderManager::extractBasalamItemName([]));
         }
 
-        public function testMetaKeyIsVisibleForWooCommerceDisplay(): void
+        public function testMetaKeysArePrivateForWooCommerceDisplay(): void
         {
-            // ووکامرس متاهایی که با «_» شروع نمی‌شوند را در صفحه سفارش نشان می‌دهد.
-            self::assertStringStartsNotWith('_', OrderManager::BASALAM_ITEM_NAME_META_KEY);
+            self::assertStringStartsWith('_', OrderManager::BASALAM_ITEM_NAME_META_KEY);
+            self::assertStringStartsWith('_', OrderManager::BASALAM_ITEM_LINK_META_KEY);
         }
 
-        public function testStoresVisibleMetaOnOrderItem(): void
+        public function testStoresPrivateMetaOnOrderItem(): void
         {
             $order = new \WC_Order();
             $orderItemId = $order->add_product(new \WC_Product());
@@ -350,12 +355,12 @@ namespace SyncBasalam\Tests\Services {
 
             self::assertTrue($result);
             self::assertSame(
-                ['نام محصول در باسلام' => 'ماگ حرارتی مدل آلفا'],
+                [OrderManager::BASALAM_ITEM_NAME_META_KEY => 'ماگ حرارتی مدل آلفا'],
                 $order->get_item($orderItemId)->get_meta_data()
             );
         }
 
-        public function testStoresClickableLinkMetaWhenBasalamProductIdIsGiven(): void
+        public function testStoresPlainUrlWhenBasalamProductIdIsGiven(): void
         {
             $order = new \WC_Order();
             $orderItemId = $order->add_product(new \WC_Product());
@@ -365,9 +370,9 @@ namespace SyncBasalam\Tests\Services {
             $meta = $order->get_item($orderItemId)->get_meta_data();
 
             self::assertArrayHasKey(OrderManager::BASALAM_ITEM_LINK_META_KEY, $meta);
-            self::assertStringStartsNotWith('_', OrderManager::BASALAM_ITEM_LINK_META_KEY);
+            self::assertStringStartsWith('_', OrderManager::BASALAM_ITEM_LINK_META_KEY);
             self::assertSame(
-                '<a href="https://basalam.com/p/12345" target="_blank" rel="noopener">مشاهده</a>',
+                'https://basalam.com/p/12345',
                 $meta[OrderManager::BASALAM_ITEM_LINK_META_KEY]
             );
         }
@@ -383,6 +388,22 @@ namespace SyncBasalam\Tests\Services {
 
             self::assertArrayNotHasKey(OrderManager::BASALAM_ITEM_LINK_META_KEY, $meta);
             self::assertArrayHasKey(OrderManager::BASALAM_ITEM_NAME_META_KEY, $meta);
+        }
+
+        public function testRemovesLegacyVisibleMetaWhenUpdatingAnItem(): void
+        {
+            $order = new \WC_Order();
+            $itemId = $order->add_product(new \WC_Product());
+            $item = $order->get_item($itemId);
+            $item->update_meta_data(OrderManager::LEGACY_BASALAM_ITEM_NAME_META_KEY, 'نام قبلی');
+            $item->update_meta_data(OrderManager::LEGACY_BASALAM_ITEM_LINK_META_KEY, '<a href="https://basalam.com/p/10">نام قبلی</a>');
+
+            OrderManager::setBasalamItemNameOnOrderItem($order, $itemId, 'نام جدید', 20);
+
+            self::assertSame([
+                OrderManager::BASALAM_ITEM_NAME_META_KEY => 'نام جدید',
+                OrderManager::BASALAM_ITEM_LINK_META_KEY => 'https://basalam.com/p/20',
+            ], $item->get_meta_data());
         }
 
         public function testSkipsMetaWhenItemNameIsEmpty(): void

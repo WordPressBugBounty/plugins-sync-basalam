@@ -330,6 +330,8 @@ function sync_basalam_get_known_hooks(): array
     return [
         'sync_basalam_plugin_debug',
         'sync_basalam_fetch_version_detail',
+        // Remove the scheduler only, never payment/cancellation evidence here.
+        'salam_gate_sync_parcel_statuses',
         $create_identifier . '_cron',
         $create_identifier . '_immediate',
         $update_identifier . '_cron',

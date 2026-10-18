@@ -660,8 +660,10 @@ class OrderManager
         return $product_id ? $product_id : false;
     }
 
-    public const BASALAM_ITEM_NAME_META_KEY = 'نام محصول در باسلام';
-    public const BASALAM_ITEM_LINK_META_KEY = 'لینک محصول در باسلام';
+    public const BASALAM_ITEM_NAME_META_KEY = '_sync_basalam_item_name';
+    public const BASALAM_ITEM_LINK_META_KEY = '_sync_basalam_item_url';
+    public const LEGACY_BASALAM_ITEM_NAME_META_KEY = 'نام محصول در باسلام';
+    public const LEGACY_BASALAM_ITEM_LINK_META_KEY = 'لینک محصول در باسلام';
 
     public static function addBasalamItemToOrder(\WC_Order $order, array $item)
     {
@@ -750,12 +752,14 @@ class OrderManager
         }
 
         $order_item->update_meta_data(self::BASALAM_ITEM_NAME_META_KEY, $basalam_item_name);
+        $order_item->delete_meta_data(self::LEGACY_BASALAM_ITEM_NAME_META_KEY);
+        $order_item->delete_meta_data(self::LEGACY_BASALAM_ITEM_LINK_META_KEY);
 
         if ($basalam_product_id) {
             $link = 'https://basalam.com/p/' . (int) $basalam_product_id;
             $order_item->update_meta_data(
                 self::BASALAM_ITEM_LINK_META_KEY,
-                '<a href="' . esc_url($link) . '" target="_blank" rel="noopener">' . esc_html($basalam_item_name) . '</a>'
+                $link
             );
         }
 

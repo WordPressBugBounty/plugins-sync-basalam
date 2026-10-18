@@ -2,6 +2,27 @@
 
 <details>
 
+<summary>1.10.30 - 2026-10-18</summary>
+
+### Added
+
+- Add the complete SalamGate shipping workflow to ordinary WooSalam, including onboarding, single/native/mixed bulk shipments, reviewed payment, cancellation, eligible labels and official postal tracking (PTT-51178)
+- Keep legacy Pro as the sole shipping owner when active, preserving existing parcel mappings and financial guards without duplicate callbacks
+- Scope shipping compatibility checks and assets to the shipping module without changing ordinary OAuth client credentials or the base plugin's other features
+- Run the SalamGate shipping module on the local PHP 8.2 runtime used by the base plugin.
+
+### Fixed
+
+- Keep Basalam product names and links in private order item meta and display them separately in the order admin, so formatted item details used by SMS plugins do not repeat product names
+- Exclude the legacy visible Basalam item fields from formatted details on existing orders while preserving their admin display
+- Avoid false interrupted-worker/LiteSpeed warnings when Apache exposes the LSAPI SAPI.
+- Match the documented LiteSpeed `noabort` rule to the Woosalam async queue action and clear stale protection alerts after explicit queue cancellation.
+- Clear the interrupted-worker notice when an administrator explicitly cancels a synchronization queue.
+
+</details>
+
+<details>
+
 <summary>1.10.29 - 2026-10-10</summary>
 
 ### Fixed

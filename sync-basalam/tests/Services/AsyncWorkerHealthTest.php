@@ -103,6 +103,17 @@ class AsyncWorkerHealthTest extends TestCase
         self::assertNull($health->getNotice());
     }
 
+    public function testExplicitCancellationClearsInterruption(): void
+    {
+        $health = new RuntimeWorkerHealth(false);
+        $health->recordInterruptedJob((object) ['id' => 24, 'started_at' => time() - 121]);
+        self::assertNotNull($health->getNotice());
+
+        $health->clearInterruption();
+
+        self::assertNull($health->getNotice());
+    }
+
     public function testCorruptOptionDoesNotProduceAnAlert(): void
     {
         update_option(AsyncWorkerHealth::OPTION_KEY, 'invalid');

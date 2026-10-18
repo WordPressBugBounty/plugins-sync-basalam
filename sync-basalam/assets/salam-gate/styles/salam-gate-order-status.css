@@ -1,0 +1,182 @@
+/* Only SalamGate's status and action columns on WooCommerce's legacy and HPOS tables. */
+#wpbody-content table.wp-list-table .column-salam_gate_shipping {
+    width: 140px;
+}
+
+#wpbody-content table.wp-list-table .column-salam_gate_action {
+    width: 144px;
+}
+
+.wp-list-table .column-salam_gate_shipping,
+.wp-list-table .column-salam_gate_action {
+    text-align: center;
+    font-family: var(--sg-font-body, "PelakFA", sans-serif);
+}
+
+.wp-list-table td.column-salam_gate_shipping,
+.wp-list-table td.column-salam_gate_action {
+    vertical-align: middle;
+}
+
+@media screen and (min-width: 783px) {
+    #wpbody-content table.wp-list-table .column-salam_gate_shipping,
+    #wpbody-content table.wp-list-table .column-salam_gate_action {
+        padding: 10px;
+    }
+}
+
+.wp-list-table .sg-order-shipping-statuses {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.wp-list-table .sg-order-shipping {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 6px 9px;
+    border: 1px solid #dce2e9;
+    min-height: 34px;
+    border-radius: 999px;
+    background: #f3f5f7;
+    color: #455364;
+    font-family: var(--sg-font-body, "PelakFA", sans-serif);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.6;
+    white-space: nowrap;
+}
+
+.wp-list-table .sg-order-shipping--sent {
+    border-color: #b9dec7;
+    background: #edf8f0;
+    color: #246e42;
+}
+
+.wp-list-table .sg-order-shipping--cancelled {
+    border-color: #f0c9ce;
+    background: #fff0f2;
+    color: #a23849;
+}
+
+.wp-list-table .sg-order-shipping__icon {
+    display: block;
+    flex: 0 0 17px;
+    width: 17px;
+    height: 17px;
+    color: inherit;
+}
+
+.wp-list-table .sg-order-shipping--waiting {
+    border-color: #ecd49a;
+    background: #fff8e7;
+    color: #835d10;
+}
+
+.wp-list-table .sg-order-list-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 144px;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-height: 36px;
+    margin: 0;
+    padding: 7px 10px;
+    border: 1px solid #ef7844;
+    border-radius: 9px;
+    background: #ef7844;
+    color: #fff;
+    font-family: var(--sg-font-body, "PelakFA", sans-serif);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.6;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background .18s, border-color .18s, box-shadow .18s;
+}
+
+.wp-list-table .sg-order-list-action .dashicons {
+    flex: 0 0 17px;
+    width: 17px;
+    height: 17px;
+    font-size: 17px;
+}
+
+.wp-list-table a.sg-order-list-action:hover {
+    background: #df6231;
+    border-color: #df6231;
+    color: #fff;
+}
+
+.wp-list-table a.sg-order-list-action:focus {
+    outline: 2px solid #c65127;
+    outline-offset: 3px;
+    background: #df6231;
+    border-color: #df6231;
+    color: #fff;
+    box-shadow: none;
+}
+
+.wp-list-table .sg-order-list-action > span:not(.dashicons) {
+    color: inherit;
+    font: inherit;
+}
+
+.wp-list-table .sg-order-list-action--review,
+.wp-list-table .sg-order-list-action--receipt {
+    border-color: #dce2e9;
+    background: #fff;
+    color: #455364;
+}
+
+.wp-list-table .sg-order-list-action[aria-disabled="true"] {
+    border-color: #dce2e9;
+    background: #f3f5f7;
+    color: #6c7785;
+    cursor: default;
+}
+
+.wp-list-table .sg-order-list-action.is-loading {
+    cursor: progress;
+}
+
+.wp-list-table .sg-order-list-action.sg-order-list-action--cancelled {
+    background: #fff;
+    border-color: #dce2e9;
+    color: #455364;
+}
+.wp-list-table a.sg-order-list-action.sg-order-list-action--cancelled:is(:hover, :focus, :active) {
+    background: #f3f6f9;
+    border-color: #b9c7d6;
+    color: #334155;
+    box-shadow: none;
+}
+.wp-list-table a.sg-order-list-action.sg-order-list-action--cancelled:focus {
+    outline-color: #718096;
+}
+
+.salam-gate-page .sg-order-list-native {
+    width: min(680px, calc(100vw - 36px));
+    max-height: calc(100vh - 72px);
+    font-family: var(--sg-font-body, "PelakFA", sans-serif);
+}
+
+.salam-gate-page .sg-order-list-native .sg-modal__body {
+    overflow-y: auto;
+}
+
+@media screen and (max-width: 782px) {
+    #wpbody-content table.wp-list-table .column-salam_gate_shipping,
+    #wpbody-content table.wp-list-table .column-salam_gate_action {
+        width: auto;
+    }
+}
+.sg-order-source-list-cancelled{display:inline-flex;margin-top:6px;padding:3px 7px;border-radius:6px;background:#fef2f2;color:#b91c1c;font-size:11px;line-height:1.7}

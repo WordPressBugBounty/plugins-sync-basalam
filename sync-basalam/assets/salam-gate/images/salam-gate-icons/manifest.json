@@ -1,0 +1,248 @@
+[
+  {
+    "name": "Arrow Down",
+    "id": 521469,
+    "slug": "arrow-down",
+    "source": "https://www.svgrepo.com/show/521469/arrow-down.svg"
+  },
+  {
+    "name": "Arrow Left",
+    "id": 521474,
+    "slug": "arrow-left",
+    "source": "https://www.svgrepo.com/show/521474/arrow-left.svg"
+  },
+  {
+    "name": "Arrow Right",
+    "id": 521483,
+    "slug": "arrow-right",
+    "source": "https://www.svgrepo.com/show/521483/arrow-right.svg"
+  },
+  {
+    "name": "Book",
+    "id": 521516,
+    "slug": "book",
+    "source": "https://www.svgrepo.com/show/521516/book.svg"
+  },
+  {
+    "name": "Box",
+    "id": 521523,
+    "slug": "box",
+    "source": "https://www.svgrepo.com/show/521523/box.svg"
+  },
+  {
+    "name": "Calculator",
+    "id": 521529,
+    "slug": "calculator",
+    "source": "https://www.svgrepo.com/show/521529/calculator.svg"
+  },
+  {
+    "name": "Calendar",
+    "id": 521530,
+    "slug": "calendar",
+    "source": "https://www.svgrepo.com/show/521530/calendar.svg"
+  },
+  {
+    "name": "Cash",
+    "id": 521547,
+    "slug": "cash",
+    "source": "https://www.svgrepo.com/show/521547/cash.svg"
+  },
+  {
+    "name": "Chart Line",
+    "id": 521551,
+    "slug": "chart-line",
+    "source": "https://www.svgrepo.com/show/521551/chart-line.svg"
+  },
+  {
+    "name": "Checkmark",
+    "id": 521560,
+    "slug": "checkmark",
+    "source": "https://www.svgrepo.com/show/521560/checkmark.svg"
+  },
+  {
+    "name": "Circle Checkmark",
+    "id": 521562,
+    "slug": "circle-checkmark",
+    "source": "https://www.svgrepo.com/show/521562/circle-checkmark.svg"
+  },
+  {
+    "name": "Close",
+    "id": 521564,
+    "slug": "close",
+    "source": "https://www.svgrepo.com/show/521564/close.svg"
+  },
+  {
+    "name": "Copy",
+    "id": 521581,
+    "slug": "copy",
+    "source": "https://www.svgrepo.com/show/521581/copy.svg"
+  },
+  {
+    "name": "Download",
+    "id": 521613,
+    "slug": "download",
+    "source": "https://www.svgrepo.com/show/521613/download.svg"
+  },
+  {
+    "name": "Edit",
+    "id": 521620,
+    "slug": "edit",
+    "source": "https://www.svgrepo.com/show/521620/edit.svg"
+  },
+  {
+    "name": "Filter",
+    "id": 521661,
+    "slug": "filter",
+    "source": "https://www.svgrepo.com/show/521661/filter.svg"
+  },
+  {
+    "name": "Home",
+    "id": 521703,
+    "slug": "home",
+    "source": "https://www.svgrepo.com/show/521703/home.svg"
+  },
+  {
+    "name": "Info",
+    "id": 521709,
+    "slug": "info",
+    "source": "https://www.svgrepo.com/show/521709/info.svg"
+  },
+  {
+    "name": "Invoice",
+    "id": 521712,
+    "slug": "invoice",
+    "source": "https://www.svgrepo.com/show/521712/invoice.svg"
+  },
+  {
+    "name": "Lock",
+    "id": 521733,
+    "slug": "lock",
+    "source": "https://www.svgrepo.com/show/521733/lock.svg"
+  },
+  {
+    "name": "Plus",
+    "id": 521794,
+    "slug": "plus",
+    "source": "https://www.svgrepo.com/show/521794/plus.svg"
+  },
+  {
+    "name": "Printer",
+    "id": 521795,
+    "slug": "printer",
+    "source": "https://www.svgrepo.com/show/521795/printer.svg"
+  },
+  {
+    "name": "Receive",
+    "id": 521796,
+    "slug": "receive",
+    "source": "https://www.svgrepo.com/show/521796/receive.svg"
+  },
+  {
+    "name": "Refresh",
+    "id": 521802,
+    "slug": "refresh",
+    "source": "https://www.svgrepo.com/show/521802/refresh.svg"
+  },
+  {
+    "name": "Send",
+    "id": 521825,
+    "slug": "send",
+    "source": "https://www.svgrepo.com/show/521825/send.svg"
+  },
+  {
+    "name": "Search",
+    "id": 521826,
+    "slug": "search",
+    "source": "https://www.svgrepo.com/show/521826/search.svg"
+  },
+  {
+    "name": "Settings",
+    "id": 521835,
+    "slug": "settings",
+    "source": "https://www.svgrepo.com/show/521835/settings.svg"
+  },
+  {
+    "name": "Shield",
+    "id": 521837,
+    "slug": "shield",
+    "source": "https://www.svgrepo.com/show/521837/shield.svg"
+  },
+  {
+    "name": "Shop",
+    "id": 521841,
+    "slug": "shop",
+    "source": "https://www.svgrepo.com/show/521841/shop.svg"
+  },
+  {
+    "name": "Sort",
+    "id": 521856,
+    "slug": "sort",
+    "source": "https://www.svgrepo.com/show/521856/sort.svg"
+  },
+  {
+    "name": "Trash",
+    "id": 521893,
+    "slug": "trash",
+    "source": "https://www.svgrepo.com/show/521893/trash.svg"
+  },
+  {
+    "name": "Upload",
+    "id": 521899,
+    "slug": "upload",
+    "source": "https://www.svgrepo.com/show/521899/upload.svg"
+  },
+  {
+    "name": "Truck",
+    "id": 521901,
+    "slug": "truck",
+    "source": "https://www.svgrepo.com/show/521901/truck.svg"
+  },
+  {
+    "name": "User",
+    "id": 521902,
+    "slug": "user",
+    "source": "https://www.svgrepo.com/show/521902/user.svg"
+  },
+  {
+    "name": "View List",
+    "id": 521917,
+    "slug": "view-list",
+    "source": "https://www.svgrepo.com/show/521917/view-list.svg"
+  },
+  {
+    "name": "Wallet",
+    "id": 521920,
+    "slug": "wallet",
+    "source": "https://www.svgrepo.com/show/521920/wallet.svg"
+  },
+  {
+    "name": "Wrench",
+    "id": 521931,
+    "slug": "wrench",
+    "source": "https://www.svgrepo.com/show/521931/wrench.svg"
+  },
+  {
+    "name": "Eye Show",
+    "id": 521653,
+    "slug": "eye-show",
+    "source": "https://www.svgrepo.com/show/521653/eye-show.svg"
+  },
+  {
+    "name": "Attention",
+    "id": 521488,
+    "slug": "attention",
+    "source": "https://www.svgrepo.com/show/521488/attention.svg"
+  },
+  {
+    "name": "Time",
+    "id": 521888,
+    "slug": "time",
+    "source": "https://www.svgrepo.com/show/521888/time.svg"
+  },
+  {
+    "name": "Map Tag",
+    "id": 521740,
+    "slug": "map-tag",
+    "source": "https://www.svgrepo.com/show/521740/map-tag.svg"
+  }
+]
