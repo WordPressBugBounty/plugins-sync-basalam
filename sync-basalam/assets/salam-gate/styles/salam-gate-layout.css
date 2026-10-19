@@ -1,4 +1,9 @@
 /* Mentor layout refinement: retain existing data and operations. */
+.salam-gate-page .sg-state--disabled .sg-card { padding: 28px; }
+.salam-gate-page .sg-state--disabled .sg-card__title { font: 600 22px/1.8 var(--sg-font-heading); }
+.salam-gate-page .sg-state--disabled .sg-card__text { max-width: 780px; font-size: 14px; line-height: 2; }
+.salam-gate-page .sg-state--disabled .sg-button { margin-top: 8px; }
+.salam-gate-page .sg-site-activation-message { color: #a3321b; line-height: 1.9; margin: 16px 0 0; }
 .salam-gate-page .sg-dashboard__main,
 .salam-gate-page .sg-calculator__main {
   min-width: 0;

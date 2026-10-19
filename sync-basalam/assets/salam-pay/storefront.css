@@ -1,0 +1,165 @@
+.salampay-promotion-bar {
+	position: relative;
+	z-index: 20;
+	width: 100%;
+	border-block: 1px solid #e8ebe9;
+	background: #f7faf8;
+	color: #17231f;
+	direction: rtl;
+	font-family: inherit;
+}
+
+.salampay-promotion-bar__inner {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 44px;
+	max-width: 1200px;
+	margin-inline: auto;
+	padding: 7px 20px;
+	gap: 12px;
+}
+
+.salampay-promotion-bar__mark {
+	display: inline-flex;
+	align-items: center;
+	flex: 0 0 auto;
+}
+
+.salampay-promotion-bar__mark img {
+	display: block;
+	width: auto;
+	height: 24px;
+	margin: 0;
+}
+
+.salampay-promotion-bar__divider {
+	width: 1px;
+	height: 22px;
+	background: #d8dedb;
+}
+
+.salampay-promotion-bar__text {
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 1.7;
+	text-align: right;
+}
+
+.salampay-product-badge {
+	box-sizing: border-box;
+	display: inline-flex;
+	align-items: center;
+	width: max-content;
+	max-width: calc(100% - 20px);
+	min-height: 30px;
+	padding: 4px 8px;
+	gap: 6px;
+	border: 1px solid rgba(23, 35, 31, .12);
+	border-radius: 9px;
+	background: rgba(255, 255, 255, .96);
+	box-shadow: 0 3px 12px rgba(23, 35, 31, .08);
+	color: #17231f;
+	direction: rtl;
+	font-family: inherit;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1.4;
+}
+
+.salampay-product-badge img {
+	display: block !important;
+	flex: 0 0 auto;
+	width: auto !important;
+	max-width: 20px !important;
+	height: 15px !important;
+	max-height: 15px !important;
+	margin: 0 !important;
+	object-fit: contain !important;
+}
+
+.woocommerce ul.products li.product .salampay-product-badge--loop {
+	position: absolute;
+	inset-block-start: 10px;
+	inset-inline-end: 10px;
+	z-index: 4;
+	pointer-events: none;
+	width: max-content !important;
+	max-width: 112px !important;
+	min-height: 28px;
+	padding: 3px 6px;
+	gap: 4px;
+	border-radius: 7px;
+	font-size: 9px;
+	line-height: 1.25;
+}
+
+.woocommerce ul.products li.product .salampay-product-badge--loop img {
+	width: auto !important;
+	max-width: 18px !important;
+	height: 13px !important;
+	max-height: 13px !important;
+}
+
+.salampay-product-badge--single {
+	margin-block: 2px 12px;
+	min-height: 36px;
+	padding: 6px 10px;
+	border-radius: 11px;
+	box-shadow: none;
+	font-size: 13px;
+}
+
+.salampay-product-badge--single img {
+	width: auto !important;
+	max-width: 24px !important;
+	height: 18px !important;
+	max-height: 18px !important;
+}
+
+@media (max-width: 600px) {
+	.salampay-promotion-bar__inner {
+		justify-content: flex-start;
+		min-height: 42px;
+		padding: 6px 14px;
+		gap: 9px;
+	}
+
+	.salampay-promotion-bar__mark img {
+		height: 21px;
+	}
+
+	.salampay-promotion-bar__divider {
+		height: 19px;
+	}
+
+	.salampay-promotion-bar__text {
+		font-size: 12px;
+		line-height: 1.55;
+	}
+
+	.woocommerce ul.products li.product .salampay-product-badge--loop {
+		inset-block-start: 7px;
+		inset-inline-end: 7px;
+		max-width: calc(100% - 14px);
+		min-height: 26px;
+		padding: 3px 6px;
+		gap: 4px;
+		border-radius: 7px;
+		font-size: 9px;
+	}
+
+	.salampay-product-badge--loop img {
+		width: auto !important;
+		max-width: 16px !important;
+		height: 12px !important;
+		max-height: 12px !important;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.salampay-promotion-bar,
+	.salampay-product-badge {
+		scroll-behavior: auto;
+	}
+}

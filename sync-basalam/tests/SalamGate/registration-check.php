@@ -84,6 +84,9 @@ function esc_html($value) { return htmlspecialchars($value, ENT_QUOTES, 'UTF-8')
 function admin_url($path = '') { return 'https://example.test/wp-admin/' . $path; }
 function wp_clear_scheduled_hook($hook) { $GLOBALS['sg_registration']['clear_events'][] = $hook; }
 function syncBasalamContainer() { throw new RuntimeException('Offline OAuth configuration fallback'); }
+function syncBasalamSettings() { return new class {
+    public function getSettings($key) { return get_option('sync_basalam_settings', [])[$key] ?? null; }
+}; }
 
 require_once dirname(__DIR__, 2) . '/vendor/autoload.php';
 
@@ -150,7 +153,7 @@ Module::register();
 sgAssert($hooksBefore === $GLOBALS['sg_registration']['hooks'], 'Registration must be idempotent');
 
 $actions = [
-    'account_state', 'tracking', 'basalam_order_state', 'save_sync_settings', 'sync_now', 'activation_form',
+    'account_state', 'tracking', 'basalam_order_state', 'site_activation', 'order_availability', 'save_sync_settings', 'sync_now', 'activation_form',
     'onboarding_bootstrap', 'post_offices_references', 'provider_locations', 'provider_nodes', 'register_shop',
     'stats', 'settings_data', 'update_address', 'update_shop', 'calculate', 'send_bootstrap', 'basalam_orders',
     'basalam_order_select', 'website_orders', 'website_order_select', 'order_preview', 'send_creation_status',
@@ -213,7 +216,7 @@ foreach (['salam_gate', 'salam_gate_parcels', 'salam_gate_status'] as $page) {
 foreach (['shop_order', 'edit-shop_order', 'woocommerce_page_wc-orders'] as $screenId) {
     sgAssetsReset(); $_GET = []; $GLOBALS['sg_registration']['screen'] = (object) ['id' => $screenId];
     Module::enqueueAssets();
-    sgAssert(isset($GLOBALS['sg_registration']['scripts']['woosalam-salam-gate-script']), 'Order controller required for ' . $screenId);
+    sgAssert(!isset($GLOBALS['sg_registration']['scripts']['woosalam-salam-gate-script']), 'Unknown activation must not load the order controller for ' . $screenId);
 }
 $GLOBALS['sg_registration']['screen'] = null;
 foreach (['sync_basalam', 'sync_basalam_help'] as $page) {

@@ -35,12 +35,13 @@ final class Module
         foreach ([Admin\AccountStateRouter::class, Admin\HelpContent::class,
             Admin\ConnectionGate::class, Auth\OAuthScopes::class, Order\BasalamOrderProducts::class,
             StatusSyncScheduler::class, Admin\OrderMetabox::class, Admin\OrderShippingStatus::class,
-            Admin\OrderBulkActions::class] as $registrar) {
+            Admin\OrderBulkActions::class, Admin\OrderFeatureGate::class] as $registrar) {
             $registrar::register();
         }
         foreach (self::ajaxCallbacks() as $action => $callback) {
             add_action('wp_ajax_' . $action, $callback);
         }
+        add_action('admin_init', [self::class, 'guardDisabledActions'], 1);
 
         // Keep the ordinary application's own OAuth client and callback URL.
         add_filter('sync_basalam_oauth_save_extra_data', [self::class, 'draftConnectionData']);
@@ -130,6 +131,9 @@ final class Module
         ]);
 
         $shippingScreen = self::isShippingScreen((string) $hook);
+        $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+        $isOrderScreen = in_array($screen->id ?? $hook, ['shop_order', 'edit-shop_order', 'woocommerce_page_wc-orders'], true);
+        if ($isOrderScreen && !FeatureAvailability::isVisible()) return;
         $supportScreen = in_array(self::page(), ['sync_basalam', 'sync_basalam_help'], true);
         if (!$shippingScreen && !$supportScreen) {
             return;
@@ -176,10 +180,23 @@ final class Module
         wp_enqueue_script($handle, Paths::assetsUrl($relative), $dependencies, file_exists($file) ? (string) filemtime($file) : null, true);
     }
 
+    /** Reject stale shipping screens after a site opt-out; control/read-only probes remain available. */
+    public static function guardDisabledActions(): void
+    {
+        if (!function_exists('wp_doing_ajax') || !wp_doing_ajax() || Services\SiteActivation::isEnabled()) return;
+        $action = $_REQUEST['action'] ?? '';
+        if (!is_string($action) || !isset(self::ajaxCallbacks()[$action])
+            || in_array($action, ['salam_gate_site_activation', 'salam_gate_order_availability', 'salam_gate_refresh_shops'], true)) return;
+        wp_send_json_error(['message' => 'سلام‌گیت در این سایت غیرفعال است؛ ابتدا آن را از بخش ارسال مرسوله فعال کنید.',
+            'code' => 'site_disabled'], 409);
+    }
+
     /** Exact public/admin shipping action inventory; no anonymous mutation hooks. */
     private static function ajaxCallbacks(): array
     {
         return [
+            'salam_gate_site_activation' => [Ajax\StatusActions::class, 'siteActivation'],
+            'salam_gate_order_availability' => [Admin\OrderFeatureGate::class, 'availability'],
             'salam_gate_save_sync_settings' => [Ajax\SyncActions::class, 'save'],
             'salam_gate_sync_now' => [Ajax\SyncActions::class, 'run'],
             'salam_gate_activation_form' => [Ajax\OnboardingActions::class, 'form'],

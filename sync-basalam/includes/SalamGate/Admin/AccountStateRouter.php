@@ -10,6 +10,7 @@ use SyncBasalam\SalamGate\Paths;
 use SyncBasalam\SalamGate\Services\ShopsService;
 use SyncBasalam\SalamGate\Services\ConnectionCache;
 use SyncBasalam\SalamGate\Services\AccountService;
+use SyncBasalam\SalamGate\Services\SiteActivation;
 
 if (! defined('ABSPATH')) exit;
 
@@ -43,6 +44,7 @@ class AccountStateRouter
     public const STATE_REJECTED       = 'rejected';
     public const STATE_INACTIVE       = 'inactive';
     public const STATE_ACTIVE         = 'active';
+    public const STATE_DISABLED       = 'disabled';
 
     public const ALL_STATES = [
         self::STATE_NOT_CONNECTED,
@@ -55,6 +57,7 @@ class AccountStateRouter
         self::STATE_REJECTED,
         self::STATE_INACTIVE,
         self::STATE_ACTIVE,
+        self::STATE_DISABLED,
     ];
 
     /** viewهای مجاز روی مسیر canonical. */
@@ -112,6 +115,9 @@ class AccountStateRouter
      */
     public static function resolveForPage(): array
     {
+        if (!SiteActivation::isEnabled()) {
+            return ['state' => self::STATE_DISABLED, 'shops' => [], 'message' => ''];
+        }
         $token = syncBasalamSettings()->getSettings(SettingsConfig::TOKEN);
         if (!is_string($token) || trim($token) === '') {
             return ['state' => self::STATE_NOT_CONNECTED, 'shops' => [], 'message' => ''];
@@ -136,6 +142,9 @@ class AccountStateRouter
      */
     public static function resolveCurrent(bool $fresh = false): array
     {
+        if (!SiteActivation::isEnabled()) {
+            return ['state' => self::STATE_DISABLED, 'shops' => [], 'message' => ''];
+        }
         try {
             $token = ClientFactory::make()->token();
         } catch (\Throwable $exception) {
@@ -170,6 +179,9 @@ class AccountStateRouter
             return ['state' => self::STATE_ERROR_NETWORK, 'shops' => [], 'message' => $exception->getMessage()];
         }
 
+        if (!SiteActivation::isEnabled()) {
+            return ['state' => self::STATE_DISABLED, 'shops' => [], 'message' => ''];
+        }
         return [
             'state' => self::stateForShops($shops),
             'shops' => $shops,
@@ -251,6 +263,8 @@ class AccountStateRouter
         $isSalamGatePage = strpos($hookSuffix, 'salam_gate') !== false;
         $screen = function_exists('get_current_screen') ? get_current_screen() : null;
         $isOrderScreen = $screen && in_array($screen->id, ['shop_order', 'edit-shop_order', 'woocommerce_page_wc-orders'], true);
+
+        if ($isOrderScreen && !\SyncBasalam\SalamGate\FeatureAvailability::isVisible()) return;
 
         if (!$isSalamGatePage && !$isOrderScreen) {
             return;

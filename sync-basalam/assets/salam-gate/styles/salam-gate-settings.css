@@ -79,6 +79,17 @@
 .salam-gate-page [data-sg-address-details-modal] .sg-address-details__location { display: grid; gap: 12px; margin: 0 0 4px; padding-bottom: 18px; border-bottom: 1px solid var(--sg-border); }
 .salam-gate-page [data-sg-address-details-modal] .sg-address-details__location > div { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
 .salam-gate-page [data-sg-address-details-modal] .sg-address-details__location dt { color: var(--sg-muted); font-size: 13px; }
+
+.salam-gate-page .sg-settings__activation { border: 1px solid #f4d7ca; }
+.sg-settings__activation .sg-card__detail { max-width: 780px; line-height: 2; }
+.sg-settings__deactivate-confirm { margin-top: 16px; }
+.sg-settings__deactivate-confirm > summary { display: inline-flex; cursor: pointer; list-style: none; }
+.salam-gate-page .sg-settings__deactivate-confirm > .sg-button { color: #fff; background: #dc2626; border-color: #dc2626; }
+.salam-gate-page .sg-settings__deactivate-confirm > .sg-button:hover,
+.salam-gate-page .sg-settings__deactivate-confirm > .sg-button:focus-visible { color: #fff; background: #b91c1c; border-color: #b91c1c; }
+.salam-gate-page .sg-settings__deactivate-confirm > .sg-button:focus-visible { outline: 2px solid #dc2626; outline-offset: 3px; }
+.sg-settings__deactivate-confirm > summary::-webkit-details-marker { display: none; }
+.sg-settings__deactivate-confirm[open] > summary { margin-bottom: 12px; }
 .salam-gate-page [data-sg-address-details-modal] .sg-address-details__location dd { margin: 0; font-size: 14px; font-weight: 700; }
 .salam-gate-page [data-sg-address-details-modal] .sg-field__label { font-size: 14px; font-weight: 600; }
 .salam-gate-page [data-sg-address-details-modal] .sg-field__input { min-height: 48px; font-size: 14px; font-weight: 500; }

@@ -12,9 +12,10 @@ $router = \SyncBasalam\SalamGate\Admin\AccountStateRouter::class;
 $sgView = (string) ($data['view'] ?? '');
 $connectionUnavailable = in_array($data['state'] ?? '', ['not_connected', 'error_auth', 'error_forbidden'], true);
 $protectedView = in_array($sgView, ['send', 'settings', 'activation'], true);
+$siteDisabled = ($data['state'] ?? '') === 'disabled';
 $accountLoading = ($data['state'] ?? '') === 'loading';
 $requiresActiveAccount = in_array($sgView, ['send', 'settings'], true) && ($data['state'] ?? '') !== 'active';
-$loadView = !$requiresActiveAccount && !((($connectionUnavailable || $accountLoading) && $protectedView))
+$loadView = !$siteDisabled && !$requiresActiveAccount && !((($connectionUnavailable || $accountLoading) && $protectedView))
     && (in_array($sgView, ['send', 'settings', 'calculator', 'post-offices'], true)
         || ($sgView === 'activation' && in_array($data['state'] ?? '', ['', 'not_registered'], true))
         || ($sgView === '' && ($data['state'] ?? '') === 'active'));
@@ -27,7 +28,7 @@ $loadView = !$requiresActiveAccount && !((($connectionUnavailable || $accountLoa
             <?php include __DIR__ . '/partials/loading-region.php'; ?>
             <div data-sg-load-content inert>
         <?php endif; ?>
-        <?php if ((($connectionUnavailable || $accountLoading) && $protectedView) || $requiresActiveAccount) : ?>
+        <?php if ($siteDisabled || (($connectionUnavailable || $accountLoading) && $protectedView) || $requiresActiveAccount) : ?>
             <?php echo $router::renderStatePartial($data); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped — internal synthetic lock template ?>
         <?php elseif (!empty($data['view'])) : ?>
             <?php

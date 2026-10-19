@@ -2,6 +2,28 @@
 
 <details>
 
+<summary>1.10.32 - 2026-10-19</summary>
+
+### Added
+
+- Bundle Salam Pay as a WooSalam payment module with classic and Blocks checkout, HPOS, existing settings/order/callback compatibility, configurable storefront promotions and direct access through WooCommerce payment settings.
+- Verify order reference, payment amount, currency and session before completing payment; serialize financial operations and reconcile interrupted requests without repeating ambiguous POSTs.
+- Track partial/full asynchronous refunds and create WooCommerce refund records, item restocks and final status only after confirmed settlement. Recover existing standalone refund intents and preserve their existing WooCommerce records.
+- Keep payment callbacks available during forced synchronization updates; resume interrupted inquiry jobs and expose manual reconciliation and refund status in order admin.
+- Add the current upstream API contract subset, a local Postman simulation and WordPress integration checks.
+
+### Changed
+
+- Remove the extra Salam Pay submenu from WooSalam; configure the gateway directly in WooCommerce payment settings. Existing settings bookmarks redirect to the same page.
+
+### Fixed
+
+- Fix SalamGate shipping being disabled on PHP 8.2 by correcting the module's minimum PHP requirement from 8.3 to 8.2.
+
+</details>
+
+<details>
+
 <summary>1.10.30 - 2026-10-18</summary>
 
 ### Added
@@ -9,7 +31,6 @@
 - Add the complete SalamGate shipping workflow to ordinary WooSalam, including onboarding, single/native/mixed bulk shipments, reviewed payment, cancellation, eligible labels and official postal tracking (PTT-51178)
 - Keep legacy Pro as the sole shipping owner when active, preserving existing parcel mappings and financial guards without duplicate callbacks
 - Scope shipping compatibility checks and assets to the shipping module without changing ordinary OAuth client credentials or the base plugin's other features
-- Run the SalamGate shipping module on the local PHP 8.2 runtime used by the base plugin.
 
 ### Fixed
 

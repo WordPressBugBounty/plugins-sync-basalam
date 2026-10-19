@@ -58,6 +58,30 @@ jQuery(function ($) {
     });
   });
 
+  $(document).on("click", "[data-sg-site-enabled]", function () {
+    var $button = $(this), enabled = $button.attr("data-sg-site-enabled");
+    if ($button.prop("disabled")) return;
+    var $message = $button.closest(".sg-state, .sg-settings__activation").find("[data-sg-site-activation-message]");
+    $message.prop("hidden", true).text("");
+    sgBusy($button, true);
+    $.ajax({ url: basalam_ajax.ajaxurl, type: "POST", dataType: "json", timeout: 30000,
+      data: { action: "salam_gate_site_activation", enabled: enabled, _wpnonce: basalam_ajax.nonce }
+    }).done(function (result) {
+      if (result && result.success && result.data) {
+        window.location.assign(result.data.redirect);
+        return;
+      }
+      fail(result && result.data && result.data.message);
+    }).fail(function (xhr) {
+      var result = xhr.responseJSON;
+      fail(result && result.data && result.data.message);
+    });
+    function fail(message) {
+      sgBusy($button, false);
+      $message.text(message || "نتیجه تغییر وضعیت دریافت نشد؛ صفحه را تازه‌سازی کنید. ثبت یا پرداخت جدیدی انجام نمی‌شود.").prop("hidden", false);
+    }
+  });
+
   $(document).on("click", ".salam-gate-activate", function () {
     // shop_id روی خود دکمه صفحه router است — فال‌بک به والد data-shop-id.
     var shopId = $(this).data("shop-id") || $(this).closest("[data-shop-id]").data("shop-id");
@@ -103,7 +127,7 @@ jQuery(function ($) {
   var $container = $("#sg-state-container", $root);
   var $msg = $(".sg-refresh-state__msg", $root);
   var refreshInFlight = false, navigating = false;
-  var accountStates = ["not_connected", "error_network", "error_auth", "error_forbidden", "not_registered", "pending", "rejected", "inactive", "active"];
+  var accountStates = ["not_connected", "error_network", "error_auth", "error_forbidden", "not_registered", "pending", "rejected", "inactive", "active", "disabled"];
 
   function sgRouterBusy(on) {
     // Query again after each partial replacement: the retry button may be new.

@@ -34,6 +34,19 @@ $trackingUrl = admin_url('admin.php?page=salam_gate&view=tracking');
             <div class="sg-wizard__notice" data-sg-settings-notice style="display:none;" role="status" aria-live="polite"></div>
         </section>
 
+        <section class="sg-card sg-settings__group sg-settings__activation" aria-labelledby="sg-settings-activation-title">
+            <div>
+                <h3 class="sg-card__title" id="sg-settings-activation-title">وضعیت سلام‌گیت در این سایت</h3>
+                <p class="sg-card__detail">با غیرفعال‌سازی، امکانات سلام‌گیت از سفارش‌های ووکامرس پنهان می‌شود. حساب پستی و مرسوله‌های قبلی حذف نمی‌شوند و فعال‌سازی دوباره هزینه ندارد.</p>
+            </div>
+            <details class="sg-settings__deactivate-confirm">
+                <summary class="sg-button sg-button--secondary">غیرفعال‌سازی سلام‌گیت</summary>
+                <p class="sg-card__detail">سلام‌گیت فقط در همین سایت غیرفعال می‌شود؛ پرداخت یا ارسال قبلی لغو نخواهد شد. ادامه می‌دهید؟</p>
+                <button type="button" class="sg-button sg-button--secondary" data-sg-site-enabled="0">بله، غیرفعال شود</button>
+            </details>
+            <p class="sg-site-activation-message" data-sg-site-activation-message role="status" aria-live="polite" hidden></p>
+        </section>
+
         <section class="sg-card sg-settings__group sg-settings__help" id="sg-settings-help" aria-labelledby="sg-settings-help-title">
             <h3 class="sg-card__title" id="sg-settings-help-title"><span class="dashicons dashicons-admin-tools" aria-hidden="true"></span> ابزارها، پرسش‌های متداول و قوانین</h3>
             <!-- ماشین‌حساب و مراکز -->

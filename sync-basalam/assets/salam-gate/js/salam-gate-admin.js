@@ -330,6 +330,7 @@
       active: ["حساب فعال", "active"],
       pending: ["در انتظار تأیید", "pending"],
       inactive: ["حساب غیرفعال", "inactive"],
+      disabled: ["غیرفعال در این سایت", "inactive"],
       rejected: ["درخواست رد شده", "inactive"],
       not_registered: ["فعال‌سازی نشده", "neutral"],
       not_connected: ["اتصال برقرار نیست", "error"],

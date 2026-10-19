@@ -1,0 +1,1406 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Salam Pay public API subset (upstream snapshot)",
+    "version": "2026-10-19",
+    "description": "Subset fetched from https://salam-pay-api.basalam.com/openapi.json on 2026-10-19. Numeric exclusiveMinimum normalized to OpenAPI 3.0 form. X-Client-Secret authentication added from the supplied official plugin. Refund POST response is unspecified upstream; no acceptance body is assumed."
+  },
+  "servers": [
+    {
+      "url": "https://salam-pay-api.basalam.com"
+    }
+  ],
+  "paths": {
+    "/public-api/v1/sessions": {
+      "post": {
+        "tags": [
+          "sessions-public-api"
+        ],
+        "summary": "Create Session",
+        "operationId": "create_session_public_api_v1_sessions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSessionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateSessionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public-api/v1/payments/references/{reference_id}": {
+      "get": {
+        "tags": [
+          "pays-public-api"
+        ],
+        "summary": "Get Payment",
+        "operationId": "get_payment_public_api_v1_payments_references__reference_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Reference Id",
+              "type": "integer"
+            },
+            "name": "reference_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaySummaryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public-api/v1/refunds": {
+      "post": {
+        "tags": [
+          "refunds-public-api"
+        ],
+        "summary": "Refund",
+        "operationId": "refund_public_api_v1_refunds_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefundRequestModel"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public-api/v1/refunds/{reference_id}/status": {
+      "get": {
+        "tags": [
+          "refunds-public-api"
+        ],
+        "summary": "Inquiry Refund",
+        "operationId": "inquiry_refund_public_api_v1_refunds__reference_id__status_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Reference Id",
+              "exclusiveMinimum": true,
+              "type": "integer",
+              "minimum": 0.0
+            },
+            "name": "reference_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InquiryRefundResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BnplFixedLineConfigValue": {
+        "title": "BnplFixedLineConfigValue",
+        "required": [
+          "installment_count",
+          "monthly_interest_percent",
+          "upfront_amount"
+        ],
+        "type": "object",
+        "properties": {
+          "installment_count": {
+            "title": "Installment Count",
+            "exclusiveMinimum": true,
+            "type": "integer",
+            "minimum": 0.0
+          },
+          "monthly_interest_percent": {
+            "title": "Monthly Interest Percent",
+            "minimum": 0.0,
+            "type": "number"
+          },
+          "upfront_amount": {
+            "title": "Upfront Amount",
+            "minimum": 0.0,
+            "type": "integer"
+          }
+        }
+      },
+      "Category": {
+        "title": "Category",
+        "required": [
+          "id",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        }
+      },
+      "ClientUserResponse": {
+        "title": "ClientUserResponse",
+        "required": [
+          "client_id",
+          "client_title",
+          "user_id",
+          "name",
+          "mobile"
+        ],
+        "type": "object",
+        "properties": {
+          "client_id": {
+            "title": "Client Id",
+            "type": "integer"
+          },
+          "client_title": {
+            "title": "Client Title",
+            "type": "string"
+          },
+          "user_id": {
+            "title": "User Id",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "mobile": {
+            "title": "Mobile",
+            "type": "string"
+          },
+          "national_code": {
+            "title": "National Code",
+            "type": "string"
+          },
+          "seller": {
+            "$ref": "#/components/schemas/SellerInfoResponse"
+          }
+        },
+        "description": "Represents user seller information."
+      },
+      "CreateSessionRequest": {
+        "title": "CreateSessionRequest",
+        "required": [
+          "amount",
+          "reference_id",
+          "callback_url"
+        ],
+        "type": "object",
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "exclusiveMinimum": true,
+            "type": "integer",
+            "minimum": 1000.0
+          },
+          "reference_id": {
+            "title": "Reference Id",
+            "exclusiveMinimum": true,
+            "type": "integer",
+            "minimum": 0.0
+          },
+          "seller_user_id": {
+            "title": "Seller User Id",
+            "exclusiveMinimum": true,
+            "type": "integer",
+            "minimum": 0.0
+          },
+          "mobile": {
+            "title": "Mobile",
+            "type": "string"
+          },
+          "items": {
+            "title": "Items",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Item"
+            }
+          },
+          "discount": {
+            "title": "Discount",
+            "minimum": 0.0,
+            "type": "integer"
+          },
+          "callback_url": {
+            "title": "Callback Url",
+            "type": "string"
+          },
+          "metadata": {
+            "title": "Metadata",
+            "type": "object"
+          },
+          "configs": {
+            "title": "Configs",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SessionConfigCreateSchema"
+            }
+          },
+          "front_url": {
+            "title": "Front Url",
+            "type": "string"
+          }
+        }
+      },
+      "CreateSessionResponse": {
+        "title": "CreateSessionResponse",
+        "required": [
+          "url",
+          "session"
+        ],
+        "type": "object",
+        "properties": {
+          "url": {
+            "title": "Url",
+            "type": "string"
+          },
+          "session": {
+            "$ref": "#/components/schemas/SessionResponse"
+          }
+        }
+      },
+      "CreditProgramAllocationRequestEntity": {
+        "title": "CreditProgramAllocationRequestEntity",
+        "required": [
+          "credit_program_id",
+          "amount"
+        ],
+        "type": "object",
+        "properties": {
+          "credit_program_id": {
+            "title": "Credit Program Id",
+            "type": "integer"
+          },
+          "amount": {
+            "title": "Amount",
+            "type": "integer"
+          }
+        }
+      },
+      "CustomerResponse": {
+        "title": "CustomerResponse",
+        "required": [
+          "mobile"
+        ],
+        "type": "object",
+        "properties": {
+          "mobile": {
+            "title": "Mobile",
+            "type": "string"
+          },
+          "national_id": {
+            "title": "National Id",
+            "type": "string"
+          }
+        }
+      },
+      "DriverIdEnum": {
+        "title": "DriverIdEnum",
+        "enum": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22
+        ],
+        "type": "integer",
+        "description": "An enumeration."
+      },
+      "DriverMinimalResponse": {
+        "title": "DriverMinimalResponse",
+        "required": [
+          "id",
+          "value",
+          "name",
+          "description"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "value": {
+            "title": "Value",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          }
+        }
+      },
+      "EnumResponse": {
+        "title": "EnumResponse",
+        "required": [
+          "name",
+          "value",
+          "description"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          }
+        }
+      },
+      "HTTPValidationError": {
+        "title": "HTTPValidationError",
+        "type": "object",
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            }
+          }
+        }
+      },
+      "InquiryRefundResponse": {
+        "title": "InquiryRefundResponse",
+        "required": [
+          "final_status",
+          "adjustment"
+        ],
+        "type": "object",
+        "properties": {
+          "final_status": {
+            "$ref": "#/components/schemas/EnumResponse"
+          },
+          "error_description": {
+            "title": "Error Description",
+            "type": "string"
+          },
+          "adjustment": {
+            "$ref": "#/components/schemas/RefundAdjustmentResponse"
+          }
+        },
+        "description": "V3 refund status response."
+      },
+      "InvoiceItemAllocationRequestEntity": {
+        "title": "InvoiceItemAllocationRequestEntity",
+        "required": [
+          "invoice_item_id",
+          "amount",
+          "shipping_amount",
+          "service_fee"
+        ],
+        "type": "object",
+        "properties": {
+          "invoice_item_id": {
+            "title": "Invoice Item Id",
+            "type": "integer"
+          },
+          "allocations": {
+            "title": "Allocations",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreditProgramAllocationRequestEntity"
+            }
+          },
+          "amount": {
+            "title": "Amount",
+            "type": "integer"
+          },
+          "shipping_amount": {
+            "title": "Shipping Amount",
+            "type": "integer"
+          },
+          "service_fee": {
+            "title": "Service Fee",
+            "type": "integer"
+          }
+        }
+      },
+      "Item": {
+        "title": "Item",
+        "required": [
+          "id",
+          "title",
+          "unit_price",
+          "quantity",
+          "category"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "unit_price": {
+            "title": "Unit Price",
+            "minimum": 0.0,
+            "type": "integer"
+          },
+          "discount": {
+            "title": "Discount",
+            "type": "integer"
+          },
+          "store": {
+            "$ref": "#/components/schemas/Store"
+          },
+          "quantity": {
+            "title": "Quantity",
+            "minimum": 1.0,
+            "type": "integer"
+          },
+          "category": {
+            "$ref": "#/components/schemas/Category"
+          },
+          "metadata": {
+            "title": "Metadata",
+            "type": "object"
+          }
+        }
+      },
+      "Options": {
+        "title": "Options",
+        "type": "object",
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "cash_amount": {
+            "title": "Cash Amount",
+            "exclusiveMinimum": true,
+            "type": "integer",
+            "minimum": 1000.0
+          },
+          "use_wallet": {
+            "title": "Use Wallet",
+            "type": "boolean",
+            "default": false
+          },
+          "check_card_owner": {
+            "title": "Check Card Owner",
+            "type": "boolean",
+            "default": false
+          },
+          "shipping_amount": {
+            "title": "Shipping Amount",
+            "type": "integer"
+          },
+          "discount_shipping_amount": {
+            "title": "Discount Shipping Amount",
+            "type": "integer"
+          },
+          "service_fee": {
+            "title": "Service Fee",
+            "type": "integer"
+          },
+          "invoice_id": {
+            "title": "Invoice Id",
+            "type": "integer"
+          },
+          "invoice_item_id": {
+            "title": "Invoice Item Id",
+            "type": "integer"
+          },
+          "invoice_items": {
+            "title": "Invoice Items",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InvoiceItemAllocationRequestEntity"
+            }
+          },
+          "total_additions": {
+            "title": "Total Additions",
+            "type": "integer"
+          },
+          "total_deductions": {
+            "title": "Total Deductions",
+            "type": "integer"
+          },
+          "basket_details": {
+            "title": "Basket Details",
+            "type": "object"
+          },
+          "basket_refund": {
+            "title": "Basket Refund",
+            "type": "object"
+          }
+        }
+      },
+      "PayMinimalResponse": {
+        "title": "PayMinimalResponse",
+        "required": [
+          "id",
+          "user_id",
+          "reference_id",
+          "amount",
+          "status",
+          "reason_id",
+          "created_at",
+          "updated_at"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "user_id": {
+            "title": "User Id",
+            "type": "integer"
+          },
+          "reference_id": {
+            "title": "Reference Id",
+            "type": "integer"
+          },
+          "amount": {
+            "title": "Amount",
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EnumResponse"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "reason_id": {
+            "title": "Reason Id",
+            "type": "integer"
+          },
+          "reason": {
+            "$ref": "#/components/schemas/ReasonMinimalResponse"
+          },
+          "transactions": {
+            "title": "Transactions",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TransactionMinimalResponse"
+            }
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "integer"
+          },
+          "updated_at": {
+            "title": "Updated At",
+            "type": "integer"
+          }
+        }
+      },
+      "PaySummaryResponse": {
+        "title": "PaySummaryResponse",
+        "required": [
+          "id",
+          "user_id",
+          "reference_id",
+          "amount",
+          "callback_url",
+          "customer",
+          "payment_methods",
+          "status",
+          "key",
+          "transactions",
+          "created_at",
+          "updated_at"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "user_id": {
+            "title": "User Id",
+            "type": "integer"
+          },
+          "reference_id": {
+            "title": "Reference Id",
+            "type": "integer"
+          },
+          "amount": {
+            "title": "Amount",
+            "type": "integer"
+          },
+          "seller_user_id": {
+            "title": "Seller User Id",
+            "type": "integer"
+          },
+          "discount": {
+            "title": "Discount",
+            "type": "integer",
+            "default": 0
+          },
+          "callback_url": {
+            "title": "Callback Url",
+            "type": "string"
+          },
+          "customer": {
+            "$ref": "#/components/schemas/CustomerResponse"
+          },
+          "payment_methods": {
+            "title": "Payment Methods",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentMethodResponse"
+            }
+          },
+          "items": {
+            "title": "Items",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Item"
+            }
+          },
+          "metadata": {
+            "title": "Metadata",
+            "type": "object"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EnumResponse"
+          },
+          "session_id": {
+            "title": "Session Id",
+            "type": "integer"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "transactions": {
+            "title": "Transactions",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TransactionMinimalResponse"
+            }
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "integer"
+          },
+          "updated_at": {
+            "title": "Updated At",
+            "type": "integer"
+          }
+        }
+      },
+      "PayWithSpecificLineConfigValue": {
+        "title": "PayWithSpecificLineConfigValue",
+        "required": [
+          "option_code"
+        ],
+        "type": "object",
+        "properties": {
+          "option_code": {
+            "title": "Option Code",
+            "type": "string"
+          }
+        }
+      },
+      "PaymentMethodOptionsResponse": {
+        "title": "PaymentMethodOptionsResponse",
+        "type": "object",
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "cash_amount": {
+            "title": "Cash Amount",
+            "type": "integer"
+          },
+          "use_wallet": {
+            "title": "Use Wallet",
+            "type": "boolean",
+            "default": false
+          },
+          "check_card_owner": {
+            "title": "Check Card Owner",
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "PaymentMethodResponse": {
+        "title": "PaymentMethodResponse",
+        "required": [
+          "id",
+          "amount"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/DriverIdEnum"
+          },
+          "amount": {
+            "title": "Amount",
+            "type": "integer"
+          },
+          "options": {
+            "$ref": "#/components/schemas/PaymentMethodOptionsResponse"
+          },
+          "metadata": {
+            "title": "Metadata",
+            "type": "object"
+          }
+        }
+      },
+      "ReasonMinimalResponse": {
+        "title": "ReasonMinimalResponse",
+        "required": [
+          "id",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        }
+      },
+      "RefundAdjustmentResponse": {
+        "title": "RefundAdjustmentResponse",
+        "required": [
+          "id",
+          "user_id",
+          "pay_id",
+          "pay",
+          "reference_type",
+          "reference_id",
+          "amount",
+          "description",
+          "original_reference_id",
+          "status",
+          "action",
+          "transactions",
+          "created_at",
+          "updated_at"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "user_id": {
+            "title": "User Id",
+            "type": "integer"
+          },
+          "pay_id": {
+            "title": "Pay Id",
+            "type": "integer"
+          },
+          "pay": {
+            "$ref": "#/components/schemas/PayMinimalResponse"
+          },
+          "reference_type": {
+            "$ref": "#/components/schemas/EnumResponse"
+          },
+          "reference_id": {
+            "title": "Reference Id",
+            "type": "integer"
+          },
+          "amount": {
+            "title": "Amount",
+            "type": "integer"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "original_reference_id": {
+            "title": "Original Reference Id",
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EnumResponse"
+          },
+          "action": {
+            "$ref": "#/components/schemas/EnumResponse"
+          },
+          "metadata": {
+            "title": "Metadata",
+            "type": "object"
+          },
+          "transactions": {
+            "title": "Transactions",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TransactionSummaryResponse"
+            }
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "integer"
+          },
+          "updated_at": {
+            "title": "Updated At",
+            "type": "integer"
+          }
+        }
+      },
+      "RefundRequestModel": {
+        "title": "RefundRequestModel",
+        "required": [
+          "pay_reference_id",
+          "reference_id",
+          "amount",
+          "description"
+        ],
+        "type": "object",
+        "properties": {
+          "pay_reference_id": {
+            "title": "Pay Reference Id",
+            "exclusiveMinimum": true,
+            "type": "integer",
+            "minimum": 0.0
+          },
+          "reference_id": {
+            "title": "Reference Id",
+            "exclusiveMinimum": true,
+            "type": "integer",
+            "minimum": 0.0
+          },
+          "metadata": {
+            "title": "Metadata",
+            "type": "object"
+          },
+          "amount": {
+            "title": "Amount",
+            "exclusiveMinimum": true,
+            "type": "integer",
+            "minimum": 0.0
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "options": {
+            "$ref": "#/components/schemas/Options"
+          }
+        }
+      },
+      "SellerInfoResponse": {
+        "title": "SellerInfoResponse",
+        "required": [
+          "seller_id",
+          "is_verified"
+        ],
+        "type": "object",
+        "properties": {
+          "seller_id": {
+            "title": "Seller Id",
+            "type": "integer"
+          },
+          "is_verified": {
+            "title": "Is Verified",
+            "type": "boolean"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "slug": {
+            "title": "Slug",
+            "type": "string"
+          },
+          "logo": {
+            "title": "Logo",
+            "type": "string"
+          }
+        },
+        "description": "Represents seller information."
+      },
+      "SendSmsSessionLinkConfigValue": {
+        "title": "SendSmsSessionLinkConfigValue",
+        "required": [
+          "enabled"
+        ],
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          }
+        }
+      },
+      "SessionConfigCreateSchema": {
+        "title": "SessionConfigCreateSchema",
+        "required": [
+          "type",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/SessionConfigTypeEnum"
+          },
+          "value": {
+            "title": "Value",
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BnplFixedLineConfigValue"
+              },
+              {
+                "$ref": "#/components/schemas/SendSmsSessionLinkConfigValue"
+              },
+              {
+                "$ref": "#/components/schemas/PayWithSpecificLineConfigValue"
+              },
+              {
+                "$ref": "#/components/schemas/SessionFeeConfigValue"
+              }
+            ]
+          }
+        }
+      },
+      "SessionConfigTypeEnum": {
+        "title": "SessionConfigTypeEnum",
+        "enum": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "type": "integer",
+        "description": "An enumeration."
+      },
+      "SessionFeeConfigValue": {
+        "title": "SessionFeeConfigValue",
+        "required": [
+          "fee_type"
+        ],
+        "type": "object",
+        "properties": {
+          "fee_type": {
+            "title": "Fee Type",
+            "enum": [
+              10,
+              12
+            ],
+            "type": "integer"
+          }
+        }
+      },
+      "SessionResponse": {
+        "title": "SessionResponse",
+        "required": [
+          "id",
+          "key",
+          "amount",
+          "reference_id",
+          "status",
+          "callback_url",
+          "expires_at"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "amount": {
+            "title": "Amount",
+            "type": "integer"
+          },
+          "reference_id": {
+            "title": "Reference Id",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "logo": {
+            "title": "Logo",
+            "type": "string"
+          },
+          "mobile": {
+            "title": "Mobile",
+            "type": "string"
+          },
+          "items": {
+            "title": "Items",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Item"
+            }
+          },
+          "discount": {
+            "title": "Discount",
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EnumResponse"
+          },
+          "callback_url": {
+            "title": "Callback Url",
+            "type": "string"
+          },
+          "metadata": {
+            "title": "Metadata",
+            "type": "object"
+          },
+          "expires_at": {
+            "title": "Expires At",
+            "type": "string",
+            "format": "date-time"
+          },
+          "payment_details": {
+            "title": "Payment Details"
+          },
+          "configs": {
+            "title": "Configs",
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "client_seller": {
+            "$ref": "#/components/schemas/ClientUserResponse"
+          }
+        }
+      },
+      "Store": {
+        "title": "Store",
+        "required": [
+          "id",
+          "title",
+          "salampay_seller_user_id"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "salampay_seller_user_id": {
+            "title": "Salampay Seller User Id",
+            "type": "integer"
+          }
+        }
+      },
+      "TransactionMinimalResponse": {
+        "title": "TransactionMinimalResponse",
+        "required": [
+          "id",
+          "pay_id",
+          "pay_driver_id",
+          "amount",
+          "status",
+          "type",
+          "action",
+          "created_at",
+          "updated_at"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "pay_id": {
+            "title": "Pay Id",
+            "type": "integer"
+          },
+          "pay_driver_id": {
+            "$ref": "#/components/schemas/EnumResponse"
+          },
+          "adjustment_id": {
+            "title": "Adjustment Id",
+            "type": "integer"
+          },
+          "adjustment_driver_id": {
+            "$ref": "#/components/schemas/EnumResponse"
+          },
+          "amount": {
+            "title": "Amount",
+            "type": "integer"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EnumResponse"
+          },
+          "type": {
+            "$ref": "#/components/schemas/EnumResponse"
+          },
+          "action": {
+            "$ref": "#/components/schemas/EnumResponse"
+          },
+          "driver_provided_data": {
+            "title": "Driver Provided Data",
+            "type": "object"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "integer"
+          },
+          "updated_at": {
+            "title": "Updated At",
+            "type": "integer"
+          }
+        }
+      },
+      "TransactionSummaryResponse": {
+        "title": "TransactionSummaryResponse",
+        "required": [
+          "id",
+          "pay_id",
+          "pay_driver_id",
+          "amount",
+          "status",
+          "type",
+          "action",
+          "created_at",
+          "updated_at"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "pay_id": {
+            "title": "Pay Id",
+            "type": "integer"
+          },
+          "pay_driver_id": {
+            "$ref": "#/components/schemas/EnumResponse"
+          },
+          "pay_driver": {
+            "$ref": "#/components/schemas/DriverMinimalResponse"
+          },
+          "driver_option": {
+            "title": "Driver Option",
+            "type": "string"
+          },
+          "adjustment_id": {
+            "title": "Adjustment Id",
+            "type": "integer"
+          },
+          "adjustment_driver_id": {
+            "$ref": "#/components/schemas/EnumResponse"
+          },
+          "adjustment_driver": {
+            "$ref": "#/components/schemas/DriverMinimalResponse"
+          },
+          "amount": {
+            "title": "Amount",
+            "type": "integer"
+          },
+          "details": {
+            "title": "Details",
+            "type": "object"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EnumResponse"
+          },
+          "type": {
+            "$ref": "#/components/schemas/EnumResponse"
+          },
+          "action": {
+            "$ref": "#/components/schemas/EnumResponse"
+          },
+          "error_description": {
+            "title": "Error Description",
+            "type": "string"
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "integer"
+          },
+          "updated_at": {
+            "title": "Updated At",
+            "type": "integer"
+          }
+        }
+      },
+      "ValidationError": {
+        "title": "ValidationError",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "loc": {
+            "title": "Location",
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            }
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "ClientSecret": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Client-Secret"
+      }
+    }
+  },
+  "security": [
+    {
+      "ClientSecret": []
+    }
+  ]
+}

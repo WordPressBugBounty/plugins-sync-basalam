@@ -72,7 +72,7 @@ final class StatusSyncScheduler
             ?? SalamGateSettings::DEFAULTS[SalamGateSettings::KEY_STATUS_SYNC_INTERVAL];
 
         return [
-            'enabled' => !empty($stored[SalamGateSettings::KEY_STATUS_SYNC_ENABLED]
+            'enabled' => SiteActivation::isEnabled() && !empty($stored[SalamGateSettings::KEY_STATUS_SYNC_ENABLED]
                 ?? SalamGateSettings::DEFAULTS[SalamGateSettings::KEY_STATUS_SYNC_ENABLED]),
             'interval' => in_array($interval, SalamGateSettings::SYNC_INTERVALS, true)
                 ? $interval

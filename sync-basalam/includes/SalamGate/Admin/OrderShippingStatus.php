@@ -29,6 +29,7 @@ final class OrderShippingStatus
 
     public static function columns(array $columns): array
     {
+        if (!\SyncBasalam\SalamGate\FeatureAvailability::isVisible()) return $columns;
         unset($columns[self::COLUMN], $columns[self::ACTION_COLUMN], $columns['basalam_order']);
         $result = [];
         foreach ($columns as $key => $label) {
@@ -43,6 +44,7 @@ final class OrderShippingStatus
     /** Presentation only on Woo's order lists; stored statuses and hooks stay intact. */
     public static function orderStatusLabels(array $statuses): array
     {
+        if (!\SyncBasalam\SalamGate\FeatureAvailability::isVisible()) return $statuses;
         $screen = function_exists('get_current_screen') ? get_current_screen() : null;
         if (!$screen || !in_array($screen->id, ['edit-shop_order', 'woocommerce_page_wc-orders'], true)
             || ($screen->id === 'woocommerce_page_wc-orders' && !empty($_GET['action']))) { return $statuses; }
@@ -77,6 +79,7 @@ final class OrderShippingStatus
     /** HPOS supplies WC_Order; the legacy screen supplies a post ID. */
     public static function render(string $column, $orderOrId): void
     {
+        if (!\SyncBasalam\SalamGate\FeatureAvailability::isVisible()) return;
         if (!in_array($column, [self::COLUMN, self::ACTION_COLUMN], true)) { return; }
         $order = $orderOrId instanceof \WC_Order ? $orderOrId
             : (function_exists('wc_get_order') ? wc_get_order($orderOrId) : false);
@@ -260,6 +263,7 @@ final class OrderShippingStatus
 
     public static function enqueueStyles(): void
     {
+        if (!\SyncBasalam\SalamGate\FeatureAvailability::isVisible()) return;
         $screen = get_current_screen();
         if (!$screen || !in_array($screen->id, ['edit-shop_order', 'woocommerce_page_wc-orders'], true)) { return; }
         // Woo's table does not inherit the SalamGate shell font. Reuse its
@@ -293,7 +297,7 @@ final class OrderShippingStatus
     {
         $screen = get_current_screen();
         if (!$screen || !in_array($screen->id, ['edit-shop_order', 'woocommerce_page_wc-orders'], true)
-            || !current_user_can('manage_woocommerce') || !\SyncBasalam\SalamGate\FeatureAvailability::isAvailable()) { return; }
+            || !current_user_can('manage_woocommerce') || !\SyncBasalam\SalamGate\FeatureAvailability::isVisible()) { return; }
         if ($screen->id === 'woocommerce_page_wc-orders' && isset($_GET['action']) && $_GET['action'] !== '') { return; }
         include dirname(__DIR__, 3) . '/templates/SalamGate/order-list-host.php';
     }

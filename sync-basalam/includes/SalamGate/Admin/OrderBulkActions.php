@@ -39,6 +39,7 @@ class OrderBulkActions
 
     public static function registerAction(array $actions): array
     {
+        if (!FeatureAvailability::isVisible()) return $actions;
         $actions[self::ACTION] = 'ارسال گروهی با سلام‌گیت ووسلام';
 
         return $actions;
@@ -52,6 +53,8 @@ class OrderBulkActions
         if ($action !== self::ACTION) {
             return $redirectUrl;
         }
+
+        if (!FeatureAvailability::isVisible()) return $redirectUrl;
 
         if (!current_user_can('manage_woocommerce')) {
             return $redirectUrl;
@@ -68,7 +71,7 @@ class OrderBulkActions
 
     public static function renderBulkHost(): void
     {
-        if (!current_user_can('manage_woocommerce')) return;
+        if (!current_user_can('manage_woocommerce') || !FeatureAvailability::isVisible()) return;
         $screen = function_exists('get_current_screen') ? get_current_screen() : null;
         $orderList = $screen && in_array($screen->id, ['edit-shop_order', 'woocommerce_page_wc-orders'], true)
             && empty($_GET['action']);
@@ -79,6 +82,7 @@ class OrderBulkActions
 
     public static function renderNotice(): void
     {
+        if (!FeatureAvailability::isVisible()) return;
         if (($_GET['salam_gate_bulk_error'] ?? '') === 'limit' && current_user_can('manage_woocommerce')) {
             echo '<div class="notice notice-warning is-dismissible" data-sg-feedback-notice data-sg-feedback-kind="warning"><p>'
                 . esc_html('برای ارسال گروهی، حداکثر ۲۰ سفارش را در هر نوبت انتخاب کنید.') . '</p></div>';

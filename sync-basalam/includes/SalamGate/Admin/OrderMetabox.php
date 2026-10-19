@@ -72,7 +72,7 @@ class OrderMetabox
 
     public static function registerMetaBox(): void
     {
-        if (!current_user_can('manage_woocommerce')) return;
+        if (!current_user_can('manage_woocommerce') || !FeatureAvailability::isVisible()) return;
 
         // HPOS از id و CPT قدیمی از post استفاده می‌کند (الگوی OrderMetaBox پایه)
         $orderId = isset($_GET['id']) ? absint($_GET['id']) : 0;
@@ -105,6 +105,7 @@ class OrderMetabox
      */
     public static function render($postOrOrder): void
     {
+        if (!FeatureAvailability::isVisible()) return;
         if (is_object($postOrOrder) && method_exists($postOrOrder, 'get_id')) {
             $orderId = (int) $postOrOrder->get_id();
         } else {

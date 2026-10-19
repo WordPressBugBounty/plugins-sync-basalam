@@ -3,6 +3,8 @@
 namespace SyncBasalam\SalamGate;
 
 use SyncBasalam\SalamGate\Services\ShopsService;
+use SyncBasalam\SalamGate\Services\SiteActivation;
+use SyncBasalam\SalamGate\Admin\AccountStateRouter;
 
 defined('ABSPATH') || exit;
 
@@ -11,6 +13,12 @@ defined('ABSPATH') || exit;
  */
 class FeatureAvailability
 {
+    /** Cache-only presentation guard: no OAuth renewal or external HTTP in order rendering. */
+    public static function isVisible(): bool
+    {
+        return AccountStateRouter::resolveForPage()['state'] === AccountStateRouter::STATE_ACTIVE;
+    }
+
     public static function isAvailable(): bool
     {
         return self::activeShop() !== null;
@@ -21,6 +29,7 @@ class FeatureAvailability
      */
     public static function activeShop(): ?array
     {
+        if (!SiteActivation::isEnabled()) return null;
         try {
             if (ClientFactory::make()->token() === null) {
                 return null;

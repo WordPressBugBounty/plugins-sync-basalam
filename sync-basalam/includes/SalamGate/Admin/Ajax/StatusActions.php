@@ -15,6 +15,23 @@ if (! defined('ABSPATH')) exit;
  */
 class StatusActions
 {
+    public static function siteActivation(): void
+    {
+        self::guard();
+        $enabled = $_POST['enabled'] ?? null;
+        if (!is_string($enabled) || !in_array($enabled, ['0', '1'], true)) {
+            wp_send_json_error(['message' => 'وضعیت درخواستی معتبر نیست.'], 422);
+        }
+        try {
+            \SyncBasalam\SalamGate\Services\SiteActivation::setEnabled($enabled === '1');
+        } catch (SalamGateException $exception) {
+            wp_send_json_error(['message' => $exception->firstMessage()], 422);
+        } catch (\Throwable $exception) {
+            wp_send_json_error(['message' => 'تغییر وضعیت انجام نشد؛ دوباره تلاش کنید. ثبت یا پرداخت جدیدی انجام نشده است.'], 503);
+        }
+        wp_send_json_success(['enabled' => $enabled === '1', 'redirect' => admin_url('admin.php?page=salam_gate')]);
+    }
+
     /**
      * وضعیت حساب + HTML جزء وضعیت — برای «بررسی مجدد» بدون رفرش کامل صفحه (پارت ۳).
      */

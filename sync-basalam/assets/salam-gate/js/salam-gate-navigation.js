@@ -11,7 +11,7 @@
     var publicView = view === "calculator" || view === "post-offices" || view === "tracking";
     var request = null, leaving = false;
     var reloadKey = "salam-gate-account-reload:" + window.location.pathname + window.location.search;
-    var states = ["not_connected", "error_network", "error_auth", "error_forbidden", "not_registered", "pending", "rejected", "inactive", "active"];
+    var states = ["not_connected", "error_network", "error_auth", "error_forbidden", "not_registered", "pending", "rejected", "inactive", "active", "disabled"];
 
     function loading(on) {
       if (!publicView) body.setAttribute("aria-busy", on ? "true" : "false");
@@ -74,7 +74,7 @@
         }
         notifyState(data.state);
         if (publicView) return; // Never erase an in-progress calculation or map selection.
-        if (data.state.indexOf("error_") === 0 || data.state === "not_connected" || data.state === "not_registered") {
+        if (data.state.indexOf("error_") === 0 || data.state === "not_connected" || data.state === "not_registered" || data.state === "disabled") {
           $(body).html(data.html);
           return;
         }

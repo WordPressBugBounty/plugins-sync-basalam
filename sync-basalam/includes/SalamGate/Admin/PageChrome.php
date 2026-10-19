@@ -13,6 +13,7 @@ class PageChrome
             'active'         => ['label' => 'حساب فعال', 'tone' => 'active'],
             'pending'        => ['label' => 'در انتظار تأیید', 'tone' => 'pending'],
             'inactive'       => ['label' => 'حساب غیرفعال', 'tone' => 'inactive'],
+            'disabled'       => ['label' => 'غیرفعال در این سایت', 'tone' => 'inactive'],
             'rejected'       => ['label' => 'درخواست رد شده', 'tone' => 'inactive'],
             'not_registered' => ['label' => 'فعال‌سازی نشده', 'tone' => 'neutral'],
             'not_connected'  => ['label' => 'اتصال برقرار نیست', 'tone' => 'error'],

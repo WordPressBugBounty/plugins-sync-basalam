@@ -114,6 +114,7 @@ class SalamGateClient
         // A failed read has no uncertain mutation to reconcile. The public
         // calculator uses POST for an estimate but does not register or pay.
         $readOnly = $method === 'GET' || ($method === 'POST' && $path === self::PATH_CALCULATOR);
+        if (!$readOnly) Services\SiteActivation::assertEnabled();
         $token = $withAuth ? $this->token() : null;
         $this->lastRequestIdentityHash = $withAuth && $token !== null ? substr(sha1($token), 0, 12) : null;
 
@@ -157,6 +158,7 @@ class SalamGateClient
             $args['body'] = wp_json_encode($body);
         }
 
+        if (!$readOnly) Services\SiteActivation::assertEnabled();
         $response = wp_remote_request($url, $args);
 
         // A rejected payment response is not an idempotency guarantee. Renewing
@@ -176,6 +178,13 @@ class SalamGateClient
                 $args['headers']['Authorization'] = 'Bearer ' . $freshToken;
                 $token = $freshToken;
                 $this->lastRequestIdentityHash = substr(sha1($token), 0, 12);
+                if (!$readOnly && !Services\SiteActivation::isEnabled()) {
+                    // The first request has already been dispatched. Do not
+                    // label this as a definite preflight failure or clear its
+                    // durable financial/creation evidence when skipping retry.
+                    throw new SalamGateException('سلام‌گیت غیرفعال شد؛ نتیجه درخواست قبلی را پس از فعال‌سازی دوباره بررسی کنید.',
+                        0, [], SalamGateException::KIND_TRANSPORT);
+                }
                 $response = wp_remote_request($url, $args);
             }
         }

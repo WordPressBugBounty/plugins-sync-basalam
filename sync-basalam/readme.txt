@@ -4,7 +4,7 @@ Tags: woocommerce, basalam, woosalam, integration
 Requires at least: 6.0  
 Tested up to: 7.0
 Requires PHP: 7.4 
-Stable tag: 1.10.30
+Stable tag: 1.10.32
 License: GPL-2.0-or-later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -19,6 +19,16 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 - سفارش‌های ثبت‌شده در باسلام را به صورت خودکار در ووکامرس دریافت و مدیریت کنید  
 - قیمت و موجودی کالاها را به صورت لحظه‌ای همگام سازی کنید  
 - سفارش‌های فروشگاه، باسلام و مبدأهای مستقل را با سلام‌گیت برای ارسال پستی آماده و هزینه ارسال را پرداخت کنید
+
+== پرداخت با سلام‌پی / Salam Pay ==
+
+درگاه سلام‌پی از «ووکامرس ← پیکربندی ← پرداخت‌ها ← سلام‌پی» در دسترس است. برای فعال‌سازی، کلید اتصال دریافتی از سلام‌پی را در تنظیمات وارد کنید. پرداخت معمولی و بلوکی ووکامرس، واحدهای ریال و تومان، نوار معرفی و نشان محصول، استعلام پرداخت و بازگشت وجه کامل و جزئی پشتیبانی می‌شوند.
+
+تنظیمات، شناسه درگاه و callback نسخه مستقل حفظ شده‌اند. اگر افزونه مستقل سلام‌پی فعال باشد، همان افزونه مسئول پرداخت است؛ برای استفاده از نسخه داخلی ووسلام، نسخه مستقل را غیرفعال کنید و آن را حذف نکنید، چون حذف‌کننده نسخه مستقل تنظیمات مشترک را پاک می‌کند. دریافت پول و بازگشت وجه به کلید معتبر فروشنده نیاز دارند.
+
+بازگشت وجه سلام‌پی غیرهمزمان است: ابتدا درخواست ثبت و سپس نتیجه استعلام می‌شود؛ ووکامرس فقط پس از تأیید نهایی، بازگشت وجه و موجودی انتخاب‌شده را ثبت می‌کند. پیام «در انتظار تأیید» به معنی ثبت درخواست است؛ آن را دوباره ارسال نکنید. وضعیت در جزئیات سفارش و عملیات «بررسی پرداخت و بازگشت وجه سلام‌پی» قابل پیگیری است. درخواست خودکار بازگشت مانده وجه هنگام لغو سفارش، تنظیم جداگانه دارد و پیش‌فرض خاموش است. پیگیری خودکار به اجرای WP-Cron وابسته است.
+
+Salam Pay checkout is bundled with WooSalam, with classic/Blocks checkout, HPOS-compatible order storage, authenticated inquiry, amount checks, partial/full asynchronous refunds and optional storefront badges. Existing gateway settings and callback URLs are retained. The standalone plugin remains the sole owner while active; deactivate it to use the bundled gateway. Do not uninstall the standalone plugin after handover: its uninstaller deletes the shared settings. Refund acceptance is pending, not settlement; WooCommerce refunds are recorded after provider confirmation. Production transactions require a merchant client secret and live acceptance testing. See docs/salam-pay.md for the integration contract and reproducible local verification.
 
 == ارسال مرسوله با سلام‌گیت / SalamGate shipping ==
 
@@ -136,6 +146,10 @@ API calls use HTTPS. Authenticated operations use the configured account and che
 1. تنظیمات اولیه افزونه در وردپرس
 
 == Changelog ==
+
+= 1.10.32 =
+* Bundle Salam Pay with settings available directly under WooCommerce payments, without an extra WooSalam submenu.
+* Fix SalamGate shipping being disabled on PHP 8.2 by correcting the module's minimum PHP requirement from 8.3 to 8.2.
 
 = 1.10.30 =
 * Add the complete SalamGate shipping workflow to ordinary WooSalam, including onboarding, shipping estimates, reviewed payment, eligible labels and tracking.
