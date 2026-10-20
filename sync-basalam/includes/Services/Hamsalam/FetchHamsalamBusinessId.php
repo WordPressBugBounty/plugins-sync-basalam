@@ -55,7 +55,7 @@ class FetchHamsalamBusinessId
             }
 
             return null;
-        } catch (\Exception) {
+        } catch (\Exception $exception) {
             return null;
         }
     }

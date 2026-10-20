@@ -19,9 +19,10 @@ final class BasalamShippingPreflight
     public const MIN_DECLARED_VALUE_RIAL = 20000;
     public const MAX_DECLARED_VALUE_RIAL = 5000000000;
 
-    /** Called before an order-linked parcel is created/changed or paid. */
-    public static function check(\WC_Order|BasalamParcelOrder $order, bool $requireShippable = true, ?array &$snapshots = null): array
+    /** @param \WC_Order|BasalamParcelOrder $order Called before creation, changes or payment. */
+    public static function check(object $order, bool $requireShippable = true, ?array &$snapshots = null): array
     {
+        OrderContext::assertSupportedOrder($order);
         if ($requireShippable && ($reason = self::localStatusBlockReason($order)) !== null) {
             throw self::error($reason);
         }
@@ -64,9 +65,10 @@ final class BasalamShippingPreflight
      * Pure normalization of authenticated snapshots, deliberately independent of Woo units.
      * order_data can be passed directly to ParcelPayloadBuilder::assemble().
      * Reported financial totals are NOT the available amount for paying postage.
+     * @param \WC_Order|BasalamParcelOrder|null $order
      */
     public static function fromSnapshots(
-        \WC_Order|BasalamParcelOrder|null $order,
+        ?object $order,
         array $orderDetail,
         array $parcel,
         int $vendorId,
@@ -76,6 +78,7 @@ final class BasalamShippingPreflight
         bool $requireShippable = true,
         bool $nativeSubset = false
     ): array {
+        if ($order !== null) { OrderContext::assertSupportedOrder($order); }
         if ($requireShippable && $order !== null && ($reason = self::localStatusBlockReason($order)) !== null) {
             throw self::error($reason);
         }
@@ -261,9 +264,10 @@ final class BasalamShippingPreflight
             && $amount <= ($existing ? 10000000000 : self::MAX_DECLARED_VALUE_RIAL);
     }
 
-    /** One local terminal-state policy for menu selection and every shipping mutation. */
-    public static function localStatusBlockReason(\WC_Order|BasalamParcelOrder $order): ?string
+    /** @param \WC_Order|BasalamParcelOrder $order One policy for selection and shipping mutations. */
+    public static function localStatusBlockReason(object $order): ?string
     {
+        OrderContext::assertSupportedOrder($order);
         $terminal = [
             'trash' => 'زباله‌دان', 'refunded' => 'مستردشده', 'cancelled' => 'لغوشده',
             'failed' => 'ناموفق', 'bslm-rejected' => 'ردشده',
@@ -274,7 +278,8 @@ final class BasalamShippingPreflight
             . '» است؛ ابتدا وضعیت سفارش را بررسی کنید. ثبت و پرداخت انجام نشد.';
     }
 
-    private static function localStatusBlockReasonForNullable(\WC_Order|BasalamParcelOrder|null $order): ?string
+    /** @param \WC_Order|BasalamParcelOrder|null $order */
+    private static function localStatusBlockReasonForNullable(?object $order): ?string
     {
         return $order === null ? null : self::localStatusBlockReason($order);
     }

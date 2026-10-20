@@ -2,6 +2,7 @@
 """Real HTTP workers on disposable Apache, Nginx/FPM, Caddy/FPM and OLS."""
 import argparse
 import concurrent.futures
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -13,17 +14,7 @@ import urllib.parse
 import urllib.request
 
 HERE = Path(__file__).resolve().parent
-PROTECTED = """# BEGIN SyncBasalam Async
-<IfModule LiteSpeed>
-<IfModule mod_rewrite.c>
-RewriteEngine On
-RewriteCond %{REQUEST_URI} /wp-admin/admin-ajax\\.php$
-RewriteCond %{QUERY_STRING} (^|&)action=sync_basalam_run_jobs_async(&|$)
-RewriteRule .* - [E=noabort:1]
-</IfModule>
-</IfModule>
-# END SyncBasalam Async
-"""
+ORIGINAL = '# preserved matrix configuration\r\n'
 SERVERS = {
     'apache': (8141, 'apache', ['apache'], 'apache2handler'),
     'nginx': (8142, 'fpm', ['fpm', 'nginx'], 'fpm-fcgi'),
@@ -41,7 +32,17 @@ class Matrix:
         self.token = secrets.token_hex(32)
         self.env = dict(os.environ, MATRIX_TOKEN=self.token, MATRIX_SITE_DIR=str(self.site))
         self.command = ['docker', 'compose', '-f', str(HERE / 'compose.yml')]
-        self.report = {'success': False, 'servers': [], 'source_commit': self.git_head()}
+        source = HERE.parents[2]
+        self.report = {
+            'success': False, 'servers': [], 'source_commit': self.git_head(),
+            'source_files_sha256': {
+                name: hashlib.sha256((source / name).read_bytes()).hexdigest()
+                for name in ['JobsRunner.php', 'sync-basalam.php',
+                             'includes/Services/AsyncWorkerEnvironment.php',
+                             'includes/Services/AsyncWorkerHealth.php',
+                             'includes/Services/AsyncWorkerProtection.php']
+            },
+        }
         self.assertions = 0
 
     def git_head(self):
@@ -52,6 +53,16 @@ class Matrix:
         if check and result.returncode:
             raise RuntimeError(result.stdout + result.stderr)
         return result
+
+    def write_htaccess(self, contents):
+        # Mirror the installer's atomic replacement. Truncating a bind-mounted
+        # file can expose incomplete rules to concurrent Apache reads.
+        temporary = self.site / '.htaccess.matrix-tmp'
+        with temporary.open('wb') as stream:
+            stream.write(contents)
+            stream.flush()
+            os.fsync(stream.fileno())
+        temporary.replace(self.site / '.htaccess')
 
     def http(self, fields, control=True, timeout=15):
         body = urllib.parse.urlencode(fields).encode()
@@ -107,15 +118,51 @@ class Matrix:
 
     def ready(self):
         deadline = time.monotonic() + 45
+        last_error = None
         while time.monotonic() < deadline:
             try:
                 return self.control()
-            except (OSError, ValueError, RuntimeError):
+            except (OSError, ValueError, RuntimeError) as error:
+                last_error = str(error)
                 time.sleep(.3)
-        raise RuntimeError(f'HTTP server did not become ready: {self.url}')
+        raise RuntimeError(f'HTTP server did not become ready: {self.url}: {last_error}')
+
+    def reload_rules(self):
+        # Recreate the disposable OLS runtime so killed LSAPI workers cannot
+        # leave stale Unix sockets/PID files across repeated configuration tests.
+        self.compose('up', '-d', '--force-recreate', 'ols')
+        self.ready()
+
+    def verify_rule_repair(self, result, scenario):
+        self.control('reset')
+        self.write_htaccess(b'')
+        self.reload_rules()
+        self.control('enqueue', key='unprotected')
+        self.worker()
+        state = self.completed('unprotected')
+        self.check(state['notice']['class'] == 'notice-warning', 'Actual LSAPI without rule must record unverified protection internally')
+        self.check(state['health']['last_returned_protected'] is False, 'Missing actual noabort flag must be recorded')
+        self.check(self.control('notice')['html'] == '', 'Missing protection must not display an admin alert')
+        result['unprotected_evidence'] = state
+        scenario('actual LSAPI without htaccess protection records an internal diagnosis even after fast completion')
+        self.control('protect', force=1)
+        self.check(b'E=noabort:1' in (self.site / '.htaccess').read_bytes(), 'Administrator setup must repair a removed rule')
+        self.reload_rules()
+        self.control('enqueue', key='protection-restored', seconds=3, dispatch=1)
+        state = self.completed('protection-restored')
+        self.check(state['notice'] is None and state['health']['last_returned_protected'] is True, 'Automatic rule repair must be verified by real execution')
+        result['restored_evidence'] = state
+        scenario('automatic rule repair is observed in real LSAPI and clears internal missing-protection evidence')
+
+    def finish_server(self, result, start_assertions, services):
+        self.control('reset')
+        result['assertions'] = self.assertions - start_assertions
+        result['success'] = True
+        self.compose('stop', *services)
 
     def run_server(self, name):
         port, backend, services, expected_sapi = SERVERS[name]
+        self.write_htaccess(ORIGINAL.encode())
         self.url = f'http://127.0.0.1:{port}/wp-admin/admin-ajax.php'
         self.compose('up', '-d', *services)
         state = self.ready()
@@ -124,6 +171,50 @@ class Matrix:
         start_assertions = self.assertions
         self.report['servers'].append(result)
         scenario = lambda text: (result['scenarios'].append(text), print(f'{name}: PASS {text}', flush=True))
+
+        self.control('reset')
+        before = (self.site / '.htaccess').read_bytes()
+        self.check(self.control('protect', role='anonymous')['html'] == '', 'Anonymous protection check must be silent')
+        self.check((self.site / '.htaccess').read_bytes() == before, 'Anonymous requests cannot write server configuration')
+        self.check(self.control('protect', role='subscriber')['html'] == '', 'Subscriber protection check must be silent')
+        self.check((self.site / '.htaccess').read_bytes() == before, 'Subscribers cannot write server configuration')
+        self.check(self.control('protect', file_mods='denied')['html'] == '', 'Disabled file modifications must remain silent')
+        self.check((self.site / '.htaccess').read_bytes() == before, 'DISALLOW_FILE_MODS must prevent configuration writes')
+        setup = self.control('protect')
+        self.check(setup['html'] == '', 'Automatic administrator setup must not show an alert')
+        after = (self.site / '.htaccess').read_bytes()
+        if name == 'ols':
+            self.check(after.endswith(before) and after.count(b'# BEGIN SyncBasalam Async') == 1, f'LiteSpeed must install one scoped block while preserving original bytes: {setup}')
+            self.check(self.control()['protection']['status'] == 'installed', 'Installation status must be persisted internally')
+            self.check(self.control()['backup_sha256'] == hashlib.sha256(before).hexdigest(), 'Backup must contain the exact previous configuration')
+            self.check(self.control()['backup_autoload'] in ['off', 'no'], 'Configuration backup must not autoload')
+            self.control('protect')
+            self.check((self.site / '.htaccess').read_bytes() == after, 'Repeated admin requests must not duplicate the rule')
+        else:
+            self.check(after == before, 'Other actual webservers must not change htaccess')
+        self.check(not self.control()['effective_noabort'], 'noabort must not apply to unrelated AJAX requests')
+        scenario('automatic privileged configuration, permission denial, byte preservation and no visible alert')
+
+        if name == 'ols':
+            # OpenLiteSpeed 1.9.3 loads these rules on server reload. Installing
+            # the file must not be confused with effective runtime protection.
+            self.worker()
+            state = self.control()
+            reload_required = state['health'].get('protection_missing', False)
+            result['configuration_reload_required'] = reload_required
+            if reload_required:
+                self.check(self.control('notice')['html'] == '', 'Unapplied host configuration must not display an alert')
+                self.reload_rules()
+            scenario('file installation is distinct from runtime verification; apply required OpenLiteSpeed reload')
+
+        if name != 'ols':
+            # Exercise the exact block even where automatic installation skips
+            # it. Apache must evaluate the guard; Nginx/Caddy must stay healthy
+            # with the otherwise-unused file present.
+            rules = self.control('rules')['text'].encode()
+            self.write_htaccess(rules + b'\n' + before)
+            self.check(not self.control()['effective_noabort'], 'A manually present block must not protect unrelated requests')
+            scenario('exact managed block is present on a non-LiteSpeed server without breaking HTTP requests')
 
         self.control('reset')
         status, _ = self.worker('invalid-matrix-nonce')
@@ -140,8 +231,42 @@ class Matrix:
         self.check(state['notice'] is None, 'Healthy runtime must not alert')
         self.check(state['health']['last_returned_protected'] is (True if name == 'ols' else None), 'Protection must match the real runtime')
         self.check(state['autoload'] in ['off', 'no'], 'Health metadata must not autoload')
+        if name in ['apache', 'ols']:
+            event = state['events']['success']
+            self.check(event['litespeed_module'] is (name == 'ols'), 'Actual module evaluation must identify LiteSpeed correctly')
+            self.check(event['other_module'] is (name == 'apache'), 'Actual Apache probe must identify the non-LiteSpeed module branch')
         result['healthy_evidence'] = state
         scenario('actual queue success, runtime protection, cleanup and non-autoloaded health')
+
+        if self.args.protection_only:
+            self.control('reset')
+            dispatched = self.control('enqueue', key='protected-background', seconds=3, dispatch=1)
+            state = self.completed('protected-background')
+            event = state['events']['protected-background']
+            self.check(dispatched['dispatch_returned_at'] < event['returned_at'], 'Dispatcher must return before the background job completes')
+            self.check(event['returned_at'] - event['started_at'] >= 2.9, 'The delayed background job must actually run to completion')
+            self.check(state['health']['last_returned_protected'] is (True if name == 'ols' else None), 'Background protection must match the actual server')
+            self.check(self.control('notice')['html'] == '', 'Completed background execution must not display an alert')
+            result['background_evidence'] = event
+            scenario('real three-second nonblocking background job completes once after its caller returns')
+            if name == 'ols':
+                self.verify_rule_repair(result, scenario)
+            self.finish_server(result, start_assertions, services)
+            return
+
+        self.control('reset')
+        for index in range(5):
+            self.control('enqueue', key=f'continuation-{index}', seconds=.65)
+        first = self.control('dispatch')
+        self.check(bool(first['recovery_at']), 'Initial dispatch must schedule a recovery event')
+        state = self.wait(lambda s: not s['jobs'] and s['lock_free'])
+        events = [state['events'][f'continuation-{index}'] for index in range(5)]
+        self.check(all(e['starts'] == 1 and e['returns'] == 1 for e in events), 'One dispatch must drain multiple batches exactly once without visitor requests')
+        self.check(all(events[i]['returned_at'] <= events[i + 1]['started_at'] for i in range(4)), 'Successor jobs must not overlap')
+        self.check(state['recovery_at'] == first['recovery_at'], 'Batch handoffs must reuse one recovery event')
+        self.check(self.control('recover')['recovery_at'] is False, 'Recovery must stop rearming once the queue is empty')
+        result['continuation_evidence'] = events
+        scenario('one loopback dispatch drains five jobs across multiple batches with cron disabled and no visitors')
 
         self.control('reset')
         self.control('enqueue', key='rejected', mode='reject')
@@ -153,10 +278,10 @@ class Matrix:
 
         self.control('reset')
         began = time.monotonic()
-        self.control('enqueue', key='disconnected', seconds=3, dispatch=1)
+        dispatched = self.control('enqueue', key='disconnected', seconds=3, dispatch=1)
         dispatch_seconds = time.monotonic() - began
         state = self.completed('disconnected')
-        self.check(dispatch_seconds < 2.5, 'Nonblocking caller must return before the three-second job completes')
+        self.check(dispatched['dispatch_returned_at'] < state['events']['disconnected']['returned_at'], 'Dispatcher must return before the background job completes; exclude HTTP bootstrap latency')
         self.check(state['events']['disconnected']['returned_at'] - state['events']['disconnected']['started_at'] >= 2.9, 'Background job must finish after client disconnection')
         self.check(state['notice'] is None, 'Completed background request must not alert')
         result['disconnect_evidence'] = {'caller_seconds': round(dispatch_seconds, 3), 'worker': state['events']['disconnected']}
@@ -190,11 +315,11 @@ class Matrix:
         html = self.control('notice')['html']
         state = self.control()
         self.check(state['notice']['class'] == 'notice-error' and state['notice']['job_id'] == job, 'A later HTTP admin request must detect the dead worker')
-        self.check(str(job) in html and 'role="alert"' in html, 'Admin notice must identify the job')
-        self.check(('noabort' in html) == (name == 'ols'), 'Hosting advice must match actual runtime')
+        self.check(html == '', 'Interrupted workers must not display an admin alert')
+        self.check(('noabort' in state['notice']['guidance']) == (name == 'ols'), 'Internal hosting diagnosis must match actual runtime')
         self.check(self.control('notice', role='anonymous')['html'] == '', 'Anonymous callers cannot see the admin notice')
         result['kill_evidence'] = {'pid': pid, 'health': state['health'], 'notice': state['notice']}
-        scenario('SIGKILL of actual HTTP PHP worker, independent detection and admin permissions')
+        scenario('SIGKILL of actual HTTP PHP worker, silent independent detection and admin permissions')
 
         self.compose('restart', backend)
         self.ready()
@@ -252,29 +377,9 @@ class Matrix:
             scenario('real PHP-FPM request timeout, interruption alert and recovery')
 
         if name == 'ols':
-            self.control('reset')
-            (self.site / '.htaccess').write_text('')
-            self.compose('restart', 'ols')
-            self.ready()
-            self.control('enqueue', key='unprotected')
-            self.worker()
-            state = self.completed('unprotected')
-            self.check(state['notice']['class'] == 'notice-warning', 'Actual LSAPI without rule must report unverified protection')
-            self.check(state['health']['last_returned_protected'] is False, 'Missing actual noabort flag must be recorded')
-            result['unprotected_evidence'] = state
-            scenario('actual LSAPI without htaccess protection warns even after fast completion')
-            (self.site / '.htaccess').write_text(PROTECTED)
-            self.compose('restart', 'ols')
-            self.ready()
-            self.control('enqueue', key='protection-restored', seconds=3, dispatch=1)
-            state = self.completed('protection-restored')
-            self.check(state['notice'] is None and state['health']['last_returned_protected'] is True, 'Restoring actual scoped rule must clear warning after real execution')
-            scenario('restored scoped htaccess rule is observed in LSAPI and clears warning')
+            self.verify_rule_repair(result, scenario)
 
-        self.control('reset')
-        result['assertions'] = self.assertions - start_assertions
-        result['success'] = True
-        self.compose('stop', *services)
+        self.finish_server(result, start_assertions, services)
 
     def run(self):
         self.check((self.site / 'wp-load.php').is_file(), 'Supply a disposable WordPress core')
@@ -288,7 +393,7 @@ class Matrix:
         (self.site / 'wp-config.php').touch()
         (self.site / 'wp-content/mu-plugins/matrix.php').touch()
         (self.site / 'wp-content/plugins/sync-basalam').mkdir(exist_ok=True)
-        (self.site / '.htaccess').write_text(PROTECTED)
+        self.write_htaccess(ORIGINAL.encode())
         try:
             self.compose('up', '-d', '--wait', 'db', 'apache')
             self.compose('exec', '-T', 'apache', 'php', '/matrix/install.php')
@@ -304,6 +409,7 @@ class Matrix:
             self.report['assertions'] = self.assertions
             self.output.joinpath('results.json').write_text(json.dumps(self.report, indent=2, ensure_ascii=False))
             self.output.joinpath('containers.log').write_text(self.compose('logs', '--no-color', check=False).stdout)
+            self.output.joinpath('ols-error.log').write_text(self.compose('exec', '-T', 'ols', 'cat', '/usr/local/lsws/logs/error.log', check=False).stdout)
             images = subprocess.run(['docker', 'image', 'inspect', 'wordpress:php8.2-apache', 'wordpress:php8.2-fpm', 'nginx:1.29-alpine', 'caddy:2-alpine', 'litespeedtech/openlitespeed:1.9.3-lsphp83'], text=True, capture_output=True)
             if images.returncode == 0:
                 self.output.joinpath('images.json').write_text(json.dumps([{k: image[k] for k in ['Id', 'RepoDigests', 'Architecture']} for image in json.loads(images.stdout)], indent=2))
@@ -318,4 +424,5 @@ if __name__ == '__main__':
     parser.add_argument('--results', type=Path, required=True)
     parser.add_argument('--servers', nargs='+', choices=SERVERS, default=list(SERVERS))
     parser.add_argument('--keep', action='store_true', help='Keep disposable containers after the run for debugging')
+    parser.add_argument('--protection-only', action='store_true', help='Focus on automatic htaccess configuration, actual module detection and silent diagnostics')
     Matrix(parser.parse_args()).run()

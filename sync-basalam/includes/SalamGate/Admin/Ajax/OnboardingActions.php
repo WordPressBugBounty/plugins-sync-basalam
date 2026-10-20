@@ -2,6 +2,7 @@
 
 namespace SyncBasalam\SalamGate\Admin\Ajax;
 
+use SyncBasalam\SalamGate\Utils\Arrays;
 use SyncBasalam\SalamGate\ClientFactory;
 use SyncBasalam\SalamGate\Contracts\PayMethods;
 use SyncBasalam\SalamGate\Contracts\ShopNormalizer;
@@ -703,7 +704,7 @@ class OnboardingActions
     private static function referenceRows($body): array
     {
         if ($body === null) return []; // Native reference endpoints return null for no coverage.
-        if (!is_array($body) || !array_is_list($body) || count($body) > 10000) throw self::invalidReferences();
+        if (!is_array($body) || !Arrays::isList($body) || count($body) > 10000) throw self::invalidReferences();
         $seen = [];
         foreach ($body as $row) {
             $id = is_array($row) ? self::formInteger($row['id'] ?? null, 1, 2147483647) : null;

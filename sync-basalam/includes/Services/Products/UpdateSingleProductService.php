@@ -3,6 +3,7 @@
 namespace SyncBasalam\Services\Products;
 
 use SyncBasalam\Admin\Product\Data\Services\VariantService;
+use SyncBasalam\Admin\Product\ProductDataFactory;
 use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Admin\Settings\SettingsManager;
 use SyncBasalam\Config\Endpoints;
@@ -106,7 +107,11 @@ class UpdateSingleProductService
 
         while (true) {
             try {
-                $request = $this->apiservice->patch($url, $productData);
+                $request = ProductPriceStockRetry::send(
+                    fn(array $data) => $this->apiservice->patch($url, $data),
+                    $productData,
+                    fn() => $this->buildPriceStockFallback($productId, $productData)
+                );
             } catch (RetryableException $e) {
                 if ($this->retryWithoutDuplicateSku($productData, $e, $skuRetry)) {
                     continue;
@@ -172,7 +177,7 @@ class UpdateSingleProductService
         // not lost for variable products.
         // When the duplicate-SKU fallback was used, deliberately keep the
         // second request SKU-free; do not issue a follow-up SKU-only patch.
-        if (!$skuRetry) $this->ensureProductSkuUpdated($url, $productData, $body);
+        if (!$skuRetry) $this->ensureProductSkuUpdated($url, $productData, $body, $productId);
 
         $product = \wc_get_product($productId);
         if ($product && $product->is_type('variable')) {
@@ -265,6 +270,39 @@ class UpdateSingleProductService
         do_action('sync_basalam_after_update_product_api', $productId, $body, $result);
 
         return $result;
+    }
+
+    private function buildPriceStockFallback(int $productId, array $productData): array
+    {
+        $product = \wc_get_product($productId);
+        if (!$product) return $productData;
+
+        // Custom mode may omit price/stock entirely, or may have already sent
+        // variations separately. Build the missing data without changing the
+        // saved mode or rebuilding unrelated fields such as photos.
+        if ($product->is_type('variable')) {
+            $variants = $productData['variants'] ?? [];
+            $complete = !empty($variants);
+            foreach ($variants as $variant) {
+                if (!isset($variant['primary_price'], $variant['stock'], $variant['properties'])) {
+                    $complete = false;
+                    break;
+                }
+            }
+
+            if (!$complete) $variants = $this->variantDataService->getVariants($product);
+            foreach ($variants as &$variant) {
+                unset($variant['id']);
+            }
+            unset($variant);
+            $productData['variants'] = $variants;
+        } elseif (!isset($productData['primary_price'], $productData['stock'])) {
+            $handler = (new ProductDataFactory())->createHandler($product);
+            $productData['primary_price'] = $productData['primary_price'] ?? $handler->getPrice($product);
+            $productData['stock'] = $productData['stock'] ?? $handler->getStock($product);
+        }
+
+        return $productData;
     }
 
     private function shouldUpdateVariationsSeparately($productId, array $productData): bool
@@ -409,7 +447,7 @@ class UpdateSingleProductService
         throw NonRetryableException::permanent("تغییر وضعیت محصول در باسلام ناموفق بود.");
     }
 
-    private function ensureProductSkuUpdated(string $url, array $productData, $responseBody): void
+    private function ensureProductSkuUpdated(string $url, array $productData, &$responseBody, int $productId): void
     {
         if (!array_key_exists('sku', $productData) || $productData['sku'] === null) return;
 
@@ -422,9 +460,24 @@ class UpdateSingleProductService
 
         if ($responseSku !== null && (string) $responseSku === $requestedSku) return;
 
-        $skuRequest = $this->apiservice->patch($url, ['sku' => $productData['sku']]);
+        $skuData = ['sku' => $productData['sku']];
+        $skuRequest = ProductPriceStockRetry::send(
+            fn(array $data) => $this->apiservice->patch($url, $data),
+            $skuData,
+            fn() => $this->buildPriceStockFallback($productId, $productData)
+        );
         if (!is_array($skuRequest) || (int) ($skuRequest['status_code'] ?? 0) !== 200) {
             throw NonRetryableException::permanent('بروزرسانی شناسه محصول (SKU) در باسلام ناموفق بود.');
+        }
+
+        // A validation fallback can replace the variants again. Persist ids
+        // from that latest response instead of the earlier full update.
+        if (isset($skuData['variants'])) {
+            $skuBody = $skuRequest['body'] ?? [];
+            if (is_string($skuBody)) $skuBody = json_decode($skuBody, true);
+            if (is_array($skuBody) && isset($skuBody['variants'])) {
+                $responseBody['variants'] = $skuBody['variants'];
+            }
         }
     }
 }

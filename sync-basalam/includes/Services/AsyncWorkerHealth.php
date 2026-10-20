@@ -16,7 +16,7 @@ class AsyncWorkerHealth
         $this->protection = $this->detectLiteSpeedProtection();
         $state = $this->getState();
         $missing = $this->protection === false;
-        if (($state['protection_missing'] ?? false) === $missing) return;
+        if (array_key_exists('protection_missing', $state) && $state['protection_missing'] === $missing) return;
 
         $state['protection_missing'] = $missing;
         $state['environment_checked_at'] = time();
@@ -96,42 +96,14 @@ class AsyncWorkerHealth
 
     protected function isLiteSpeed(): bool
     {
-        // Apache can use LSAPI; PHP_SAPI alone does not identify the web server.
-        // The server sets this marker only for the queue endpoint inside !LiteSpeed.
-        foreach (['SYNCBASALAM_NOT_LITESPEED', 'REDIRECT_SYNCBASALAM_NOT_LITESPEED'] as $name) {
-            if ((string) ($_SERVER[$name] ?? '') === '1' || (string) getenv($name) === '1') {
-                return false;
-            }
-        }
-
-        // Some Apache+LSAPI hosts do not preserve the scoped marker. A clear
-        // Apache server signature is still stronger evidence than PHP_SAPI,
-        // which LSAPI reports as "litespeed" even when LiteSpeed is absent.
-        $serverSoftware = strtolower((string) (
-            $_SERVER['SERVER_SOFTWARE'] ?? getenv('SERVER_SOFTWARE') ?? ''
-        ));
-        if ($serverSoftware !== ''
-            && strpos($serverSoftware, 'apache') !== false
-            && strpos($serverSoftware, 'litespeed') === false
-        ) {
-            return false;
-        }
-
-        return PHP_SAPI === 'litespeed';
+        return (new AsyncWorkerEnvironment())->isLiteSpeed() === true;
     }
 
-    /** null means a different PHP runtime; absence cannot rule out a global host setting. */
+    /** null means another/unknown server; absence cannot rule out a global host setting. */
     protected function detectLiteSpeedProtection(): ?bool
     {
         if (!$this->isLiteSpeed()) return null;
 
-        foreach (['noabort', 'REDIRECT_noabort'] as $name) {
-            $values = [$_SERVER[$name] ?? null, getenv($name)];
-            if (function_exists('apache_getenv')) $values[] = apache_getenv($name);
-            foreach ($values as $value) {
-                if ((string) $value === '1') return true;
-            }
-        }
-        return false;
+        return (new AsyncWorkerEnvironment())->hasFlag('noabort');
     }
 }

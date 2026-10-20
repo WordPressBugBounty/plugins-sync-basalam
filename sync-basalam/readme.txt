@@ -4,7 +4,7 @@ Tags: woocommerce, basalam, woosalam, integration
 Requires at least: 6.0  
 Tested up to: 7.0
 Requires PHP: 7.4 
-Stable tag: 1.10.32
+Stable tag: 1.10.33
 License: GPL-2.0-or-later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -32,13 +32,13 @@ Salam Pay checkout is bundled with WooSalam, with classic/Blocks checkout, HPOS-
 
 == ارسال مرسوله با سلام‌گیت / SalamGate shipping ==
 
-سلام‌گیت از منوی «ووسلام ← ارسال مرسوله» و صفحه سفارش‌های ووکامرس، بدون نیاز به فعال‌بودن افزونه پرو، در دسترس است. ثبت و فعال‌سازی حساب، انتخاب آدرس فرستنده، ماشین‌حساب، مراکز تحویل، ارسال تکی و گروهی، ادامه پرداخت، چاپ لیبل و لغو مجاز مرسوله غیرباسلامی پشتیبانی می‌شوند. برای این بخش PHP 8.2 یا بالاتر روی معماری ۶۴بیتی، WordPress 6.5 یا بالاتر و WooCommerce 10.0 یا بالاتر لازم است؛ روی محیط ناسازگار فقط بخش ارسال فعال نمی‌شود.
+سلام‌گیت از منوی «ووسلام ← ارسال مرسوله» و صفحه سفارش‌های ووکامرس، بدون نیاز به فعال‌بودن افزونه پرو، در دسترس است. ثبت و فعال‌سازی حساب، انتخاب آدرس فرستنده، ماشین‌حساب، مراکز تحویل، ارسال تکی و گروهی، ادامه پرداخت، چاپ لیبل و لغو مجاز مرسوله غیرباسلامی پشتیبانی می‌شوند. نیازمندی‌های این بخش همان نیازمندی‌های اصلی ووسلام است و ووکامرس باید فعال باشد.
 
 هزینه ارسال سفارش باسلامی با روش ۱۹ از همان سفارش اصلی کسر می‌شود؛ مبدأهای دیگر از تراز غرفه یا کیف پول باسلام، روش ۲۰/۲۱، استفاده می‌کنند. گروه مختلط، چند پرداخت مستقل و متوالی است، نه یک تراکنش مشترک. فروشنده وزن نهایی را مرور و تأیید می‌کند؛ دریافت نرخ به‌تنهایی پرداخت نیست. نتیجه قطع‌شده مالی نیاز به بررسی دارد و خودکار تکرار نمی‌شود. رسید معتبر شرط چاپ است؛ لغو پستی، سفارش ووکامرس یا پرداخت خریدار را لغو نمی‌کند.
 
 اگر پروِ دارای سلام‌گیت هم فعال باشد، همان پرو تنها مسئول این بخش می‌ماند و اجرای تکراری انجام نمی‌شود. با غیرفعال‌شدن پرو، نسخه عادی از همان نگاشت‌ها و سوابق موجود استفاده می‌کند؛ اطلاعات مرسوله و محافظ مالی پاک یا جابه‌جا نمی‌شوند. اتصال از حساب عادی ووسلام انجام می‌شود و برای اعطای مجوزهای جدید سلام‌گیت ممکن است اتصال مجدد و تأیید دسترسی کلاینت عادی از سمت باسلام لازم باشد؛ داشتن توکن به‌تنهایی اعطای این مجوزها را تضمین نمی‌کند.
 
-SalamGate is available in ordinary WooSalam without Pro. It supports account onboarding, sender settings, estimates, delivery centers, single/mixed bulk shipping, reviewed payment, eligible PDF labels and guarded non-Basalam cancellation. Shipping requires PHP 8.2+/64-bit, WordPress 6.5+ and WooCommerce 10.0+; unsupported environments keep the other base features. Legacy Pro remains the sole shipping owner while active, avoiding duplicate handlers. Existing shipment mappings and financial guards are preserved when ownership changes.
+SalamGate is available in ordinary WooSalam without Pro. It supports account onboarding, sender settings, estimates, delivery centers, single/mixed bulk shipping, reviewed payment, eligible PDF labels and guarded non-Basalam cancellation. Shipping follows WooSalam's base requirements and needs active WooCommerce. Legacy Pro remains the sole shipping owner while active, avoiding duplicate handlers. Existing shipment mappings and financial guards are preserved when ownership changes.
 
 Native Basalam shipping uses payment method 19 from its original order; other origins use vendor balance 20 or wallet 21. Bulk payments are sequential, not one atomic debit. Lost financial responses require read-only reconciliation, never automatic replay. Real payment/activation/refund needs deliberate authorization; automated tests are not proof of a live financial result. Current base OAuth renewal has no operational shared-client refresh adapter; reconnect remains the fallback. The ordinary OAuth client/callback are not replaced with Pro credentials.
 
@@ -146,6 +146,27 @@ API calls use HTTPS. Authenticated operations use the configured account and che
 1. تنظیمات اولیه افزونه در وردپرس
 
 == Changelog ==
+
+= 1.10.33 =
+* Retry product updates rejected with HTTP 400 or 422 once using only price and stock, including single products, variations, batches and SKU follow-ups.
+* Rebuild missing price and stock in custom mode without changing the saved update settings.
+* Store the latest variation identifiers after fallback and propagate failed variation or batch updates correctly.
+* Add real HTTP/store simulation coverage and make shared test fixtures independent of execution order.
+
+* Remove independent SalamGate runtime restrictions and use list validation compatible with the base plugin requirements.
+* Recover order-list connection failures through Order Processing v3 in the importer and SalamGate, preserving filters, cursors and authentication.
+* Retry OpenAPI DNS/connection failures once through documented Core routes, using normal DNS and verified TLS.
+* Add Core fallback for batch updates and Webhook service fallback for webhook list/create/update/delete operations.
+* Send mapped requests directly to fallback for 48 hours after ten OpenAPI cURL 6/7 failures within ten minutes.
+* Reconcile missing webhooks on activation for connected stores, preserving subscriptions belonging to other stores.
+* Add grouped postal label and barcode printing in SalamGate.
+* Continue background queue batches and schedule recovery for delayed or interrupted processing.
+* Automatically install scoped LiteSpeed background-worker protection and remove worker-health admin alerts.
+* Distinguish Apache/LSAPI from LiteSpeed using server evidence instead of the PHP SAPI alone.
+* Isolate WordPress admin notices from SalamGate styles and load dashboard reports independently from account state.
+* Clarify SalamGate report/account errors, allow 45 seconds for account checks and silence routine synchronization INFO logs.
+* Remove repeated product-update status polling and the redundant Salam Pay settings link from the plugin list.
+* Add queue/webserver/fallback regression coverage, live verification of all 14 mapped HTTP operations and host-based threshold/expiry checks.
 
 = 1.10.32 =
 * Bundle Salam Pay with settings available directly under WooCommerce payments, without an extra WooSalam submenu.

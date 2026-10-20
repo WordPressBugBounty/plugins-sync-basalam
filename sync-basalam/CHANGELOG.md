@@ -2,6 +2,40 @@
 
 <details>
 
+<summary>1.10.33 - 2026-10-20</summary>
+
+### Added
+
+- Install scoped LiteSpeed background-worker protection automatically, preserving existing `.htaccess` configuration and a private backup.
+- Route mapped requests directly to their fallback for a fixed 48 hours after ten OpenAPI cURL 6/7 failures in a rolling ten-minute window, with shared persistent state across PHP workers.
+- Add grouped postal label and barcode printing in SalamGate.
+- Add regression and integration coverage for queue continuation, webserver protection and all 14 mapped fallback HTTP operations, with live provider verification and host-based threshold/expiry checks.
+- Add unit coverage and local Postman simulations through real WordPress HTTP, including WooCommerce/MariaDB persistence, AJAX, queued jobs, connection failures and bounded retries.
+- Isolate shared WordPress metadata and database test fixtures so the full PHPUnit suite passes with normal and randomized execution order.
+
+### Changed
+
+- Remove independent SalamGate PHP, WordPress, WooCommerce and architecture gates, use base-compatible list validation and remove the unneeded WooCommerce 10 minimum from plugin metadata.
+- Keep worker-health diagnostics without displaying admin alerts, and retain SalamGate synchronization statistics without emitting routine INFO logs.
+- Remove repeated queue-status polling from the product-update dialog and the redundant Salam Pay settings link from the plugin list. Salam Pay remains configurable through WooCommerce payment settings.
+
+### Fixed
+
+- Retry OpenAPI DNS/connection failures once through the corresponding documented Core API route, using normal DNS and preserving TLS verification without replaying ambiguous writes.
+- Recover batch-product update connection failures through the corresponding Core route and webhook list/create/update/delete connection failures through the Webhook service.
+- Recover OpenAPI order-list connection failures through Order Processing v3 in both the order importer and SalamGate, preserving date filters, opaque cursors and authentication.
+- Reconcile missing webhooks on activation for connected stores, preserve other stores' subscriptions and log setup results without blocking activation on remote errors.
+- Retry product updates rejected with HTTP 400 or 422 once using only price and stock, including single products, variations, batch updates and SKU-only follow-up requests.
+- Rebuild missing custom-mode price and stock from WooCommerce without changing the saved update mode or restoring rejected SKU, description and other product fields.
+- Persist variation identifiers from the latest successful fallback response and propagate failed variation or batch updates instead of reporting success.
+- Continue queued work after each background batch and schedule recovery for delayed or interrupted processing while preserving dispatch and database locks.
+- Treat LSAPI without server evidence as unknown; use conditional module markers to distinguish Apache/LSAPI from LiteSpeed instead of assuming the PHP SAPI identifies the web server.
+- Keep WordPress admin notices outside SalamGate styles and load dashboard reports independently from account state. Return structured report errors, clarify account/network errors and allow 45 seconds for account-state requests.
+
+</details>
+
+<details>
+
 <summary>1.10.32 - 2026-10-19</summary>
 
 ### Added

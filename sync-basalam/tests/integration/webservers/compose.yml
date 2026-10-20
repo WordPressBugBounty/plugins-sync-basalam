@@ -38,6 +38,7 @@ services:
       MATRIX_SITE_URL: http://nginx
   nginx:
     image: nginx:1.29-alpine@sha256:5616878291a2eed594aee8db4dade5878cf7edcb475e59193904b198d9b830de
+    depends_on: [fpm]
     networks: [matrix]
     volumes:
       - ${MATRIX_SITE_DIR}:/var/www/html:ro
@@ -51,6 +52,7 @@ services:
       MATRIX_SITE_URL: http://caddy
   caddy:
     image: caddy:2-alpine@sha256:d8542f48d34a9cf4e4c11a478865229840e87e4c96ea3f439101f31a5d35f75f
+    depends_on: [caddy-fpm]
     networks: [matrix]
     volumes:
       - ${MATRIX_SITE_DIR}:/var/www/html:ro

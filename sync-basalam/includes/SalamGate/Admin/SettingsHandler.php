@@ -52,7 +52,7 @@ class SettingsHandler
     {
         $settings = SalamGateSettings::instance();
 
-        $value = static fn (string $key, mixed $default = '') => isset($raw[$key]) && is_scalar($raw[$key])
+        $value = static fn (string $key, $default = '') => isset($raw[$key]) && is_scalar($raw[$key])
             ? trim((string) $raw[$key])
             : $default;
 

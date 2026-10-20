@@ -255,23 +255,6 @@ namespace {
         }
     }
 
-    // productExistsByTitle در مسیر placeholder از wpdb استفاده می‌کند.
-    if (!isset($GLOBALS['wpdb'])) {
-        $GLOBALS['wpdb'] = new class {
-            public $prefix = 'wp_';
-            public $posts = 'wp_posts';
-
-            public function get_var($query = null, $x = 0, $y = 0)
-            {
-                return null; // محصول جایگزین هنوز ساخته نشده
-            }
-
-            public function prepare($query, ...$args)
-            {
-                return $query;
-            }
-        };
-    }
 }
 
 namespace SyncBasalam\Services\Orders {
@@ -301,9 +284,26 @@ namespace SyncBasalam\Tests\Services {
     class OrderManagerAddBasalamItemTest extends TestCase
     {
         private const MAPPED_WOO_PRODUCT_ID = 500;
+        private $previousWpdb;
 
         protected function setUp(): void
         {
+            $this->previousWpdb = $GLOBALS['wpdb'] ?? null;
+            // Each test owns the database fixture used by placeholder lookup.
+            $GLOBALS['wpdb'] = new class {
+                public $prefix = 'wp_';
+                public $posts = 'wp_posts';
+
+                public function get_var($query = null, $x = 0, $y = 0)
+                {
+                    return null;
+                }
+
+                public function prepare($query, ...$args)
+                {
+                    return $query;
+                }
+            };
             $GLOBALS['sync_basalam_test_options'] = [
                 'sync_basalam_settings' => ['vendor_id' => '123'],
             ];
@@ -319,6 +319,11 @@ namespace SyncBasalam\Tests\Services {
 
         protected function tearDown(): void
         {
+            if ($this->previousWpdb !== null) {
+                $GLOBALS['wpdb'] = $this->previousWpdb;
+            } else {
+                unset($GLOBALS['wpdb']);
+            }
             unset(
                 $GLOBALS['sync_basalam_placeholder_id'],
                 $GLOBALS['sync_basalam_test_posts_by_meta'],

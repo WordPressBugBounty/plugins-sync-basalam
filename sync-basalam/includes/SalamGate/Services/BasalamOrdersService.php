@@ -2,6 +2,7 @@
 
 namespace SyncBasalam\SalamGate\Services;
 
+use SyncBasalam\SalamGate\Utils\Arrays;
 use SyncBasalam\SalamGate\FeatureAvailability;
 use SyncBasalam\SalamGate\Contracts\ParcelStatuses;
 use SyncBasalam\SalamGate\Order\BasalamOrderContext;
@@ -78,7 +79,7 @@ final class BasalamOrdersService
                 self::assertVendorUnchanged($vendorId);
                 $response = BasalamParcelReader::orders($days, $cursor);
                 ++$searchedPages;
-                if (!is_array($response['data'] ?? null) || !array_is_list($response['data'])
+                if (!is_array($response['data'] ?? null) || !Arrays::isList($response['data'])
                     || count($response['data']) > 100) {
                     throw self::error('پاسخ فهرست سفارش‌های باسلام معتبر نیست؛ دوباره تلاش کنید.');
                 }

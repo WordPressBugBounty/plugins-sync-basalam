@@ -7,9 +7,10 @@ defined('ABSPATH') || exit;
 /** Read-only presentation of the method saved on the source order, never a SalamGate quote. */
 final class OrderShippingPreference
 {
-    /** Basalam snapshots must be the authenticated, verified reads from shipping preparation. */
-    public static function forOrder(\WC_Order|BasalamParcelOrder $order, string $market, ?array $snapshots = null): ?string
+    /** @param \WC_Order|BasalamParcelOrder $order Basalam snapshots must be authenticated. */
+    public static function forOrder(object $order, string $market, ?array $snapshots = null): ?string
     {
+        OrderContext::assertSupportedOrder($order);
         if ($market === OrderContext::MARKET_BASALAM) {
             if (!is_array($snapshots['order'] ?? null) || !is_array($snapshots['parcel'] ?? null)) {
                 return null;

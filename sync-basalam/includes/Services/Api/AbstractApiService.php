@@ -60,7 +60,13 @@ abstract class AbstractApiService
         }
 
         try {
-            $response = $this->executeRequest($preparedRequest);
+            $response = (new OpenApiConnectionFallback())->request(
+                $url,
+                fn (string $requestUrl) => $this->executeRequest(array_replace(
+                    $preparedRequest,
+                    ['url' => $requestUrl]
+                ))
+            );
             $result   = $this->responseHandler->handle($response, $url);
             $this->circuitBreaker->recordSuccess();
             return $result;

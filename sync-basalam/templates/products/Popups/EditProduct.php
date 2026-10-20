@@ -1,6 +1,6 @@
 <?php defined('ABSPATH') || exit; ?>
 
-<div id="BasalamUpdateProductsModal" class="basalam-modal basalam-hidden" data-status-nonce="<?php echo esc_attr(wp_create_nonce('get_update_queue_status_nonce')); ?>">
+<div id="BasalamUpdateProductsModal" class="basalam-modal basalam-hidden">
     <div class="basalam-modal-content basalam-max-width-500">
         <span class="basalam-modal-close"> <img class="basalam-img-20" src="<?php echo esc_url(syncBasalamPlugin()->assetsUrl() . '/icons/close.svg'); ?>">
         </span>
@@ -13,11 +13,6 @@
                 <p><?php echo esc_html($vendorSyncState['message']); ?></p>
             </div>
         <?php else: ?>
-            <div id="update-status-loading" class="basalam-p basalam-padding-top-normal" hidden>در حال بررسی وضعیت بروزرسانی...</div>
-            <div id="update-status-error" class="basalam-p basalam-padding-top-normal" hidden>
-                دریافت وضعیت بروزرسانی ممکن نشد.
-                <button type="button" id="update-status-retry" class="basalam-primary-button basalam-p">تلاش دوباره</button>
-            </div>
             <div id="update-type-selection" class="basalam-block" <?php echo $update_queue_status['active'] ? 'hidden' : ''; ?>>
                 <?php wp_nonce_field('update_products_in_basalam_nonce', '_wpnonce'); ?>
                 <p class="basalam-p basalam-padding-top-normal">

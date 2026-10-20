@@ -31,6 +31,9 @@ $sendUrl = admin_url('admin.php?page=salam_gate&view=send');
     </section>
 
     <!-- گزارش عملکرد -->
+    <section class="sg-dashboard__report sg-load-region" data-sg-load data-sg-load-state="loading" aria-busy="true" aria-label="گزارش عملکرد">
+    <?php include dirname(__DIR__) . '/partials/loading-region.php'; ?>
+    <div data-sg-load-content inert>
     <h3 class="sg-dash-section-title">گزارش عملکرد</h3>
     <div class="sg-stats sg-stats--cards" data-sg-stats>
         <article class="sg-stats__card">
@@ -56,5 +59,7 @@ $sendUrl = admin_url('admin.php?page=salam_gate&view=send');
         </article>
     </div>
     <p class="sg-stats__state" data-sg-stats-state></p>
+    </div>
+    </section>
     </section>
 </div>

@@ -245,7 +245,10 @@
         if (!opener) return false;
         var overlay = document.querySelector(mapping[1]);
         var record = records.get(overlay);
-        if (record) record.pendingOpener = opener;
+        // A print choice is hidden once its disclosure closes. Return focus
+        // to the persistent button, not an invisible option after the dialog.
+        var printMenu = opener.closest("[data-sgp-print-menu]");
+        if (record) record.pendingOpener = printMenu ? printMenu.querySelector("[data-sgp-print-toggle]") || opener : opener;
         return true;
       });
     }
@@ -335,7 +338,7 @@
       not_registered: ["فعال‌سازی نشده", "neutral"],
       not_connected: ["اتصال برقرار نیست", "error"],
       error_auth: ["نیاز به اتصال مجدد", "error"],
-      error_forbidden: ["مجوز سلام‌گیت کافی نیست", "error"],
+      error_forbidden: ["مجوز دسترسی به سلام‌گیت تأیید نشد. لطفاً دوباره تلاش کنید.", "error"],
       error_network: ["بررسی وضعیت ناموفق", "error"],
       loading: ["در حال بررسی وضعیت", "neutral"]
     };

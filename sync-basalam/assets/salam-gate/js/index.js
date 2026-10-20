@@ -176,7 +176,7 @@ jQuery(function ($) {
         if (data.state.indexOf("error_") === 0) {
           var errors = { error_network: "دریافت وضعیت حساب سلام‌گیت انجام نشد؛ کمی بعد دوباره تلاش کنید.",
             error_auth: "اتصال حساب سلام‌گیت معتبر نیست؛ اتصال باسلام را دوباره بررسی کنید.",
-            error_forbidden: "مجوز دسترسی به حساب سلام‌گیت در دسترس نیست؛ اتصال را بررسی کنید." };
+            error_forbidden: "مجوز دسترسی به سلام‌گیت تأیید نشد. لطفاً دوباره تلاش کنید." };
           sgRefreshError(typeof data.message === "string" && /[\u0600-\u06ff]/.test(data.message) ? data.message : errors[data.state]);
           return;
         }
@@ -1039,6 +1039,7 @@ jQuery(function ($) {
     var $block = $(this);
     var $state = $block.siblings("[data-sg-stats-state]") || $();
     function loadStats() {
+    $state.text("").hide();
     var statsLoading = typeof window !== "undefined" && window.WoosalamGateLoading && window.WoosalamGateLoading.begin($block[0], "stats", loadStats);
     var request = typeof window !== "undefined" && window.WoosalamGateRequests ? window.WoosalamGateRequests.post : $.post;
     request(basalam_ajax.ajaxurl, { _wpnonce: basalam_ajax.nonce, action: "salam_gate_stats" })
@@ -1059,11 +1060,19 @@ jQuery(function ($) {
           if (statsLoading) statsLoading.ready();
           return;
         }
-        $state.text((res && res.data && res.data.message) || "گزارش عملکرد در دسترس نیست.").show();
+        var detail = res && res.data && res.data.message;
+        $state.text(typeof detail === "string" && detail.trim()
+          ? "دریافت گزارش عملکرد انجام نشد: " + detail
+          : "گزارش عملکرد فعلاً در دسترس نیست؛ دوباره تلاش کنید.").show();
         if (statsLoading) statsLoading.fail($state.text());
       })
-      .fail(function () {
-        $state.text("ارتباط با سرور برقرار نشد؛ گزارش در دسترس نیست.").show();
+      .fail(function (xhr, status) {
+        var message = xhr && (xhr.status === 401 || xhr.status === 403)
+          ? "اعتبار صفحه پایان یافته یا دسترسی مجاز نیست؛ صفحه را تازه‌سازی کنید."
+          : (status === "timeout"
+            ? "دریافت گزارش عملکرد بیش از حد طول کشید؛ دوباره تلاش کنید."
+            : "دریافت گزارش عملکرد انجام نشد؛ اتصال سایت و پاسخ سرور را بررسی کنید.");
+        $state.text(message).show();
         if (statsLoading) statsLoading.fail($state.text());
       });
     }
@@ -5413,6 +5422,9 @@ jQuery(function ($) {
   var labelListCursor = "", labelListHasMore = true, labelListReady = false, labelListConnection = null;
   var labelListSeen = Object.create(null), labelListError = "";
   var $printModal = $("[data-sgp-print-modal-el]");
+  var $printMenu = $page.find("[data-sgp-print-menu]");
+  var defaultLabelTemplate = String($printModal.find("[name='sgp-template']:checked").val() || "invoice");
+  var bulkPrintKind = "label";
   var searchResults = null, searchKey = "", searchTimer = null;
   var $filterModal = $(".sg-modal-overlay[data-sgp-filter-modal]");
 
@@ -5913,7 +5925,7 @@ jQuery(function ($) {
   }
 
   function updateLabelActions() {
-    $page.find(".sgp-row-label, [data-sgp-print-modal]")
+    $page.find(".sgp-row-label, [data-sgp-print-modal], [data-sgp-print-toggle]")
       .add($("[data-sgp-print-modal-el] [data-sgp-print-submit]"))
       .prop("disabled", labelRequestPending || latestJobPending);
     updateSelection();
@@ -5935,7 +5947,7 @@ jQuery(function ($) {
     $printModal.find("[data-sgp-selected-count]").text(fa(ids.length) + " مرسوله انتخاب شده");
     $printModal.find("[data-sgp-clear-selection]").prop("disabled", !ids.length || pending);
     $printModal.find("[data-sgp-print-submit]").prop("disabled", pending || (selectionPrintMode() && (!ids.length || !!labelListRequest)));
-    $printModal.find("[name='sgp-print-mode'], [data-sgp-select]").prop("disabled", pending);
+    $printModal.find("[name='sgp-print-mode'], [name='sgp-template'], [data-sgp-select]").prop("disabled", pending);
     $printModal.find("[data-sgp-label-list-more]").prop("hidden", !labelListHasMore)
       .prop("disabled", pending || !!labelListRequest).text(labelListError ? "تلاش دوباره" : "نمایش مرسوله‌های بیشتر");
     $printModal.find("[data-sgp-label-list-state]").text(labelListRequest ? "در حال دریافت مرسوله‌های قابل چاپ…"
@@ -6053,7 +6065,7 @@ jQuery(function ($) {
   });
 
   $page.on("click", ".sgp-row-label", function () {
-    requestLabelForIds([String($(this).closest("tr").attr("data-parcel-id"))]);
+    requestLabelForIds([String($(this).closest("tr").attr("data-parcel-id"))], defaultLabelTemplate);
   });
 
   function restoreLabelJob(previous) {
@@ -6118,7 +6130,7 @@ jQuery(function ($) {
       reservedLabelWindow = window.open("about:blank", "_blank");
       if (reservedLabelWindow) {
         reservedLabelWindow.opener = null;
-        reservedLabelWindow.document.title = "در حال دریافت برچسب پستی…";
+        reservedLabelWindow.document.title = "در حال دریافت فایل چاپ…";
       }
     } catch (_) { reservedLabelWindow = null; }
   }
@@ -6149,14 +6161,14 @@ jQuery(function ($) {
       ? Date.parse(result.expire_at) : NaN;
     if (!url || Number.isFinite(explicitExpiry) && explicitExpiry <= Date.now()) {
       closeReservedLabelWindow();
-      recoverLabel("نشانی فایل برچسب معتبر نیست؛ وضعیت فایل را دوباره بررسی کنید.");
+      recoverLabel("نشانی فایل چاپ معتبر نیست؛ وضعیت فایل را دوباره بررسی کنید.");
       return;
     }
     var floating = typeof window.woosalamNotify === "function";
     // Stream the original PDF to the native browser viewer, preserving embedded
     // fonts and its actual print/download controls instead of rendering canvas.
     $page.find(".sgp-label-status").empty().removeClass("sg-feedback-actions sg-feedback-toast-only")
-      .attr("role", "status").text(floating ? "" : "فایل برچسب پستی آماده است.").toggle(!floating);
+      .attr("role", "status").text(floating ? "" : "فایل چاپ آماده است.").toggle(!floating);
     var target = reservedLabelWindow;
     reservedLabelWindow = null;
     try {
@@ -6166,11 +6178,11 @@ jQuery(function ($) {
       target.location.replace(url);
     } catch (_) {
       $page.find(".sgp-label-status").empty().append($("<a target='_blank' rel='noopener noreferrer'>")
-        .attr("href", url).text("مشاهده PDF برچسب پستی")).show();
+        .attr("href", url).text("مشاهده فایل PDF چاپ")).show();
       if (floating) window.woosalamNotify("مرورگر بازشدن تب PDF را مسدود کرد؛ از لینک مشاهده PDF استفاده کنید.", "warning");
       return;
     }
-    if (floating) window.woosalamNotify("فایل برچسب پستی آماده است.", "success");
+    if (floating) window.woosalamNotify("فایل چاپ آماده است.", "success");
   }
 
   function labelResult(result, sequence) {
@@ -6180,7 +6192,7 @@ jQuery(function ($) {
       // absent job still cannot prove an interrupted create will never appear.
       stopPolling();
       closeReservedLabelWindow();
-      recoverLabel("درخواستی برای برچسب پیدا نشد؛ نتیجه درخواست قبلی هنوز تأیید نشده است. درخواست جدید ثبت نکنید.", true);
+      recoverLabel("درخواست چاپ پیدا نشد؛ نتیجه درخواست قبلی هنوز تأیید نشده است. درخواست جدید ثبت نکنید.", true);
       return;
     }
     if (activeJobId && validJobId(result.request_id) && validJobId(result.request_id) !== activeJobId) {
@@ -6194,15 +6206,15 @@ jQuery(function ($) {
     } else if (result.status === "failed" || result.status === "expired") {
       closeReservedLabelWindow();
       stopPolling();
-      recoverLabel(readableMessage(result.message, "ساخت فایل برچسب انجام نشد؛ می‌توانید درخواست جدید ثبت کنید."));
+      recoverLabel(readableMessage(result.message, "ساخت فایل چاپ انجام نشد؛ می‌توانید درخواست جدید ثبت کنید."));
     } else if (!activeJobId) {
       closeReservedLabelWindow();
       // An unscoped latest request can belong to another selected parcel/tab.
       // Regenerating this PDF is safe; never replay shipping or payment here.
       restoreLabelJob({ id: 0, latest: false });
-      recoverLabel("فایل برچسب تأیید نشد؛ دوباره چاپ برچسب را بزنید. ثبت مرسوله یا پرداخت دوباره انجام نمی‌شود.");
+      recoverLabel("فایل چاپ تأیید نشد؛ دوباره درخواست چاپ را بزنید. ثبت مرسوله یا پرداخت دوباره انجام نمی‌شود.");
     } else {
-      statusText("در حال آماده‌سازی برچسب پستی… (درخواست #" + fa(activeJobId) + ")");
+      statusText("در حال آماده‌سازی فایل چاپ… (درخواست #" + fa(activeJobId) + ")");
       pollLabel(activeJobId, result.retry_after || 5, sequence);
     }
   }
@@ -6236,7 +6248,15 @@ jQuery(function ($) {
     }, Math.min(60, Math.max(2, Number(retryAfter) || 5)) * 1000);
   }
 
-  function requestLabelForIds(ids) {
+  function bulkPrintTemplate() {
+    return bulkPrintKind === "barcode" ? "barcode" : String($printModal.find("[name='sgp-template']:checked").val() || defaultLabelTemplate);
+  }
+
+  function updatePrintSubmitLabel() {
+    $printModal.find("[data-sgp-print-submit-label]").text(bulkPrintKind === "barcode" ? "چاپ بارکدها" : "چاپ برچسب‌های پستی");
+  }
+
+  function requestLabelForIds(ids, template) {
     if (labelRequestPending || latestJobPending) return;
     ids = ids.filter(function (id) { return (listedParcels[id] && listedParcels[id].can_print_label === true)
       || (labelCandidates[id] && labelCandidates[id].can_print_label === true); });
@@ -6247,15 +6267,14 @@ jQuery(function ($) {
     var previousJob = { id: activeJobId, latest: latestJobPending };
     markLatestJob();
     var sequence = ++jobSequence;
-    var template = String($("[data-sgp-templates] input[name='sgp-template']:checked").val() || "invoice");
-    statusText("در حال ثبت درخواست برچسب پستی…");
+    statusText("در حال ثبت درخواست چاپ…");
     sgPost("salam_gate_bulk_label", { parcel_ids: ids, template: template })
       .done(function (res) {
         if (!res || !res.success) {
           closeReservedLabelWindow();
           restoreLabelJob(previousJob);
           recoverLabel(readableMessage(res && res.data && res.data.message,
-            res && res.data && res.data.request_dispatched === false ? "برچسب این مرسوله هنوز آماده چاپ نیست؛ وضعیت پرداخت و کد رهگیری را بررسی کنید." : "فایل برچسب دریافت نشد؛ دوباره چاپ برچسب را بزنید. ثبت مرسوله یا پرداخت دوباره انجام نمی‌شود."));
+            res && res.data && res.data.request_dispatched === false ? "این مرسوله هنوز آماده چاپ نیست؛ وضعیت پرداخت و کد رهگیری را بررسی کنید." : "فایل چاپ دریافت نشد؛ دوباره درخواست چاپ را بزنید. ثبت مرسوله یا پرداخت دوباره انجام نمی‌شود."));
           return;
         }
         $printModal.hide();
@@ -6264,7 +6283,7 @@ jQuery(function ($) {
       .fail(function () {
         closeReservedLabelWindow();
         restoreLabelJob(previousJob);
-        recoverLabel("فایل برچسب دریافت نشد؛ دوباره چاپ برچسب را بزنید. ثبت مرسوله یا پرداخت دوباره انجام نمی‌شود.");
+        recoverLabel("فایل چاپ دریافت نشد؛ دوباره درخواست چاپ را بزنید. ثبت مرسوله یا پرداخت دوباره انجام نمی‌شود.");
       }).always(function () {
         labelRequestPending = false;
         updateLabelActions();
@@ -6277,8 +6296,39 @@ jQuery(function ($) {
     pollLabel(activeJobId, 2);
   });
 
-  // ---------- چاپ گروهی با بازه تاریخ (پارت ۸) ----------
+  // Disclosure menu: opening it never dispatches a PDF job or payment.
+  function closePrintMenu(restoreFocus) {
+    $printMenu.find("[data-sgp-print-options]").prop("hidden", true);
+    $printMenu.find("[data-sgp-print-toggle]").attr("aria-expanded", "false");
+    if (restoreFocus) $printMenu.find("[data-sgp-print-toggle]").trigger("focus");
+  }
+  $page.on("click", "[data-sgp-print-toggle]", function () {
+    var open = $(this).attr("aria-expanded") !== "true";
+    $(this).attr("aria-expanded", String(open));
+    $printMenu.find("[data-sgp-print-options]").prop("hidden", !open);
+  });
+  $(document).on("click", function (event) {
+    if (!$(event.target).closest("[data-sgp-print-menu]").length) closePrintMenu(false);
+  });
+  $printMenu.on("keydown", function (event) {
+    if (event.key === "Escape") { event.preventDefault(); closePrintMenu(true); }
+    if (event.key === "ArrowDown" && $(event.target).is("[data-sgp-print-toggle]")) {
+      event.preventDefault();
+      $printMenu.find("[data-sgp-print-toggle]").attr("aria-expanded", "true");
+      $printMenu.find("[data-sgp-print-options]").prop("hidden", false).find("button").first().trigger("focus");
+    }
+  }).on("focusout", function (event) {
+    if (!event.relatedTarget || !this.contains(event.relatedTarget)) closePrintMenu(false);
+  });
+
+  // ---------- Batch labels / barcodes by date or selection ----------
   $page.on("click", "[data-sgp-print-modal]", function () {
+    if (labelRequestPending || latestJobPending) return;
+    bulkPrintKind = $(this).attr("data-sgp-print-kind") === "barcode" ? "barcode" : "label";
+    closePrintMenu(false);
+    $printModal.find("#sgp-print-title").text(bulkPrintKind === "barcode" ? "چاپ گروهی بارکدها" : "چاپ گروهی برچسب‌های پستی");
+    $printModal.find("[data-sgp-label-options]").prop("hidden", bulkPrintKind === "barcode");
+    updatePrintSubmitLabel();
     // باز کردن مودال درخواست تولید نمی‌سازد — فقط فرم
     resetLabelSelection();
     $printModal.find("[name='sgp-print-mode'][value='date']").prop("checked", true);
@@ -6301,7 +6351,7 @@ jQuery(function ($) {
     if (labelRequestPending || latestJobPending) return;
     if (selectionPrintMode()) {
       if (labelListRequest || !selectedIds().length) return;
-      requestLabelForIds(selectedIds());
+      requestLabelForIds(selectedIds(), bulkPrintTemplate());
       return;
     }
     var $n = $("[data-sgp-print-notice]").hide().empty();
@@ -6322,11 +6372,11 @@ jQuery(function ($) {
     var previousJob = { id: activeJobId, latest: latestJobPending };
     markLatestJob();
     var sequence = ++jobSequence;
-    var $btn = $(this).prop("disabled", true).text("در حال ثبت…");
+    $(this).prop("disabled", true).find("[data-sgp-print-submit-label]").text("در حال ثبت…");
     var markets = filters.market_name && filters.market_name.length ? filters.market_name : [];
 
     reserveLabelWindow();
-    sgPost("salam_gate_bulk_label_by_date", { from_jalali: from, to_jalali: to, template: $("[data-sgp-templates] input[name='sgp-template']:checked").val() || "", market_names: markets })
+    sgPost("salam_gate_bulk_label_by_date", { from_jalali: from, to_jalali: to, template: bulkPrintTemplate(), market_names: markets })
       .done(function (res) {
         if (res && res.success && res.data) {
           $("[data-sgp-print-modal-el]").hide();
@@ -6341,10 +6391,10 @@ jQuery(function ($) {
         $("[data-sgp-print-modal-el]").hide();
         closeReservedLabelWindow();
         restoreLabelJob(previousJob);
-        recoverLabel("فایل برچسب دریافت نشد؛ دوباره چاپ برچسب را بزنید. ثبت مرسوله یا پرداخت دوباره انجام نمی‌شود.");
+        recoverLabel("فایل چاپ دریافت نشد؛ دوباره درخواست چاپ را بزنید. ثبت مرسوله یا پرداخت دوباره انجام نمی‌شود.");
       }).always(function () {
         labelRequestPending = false;
-        $btn.text("چاپ برچسب پستی");
+        updatePrintSubmitLabel();
         updateLabelActions();
       });
   });

@@ -345,7 +345,7 @@ class SalamGateClient
             // 403 is an authorization failure, not proof of token expiry.
             // Keep a single safe error; raw details can contain sensitive data or
             // the authentication fallback above and must not reach an AJAX UI.
-            $message = 'دسترسی به این عملیات سلام‌گیت مجاز نیست. مجوزهای vendor.salamgate.read و vendor.salamgate.write را با اتصال مجدد تأیید کنید؛ اگر مجوزها در دسترس نبودند یا مشکل ادامه داشت، با پشتیبانی سلام‌گیت تماس بگیرید.';
+            $message = 'مجوز دسترسی به سلام‌گیت تأیید نشد. لطفاً دوباره تلاش کنید.';
             $errors = [['location' => 'forbidden', 'message' => $message]];
         } elseif ($kind === SalamGateException::KIND_RATE_LIMITED && $message === '') {
             $message = 'تعداد درخواست‌ها زیاد است؛ کمی بعد دوباره تلاش کنید.';

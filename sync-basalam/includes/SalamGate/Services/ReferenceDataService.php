@@ -2,6 +2,7 @@
 
 namespace SyncBasalam\SalamGate\Services;
 
+use SyncBasalam\SalamGate\Utils\Arrays;
 use SyncBasalam\SalamGate\ClientFactory;
 use SyncBasalam\SalamGate\SalamGateClient;
 use SyncBasalam\SalamGate\SalamGateException;
@@ -80,7 +81,7 @@ class ReferenceDataService
      */
     public static function isValidProvinceTree(array $tree): bool
     {
-        if ($tree === [] || !array_is_list($tree)) {
+        if ($tree === [] || !Arrays::isList($tree)) {
             return false;
         }
 
@@ -114,7 +115,7 @@ class ReferenceDataService
                 return false;
             }
             $children = array_key_exists('children', $node) ? $node['children'] : [];
-            if (!is_array($children) || !array_is_list($children)) {
+            if (!is_array($children) || !Arrays::isList($children)) {
                 return false;
             }
 
@@ -171,7 +172,7 @@ class ReferenceDataService
 
     public static function isValidNamedReferences(array $items): bool
     {
-        if ($items === [] || !array_is_list($items) || count($items) > 1000) {
+        if ($items === [] || !Arrays::isList($items) || count($items) > 1000) {
             return false;
         }
         $seen = [];
@@ -248,7 +249,7 @@ class ReferenceDataService
      */
     public static function isValidProviderNodes(array $nodes): bool
     {
-        if (!array_is_list($nodes)) {
+        if (!Arrays::isList($nodes)) {
             return false;
         }
 

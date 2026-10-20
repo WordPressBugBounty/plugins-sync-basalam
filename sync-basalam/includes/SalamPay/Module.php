@@ -30,7 +30,6 @@ final class Module
         add_action('rest_api_init', [Callback::class, 'register']);
         add_action('woocommerce_blocks_payment_method_type_registration', [self::class, 'blocks']);
         add_action('admin_init', [self::class, 'settingsRedirect']);
-        add_filter('plugin_action_links_' . plugin_basename(dirname(__DIR__, 2) . '/sync-basalam.php'), [self::class, 'actionLinks']);
         add_action('sync_basalam_salampay_reconcile_payment', [PaymentService::class, 'reconcile'], 10, 2);
         add_action('sync_basalam_salampay_reconcile_refund', [RefundService::class, 'reconcile'], 10, 2);
         add_action('woocommerce_order_status_cancelled', [RefundService::class, 'cancelled']);
@@ -83,12 +82,6 @@ final class Module
             wp_safe_redirect(self::settingsUrl());
             exit;
         }
-    }
-
-    public static function actionLinks(array $links): array
-    {
-        $links[] = '<a href="' . esc_url(self::settingsUrl()) . '">' . esc_html__('تنظیمات سلام‌پی', 'sync-basalam') . '</a>';
-        return $links;
     }
 
     public static function standaloneNotice(): void

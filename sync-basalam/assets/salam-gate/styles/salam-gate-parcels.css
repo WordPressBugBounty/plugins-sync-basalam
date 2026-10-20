@@ -19,6 +19,16 @@
   gap: 8px;
   flex: 0 0 auto;
 }
+.salam-gate-page .sgp-bulk-print { position: relative; max-width: 100%; }
+.salam-gate-page .sgp-bulk-print > .sgp-print-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.salam-gate-page .sgp-bulk-print .dashicons { flex: 0 0 18px; width: 18px; height: 18px; font: 18px/1 dashicons; }
+.salam-gate-page .sgp-print-options { position: absolute; inset-inline-start: 0; top: calc(100% + 8px); z-index: 20; display: grid; gap: 4px; width: max-content; max-width: min(300px, calc(100vw - 48px)); padding: 6px; border: 1px solid var(--sg-border, #e2e8f0); border-radius: 12px; background: #fff; box-shadow: 0 12px 30px #1e293b1f; }
+.salam-gate-page .sgp-print-options[hidden] { display: none !important; }
+.salam-gate-page .sgp-print-options button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px; margin: 0; border: 0; border-radius: 8px; background: transparent; color: var(--sg-text, #334155); font: 500 13px/1.8 var(--sg-font-body, PelakFA, Tahoma, sans-serif); text-align: start; cursor: pointer; }
+.salam-gate-page .sgp-print-options button:hover:not(:disabled),
+.salam-gate-page .sgp-print-options button:focus-visible { background: #fff5ef; color: #b84120; outline: 2px solid #ffbca4; outline-offset: -2px; }
+.salam-gate-page .sgp-print-options button:disabled { opacity: .6; cursor: wait; }
+.salam-gate-page .sgp-print-options svg { flex: 0 0 20px; width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .salam-gate-page .sgp-section .sgp-tool {
   position: relative;
   display: inline-flex;
@@ -274,6 +284,7 @@
 @media (max-width: 600px) {
   .salam-gate-page .sgp-section .sgp-toolbar__actions { width: 100%; }
   .salam-gate-page .sgp-section .sgp-toolbar__filters { margin-inline-start: auto; }
+  .salam-gate-page .sgp-print-options { inset-inline-start: auto; inset-inline-end: 0; }
 }
 .salam-gate-page #sgp-checkout-modal .sgp-checkout { width:min(880px, 100%); }
 .salam-gate-page #sgp-checkout-modal .sg-modal__body { padding:16px 20px; }

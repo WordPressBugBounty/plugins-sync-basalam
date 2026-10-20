@@ -26,6 +26,9 @@ add_action('plugins_loaded', static function () {
             $event['pid'] = getmypid();
             $event['sapi'] = PHP_SAPI;
             $event['noabort'] = $_SERVER['noabort'] ?? $_SERVER['REDIRECT_noabort'] ?? getenv('noabort') ?: null;
+            $environment = new \SyncBasalam\Services\AsyncWorkerEnvironment();
+            $event['litespeed_module'] = $environment->hasFlag('SYNCBASALAM_LITESPEED');
+            $event['other_module'] = $environment->hasFlag('SYNCBASALAM_NOT_LITESPEED');
             $event['started_at'] = microtime(true);
             $job = syncBasalamContainer()->get(\SyncBasalam\JobManager::class)->getJob(['job_type' => 'sync_basalam_matrix', 'status' => 'processing']);
             $event['history'][] = ['pid' => getmypid(), 'time' => $event['started_at'], 'job_id' => (int) $job->id, 'attempts' => (int) $job->attempts];
@@ -68,6 +71,7 @@ $control = static function () {
         $wpdb->delete($table, ['job_type' => 'sync_basalam_matrix']);
         foreach (['sync_basalam_async_worker_health', 'sync_basalam_matrix_events', 'sync_basalam_jobs_runner_last_run', 'sync_basalam_circuit_breaker'] as $name) delete_option($name);
         foreach (['sync_basalam_jobs_runner_async_dispatch_lock', 'sync_basalam_jobs_runner_idle_probe_lock'] as $name) delete_transient($name);
+        wp_clear_scheduled_hook('sync_basalam_jobs_runner_recovery');
         $lock->releaseGlobalJobsLock();
     } elseif ($op === 'enqueue') {
         $key = sanitize_key($_POST['key'] ?? 'job');
@@ -78,7 +82,7 @@ $control = static function () {
         $id = (int) $wpdb->insert_id;
         update_option('sync_basalam_jobs_runner_last_run', 0, false);
         if (!empty($_POST['dispatch'])) $runner->maybeDispatchAsyncRequest();
-        wp_send_json_success(['id' => $id]);
+        wp_send_json_success(['id' => $id, 'dispatch_returned_at' => microtime(true)]);
     } elseif (in_array($op, ['age', 'retry'], true)) {
         $id = (int) ($_POST['id'] ?? 0);
         $job = $queue->getJob(['id' => $id, 'job_type' => 'sync_basalam_matrix']);
@@ -100,7 +104,13 @@ $control = static function () {
         delete_option('_transient_timeout_' . $name);
     } elseif ($op === 'dispatch') {
         $runner->maybeDispatchAsyncRequest();
-    } elseif ($op === 'notice') {
+    } elseif ($op === 'recover') {
+        // WordPress removes a single event before invoking its callback.
+        wp_clear_scheduled_hook('sync_basalam_jobs_runner_recovery');
+        do_action('sync_basalam_jobs_runner_recovery');
+    } elseif ($op === 'rules') {
+        wp_send_json_success(['text' => \SyncBasalam\Services\AsyncWorkerProtection::rules()]);
+    } elseif ($op === 'notice' || $op === 'protect') {
         $_GET['page'] = 'sync_basalam';
         if (($_POST['role'] ?? 'administrator') === 'anonymous') wp_set_current_user(0);
         else {
@@ -108,9 +118,18 @@ $control = static function () {
             if (!$users) wp_send_json_error([], 404);
             wp_set_current_user($users[0]->ID);
         }
+        if ($op === 'protect') {
+            if (!empty($_POST['force']) && current_user_can('manage_options')) {
+                delete_option(\SyncBasalam\Services\AsyncWorkerProtection::OPTION_KEY);
+            }
+            (new \SyncBasalam\Services\AsyncWorkerProtection())->ensureInstalled();
+        }
         ob_start();
-        $runner->renderWorkerHealthNotice();
-        wp_send_json_success(['html' => ob_get_clean()]);
+        $runner->inspectWorkerHealth();
+        wp_send_json_success([
+            'html' => ob_get_clean(),
+            'protection' => get_option(\SyncBasalam\Services\AsyncWorkerProtection::OPTION_KEY, []),
+        ]);
     } elseif ($op !== 'state') {
         wp_send_json_error([], 400);
     }
@@ -122,11 +141,16 @@ $control = static function () {
         'sapi' => PHP_SAPI,
         'php' => PHP_VERSION,
         'server' => $_SERVER['SERVER_SOFTWARE'] ?? '',
+        'protection' => get_option(\SyncBasalam\Services\AsyncWorkerProtection::OPTION_KEY, []),
+        'backup_sha256' => hash('sha256', base64_decode((get_option(\SyncBasalam\Services\AsyncWorkerProtection::BACKUP_OPTION_KEY, [])['content_base64'] ?? ''))),
+        'backup_autoload' => $wpdb->get_var($wpdb->prepare("SELECT autoload FROM {$wpdb->options} WHERE option_name = %s", \SyncBasalam\Services\AsyncWorkerProtection::BACKUP_OPTION_KEY)),
+        'effective_noabort' => (new \SyncBasalam\Services\AsyncWorkerEnvironment())->hasFlag('noabort'),
         'jobs' => $wpdb->get_results($wpdb->prepare("SELECT * FROM {$table} WHERE job_type = %s ORDER BY id", 'sync_basalam_matrix')),
         'events' => (object) get_option('sync_basalam_matrix_events', []),
         'health' => get_option(\SyncBasalam\Services\AsyncWorkerHealth::OPTION_KEY, []),
         'notice' => $health->getNotice(),
         'lock_free' => $free,
+        'recovery_at' => wp_next_scheduled('sync_basalam_jobs_runner_recovery'),
         'autoload' => $wpdb->get_var($wpdb->prepare("SELECT autoload FROM {$wpdb->options} WHERE option_name = %s", \SyncBasalam\Services\AsyncWorkerHealth::OPTION_KEY)),
     ]);
 };

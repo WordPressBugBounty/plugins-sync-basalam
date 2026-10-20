@@ -91,7 +91,8 @@ final class ParcelViewNormalizer
         return $amount === false ? null : $amount;
     }
 
-    private static function invoiceAmountToman(array $parcel): int|float|null
+    /** @return int|float|null */
+    private static function invoiceAmountToman(array $parcel)
     {
         $amount = self::invoiceAmountRial($parcel);
         return $amount === null ? null : ($amount % 10 === 0 ? intdiv($amount, 10) : $amount / 10);

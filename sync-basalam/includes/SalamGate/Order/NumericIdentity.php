@@ -10,7 +10,7 @@ final class NumericIdentity
     /** Keep IDs exact in PHP, JSON and JavaScript, and outside ordinary local order IDs. */
     public static function forKey(string $key): ?int
     {
-        if (PHP_INT_SIZE < 8 || $key === '' || !function_exists('home_url')) {
+        if ($key === '' || !function_exists('home_url')) {
             return null;
         }
         $site = rtrim((string) home_url('/'), '/');
@@ -21,6 +21,8 @@ final class NumericIdentity
         $hash = hash('sha256', 'woosalam-salamgate-v1|' . $site . '|' . $blog . '|' . $key);
 
         // 52 digest bits plus a fixed high bit: 2^52 <= id <= 2^53-1.
-        return ((int) hexdec(substr($hash, 0, 13))) | 4503599627370496;
+        // Validate the complete value before returning an integer; never truncate an ID.
+        $id = filter_var(sprintf('%.0f', hexdec('1' . substr($hash, 0, 13))), FILTER_VALIDATE_INT);
+        return $id === false ? null : $id;
     }
 }

@@ -56,9 +56,10 @@ final class BasalamOrderState
             'blocked_reason' => $reason, 'checked_at' => time()];
     }
 
-    /** Cache only display data; cached eligibility is never permission to register or pay. */
-    public static function remember(\WC_Order|BasalamParcelOrder $order, array $detail, int $vendor, int $invoice): array
+    /** @param \WC_Order|BasalamParcelOrder $order Cache only display data, never permission to pay. */
+    public static function remember(object $order, array $detail, int $vendor, int $invoice): array
     {
+        OrderContext::assertSupportedOrder($order);
         $root = $order instanceof BasalamParcelOrder ? $order->getRoot() : $order;
         if (BasalamOrderContext::getInvoiceId((int) $root->get_id()) !== $invoice || self::vendorId() !== $vendor) {
             throw self::error('ارتباط سفارش باسلام تغییر کرده است؛ وضعیت را دوباره بررسی کنید.');

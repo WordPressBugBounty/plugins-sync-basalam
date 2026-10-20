@@ -26,9 +26,10 @@ final class BasalamOrderProducts
         add_action('admin_head', [self::class, 'adminStyles']);
     }
 
-    /** Reuse the exact authenticated reads already required by shipping preparation. */
-    public static function checkAndRepair(\WC_Order|BasalamParcelOrder $order, bool $requireShippable = true, ?array &$snapshots = null): array
+    /** @param \WC_Order|BasalamParcelOrder $order Reuse authenticated shipping reads. */
+    public static function checkAndRepair(object $order, bool $requireShippable = true, ?array &$snapshots = null): array
     {
+        OrderContext::assertSupportedOrder($order);
         $identity = ConnectionCache::identityHash();
         $snapshots = null;
         $preflight = BasalamShippingPreflight::check($order, $requireShippable, $snapshots);

@@ -14,6 +14,14 @@ class OrderContext
     public const MARKET_BASALAM = 'basalam';
     public const MARKET_WEBSITE = 'website';
 
+    /** Preserve the WC_Order|BasalamParcelOrder contract without PHP 8 union syntax. */
+    public static function assertSupportedOrder(object $order): void
+    {
+        if (!$order instanceof \WC_Order && !$order instanceof BasalamParcelOrder) {
+            throw new \TypeError('Shipping requires a WooCommerce order or a native Basalam parcel order.');
+        }
+    }
+
     public static function marketFor(int $orderId): string
     {
         return BasalamOrderContext::isBasalamOrder($orderId)

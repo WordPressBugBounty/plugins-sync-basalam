@@ -31,6 +31,14 @@ The supplied disposable site directory and report files remain available.
 a failure for debugging; a subsequent runner invocation reconfigures their
 ephemeral token. Use only one matrix run at a time.
 
+`--protection-only` focuses on automatic `.htaccess` installation/repair, actual
+server module detection, nonce validation, one real successful job and silent
+health diagnostics. It also verifies a real three-second nonblocking background
+job on every server. It runs on all four servers by default. OpenLiteSpeed also
+removes and automatically restores the rule, reloads its disposable runtime and
+verifies a real background job with `noabort=1`. Omit the flag to include the
+longer concurrency, worker-kill, timeout and queue-continuation scenarios.
+
 The control MU plugin requires a local WordPress environment and an ephemeral
 token on each control request. It cannot be enabled by an ordinary production
 plugin activation. Its installer requires CLI, the local environment and the
@@ -43,20 +51,54 @@ performs success, explicit failure, delayed execution or a real PHP fatal. These
 tests do **not** call Basalam's external API or fabricate customer orders.
 Product/order semantics have their separate integration/unit tests.
 
+The continuation scenario enqueues five slow jobs, dispatches once and waits
+using control requests that cannot restart the runner. With WP cron disabled,
+the queue must drain across multiple batches exactly once and without overlaps.
+All handoffs share one recovery event; invoking it after completion must stop
+rearming it. Normal ready work continues directly after the batch releases its
+database lock. Delayed retries and interrupted workers additionally use a
+single 60-second WordPress cron recovery event, which needs functioning WP cron
+or a server cron invoking WordPress.
+
+Fast runner regressions can also be run without Docker:
+
+```sh
+php tests/JobsRunnerContinuationRegression.php
+php tests/JobsRunnerLeaseRegression.php
+```
+
 Scenarios include nonce rejection/acceptance, successful cleanup, fixture API 422
 separation, real nonblocking dispatch with a caller that disconnects, four
 concurrent HTTP workers, slow-worker exclusion, SIGKILL of the actual PHP worker,
-independent detection on a subsequent admin request, notice permissions,
+independent detection on a subsequent admin request without visible alerts,
 restart persistence, stale recovery, legacy orphaned leases and PHP fatal errors.
 Nginx/Caddy additionally test a real PHP-FPM `request_terminate_timeout`.
-OpenLiteSpeed additionally removes/restores the scoped `.htaccess` rule and checks
-the **actual** LSAPI `noabort` flag; it is not simulated. Manual worker requests
+OpenLiteSpeed additionally installs/restores the scoped `.htaccess` rule through
+the real production installer and checks the **actual** LSAPI `noabort` flag.
+Anonymous/subscriber requests and `DISALLOW_FILE_MODS` cannot write configuration;
+administrator installation preserves all original bytes and a non-autoloaded
+private DB backup. Other webservers leave the original file intact. All contexts
+remain silent, including interrupted or unprotected workers.
+
+All three non-LiteSpeed cases also place the exact managed block in `.htaccess`,
+even though their automatic setup correctly leaves the file unchanged. HTTP
+requests and background work must keep succeeding with the block present.
+Apache verifies its real non-LiteSpeed module marker. OpenLiteSpeed must
+observe the positive marker and `noabort`; unrelated AJAX requests must not.
+These environment flags are not simulated. Manual worker requests
 include the same action query string as production dispatch, because the rule
 is intentionally scoped to that query string.
 
+OpenLiteSpeed 1.9.3 requires a server reload to apply changed rewrite rules. The
+matrix records this distinction, verifies that writing the file alone is not
+treated as effective protection, then reloads the disposable container. The
+production plugin does not restart a customer's webserver or claim that a
+successful file write proves effective protection. See the official
+[OpenLiteSpeed rewrite documentation](https://docs.openlitespeed.org/config/rewriterules/).
+
 For fast reproducible stale checks, the control fixture changes `started_at` to
 121 seconds ago **after** a real worker has started or died. The production
-120-second threshold is unchanged. A live worker must still suppress the alert
+120-second threshold is unchanged. A live worker must not be recorded as interrupted
 while it holds the real DB lock. The batch window is one second in this fixture;
 the production default remains twenty seconds.
 

@@ -45,6 +45,7 @@ class StatusActions
             $data = AccountStateRouter::resolveCurrent($fresh);
             wp_send_json_success([
                 'state' => $data['state'],
+                'message' => (string) ($data['message'] ?? ''),
                 'html'  => AccountStateRouter::renderStatePartial($data),
             ]);
         } catch (\Throwable $exception) {

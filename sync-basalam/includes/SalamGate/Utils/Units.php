@@ -30,8 +30,9 @@ final class Units
 
     /**
      * ریال سرویس → تومان برای نمایش.
+     * @return int|float
      */
-    public static function toToman(int $rial): int|float
+    public static function toToman(int $rial)
     {
         // Keep the payable amount exact, including its last rial after a discount.
         return $rial % 10 === 0 ? intdiv($rial, 10) : $rial / 10;
@@ -39,9 +40,13 @@ final class Units
 
     /**
      * نمایش تومان با جداکننده هزارگان و ارقام فارسی.
+     * @param int|float $toman
      */
-    public static function formatToman(int|float $toman): string
+    public static function formatToman($toman): string
     {
+        if (!is_int($toman) && !is_float($toman)) {
+            throw new \TypeError('Toman display amount must be an integer or float.');
+        }
         // Display only: preserve exact rial/toman values in conversions and payment.
         return Digits::toPersian(number_format(floor($toman), 0));
     }

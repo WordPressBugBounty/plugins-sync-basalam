@@ -20,6 +20,8 @@ define('WP_DEBUG_DISPLAY', false);
 define('WP_DEBUG_LOG', '/tmp/matrix-wordpress.log');
 define('WP_AUTO_UPDATE_CORE', false);
 define('AUTOMATIC_UPDATER_DISABLED', true);
-define('DISALLOW_FILE_MODS', true);
+// Exercise both actual WordPress file-modification policies. Remote HTTP and
+// automatic updates remain blocked independently by the MU fixture/constants.
+define('DISALLOW_FILE_MODS', ($_POST['file_mods'] ?? '') === 'denied');
 defined('ABSPATH') || define('ABSPATH', '/var/www/html/');
 require_once ABSPATH . 'wp-settings.php';

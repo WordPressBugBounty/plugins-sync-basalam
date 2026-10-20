@@ -5,10 +5,15 @@ The jobs runner sends a nonblocking request to
 the connection before the worker finishes. On LiteSpeed, `ignore_user_abort(true)`
 does not prevent the server from aborting that worker.
 
-Install this block near the top of the site's document-root `.htaccess`, before
-other rewrite rules. Back up the existing file first. The rule applies only to
-the plugin's async action; the AJAX nonce check, PHP execution limit and runner
-database lock still apply.
+The plugin installs a scoped block automatically on activation or the next
+administrator request after an update. It only attempts installation for a
+LiteSpeed server signature/module marker or an ambiguous LSAPI runtime. Apache,
+Nginx, Caddy and IIS signatures are excluded. The PHP SAPI alone is **not** proof
+of LiteSpeed: Apache on CloudLinux can also report `PHP_SAPI=litespeed`.
+
+The managed block is prepended before other rewrite rules, outside WordPress's
+generated section. The server enables protection inside `<IfModule LiteSpeed>`;
+the fallback only records another server when the positive marker is absent:
 
 ```apache
 # BEGIN SyncBasalam Async
@@ -17,55 +22,57 @@ database lock still apply.
 RewriteEngine On
 RewriteCond %{REQUEST_URI} /wp-admin/admin-ajax\.php$
 RewriteCond %{QUERY_STRING} (^|&)action=sync_basalam_run_jobs_async(&|$)
-RewriteRule .* - [E=noabort:1]
+RewriteRule .* - [E=noabort:1,E=SYNCBASALAM_LITESPEED:1]
 </IfModule>
 </IfModule>
-# END SyncBasalam Async
-```
-
-This is a host configuration requirement. The plugin does not install this rule
-automatically. Do not apply `noabort` to every site request.
-
-## Apache hosts using LSAPI
-
-Apache can run PHP through LSAPI and report `PHP_SAPI=litespeed` even though
-the web server is not LiteSpeed. In that setup, the LiteSpeed module block above
-does not apply and checking the SAPI alone can produce a false protection warning.
-
-The plugin also treats an explicit `SERVER_SOFTWARE` value containing Apache
-without LiteSpeed as Apache evidence. This fallback handles hosts that do not
-preserve the scoped marker below. The marker remains the preferred option when
-the host can expose it reliably.
-
-After confirming that `<IfModule !LiteSpeed>` applies on the host, install the
-following block near the top of `.htaccess`, before other rewrite rules and
-outside WordPress's generated section. Back up the existing file first.
-
-```apache
-# BEGIN SyncBasalam Server Detection
-<IfModule !LiteSpeed>
 <IfModule mod_rewrite.c>
 RewriteEngine On
+RewriteCond %{ENV:SYNCBASALAM_LITESPEED} !^1$
 RewriteCond %{REQUEST_URI} /wp-admin/admin-ajax\.php$
 RewriteCond %{QUERY_STRING} (^|&)action=sync_basalam_run_jobs_async(&|$)
 RewriteRule .* - [E=SYNCBASALAM_NOT_LITESPEED:1]
 </IfModule>
-</IfModule>
-# END SyncBasalam Server Detection
+# END SyncBasalam Async
 ```
 
-The plugin accepts `SYNCBASALAM_NOT_LITESPEED=1` and its `REDIRECT_` variant from
-the server/request environment as evidence that this queue request is not served
-by LiteSpeed. This marker does not enable `noabort` or prove protection against
-worker interruption. With no marker, the existing SAPI and `noabort` checks remain
-in effect. Do not set this marker unconditionally on a LiteSpeed host.
+Both the protection and module markers apply only to the queue action. Normal
+AJAX requests are unaffected. The effective module marker takes precedence over
+masked server signatures; LSAPI without a marker or recognizable server
+signature remains unknown instead of being classified as LiteSpeed. No client
+HTTP header or active LiteSpeed Cache plugin is used as server evidence.
 
-Execute an authenticated empty queue request after installing the rule to refresh
-the stored environment health. A real interrupted job still produces an error
-with generic hosting advice on Apache; only the false LiteSpeed protection warning
-is cleared by this environment check.
+Only users with `manage_options` can trigger configuration; multisite additionally
+requires a super administrator. `DISALLOW_FILE_MODS` and WordPress's
+`wp_is_file_mod_allowed()` policy are respected. There is no FTP prompt or admin
+notice. A denied/unwritable configuration is left intact, with an internal status
+and a five-minute retry interval. Successful checks are limited to once an hour.
+
+Before changing the file, the installer stores its exact previous bytes, canonical
+path and whether it existed in `sync_basalam_async_worker_htaccess_backup`, with
+`autoload=false`. The bytes are base64 encoded for lossless restoration. No
+public backup file is created. The installer preserves all unrelated bytes and
+file mode, migrates its own complete top-level marker block, avoids duplicates,
+and refuses symlinks, malformed/nested markers and files larger than 1 MiB. It
+prepares and verifies a temporary file in the same directory, checks that the
+original has not changed, then atomically replaces it. Insufficient directory
+permissions prevent installation even if the original file itself is writable.
+
+`sync_basalam_async_worker_protection` records installation status and retry time,
+with `autoload=false`. `installed` means the file contains the intended rule;
+it does **not** mean the host has already applied it. The next real async request
+checks effective `noabort` / `REDIRECT_noabort`. Servers that ignore `.htaccess`
+or require a configuration reload may still need hosting support. No automatic
+web-server restart or broad `noabort` rule is attempted.
 
 ## Worker recovery
+
+An unfinished batch now dispatches its successor after releasing the global
+database lock, so ready work can continue without another visitor request.
+A single WordPress cron event checks pending/processing work every 60 seconds
+while needed, covering delayed retries and interrupted workers. This fallback
+needs working WordPress cron or a server cron. Neither continuation nor cron
+replaces the scoped LiteSpeed protection above: a killed worker may never reach
+its handoff, and its processing job must wait for stale recovery.
 
 An aborted worker can leave a job in `processing` with no exception recorded.
 The stale-job recovery retries it after 120 seconds and eventually marks it
@@ -84,42 +91,17 @@ References:
 - [LiteSpeed: controlling LSPHP and connection aborts](https://docs.litespeedtech.com/lsws/extapp/php/configuration/control/)
 - [LiteSpeed Cache's own scoped async rewrite rule](https://github.com/litespeedtech/lscache_wp/blob/master/src/htaccess.cls.php)
 
-## Automatic admin warning
+## Silent health diagnostics
 
-Actual async workers check the effective `noabort` / `REDIRECT_noabort`
-request environment. For requests detected as LiteSpeed, an absent flag produces a
-warning on Woosalam, product and order admin screens for users who can manage
-WooCommerce or site options. Absence is reported as unverified protection:
-a global server configuration may protect workers without exposing that flag.
-The plugin never assumes that a LiteSpeed Cache plugin is active and never
-rewrites `.htaccess` itself.
-
-If a job remains `processing` beyond 120 seconds and the runner global MySQL
-lock can be acquired, its previous worker has stopped. The next runner records
-this before stale recovery, and an admin request can also discover it when no
-new worker starts. A live worker retains the lock and cannot trigger this
-interruption warning merely by being slow. Explicit API failures are handled
-separately. The alert includes the job ID, log link, hosting guidance and an
-expandable scoped rewrite rule.
+Worker health monitoring no longer registers an `admin_notices` callback or renders
+an alert template. An authorized request on relevant admin screens still inspects
+stale work via `current_screen`, and actual async executions still observe their
+request environment. Explicit API rejections remain normal job errors.
 
 The latest evidence is retained in `sync_basalam_async_worker_health`, with
-`autoload=false` and no payloads, credentials or request headers. Empty or
-contended batches do not clear interruption evidence. On LiteSpeed, a returned
-job clears it only when effective `noabort` was observed; a quick unprotected
-return still leaves the warning visible. On another web server/runtime, a completed
-async execution clears the interruption warning. Detection runs on async
-workers and relevant admin visits; it is not an external push notification.
-
-### Reproducible validation
-
-- `php tests/JobsRunnerLeaseRegression.php` checks the orphaned lease cases.
-- `phpunit --configuration phpunit.xml` runs the unit regression suite.
-- In the local Docker WordPress stack, run `php tests/integration/async-worker-health.php`.
-  This uses the real queue and MySQL locks, kills a separate PHP process during
-  execution, verifies slow-worker exclusion, stale recovery, admin permissions,
-  actionable markup, and separate API rejection. LiteSpeed environment flags
-  are simulated in this local Apache environment.
-- `php tests/integration/product-sync-operations.php` exercises actual WooCommerce
-  save hooks and product operations against deterministic API response fixtures.
-- Verify automatic AJAX execution against the live host separately; local
-  fixtures do not test LiteSpeed's actual connection-abort behavior.
+`autoload=false` and no payloads, credentials or request headers. A stale job is
+recorded as interrupted only when the runner's global MySQL lock can be acquired;
+a slow live worker still owns that lock. Empty or contended batches do not clear
+interruption evidence. On confirmed LiteSpeed, a returned job clears it only when
+effective `noabort` was observed. Internal diagnosis data is available to code and
+the integration fixtures, but is never rendered as an admin alert.

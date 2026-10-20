@@ -1,0 +1,5 @@
+simulation: product-update-retry
+routing: header
+mocks:
+  - routeKey: basalam
+    path: ../mocks/product-update-retry/config.yaml

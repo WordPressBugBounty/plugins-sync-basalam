@@ -13,6 +13,7 @@ use SyncBasalam\Admin\Settings\SettingsManager;
 use SyncBasalam\Admin\Product\Data\ProductDataBuilder;
 use SyncBasalam\Services\Products\ProductConnection;
 use SyncBasalam\Services\Products\ProductSkuRetry;
+use SyncBasalam\Services\Products\ProductPriceStockRetry;
 use SyncBasalam\Logger\Logger;
 use SyncBasalam\Services\VendorSyncPolicy;
 
@@ -142,8 +143,17 @@ class BulkUpdateProductsJob extends AbstractJobType
             if (empty($productsData)) return $this->success(['skipped' => true, 'message' => 'No products to update in this batch']);
 
             update_option(self::LAST_REQUEST_AT_OPTION, microtime(true), false);
-            $res = $this->apiService->patch($url, ['data' => $productsData]);
+            $batchPayload = ['data' => $productsData];
+            $res = ProductPriceStockRetry::send(
+                fn(array $data) => $this->apiService->patch($url, $data),
+                $batchPayload
+            );
+            $productsData = $batchPayload['data'];
             $this->retryDuplicateSkuBatchItems($url, $productsData, $res);
+
+            if ((int) ($res['status_code'] ?? 0) !== 202) {
+                throw new NonRetryableException('بروزرسانی دسته جمعی محصولات ناموفق بود.', (int) ($res['status_code'] ?? 0));
+            }
 
             if ($res['status_code'] == 202) {
                 Logger::info('بروزرسانی دسته جمعی محصولات با موفقیت انجام شد.');

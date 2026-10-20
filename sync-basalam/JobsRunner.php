@@ -20,6 +20,8 @@ class JobsRunner
     private const ASYNC_DISPATCH_LOCK_SECONDS = 25;
     private const ASYNC_IDLE_PROBE_SECONDS = 5;
     private const ASYNC_TIME_LIMIT_SECONDS = 20;
+    private const RECOVERY_CRON_HOOK = 'sync_basalam_jobs_runner_recovery';
+    private const RECOVERY_DELAY_SECONDS = 60;
     private const GLOBAL_RUNNER_LAST_RUN_OPTION = 'sync_basalam_jobs_runner_last_run';
     private const STALE_PROCESSING_TIMEOUT_SECONDS = 120;
 
@@ -42,7 +44,8 @@ class JobsRunner
         // Run before later shutdown callbacks can leave an unread mysqli result.
         add_action('shutdown', [$this, 'maybeDispatchAsyncRequest'], 2);
         add_action('sync_basalam_job_created', [$this, 'maybeDispatchAsyncRequest'], 10, 0);
-        add_action('admin_notices', [$this, 'renderWorkerHealthNotice']);
+        add_action(self::RECOVERY_CRON_HOOK, [$this, 'recoverAsyncQueue']);
+        add_action('current_screen', [$this, 'inspectWorkerHealth']);
 
         $this->jobManager = $jobManager;
         $this->jobExecutor = $jobExecutor;
@@ -51,7 +54,7 @@ class JobsRunner
         $this->workerHealth = $workerHealth ?? new AsyncWorkerHealth();
     }
 
-    public function renderWorkerHealthNotice(): void
+    public function inspectWorkerHealth(): void
     {
         if (!current_user_can('manage_woocommerce') && !current_user_can('manage_options')) return;
         if (!AdminRegistrar::isWoosalamRelatedAdminScreen()) return;
@@ -65,10 +68,6 @@ class JobsRunner
                 $this->jobExecutor->releaseGlobalJobsLock();
             }
         }
-
-        $notice = $this->workerHealth->getNotice();
-        if (!$notice) return;
-        require __DIR__ . '/templates/notifications/AsyncWorkerAlert.php';
     }
 
     private function detectInterruptedWorker(): void
@@ -87,6 +86,7 @@ class JobsRunner
 
         if ($this->CheckHttpBlockService->SyncBasalamHttpBlock()) return;
         $isNewJob = function_exists('current_filter') && current_filter() === 'sync_basalam_job_created';
+        if ($isNewJob) $this->scheduleRecovery();
         if (!$isNewJob && $this->hasActiveAsyncLease(self::ASYNC_IDLE_PROBE_TRANSIENT)) return;
         if ($this->hasActiveAsyncLease(self::ASYNC_DISPATCH_LOCK_TRANSIENT)) return;
 
@@ -105,13 +105,36 @@ class JobsRunner
         // The global database lock still prevents duplicate workers from
         // processing the same queue when requests race here.
         if ($this->hasActiveAsyncLease(self::ASYNC_DISPATCH_LOCK_TRANSIENT)) return;
+        $this->reserveAsyncDispatch();
+        $this->dispatchAsyncRequest();
+    }
+
+    public function recoverAsyncQueue(): void
+    {
+        if ($this->CheckHttpBlockService->SyncBasalamHttpBlock()) return;
+        if ($this->jobManager->getCountJobs(['status' => ['pending', 'processing']]) === 0) return;
+
+        // Keep one watchdog for delayed retries or a worker lost by the host.
+        // An empty queue lets this single event expire without rearming it.
+        $this->scheduleRecovery();
+        $this->maybeDispatchAsyncRequest();
+    }
+
+    private function scheduleRecovery(): void
+    {
+        if (!wp_next_scheduled(self::RECOVERY_CRON_HOOK)) {
+            wp_schedule_single_event(time() + self::RECOVERY_DELAY_SECONDS, self::RECOVERY_CRON_HOOK);
+        }
+    }
+
+    private function reserveAsyncDispatch(): void
+    {
         set_transient(
             self::ASYNC_DISPATCH_LOCK_TRANSIENT,
             time() + self::ASYNC_DISPATCH_LOCK_SECONDS,
             self::ASYNC_DISPATCH_LOCK_SECONDS
         );
-
-        $this->dispatchAsyncRequest();
+        $this->scheduleRecovery();
     }
 
     private function hasActiveAsyncLease(string $transient): bool
@@ -198,6 +221,7 @@ class JobsRunner
 
         $this->isAsyncBatch = true;
         $processed = 0;
+        $continue = false;
         $deadline = microtime(true) + (float) apply_filters(
             'sync_basalam_jobs_runner_async_time_limit',
             self::ASYNC_TIME_LIMIT_SECONDS
@@ -223,15 +247,32 @@ class JobsRunner
                 }
 
                 if ((microtime(true) + $delay) >= $deadline) {
+                    // Keep a low configured rate from turning handoffs into a
+                    // tight loop of empty HTTP requests before the next slot.
+                    $remaining = max(0.0, $deadline - microtime(true));
+                    if ($remaining > 0.0) usleep((int) ($remaining * 1000000));
+                    $continue = true;
                     break;
                 }
 
                 usleep((int) ($delay * 1000000));
             }
+
+            $continue = ($continue || microtime(true) >= $deadline)
+                && $this->jobManager->hasPendingOrStaleProcessingJobs(self::STALE_PROCESSING_TIMEOUT_SECONDS);
+            if ($continue) {
+                // Reserve the handoff while still owning the database lock so
+                // normal visitors cannot dispatch a second successor.
+                $this->reserveAsyncDispatch();
+            }
         } finally {
             $this->isAsyncBatch = false;
             $this->jobExecutor->releaseGlobalJobsLock();
         }
+
+        // The next request must start after the global lock is released. The
+        // normal async-request guard still suppresses dispatch during a job.
+        if ($continue) $this->dispatchAsyncRequest();
 
         return $processed;
     }

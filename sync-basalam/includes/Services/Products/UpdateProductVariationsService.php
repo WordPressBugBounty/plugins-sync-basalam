@@ -111,7 +111,10 @@ class UpdateProductVariationsService
 
         while (true) {
             try {
-                $response = $this->apiservice->patch($url, $data);
+                $response = ProductPriceStockRetry::send(
+                    fn(array $payload) => $this->apiservice->patch($url, $payload),
+                    $data
+                );
             } catch (RetryableException $e) {
                 if ($this->retryWithoutDuplicateSku($data, $e, $skuRetry)) continue;
 
@@ -128,6 +131,10 @@ class UpdateProductVariationsService
             // bounded if an adapter returns the error response directly.
             if (ProductSkuRetry::isDuplicateSkuError($response)) {
                 throw NonRetryableException::permanent('SKU متغیر محصول در باسلام تکراری است.');
+            }
+
+            if ((int) ($response['status_code'] ?? 0) !== 200) {
+                throw new NonRetryableException('بروزرسانی متغیر محصول در باسلام ناموفق بود.', (int) ($response['status_code'] ?? 0));
             }
 
             return;

@@ -2,6 +2,7 @@
 
 namespace SyncBasalam\SalamGate\Services;
 
+use SyncBasalam\SalamGate\Utils\Arrays;
 use SyncBasalam\SalamGate\Order\NumericIdentity;
 use SyncBasalam\SalamGate\SalamGateException;
 
@@ -54,7 +55,7 @@ final class CreationAttemptService
             ['market_name' => [$market], 'external_ids' => [$externalId], 'per_page' => 30]
         );
         $body = $response['body'] ?? null;
-        if (!is_array($body) || !is_array($body['data'] ?? null) || !array_is_list($body['data']) || count($body['data']) > 1
+        if (!is_array($body) || !is_array($body['data'] ?? null) || !Arrays::isList($body['data']) || count($body['data']) > 1
             || (isset($body['next_cursor']) && $body['next_cursor'] !== '')) {
             throw new SalamGateException('نتیجه ثبت قبلی مرسوله قابل تأیید نیست.', 200, [], SalamGateException::KIND_UNEXPECTED_RESPONSE);
         }

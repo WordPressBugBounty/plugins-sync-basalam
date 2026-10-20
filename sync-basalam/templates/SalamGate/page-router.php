@@ -17,9 +17,10 @@ $accountLoading = ($data['state'] ?? '') === 'loading';
 $requiresActiveAccount = in_array($sgView, ['send', 'settings'], true) && ($data['state'] ?? '') !== 'active';
 $loadView = !$siteDisabled && !$requiresActiveAccount && !((($connectionUnavailable || $accountLoading) && $protectedView))
     && (in_array($sgView, ['send', 'settings', 'calculator', 'post-offices'], true)
-        || ($sgView === 'activation' && in_array($data['state'] ?? '', ['', 'not_registered'], true))
-        || ($sgView === '' && ($data['state'] ?? '') === 'active'));
+        || ($sgView === 'activation' && in_array($data['state'] ?? '', ['', 'not_registered'], true)));
 ?>
+<!-- WordPress relocates admin notices here, outside the SalamGate styling boundary. -->
+<hr class="wp-header-end">
 <div class="wrap salam-gate-page sg-router" data-sg-root data-sg-account-state="<?php echo esc_attr((string) ($data['state'] ?? 'loading')); ?>"<?php if ($accountLoading) : ?> data-sg-account-deferred="true"<?php endif; ?>>
     <?php include __DIR__ . '/page-header.php'; ?>
 

@@ -2,6 +2,7 @@
 
 namespace SyncBasalam\SalamGate\Services;
 
+use SyncBasalam\SalamGate\Utils\Arrays;
 use SyncBasalam\SalamGate\ClientFactory;
 use SyncBasalam\SalamGate\Contracts\CancellationEligibility;
 use SyncBasalam\SalamGate\Contracts\LabelEligibility;
@@ -37,7 +38,7 @@ final class ParcelCancellationService
             $response = $client->get(SalamGateClient::PATH_PARCELS,
                 ['ids' => [$id], 'market_name' => ParcelsListService::ALL_MARKETS, 'per_page' => 1]);
             $items = $response['body']['data'] ?? null;
-            if (!is_array($items) || !array_is_list($items) || count($items) !== 1
+            if (!is_array($items) || !Arrays::isList($items) || count($items) !== 1
                 || !is_array($items[0]) || !LabelEligibility::validListShape($items[0])
                 || ParcelService::positiveId($items[0]['id'] ?? null) !== $id) {
                 throw new SalamGateException('مرسوله در حساب متصل تأیید نشد؛ فهرست را دوباره بررسی کنید.', 422);

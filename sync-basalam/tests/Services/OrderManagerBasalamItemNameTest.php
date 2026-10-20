@@ -428,23 +428,3 @@ namespace SyncBasalam\Tests\Services {
     }
 
 }
-
-namespace {
-    // productExistsByTitle در مسیر placeholder از wpdb استفاده می‌کند.
-    if (!isset($GLOBALS['wpdb'])) {
-        $GLOBALS['wpdb'] = new class {
-            public $prefix = 'wp_';
-            public $posts = 'wp_posts';
-
-            public function get_var($query = null, $x = 0, $y = 0)
-            {
-                return null; // محصول جایگزین هنوز ساخته نشده
-            }
-
-            public function prepare($query, ...$args)
-            {
-                return $query;
-            }
-        };
-    }
-}

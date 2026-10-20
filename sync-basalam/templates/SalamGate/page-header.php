@@ -7,7 +7,6 @@ $sgState = (string) ($data['state'] ?? 'loading');
 $sgChrome = \SyncBasalam\SalamGate\Admin\PageChrome::class;
 $sgPage = $sgChrome::page($sgView, $sgState);
 ?>
-<hr class="wp-header-end">
 <header class="sg-page-header">
     <div class="sg-page-header__heading">
         <span class="sg-page-header__icon" data-sg-page-icon="<?php echo esc_attr($sgPage['icon']); ?>" aria-hidden="true">

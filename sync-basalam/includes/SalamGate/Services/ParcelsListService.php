@@ -331,8 +331,8 @@ class ParcelsListService
                 || ($state === 'paid' && $status === ParcelStatuses::NEW)];
     }
 
-    /** A remote external ID alone never authorizes writes to a local WooCommerce order. */
-    public static function linkedOrderForParcel(array $parcel): \WC_Order|BasalamParcelOrder|null
+    /** @return \WC_Order|BasalamParcelOrder|null A remote ID alone never authorizes local writes. */
+    public static function linkedOrderForParcel(array $parcel): ?object
     {
         if (!function_exists('wc_get_order')) { return null; }
         require_once dirname(__DIR__) . '/Order/OrderParcelMapping.php';

@@ -1,15 +1,19 @@
 <?php
 
-/** Offline module wiring check; run with PHP 8.2+ to exercise its gate. */
+/** Offline module wiring check; shipping shares the base plugin requirements. */
 if (PHP_SAPI !== 'cli') {
     http_response_code(404);
     exit;
 }
 
 defined('ABSPATH') || define('ABSPATH', __DIR__ . '/wordpress/');
-$wp_version = in_array('--old-wordpress', $argv ?? [], true) ? '6.4' : '6.5';
+require_once __DIR__ . '/wordpress-compat.php';
+$wp_version = in_array('--old-wordpress', $argv ?? [], true) ? '6.0' : '6.5';
 if (!in_array('--without-woocommerce', $argv ?? [], true)) {
-    define('WC_VERSION', in_array('--old-woocommerce', $argv ?? [], true) ? '9.9.5' : '10.0.0');
+    class WooCommerce {}
+    if (!in_array('--without-woocommerce-version', $argv ?? [], true)) {
+        define('WC_VERSION', in_array('--old-woocommerce', $argv ?? [], true) ? '9.9.5' : '10.0.0');
+    }
 }
 
 $GLOBALS['sg_registration'] = ['hooks' => [], 'scripts' => [], 'styles' => [], 'localized' => [],
@@ -128,21 +132,14 @@ sgAssert($GLOBALS['sg_registration']['clear_events'] === ['salam_gate_sync_parce
 sgAssert(!class_exists('SyncBasalam\\SalamGate\\Services\\StatusSyncScheduler', false), 'Early deactivation must not load the scheduler domain');
 sgReset();
 Module::register();
-if (!Module::runtimeSupported()) {
-    sgAssert(!Module::ownsShipping(), 'Unsupported runtime must not become shipping owner');
-    sgAssert(count(sgEntries('admin_notices')) === 1, 'Unsupported runtime needs a scoped notice');
-    sgAssert(!class_exists('SyncBasalam\\SalamGate\\Admin\\AccountStateRouter', false), 'Unsupported runtime must not load domain classes');
-    $_GET['page'] = 'sync_basalam';
-    ob_start(); Module::runtimeNotice(); $notice = ob_get_clean();
-    sgAssert(strpos($notice, '۶۴ بیتی') !== false, 'Runtime notice must explain the requirement');
-    $_GET['page'] = 'unrelated';
-    ob_start(); Module::runtimeNotice(); $notice = ob_get_clean();
-    sgAssert($notice === '', 'Runtime notice must stay off unrelated screens');
+if (!class_exists('WooCommerce')) {
+    sgAssert(!Module::ownsShipping(), 'Inactive WooCommerce must not register shipping');
+    sgAssert($GLOBALS['sg_registration']['hooks'] === [], 'Inactive dependency must not register hooks or notices');
+    sgAssert(!class_exists('SyncBasalam\\SalamGate\\Admin\\AccountStateRouter', false), 'Inactive dependency must not load shipping classes');
     Module::deactivate();
-    sgAssert($GLOBALS['sg_registration']['clear_events'] === ['salam_gate_sync_parcel_statuses'], 'Unsupported runtime must remove an orphan cron on explicit deactivation');
-    sgAssert(!class_exists('SyncBasalam\\SalamGate\\Services\\StatusSyncScheduler', false), 'Unsupported-runtime deactivation must not load scheduler domain');
+    sgAssert($GLOBALS['sg_registration']['clear_events'] === ['salam_gate_sync_parcel_statuses'], 'Deactivation must clear an orphan shipping event');
     sgAssert($GLOBALS['sg_registration_options'] === $originalOptions, 'Deactivation must preserve settings and financial evidence');
-    echo "SalamGate unsupported-runtime registration: {$checks} checks passed\n";
+    echo "SalamGate inactive-dependency registration: {$checks} checks passed\n";
     exit(0);
 }
 

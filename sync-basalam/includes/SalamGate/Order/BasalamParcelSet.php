@@ -2,6 +2,7 @@
 
 namespace SyncBasalam\SalamGate\Order;
 
+use SyncBasalam\SalamGate\Utils\Arrays;
 use SyncBasalam\SalamGate\SalamGateException;
 use SyncBasalam\SalamGate\Services\ConnectionCache;
 
@@ -48,7 +49,7 @@ final class BasalamParcelSet
         if ($primary === null) { throw self::error('شناسه مرسوله اصلی سفارش باسلام مشخص نیست.'); }
         $response = BasalamParcelReader::orders(90, $cursor);
         self::fence($rootOrder, $context);
-        if (!is_array($response['data'] ?? null) || !array_is_list($response['data'])
+        if (!is_array($response['data'] ?? null) || !Arrays::isList($response['data'])
             || count($response['data']) > self::MAX_PAGE_ROWS) {
             throw self::error('پاسخ فهرست مرسوله‌های باسلام معتبر نیست.');
         }
@@ -270,7 +271,7 @@ final class BasalamParcelSet
 
     private static function index($items): array
     {
-        if (!is_array($items) || !array_is_list($items) || $items === []) { throw self::error('اقلام باسلام دریافت نشد یا معتبر نیست.'); }
+        if (!is_array($items) || !Arrays::isList($items) || $items === []) { throw self::error('اقلام باسلام دریافت نشد یا معتبر نیست.'); }
         $indexed = [];
         foreach ($items as $item) {
             $id = is_array($item) ? self::id($item['id'] ?? null) : null;

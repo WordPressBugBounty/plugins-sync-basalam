@@ -10,6 +10,7 @@ class JobsRunnerTest extends TestCase
     private const ASYNC_ACTION = 'sync_basalam_run_jobs_async';
     private const DISPATCH_LOCK = 'sync_basalam_jobs_runner_async_dispatch_lock';
     private const IDLE_PROBE_LOCK = 'sync_basalam_jobs_runner_idle_probe_lock';
+    private const RECOVERY_HOOK = 'sync_basalam_jobs_runner_recovery';
 
     private $originalRequest;
     private $originalCookie;
@@ -74,6 +75,9 @@ class JobsRunnerTest extends TestCase
         self::assertSame(2, $actions['shutdown'][0]['priority']);
         self::assertSame(1, $actions['shutdown'][0]['accepted_args']);
         self::assertArrayNotHasKey('init', $actions);
+        self::assertSame([$runner, 'recoverAsyncQueue'], $actions[self::RECOVERY_HOOK][0]['callback']);
+        self::assertArrayNotHasKey('admin_notices', $actions);
+        self::assertSame([$runner, 'inspectWorkerHealth'], $actions['current_screen'][0]['callback']);
 
         self::assertSame(
             [$runner, 'maybeDispatchAsyncRequest'],
@@ -339,6 +343,48 @@ class JobsRunnerTest extends TestCase
         self::assertSame([120], $jobManager->timeouts);
     }
 
+    public function testNewJobSchedulesRecoveryEvenWhenDispatchLeaseIsActive(): void
+    {
+        $GLOBALS['sync_basalam_jobs_runner_test_state']['current_filter'] = 'sync_basalam_job_created';
+        $GLOBALS['sync_basalam_jobs_runner_test_state']['transients'][self::DISPATCH_LOCK] = time() + 25;
+        $runner = $this->newRunner();
+        $runner->maybeDispatchAsyncRequest();
+        $scheduled = $this->state()['scheduled'][self::RECOVERY_HOOK];
+        self::assertGreaterThanOrEqual(time() + 59, $scheduled);
+        $runner->maybeDispatchAsyncRequest();
+        self::assertSame($scheduled, $this->state()['scheduled'][self::RECOVERY_HOOK]);
+        self::assertSame([], $this->state()['remote_requests']);
+    }
+
+    public function testRecoveryStopsForEmptyQueue(): void
+    {
+        $manager = new FakeJobManager();
+        $runner = $this->newRunner($manager);
+        $runner->recoverAsyncQueue();
+        self::assertEmpty($this->state()['scheduled'] ?? []);
+        self::assertSame([], $this->state()['remote_requests']);
+    }
+
+    public function testRecoveryRearmsDelayedWorkWithoutDispatchingAnEmptyWorker(): void
+    {
+        $manager = new FakeJobManager([false]);
+        $manager->jobCount = 1;
+        $runner = $this->newRunner($manager);
+        $runner->recoverAsyncQueue();
+        self::assertArrayHasKey(self::RECOVERY_HOOK, $this->state()['scheduled']);
+        self::assertSame([], $this->state()['remote_requests']);
+    }
+
+    public function testRecoveryDispatchesEligibleWork(): void
+    {
+        $manager = new FakeJobManager([true]);
+        $manager->jobCount = 1;
+        $runner = $this->newRunner($manager);
+        $runner->recoverAsyncQueue();
+        self::assertCount(1, $this->state()['remote_requests']);
+        self::assertArrayHasKey(self::RECOVERY_HOOK, $this->state()['scheduled']);
+    }
+
     private function newRunner(
         ?FakeJobManager $jobManager = null,
         ?FakeHttpBlockService $httpBlockService = null,
@@ -386,6 +432,7 @@ class JobsRunnerTest extends TestCase
 
 class FakeJobManager
 {
+    public $jobCount = 0;
     public $timeouts = [];
     public $onProbe;
 
@@ -403,6 +450,11 @@ class FakeJobManager
         if ($this->onProbe) ($this->onProbe)();
 
         return (bool) array_shift($this->pendingResults);
+    }
+
+    public function getCountJobs(array $where): int
+    {
+        return $this->jobCount;
     }
 }
 

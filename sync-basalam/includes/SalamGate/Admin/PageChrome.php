@@ -18,7 +18,7 @@ class PageChrome
             'not_registered' => ['label' => 'فعال‌سازی نشده', 'tone' => 'neutral'],
             'not_connected'  => ['label' => 'اتصال برقرار نیست', 'tone' => 'error'],
             'error_auth'     => ['label' => 'نیاز به اتصال مجدد', 'tone' => 'error'],
-            'error_forbidden' => ['label' => 'مجوز سلام‌گیت کافی نیست', 'tone' => 'error'],
+            'error_forbidden' => ['label' => 'مجوز دسترسی به سلام‌گیت تأیید نشد', 'tone' => 'error'],
             'error_network'  => ['label' => 'بررسی وضعیت ناموفق', 'tone' => 'error'],
             'loading'        => ['label' => 'در حال بررسی وضعیت', 'tone' => 'neutral'],
         ];

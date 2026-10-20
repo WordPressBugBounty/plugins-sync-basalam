@@ -5,6 +5,7 @@ namespace SyncBasalam\SalamGate\Order;
 use SyncBasalam\SalamGate\ClientFactory;
 use SyncBasalam\SalamGate\SalamGateException;
 use SyncBasalam\Admin\Settings\OAuthTokenRefresher;
+use SyncBasalam\Services\Api\OpenApiConnectionFallback;
 
 defined('ABSPATH') || exit;
 
@@ -54,13 +55,17 @@ final class BasalamParcelReader
             'headers' => ['Accept' => 'application/json', 'Authorization' => 'Bearer ' . $token, 'User-Agent' => 'Woosalam-Pro'],
         ];
         $url = ($openapi ? 'https://openapi.basalam.com' : 'https://order-processing.basalam.com') . $path;
-        $response = wp_remote_request($url, $args);
+        $send = static function (string $requestUrl) use (&$args) {
+            return wp_remote_request($requestUrl, $args);
+        };
+        $fallback = new OpenApiConnectionFallback();
+        $response = $fallback->request($url, $send);
         if (!is_wp_error($response) && (int) wp_remote_retrieve_response_code($response) === 401
             && class_exists(OAuthTokenRefresher::class)) {
             $fresh = OAuthTokenRefresher::refresh($token);
             if (is_string($fresh) && $fresh !== '' && $fresh !== $token) {
                 $args['headers']['Authorization'] = 'Bearer ' . $fresh;
-                $response = wp_remote_request($url, $args);
+                $response = $fallback->request($url, $send);
             }
         }
         if (is_wp_error($response)) {

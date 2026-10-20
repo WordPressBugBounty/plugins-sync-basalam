@@ -59,17 +59,22 @@
       if (request || leaving) return;
       loading(true);
       request = $.ajax({
-        url: window.basalam_ajax.ajaxurl, type: "POST", dataType: "json", timeout: 25000,
+        // Offer retry when the account check has not responded within 10 seconds.
+        url: window.basalam_ajax.ajaxurl, type: "POST", dataType: "json", timeout: 10000,
         data: { action: "salam_gate_account_state", _wpnonce: window.basalam_ajax.nonce, fresh: "0" }
       }).done(function (response) {
         if (leaving) return;
         var data = response && response.success === true ? response.data : null;
         if (!data || states.indexOf(data.state) < 0 || typeof data.html !== "string" || !data.html.trim()) {
-          failure("ارتباط با سلام‌گیت برقرار نشد. کمی بعد «تلاش دوباره» را بزنید.");
+          var errorMessage = response && response.data && response.data.message;
+          failure(typeof errorMessage === "string" && errorMessage.trim()
+            ? errorMessage : "پاسخ معتبر برای بررسی وضعیت حساب دریافت نشد؛ صفحه را تازه‌سازی کنید و دوباره تلاش کنید.");
           return;
         }
         if (data.state === "error_network") {
-          failure("سلام‌گیت فعلاً پاسخ نمی‌دهد. سایر بخش‌ها در دسترس‌اند؛ کمی بعد دوباره تلاش کنید.");
+          // Keep provider/validation details visible; an unavailable read is not proof of disconnection.
+          failure(typeof data.message === "string" && data.message.trim()
+            ? data.message : "وضعیت حساب سلام‌گیت دریافت نشد؛ کمی بعد دوباره تلاش کنید.");
           return;
         }
         notifyState(data.state);
@@ -79,8 +84,17 @@
           return;
         }
         if (!reloadOnce()) failure("وضعیت حساب دریافت شد، اما صفحه آماده نشد. برای ادامه یک‌بار صفحه را تازه کنید.");
-      }).fail(function (_, status) {
-        if (status !== "abort") failure("دریافت وضعیت حساب طول کشید یا ارتباط قطع شد. دوباره تلاش کنید.");
+      }).fail(function (xhr, status) {
+        if (status === "abort") return;
+        if (xhr && (xhr.status === 401 || xhr.status === 403)) {
+          failure("اعتبار صفحه پایان یافته یا دسترسی مجاز نیست؛ صفحه را تازه‌سازی کنید.");
+        } else if (status === "timeout") {
+          failure("دریافت وضعیت حساب بیش از حد طول کشید؛ دوباره تلاش کنید.");
+        } else if (status === "parsererror") {
+          failure("پاسخ سایت برای بررسی حساب معتبر نیست؛ صفحه را تازه‌سازی کنید و تنظیمات امنیتی سایت را بررسی کنید.");
+        } else {
+          failure("درخواست بررسی وضعیت حساب انجام نشد؛ اتصال سایت و پاسخ سرور را بررسی کنید.");
+        }
       }).always(function () {
         request = null;
         if (!leaving) loading(false);

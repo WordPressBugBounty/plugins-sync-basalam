@@ -2,6 +2,7 @@
 
 namespace SyncBasalam\SalamGate\Admin\Ajax;
 
+use SyncBasalam\SalamGate\Utils\Arrays;
 use SyncBasalam\SalamGate\ClientFactory;
 use SyncBasalam\SalamGate\Admin\OrderMetabox;
 use SyncBasalam\SalamGate\Admin\OrderListAction;
@@ -219,7 +220,7 @@ final class BulkShippingActions
 
     private static function selectedIds($raw): array
     {
-        if (!is_array($raw) || $raw === [] || count($raw) > self::MAX_BATCH || !array_is_list($raw)) {
+        if (!is_array($raw) || $raw === [] || count($raw) > self::MAX_BATCH || !Arrays::isList($raw)) {
             throw self::validation('بین ۱ تا ۲۰ سفارش را برای ارسال گروهی انتخاب کنید.');
         }
         $ids = [];
@@ -243,8 +244,8 @@ final class BulkShippingActions
             || !is_array($record['markets'] ?? null)
             || !is_array($record['foreign_ids'] ?? null)
             || !is_array($record['items'] ?? null) || $record['items'] === [] || count($record['items']) > self::MAX_BATCH
-            || !is_array($record['active_keys'] ?? null) || !array_is_list($record['active_keys'])
-            || !is_array($record['active_ids'] ?? null) || !array_is_list($record['active_ids'])
+            || !is_array($record['active_keys'] ?? null) || !Arrays::isList($record['active_keys'])
+            || !is_array($record['active_ids'] ?? null) || !Arrays::isList($record['active_ids'])
             || ($record['connection_id'] ?? '') !== ConnectionCache::identityHash()) {
             throw self::validation('انتخاب گروهی منقضی شده یا حساب متصل تغییر کرده است؛ دوباره انتخاب کنید.', 'batch_expired');
         }
@@ -308,7 +309,7 @@ final class BulkShippingActions
             'ids' => $ids, 'market_name' => ParcelsListService::ALL_MARKETS, 'per_page' => 30,
         ]);
         $body = $response['body'] ?? null;
-        if (!is_array($body) || !is_array($body['data'] ?? null) || !array_is_list($body['data'])) {
+        if (!is_array($body) || !is_array($body['data'] ?? null) || !Arrays::isList($body['data'])) {
             throw self::validation('فهرست مرسوله‌های انتخاب‌شده دریافت نشد؛ دوباره تلاش کنید.', 'batch_identity_changed');
         }
         $found = [];
@@ -668,7 +669,7 @@ final class BulkShippingActions
                     ['ids' => $chunk, 'market_name' => ['website'], 'per_page' => 30]);
                 ConnectionCache::assertCurrentIdentity($connection);
                 $body = $response['body'] ?? null;
-                if (!is_array($body) || !is_array($body['data'] ?? null) || !array_is_list($body['data'])) {
+                if (!is_array($body) || !is_array($body['data'] ?? null) || !Arrays::isList($body['data'])) {
                     throw self::validation('وضعیت پیش‌نویس‌های سفارش تأیید نشد.', 'batch_identity_changed');
                 }
                 foreach ($body['data'] as $raw) {

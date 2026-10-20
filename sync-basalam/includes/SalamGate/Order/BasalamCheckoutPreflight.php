@@ -95,8 +95,10 @@ final class BasalamCheckoutPreflight
     }
 
     /** Re-read local ownership after HTTP; a valid earlier snapshot is not a permanent authorization. */
-    private static function assertLocalIdentity(\WC_Order|BasalamParcelOrder|null $order, array $item, array $preflight): void
+    /** @param \WC_Order|BasalamParcelOrder|null $order */
+    private static function assertLocalIdentity(?object $order, array $item, array $preflight): void
     {
+        if ($order !== null) { OrderContext::assertSupportedOrder($order); }
         if ($order === null) {
             if (OrderParcelMapping::hasEvidence($item['id'], $item['external_id'])) {
                 throw self::error('ارتباط یا نتیجه پرداخت محلی این مرسوله هنگام بررسی تغییر کرد؛ دوباره وضعیت را بررسی کنید.');

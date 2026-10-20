@@ -51,6 +51,12 @@ class DashboardActions
                 'message' => $exception->firstMessage(),
                 'kind'    => $exception->getKind(),
             ]);
+        } catch (\Throwable $exception) {
+            // A report failure must remain a JSON response, not an HTML fatal/parse error.
+            wp_send_json_error([
+                'message' => 'دریافت گزارش عملکرد انجام نشد؛ پاسخ سرور سایت را بررسی کنید.',
+                'kind' => SalamGateException::KIND_UNEXPECTED_RESPONSE,
+            ], 503);
         }
     }
 

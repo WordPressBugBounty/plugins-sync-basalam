@@ -2,6 +2,7 @@
 /** Offline regression for site opt-out, paid-registration preservation and Woo UI gates. */
 if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 define('ABSPATH', __DIR__ . '/wordpress/');
+require_once __DIR__ . '/wordpress-compat.php';
 require_once dirname(__DIR__, 2) . '/vendor/autoload.php';
 
 use SyncBasalam\SalamGate\Admin\AccountStateRouter;
@@ -28,7 +29,15 @@ $remoteStatus = 14;
 $events = (object) ['schedule' => 'hourly'];
 $checks = 0;
 class ActivationJsonExit extends RuntimeException {
-    public function __construct(public bool $success, public array $data, public int $status = 200) { parent::__construct(); }
+    public bool $success;
+    public array $data;
+    public int $status;
+    public function __construct(bool $success, array $data, int $status = 200) {
+        parent::__construct();
+        $this->success = $success;
+        $this->data = $data;
+        $this->status = $status;
+    }
 }
 function check($condition, string $message): void { global $checks; if (!$condition) throw new RuntimeException($message); $checks++; }
 function get_option($key, $default = false) { global $options; return $options[$key] ?? $default; }

@@ -21,9 +21,12 @@ function esc_url_raw($url) { return $url; }
 function wp_create_nonce($action) { return 'test-nonce'; }
 function apply_filters($name, $value) { return $value; }
 function wp_remote_post($url, $args) { $GLOBALS['state']['requests'][] = [$url, $args]; return []; }
+function wp_next_scheduled($hook) { return $GLOBALS['state']['scheduled'][$hook] ?? false; }
+function wp_schedule_single_event($timestamp, $hook) { $GLOBALS['state']['scheduled'][$hook] = $timestamp; return true; }
 
 // Run in its own PHP process: php tests/JobsRunnerLeaseRegression.php
 require_once dirname(__DIR__) . '/includes/Services/AsyncWorkerHealth.php';
+require_once dirname(__DIR__) . '/includes/Services/AsyncWorkerEnvironment.php';
 require $argv[1] ?? dirname(__DIR__) . '/JobsRunner.php';
 
 class QueueForLeaseTest {

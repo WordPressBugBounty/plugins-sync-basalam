@@ -2,6 +2,7 @@
 
 namespace SyncBasalam\SalamGate\Services;
 
+use SyncBasalam\SalamGate\Utils\Arrays;
 use SyncBasalam\SalamGate\Admin\OrderMetabox;
 use SyncBasalam\SalamGate\Admin\OrderShippingStatus;
 use SyncBasalam\SalamGate\Contracts\ParcelStatuses;
@@ -49,7 +50,7 @@ final class WebsiteOrdersService
             }
         }
         $ids = ($this->query)($beforeId, $exactId, $search, self::PAGE_SIZE + 1);
-        if (!is_array($ids) || !array_is_list($ids) || count($ids) > self::PAGE_SIZE + 1) {
+        if (!is_array($ids) || !Arrays::isList($ids) || count($ids) > self::PAGE_SIZE + 1) {
             throw self::error('دریافت سفارش‌های ووکامرس انجام نشد؛ دوباره تلاش کنید.');
         }
         $seen = [];

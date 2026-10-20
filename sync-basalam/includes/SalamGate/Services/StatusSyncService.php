@@ -267,8 +267,8 @@ final class StatusSyncService
             if ($ids !== [] && $stats['skipped'] !== 'lock_lost') {
                 update_option(self::CURSOR_KEY, (int) end($ids), false);
             }
+            // Retain diagnostics without emitting a routine INFO entry on every run.
             update_option(self::LAST_SYNC_KEY, ['ran_at' => time()] + $stats, false);
-            $this->logResult($stats);
         } catch (\Throwable $exception) {
             $stats['skipped'] = 'error';
             $this->logFailure('اجرای همگام‌سازی سلام‌گیت ناموفق بود.', []);
@@ -487,13 +487,6 @@ final class StatusSyncService
         }
 
         return $changed;
-    }
-
-    private function logResult(array $stats): void
-    {
-        if (class_exists(\SyncBasalam\Logger\Logger::class)) {
-            \SyncBasalam\Logger\Logger::info('همگام‌سازی وضعیت مرسوله‌های سلام‌گیت انجام شد.', $stats);
-        }
     }
 
     private function logFailure(string $message, array $context): void

@@ -80,11 +80,11 @@ final class BasalamGoodsValue
         $title = is_string($row['title'] ?? null)
             ? trim(strtr($row['title'], ['ي' => 'ی', 'ك' => 'ک', "\u{200c}" => ' '])) : '';
         $title = preg_replace('/\s+/u', ' ', $title);
-        $titleKind = match ($title) {
+        $titleKinds = [
             'قیمت محصول' => self::PRODUCT_PRICE,
             'تخفیف محصول غرفه' => self::VENDOR_PRODUCT_DISCOUNT,
-            default => null,
-        };
+        ];
+        $titleKind = $titleKinds[$title] ?? null;
         if (!array_key_exists('id', $row)) { return $titleKind; }
         $id = self::integer($row['id']);
         $idKind = in_array($id, [self::PRODUCT_PRICE, self::VENDOR_PRODUCT_DISCOUNT], true) ? $id : null;

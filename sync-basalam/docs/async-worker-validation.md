@@ -93,6 +93,7 @@ does not replace the earlier production LiteSpeed-host verification.
 
 Reproducible setup, exact scope and report formats are documented in
 [`tests/integration/webservers/README.md`](../tests/integration/webservers/README.md).
+
 All disposable matrix containers, its database volume and its network were
 removed after the passing run. The existing local development stacks were left
 running. Queue/health PHPUnit tests (46 tests, 171 assertions) and 12 lease
@@ -104,3 +105,58 @@ OpenLiteSpeed's complete 11-scenario run was then repeated three times
 recorded attempts `[0, 1]` and exactly one returned execution in each run. The
 recovery assertion uses the actual queue attempt sequence to catch repeated
 execution within one attempt while permitting normal queue retries.
+
+## Automatic protection and silent diagnostics — 2026-10-19
+
+The new automatic installer and silent health inspection were validated locally;
+this follow-up has not been deployed to the customer site. Earlier production
+verification above refers to the previously deployed runner/manual host rule.
+
+- Focused PHPUnit: **91 tests, 285 assertions passed**, covering server detection,
+  managed-file updates/backups, permissions/failure paths and runner registration.
+- The standalone lease regression passed all **12 cases**; the continuation
+  regression also passed multi-batch, no-progress and low-rate scenarios.
+- Focused actual HTTP configuration matrix (`--protection-only`): **4 webservers,
+  92 assertions passed**, using Apache, Nginx, Caddy and OpenLiteSpeed. The report
+  records SHA-256 hashes of the tested runtime sources, confirmed against the
+  final local files.
+- Apache evaluated the guarded probe as non-LiteSpeed; OpenLiteSpeed evaluated
+  the positive branch, exposed real `noabort=1`, and did not set the fallback
+  non-LiteSpeed marker. Unrelated AJAX requests did not receive `noabort`.
+- Administrator installation preserved original bytes and a non-autoloaded DB
+  backup. Anonymous/subscriber requests and disabled file modifications could
+  not write. Admin health inspection emitted no alert, including with missing
+  protection. Removing the rule, repairing it automatically and completing a
+  real three-second background job after configuration reload also passed.
+
+OpenLiteSpeed 1.9.3 required a configuration reload to apply the installed rule.
+The installer does not equate a successful file write with effective protection.
+The actual-server test also exposed OpenLiteSpeed setting both markers when
+using a negative `IfModule` branch. The final rule instead guards the fallback
+explicitly on absence of the positive environment marker.
+
+Full PHPUnit ran **260 tests, 595 assertions**, with the same pre-existing failure
+in `StaleVariationRecoveryTest::testCustomModeStaleVariationFallsBackToOneCompleteProductPatch`
+(line 488). The previous server-detection test error no longer occurs. The full
+suite is not reported as passing.
+
+### Cross-server configuration recheck — 2026-10-19
+
+The focused HTTP matrix was rerun with additional checks for a manually present
+managed block on every non-LiteSpeed server and a real three-second nonblocking
+background job on each server. **All four servers passed, 119 assertions total**:
+Apache 2.4.68, Nginx 1.29.8, Caddy 2.11.7 and OpenLiteSpeed 1.9.3. These are actual
+isolated webserver processes, WordPress HTTP requests and database queue records.
+
+Automatic setup left Apache/Nginx/Caddy configuration untouched. Deliberately
+placing the same block in their `.htaccess` did not break HTTP requests or queue
+execution in the tested configurations. Apache observed only the non-LiteSpeed
+marker. Every delayed background job completed exactly once after its dispatcher
+returned. OpenLiteSpeed additionally passed removal and automatic repair of the
+rule; applying changed rules still required reloading its disposable runtime.
+
+The focused PHPUnit suite also passed again: **91 tests, 285 assertions**. Runtime
+source hashes in the HTTP report match the final local files. The disposable
+containers, database volume and network were removed. This recheck did not deploy
+the automatic installer or alert removal to production and did not rerun the full
+PHPUnit suite; its previously documented unrelated failure remains unresolved.

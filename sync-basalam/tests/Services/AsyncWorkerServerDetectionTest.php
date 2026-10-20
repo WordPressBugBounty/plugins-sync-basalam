@@ -16,11 +16,11 @@ class AsyncWorkerServerDetectionTest extends TestCase
         // Exercise the real detector with the SAPI reported by Apache/LSAPI hosts.
         define('SyncBasalam\\Services\\PHP_SAPI', 'litespeed');
         $GLOBALS['sync_basalam_test_options'] = [];
-        foreach (['noabort', 'REDIRECT_noabort', 'SYNCBASALAM_NOT_LITESPEED', 'REDIRECT_SYNCBASALAM_NOT_LITESPEED'] as $name) {
+        foreach (['noabort', 'REDIRECT_noabort', 'SYNCBASALAM_LITESPEED', 'REDIRECT_SYNCBASALAM_LITESPEED', 'SYNCBASALAM_NOT_LITESPEED', 'REDIRECT_SYNCBASALAM_NOT_LITESPEED'] as $name) {
             unset($_SERVER[$name]);
             putenv($name);
         }
-        unset($_SERVER['SERVER_SOFTWARE']);
+        $_SERVER['SERVER_SOFTWARE'] = 'LiteSpeed';
         putenv('SERVER_SOFTWARE');
     }
 
@@ -112,5 +112,51 @@ class AsyncWorkerServerDetectionTest extends TestCase
         $health->observeAsyncEnvironment();
 
         self::assertSame('notice-warning', $health->getNotice()['class']);
+    }
+
+    public function testLsapiAloneIsUnknownAndDoesNotCreateAFalseLiteSpeedDiagnosis(): void
+    {
+        unset($_SERVER['SERVER_SOFTWARE']);
+        self::assertNull((new \SyncBasalam\Services\AsyncWorkerEnvironment())->isLiteSpeed());
+        self::assertTrue((new \SyncBasalam\Services\AsyncWorkerEnvironment())->shouldInstallProbe());
+        $health = new AsyncWorkerHealth();
+        $health->observeAsyncEnvironment();
+        self::assertNull($health->getNotice());
+        $health->recordJobReturned((object) ['id' => 42], 0.1);
+        self::assertNull(get_option(AsyncWorkerHealth::OPTION_KEY)['last_returned_protected']);
+    }
+
+    /** @dataProvider otherServerSignatures */
+    public function testOtherServersUsingLsapiAreNotLiteSpeed(string $signature): void
+    {
+        $_SERVER['SERVER_SOFTWARE'] = $signature;
+        self::assertFalse((new \SyncBasalam\Services\AsyncWorkerEnvironment())->isLiteSpeed());
+    }
+
+    public function otherServerSignatures(): array
+    {
+        return [['Apache/2.4.62'], ['nginx/1.29.1'], ['Caddy'], ['Microsoft-IIS/10.0']];
+    }
+
+    public function testActualModuleMarkerCanResolveAMaskedServerSignature(): void
+    {
+        $_SERVER['SERVER_SOFTWARE'] = 'Apache';
+        $_SERVER['REDIRECT_SYNCBASALAM_LITESPEED'] = '1';
+        self::assertTrue((new \SyncBasalam\Services\AsyncWorkerEnvironment())->isLiteSpeed());
+    }
+
+    public function testConflictingModuleMarkersRemainUnknown(): void
+    {
+        $_SERVER['SYNCBASALAM_LITESPEED'] = '1';
+        $_SERVER['SYNCBASALAM_NOT_LITESPEED'] = '1';
+        self::assertNull((new \SyncBasalam\Services\AsyncWorkerEnvironment())->isLiteSpeed());
+    }
+
+    public function testClientHeadersCannotSupplyServerEvidence(): void
+    {
+        unset($_SERVER['SERVER_SOFTWARE']);
+        $_SERVER['HTTP_SERVER_SOFTWARE'] = 'LiteSpeed';
+        $_SERVER['HTTP_SYNCBASALAM_LITESPEED'] = '1';
+        self::assertNull((new \SyncBasalam\Services\AsyncWorkerEnvironment())->isLiteSpeed());
     }
 }

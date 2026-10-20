@@ -106,8 +106,8 @@ class QuoteNormalizer
         return $rows;
     }
 
-    /** Provider discounts start from raw fare; coupons replace them and start from base fare. */
-    private static function fareCost(array $costs): int|float|null
+    /** @return int|float|null Raw fare after provider discounts, or base fare for coupons. */
+    private static function fareCost(array $costs)
     {
         $coupon = false;
         foreach ((array) ($costs['discount']['items'] ?? []) as $item) {

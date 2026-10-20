@@ -18,7 +18,7 @@ defined('ABSPATH') || exit;
  */
 class ParcelService
 {
-    public const LABEL_TEMPLATES = ['invoice', 'invoice_new', 'summary', 'label_10x15'];
+    public const LABEL_TEMPLATES = ['invoice', 'invoice_new', 'summary', 'label_10x15', 'barcode'];
 
     /**
      * پرداخت مرسوله؛ خطا پس از ارسال درخواست لزوماً به معنی عدم کسر هزینه نیست.

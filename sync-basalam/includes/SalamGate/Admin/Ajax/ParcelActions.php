@@ -218,9 +218,10 @@ class ParcelActions
         ]);
     }
 
-    /** Read-only remote recovery; never substitutes an unverified ID or silently repairs conflicting metadata. */
-    private static function recoverBasalamParcel(\WC_Order|BasalamParcelOrder $order, int $externalId): ?array
+    /** @param \WC_Order|BasalamParcelOrder $order Recovery never repairs conflicting metadata. */
+    private static function recoverBasalamParcel(object $order, int $externalId): ?array
     {
+        OrderContext::assertSupportedOrder($order);
         $rawId = $order->get_meta('_salam_gate_parcel_id');
         $parcelId = $rawId === '' || $rawId === null ? null : ParcelService::positiveId($rawId);
         $savedMarket = $order->get_meta('_salam_gate_market');
@@ -850,11 +851,13 @@ class ParcelActions
      * اثر پرداخت موفق روی سفارش وو (متا/یادداشت/وضعیت) — جدا برای تست.
      *
      * @param array|null $parcelItem رکورد لیست نرمال‌شده یا null = وضعیت نامعلوم
+     * @param \WC_Order|BasalamParcelOrder $order
      *
      * @return array خلاصه برای پاسخ AJAX
      */
-    public static function applyPaySuccess(\WC_Order|BasalamParcelOrder $order, array $payBody, ?array $parcelItem, string $market = OrderContext::MARKET_BASALAM): array
+    public static function applyPaySuccess(object $order, array $payBody, ?array $parcelItem, string $market = OrderContext::MARKET_BASALAM): array
     {
+        OrderContext::assertSupportedOrder($order);
         $statusId = (int) ($parcelItem['status_id'] ?? 0);
         $trackingCode = (string) ($parcelItem['tracking_code'] ?? '');
 
@@ -1119,8 +1122,8 @@ class ParcelActions
 
     // ---------------------------------------------------------------
 
-    /** Stored identity + fresh SalamGate ownership proof; never opens source-order checkout. */
-    private static function labelOrderOrError(): \WC_Order|BasalamParcelOrder|null
+    /** @return \WC_Order|BasalamParcelOrder|null Stored identity plus fresh ownership proof. */
+    private static function labelOrderOrError(): ?object
     {
         $orderId = ParcelService::positiveId($_POST['order_id'] ?? null);
         $root = $orderId !== null ? wc_get_order($orderId) : null;
@@ -1278,9 +1281,11 @@ class ParcelActions
     /**
      * Cross-panel financial state is checked under the shared lease before stateful quotes/upsert.
      * Keep this separate from knownPaymentOutcome: successful payment reconciliation must still work.
+     * @param \WC_Order|BasalamParcelOrder $order
      */
-    private static function basalamQuoteMutationBlock(\WC_Order|BasalamParcelOrder $order, int $parcelId): ?array
+    private static function basalamQuoteMutationBlock(object $order, int $parcelId): ?array
     {
+        OrderContext::assertSupportedOrder($order);
         if (OrderContext::marketFor((int) $order->get_id()) !== OrderContext::MARKET_BASALAM) { return null; }
         try {
             // Rate GET/selection changes the remote draft; source cancellation must
@@ -1591,7 +1596,8 @@ class ParcelActions
         }
     }
 
-    private static function orderOrError(): \WC_Order|BasalamParcelOrder|null
+    /** @return \WC_Order|BasalamParcelOrder|null */
+    private static function orderOrError(): ?object
     {
         $orderId = isset($_POST['order_id']) ? (int) $_POST['order_id'] : 0;
         $order = $orderId > 0 ? wc_get_order($orderId) : null;

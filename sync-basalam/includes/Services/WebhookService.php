@@ -17,6 +17,24 @@ class WebhookService
 
     public const TARGET_EVENT_IDS = [3, 5, 7];
 
+    /** Activation must reconcile an already connected store's subscription. */
+    public static function onActivation(): void
+    {
+        // A new installation receives its webhook after OAuth saves the token.
+        if (!Settings::getSettings(SettingsConfig::TOKEN)) return;
+
+        try {
+            if ((new self())->setupWebhook()) {
+                Logger::info('وبهوک سفارش‌های باسلام پس از فعال‌سازی افزونه با موفقیت تنظیم شد.');
+            } else {
+                Logger::error('تنظیم وبهوک سفارش‌های باسلام پس از فعال‌سازی افزونه ناموفق بود.');
+            }
+        } catch (\Throwable $e) {
+            // A remote service failure must not prevent plugin activation.
+            Logger::error('خطا در تنظیم وبهوک پس از فعال‌سازی افزونه: ' . $e->getMessage());
+        }
+    }
+
     public function __construct()
     {
         $this->apiService = syncBasalamContainer()->get(ApiServiceManager::class);
@@ -50,6 +68,10 @@ class WebhookService
             $webhooksMarkedForDeletion = [];
 
             foreach ($existingWebhooks['data'] as $webhook) {
+                // Another store can use the same app/account. Never overwrite or
+                // remove its subscriptions while activating this installation.
+                if (($webhook['url'] ?? '') !== $webhookUrl) continue;
+
                 if (isset($webhook['events']) && is_array($webhook['events'])) {
                     $webhookEventIds = [];
                     foreach ($webhook['events'] as $event) {
@@ -167,7 +189,7 @@ class WebhookService
     {
         $siteUrl = get_site_url();
 
-        if (str_contains($siteUrl, 'localhost')) {
+        if (strpos($siteUrl, 'localhost') !== false) {
             Logger::error("وبهوک برای محیط لوکال تنظیم نمی‌شود.");
             return false;
         }

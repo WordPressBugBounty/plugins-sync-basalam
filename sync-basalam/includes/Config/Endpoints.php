@@ -10,6 +10,7 @@ final class Endpoints
     const OPENAPI_BASE        = 'https://openapi.basalam.com';
     const ORDER_BASE          = 'https://order-processing.basalam.com';
     const CORE_BASE           = 'https://core.basalam.com';
+    const WEBHOOK_BASE        = 'https://webhook.basalam.com';
     const UPLOAD_BASE         = 'https://uploadio.basalam.com';
     const CATEGORY_BASE       = 'https://categorydetection.basalam.com';
     const APPS_BASE           = 'https://apps-api.basalam.com';
@@ -33,7 +34,7 @@ final class Endpoints
     /** PATCH update a single variation of a product — sprintf($url, $basalamProductId, $basalamVariationId) */
     const PRODUCT_VARIATION_UPDATE = self::CORE_BASE . '/v4/products/%d/variations/%d';
 
-    /** POST batch-update products for a vendor */
+    /** PATCH batch-update products for a vendor */
     const PRODUCT_BATCH_UPDATE = self::OPENAPI_BASE . '/v1/vendors/%d/products/batch-updates?continue_on_error=true';
 
     /** GET vendor information — sprintf($url, $vendorId) */

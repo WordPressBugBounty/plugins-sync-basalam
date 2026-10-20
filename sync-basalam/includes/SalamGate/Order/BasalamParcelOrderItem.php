@@ -7,7 +7,14 @@ defined('ABSPATH') || exit;
 /** Immutable allocation view. Shipping cannot rewrite purchased quantities or prices. */
 final class BasalamParcelOrderItem
 {
-    public function __construct(private $item, private int $quantity) {}
+    private $item;
+    private int $quantity;
+
+    public function __construct($item, int $quantity)
+    {
+        $this->item = $item;
+        $this->quantity = $quantity;
+    }
     public function get_id() { return $this->item->get_id(); }
     public function get_quantity() { return $this->quantity; }
     public function get_product() { return $this->item->get_product(); }

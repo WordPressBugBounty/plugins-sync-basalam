@@ -25,8 +25,7 @@ final class Module
         if (self::legacyProOwnsShipping()) {
             return;
         }
-        if (!self::runtimeSupported()) {
-            add_action('admin_notices', [self::class, 'runtimeNotice']);
+        if (!class_exists('WooCommerce')) {
             return;
         }
 
@@ -47,16 +46,6 @@ final class Module
         add_filter('sync_basalam_oauth_save_extra_data', [self::class, 'draftConnectionData']);
         // The main handles must exist before the domain assets enqueue dependencies.
         add_action('admin_enqueue_scripts', [self::class, 'enqueueAssets'], 5);
-    }
-
-    public static function runtimeSupported(): bool
-    {
-        global $wp_version;
-
-        // Keep the shipping module aligned with the base plugin's PHP 8.2 runtime.
-        return PHP_VERSION_ID >= 80200 && PHP_INT_SIZE >= 8
-            && (!isset($wp_version) || version_compare((string) $wp_version, '6.5', '>='))
-            && defined('WC_VERSION') && version_compare((string) WC_VERSION, '10.0.0', '>=');
     }
 
     public static function ownsShipping(): bool
@@ -82,7 +71,7 @@ final class Module
     {
         if (!self::legacyProOwnsShipping()) {
             // Explicit deactivation must also clean an event left by a previous
-            // supported runtime or a bootstrap stopped by the force-update gate.
+            // registration or a bootstrap stopped by the force-update gate.
             // Keep this independent of the shipping domain classes and leave all
             // durable creation/payment/cancellation evidence untouched.
             wp_clear_scheduled_hook('salam_gate_sync_parcel_statuses');
@@ -95,17 +84,6 @@ final class Module
     {
         $data['salam_gate_draft_connection_id'] = wp_generate_uuid4();
         return $data;
-    }
-
-    public static function runtimeNotice(): void
-    {
-        if (!current_user_can('manage_options')
-            || (!self::isShippingScreen() && !in_array(self::page(), ['sync_basalam', 'sync_basalam_help'], true))) {
-            return;
-        }
-        echo '<div class="notice notice-warning"><p>'
-            . esc_html('بخش ارسال مرسوله به وردپرس ۶٫۵ یا بالاتر، ووکامرس فعال نسخهٔ ۱۰ یا بالاتر و PHP نسخهٔ ۸٫۲ یا بالاتر در محیط ۶۴ بیتی نیاز دارد. سایر بخش‌های ووسلام همچنان فعال هستند.')
-            . '</p></div>';
     }
 
     /** Global draft cleanup is intentional; shipping controllers are not global. */

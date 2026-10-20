@@ -22,7 +22,7 @@ if (wp_get_environment_type() !== 'local') throw new RuntimeException('Local env
 $installedRunner = syncBasalamContainer()->get(JobsRunner::class);
 remove_action('shutdown', [$installedRunner, 'maybeDispatchAsyncRequest'], 2);
 remove_action('sync_basalam_job_created', [$installedRunner, 'maybeDispatchAsyncRequest'], 10);
-remove_action('admin_notices', [$installedRunner, 'renderWorkerHealthNotice']);
+remove_action('current_screen', [$installedRunner, 'inspectWorkerHealth']);
 
 class WorkerHealthFixture implements JobType
 {
@@ -96,7 +96,7 @@ $create = static function (string $mode) use ($queue, $wpdb, &$jobs): int {
 };
 $notice = static function () use ($runner): string {
     ob_start();
-    $runner->renderWorkerHealthNotice();
+    $runner->inspectWorkerHealth();
     return ob_get_clean();
 };
 
@@ -150,13 +150,11 @@ try {
     $assert(!empty($admins), 'A local administrator must exist.');
     wp_set_current_user($admins[0]->ID);
     $html = $notice();
-    $assert(strpos($html, 'role="alert"') !== false && strpos($html, 'noabort') !== false, 'Authorized admin sees actionable RTL alert.');
-    $assert(strpos($html, '&lt;IfModule') !== false, 'Technical rule must be escaped.');
-    file_put_contents('/tmp/sync-basalam-health-warning.html', '<!doctype html><meta charset="utf-8"><body dir="rtl">' . $html);
+    $assert($html === '', 'Authorized admin must not see a worker health alert.');
     wp_set_current_user(0);
     $assert($notice() === '', 'Anonymous users cannot see admin notice.');
     wp_set_current_user($admins[0]->ID);
-    $scenarios[] = 'real WordPress permissions and rendered notice';
+    $scenarios[] = 'real WordPress permissions and silent health inspection';
 
     $_SERVER['noabort'] = '1';
     $id = $create('hang');
@@ -185,7 +183,7 @@ try {
     $assert($free, 'Killed worker must release MySQL lock on disconnect.');
     $lock->releaseGlobalJobsLock();
     $html = $notice();
-    $assert(strpos($html, 'اجرای همگام‌سازی نیمه‌کاره متوقف شده است.') !== false, 'Next admin request must discover interruption without relying on dead worker.');
+    $assert($html === '', 'Interrupted worker inspection must remain silent.');
     $assert($health->getNotice()['job_id'] === $id, 'Alert must identify interrupted job.');
     $scenarios[] = 'SIGKILL interruption detected independently';
 

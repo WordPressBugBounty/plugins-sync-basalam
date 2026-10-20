@@ -163,3 +163,18 @@ if (!function_exists('wp_remote_post')) {
         return ['response' => ['code' => 200]];
     }
 }
+
+if (!function_exists('wp_next_scheduled')) {
+    function wp_next_scheduled($hook, $args = [])
+    {
+        return $GLOBALS['sync_basalam_jobs_runner_test_state']['scheduled'][$hook] ?? false;
+    }
+}
+
+if (!function_exists('wp_schedule_single_event')) {
+    function wp_schedule_single_event($timestamp, $hook, $args = [])
+    {
+        $GLOBALS['sync_basalam_jobs_runner_test_state']['scheduled'][$hook] = $timestamp;
+        return true;
+    }
+}

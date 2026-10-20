@@ -23,6 +23,7 @@ if (!function_exists('wp_check_filetype')) {
 }
 
 require_once __DIR__ . '/Support/JobsRunnerWordPressStubs.php';
+require_once __DIR__ . '/Support/ProductMetaWordPressStubs.php';
 require_once __DIR__ . '/Support/FetchCommissionStubs.php';
 
 require_once dirname(__DIR__) . '/includes/Services/MediaMimeType.php';
@@ -34,4 +35,6 @@ require_once dirname(__DIR__) . '/includes/Config/Endpoints.php';
 require_once dirname(__DIR__) . '/includes/Services/Products/FetchCommission.php';
 require_once dirname(__DIR__) . '/includes/Services/Products/ProductSkuRetry.php';
 require_once dirname(__DIR__) . '/includes/Services/AsyncWorkerHealth.php';
+require_once dirname(__DIR__) . '/includes/Services/AsyncWorkerEnvironment.php';
+require_once dirname(__DIR__) . '/includes/Services/AsyncWorkerProtection.php';
 require_once dirname(__DIR__) . '/JobsRunner.php';

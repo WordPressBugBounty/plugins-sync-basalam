@@ -75,6 +75,8 @@ $tabUrl = static function (string $tab) use ($filters): string {
 };
 
 ?>
+<!-- Keep admin notices outside the SalamGate styling boundary on the parcels screen too. -->
+<hr class="wp-header-end">
 <div class="wrap salam-gate-page sg-router" data-sg-account-state="<?php echo esc_attr($data['state']); ?>" <?php echo $data['state'] === 'loading' ? 'data-sg-account-deferred="true"' : ''; ?>>
     <?php include __DIR__ . '/page-header.php'; ?>
     <div id="sg-state-container" class="salam-gate-parcels-page sg-router__body<?php echo $available ? ' sg-load-region' : ''; ?>"<?php if ($available) : ?> data-sg-load data-sg-load-state="loading" aria-busy="true"<?php endif; ?>>
@@ -94,7 +96,15 @@ $tabUrl = static function (string $tab) use ($filters): string {
         <div class="sgp-head sgp-toolbar">
             <h2 class="sgp-title" id="sgp-list-title">فهرست مرسوله‌ها</h2>
             <div class="sgp-toolbar__actions">
-                <button type="button" class="sgp-print-btn sg-button sg-button--secondary" data-sgp-print-modal>چاپ گروهی برچسب پستی</button>
+                <div class="sgp-bulk-print" data-sgp-print-menu>
+                    <button type="button" class="sgp-print-btn sg-button sg-button--secondary" data-sgp-print-toggle aria-expanded="false" aria-controls="sgp-print-options">
+                        <span class="dashicons dashicons-printer" aria-hidden="true"></span><span>چاپ گروهی</span><span class="dashicons dashicons-arrow-down-alt2" aria-hidden="true"></span>
+                    </button>
+                    <div id="sgp-print-options" class="sgp-print-options" data-sgp-print-options role="group" aria-label="گزینه‌های چاپ گروهی" hidden>
+                        <button type="button" data-sgp-print-modal data-sgp-print-kind="label" aria-haspopup="dialog"><span class="dashicons dashicons-printer" aria-hidden="true"></span><span>چاپ گروهی برچسب‌های پستی</span></button>
+                        <button type="button" data-sgp-print-modal data-sgp-print-kind="barcode" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8V4h4m8 0h4v4M4 16v4h4m8 0h4v-4M8 8v8m3-8v6m3-6v8m3-8v6"/></svg><span>چاپ گروهی بارکدها</span></button>
+                    </div>
+                </div>
                 <button type="button" class="sg-button sg-button--secondary" data-sgp-retry>به‌روزرسانی فهرست</button>
                 <div class="sgp-toolbar__filters" role="group" aria-label="فیلتر و ترتیب فهرست مرسوله‌ها">
                     <button type="button" class="sgp-tool sgp-tool--market <?php echo $filters['market_name'] !== [] ? 'is-active' : ''; ?>" data-sgp-filter-modal aria-haspopup="dialog" aria-label="<?php echo esc_attr('فیلتر بازار: ' . $marketControlLabel); ?>" title="<?php echo esc_attr('فیلتر بازار: ' . $marketControlLabel); ?>" data-sgp-tooltip="<?php echo esc_attr('فیلتر بازار: ' . $marketControlLabel); ?>">
@@ -194,10 +204,10 @@ $tabUrl = static function (string $tab) use ($filters): string {
         </div>
     </div>
 
-    <!-- مودال چاپ گروهی (بازه جلالی + اندازه برچسب) -->
+    <!-- Shared batch-print dialog: labels or barcodes, by date or parcel selection. -->
     <div class="sg-modal-overlay" data-sgp-print-modal-el style="display:none;">
         <div class="sg-modal sgp-print-dialog" role="dialog" aria-modal="true" aria-labelledby="sgp-print-title" tabindex="-1">
-            <div class="sg-modal__header"><h4 id="sgp-print-title">چاپ گروهی برچسب پستی سلام‌گیت</h4><button type="button" class="sg-modal__close" data-close-modal aria-label="بستن">&times;</button></div>
+            <div class="sg-modal__header"><h4 id="sgp-print-title">چاپ گروهی برچسب‌های پستی</h4><button type="button" class="sg-modal__close" data-close-modal aria-label="بستن">&times;</button></div>
             <div class="sg-modal__body">
                 <div class="sgp-print-modes" role="radiogroup" aria-label="روش انتخاب مرسوله‌ها برای چاپ">
                     <label><input type="radio" name="sgp-print-mode" value="date" checked><span class="dashicons dashicons-clock" aria-hidden="true"></span><span>انتخاب بازه زمانی</span></label>
@@ -224,7 +234,7 @@ $tabUrl = static function (string $tab) use ($filters): string {
                         <button type="button" class="sg-button sg-button--secondary" data-sgp-label-list-more hidden>نمایش مرسوله‌های بیشتر</button>
                     </div>
                 </section>
-                <div class="sg-field">
+                <div class="sg-field" data-sgp-label-options>
                     <span class="sg-field__label">اندازه برچسب</span>
                     <div class="sg-wizard__radios" data-sgp-templates>
                         <?php foreach ($labelTemplates as $tpl => $tplTitle) : ?>
@@ -232,12 +242,12 @@ $tabUrl = static function (string $tab) use ($filters): string {
                         <?php endforeach; ?>
                     </div>
                 </div>
-                <p class="sg-card__detail">برچسب پستی فقط برای مرسوله‌هایی با پرداخت تکمیل‌شده و کد رهگیری قابل چاپ است.</p>
+                <p class="sg-card__detail">چاپ برچسب یا بارکد فقط برای مرسوله‌هایی با پرداخت تکمیل‌شده و کد رهگیری امکان‌پذیر است.</p>
                 <div class="sg-wizard__notice" data-sgp-print-notice style="display:none;" role="alert"></div>
             </div>
             <div class="sg-modal__footer">
                 <button type="button" class="sg-button sg-button--secondary" data-close-modal>انصراف</button>
-                <button type="button" class="sg-button sg-button--primary" data-sgp-print-submit><span class="dashicons dashicons-printer" aria-hidden="true"></span><span>چاپ برچسب پستی</span></button>
+                <button type="button" class="sg-button sg-button--primary" data-sgp-print-submit><span class="dashicons dashicons-printer" aria-hidden="true"></span><span data-sgp-print-submit-label>چاپ برچسب‌های پستی</span></button>
             </div>
         </div>
     </div>
