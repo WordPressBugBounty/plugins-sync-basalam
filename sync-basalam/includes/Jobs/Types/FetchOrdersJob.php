@@ -34,7 +34,7 @@ class FetchOrdersJob extends AbstractJobType
 
     public function getPriority(): int
     {
-        return 5;
+        return 1;
     }
 
     public function execute(array $payload): JobResult

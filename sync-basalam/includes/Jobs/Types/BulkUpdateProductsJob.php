@@ -12,6 +12,7 @@ use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Admin\Settings\SettingsManager;
 use SyncBasalam\Admin\Product\Data\ProductDataBuilder;
 use SyncBasalam\Services\Products\ProductConnection;
+use SyncBasalam\Services\Products\ProductOwnership;
 use SyncBasalam\Services\Products\ProductSkuRetry;
 use SyncBasalam\Services\Products\ProductPriceStockRetry;
 use SyncBasalam\Logger\Logger;
@@ -47,7 +48,7 @@ class BulkUpdateProductsJob extends AbstractJobType
 
     public function getPriority(): int
     {
-        return 2;
+        return 3;
     }
 
     public function canRun(): bool
@@ -88,7 +89,6 @@ class BulkUpdateProductsJob extends AbstractJobType
 
             if (!$productIds) {
                 Logger::info('بروزرسانی دسته‌ای: همه محصولات بروزرسانی شدند.');
-                $this->jobManager->deleteJob(['job_type' => 'sync_basalam_bulk_update_products']);
                 return $this->success(['completed' => true, 'message' => 'All products bulk updated']);
             }
 
@@ -105,6 +105,7 @@ class BulkUpdateProductsJob extends AbstractJobType
                 }
 
                 try {
+                    if (!(new ProductOwnership($this->apiService))->prepareQueuedUpdate((int) $productId, $vendorId)) continue;
                     $productData = $builder->reset()
                         ->setStrategy($this->factory->createStrategy('quick_update'))
                         ->fromWooProduct($productId)
@@ -135,12 +136,17 @@ class BulkUpdateProductsJob extends AbstractJobType
                         unset($productData['type']);
                         $productsData[] = $productData;
                     }
+                } catch (RetryableException $e) {
+                    throw $e;
                 } catch (\Throwable $e) {
                     continue;
                 }
             }
 
-            if (empty($productsData)) return $this->success(['skipped' => true, 'message' => 'No products to update in this batch']);
+            if (empty($productsData)) {
+                $this->enqueueContinuation(max($productIds));
+                return $this->success(['skipped' => true, 'message' => 'No products to update in this batch']);
+            }
 
             update_option(self::LAST_REQUEST_AT_OPTION, microtime(true), false);
             $batchPayload = ['data' => $productsData];
@@ -161,13 +167,7 @@ class BulkUpdateProductsJob extends AbstractJobType
 
             $newLastId = max($productIds);
 
-            if ($this->currentProcessingJobExists()) {
-                $this->jobManager->createJob(
-                    'sync_basalam_bulk_update_products',
-                    'pending',
-                    json_encode(['last_updatable_product_id' => $newLastId])
-                );
-            }
+            $this->enqueueContinuation($newLastId);
 
             return $this->success(['last_id' => $newLastId, 'count' => count($productsData)]);
         } catch (RetryableException $e) {
@@ -247,5 +247,13 @@ class BulkUpdateProductsJob extends AbstractJobType
             'job_type' => $this->getType(),
             'status' => 'processing',
         ]) !== null;
+    }
+
+    private function enqueueContinuation(int $lastId): void
+    {
+        if (!$this->currentProcessingJobExists()) return;
+        $this->jobManager->createJob(
+            $this->getType(), 'pending', json_encode(['last_updatable_product_id' => $lastId])
+        );
     }
 }

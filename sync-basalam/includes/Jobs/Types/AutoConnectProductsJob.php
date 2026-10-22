@@ -27,7 +27,7 @@ class AutoConnectProductsJob extends AbstractJobType
 
     public function getPriority(): int
     {
-        return 6;
+        return 7;
     }
 
     public function execute(array $payload): JobResult

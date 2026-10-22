@@ -43,9 +43,17 @@ class ConnectProduct
             ];
         }
 
-        $connect_status = ConnectSingleProductService::connectProductById($woo_product_id, $sync_basalam_product_id);
+        try {
+            $connect_status = ConnectSingleProductService::connectProductById($woo_product_id, $sync_basalam_product_id);
+        } catch (\SyncBasalam\Jobs\Exceptions\JobException $exception) {
+            return [
+                'success' => false,
+                'message' => $exception->getMessage(),
+                'status_code' => $exception->shouldRetry() ? 503 : 409,
+            ];
+        }
 
-        if (SettingsManager::isProductUpdateSelectionValid()) {
+        if ($connect_status && SettingsManager::isProductUpdateSelectionValid()) {
             $job_manager = syncBasalamContainer()->get(JobManager::class);
             $job_manager->createJob(
                 'sync_basalam_update_single_product',

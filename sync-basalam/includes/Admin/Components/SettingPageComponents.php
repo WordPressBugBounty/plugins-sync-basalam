@@ -80,13 +80,13 @@ class SettingPageComponents
     public static function renderDefaultStockQuantity()
     {
         $current_value = syncBasalamSettings()->getSettings(SettingsConfig::DEFAULT_STOCK_QUANTITY);
-        echo '<input type="number" name="sync_basalam_settings[' . esc_attr(SettingsConfig::DEFAULT_STOCK_QUANTITY) . ']" min="0" value="' . esc_attr($current_value) . '" class="basalam-input basalam-p" required>';
+        echo '<input type="number" name="sync_basalam_settings[' . esc_attr(SettingsConfig::DEFAULT_STOCK_QUANTITY) . ']" min="0" max="' . esc_attr(SettingsConfig::MAX_STOCK_QUANTITY) . '" value="' . esc_attr($current_value) . '" class="basalam-input basalam-p" required>';
     }
 
     public static function renderSafeStock()
     {
         $current_value = syncBasalamSettings()->getSettings(SettingsConfig::SAFE_STOCK);
-        echo '<input type="number" name="sync_basalam_settings[' . esc_attr(SettingsConfig::SAFE_STOCK) . ']" min="0" value="' . esc_attr($current_value) . '" class="basalam-input basalam-p" required>';
+        echo '<input type="number" name="sync_basalam_settings[' . esc_attr(SettingsConfig::SAFE_STOCK) . ']" min="0" max="' . esc_attr(SettingsConfig::MAX_STOCK_QUANTITY) . '" value="' . esc_attr($current_value) . '" class="basalam-input basalam-p" required>';
     }
 
     public static function renderVariableProductStockSource()

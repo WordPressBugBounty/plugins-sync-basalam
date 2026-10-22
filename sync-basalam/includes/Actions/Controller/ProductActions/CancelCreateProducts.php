@@ -14,29 +14,10 @@ class CancelCreateProducts extends ActionController
     {
         $jobManager = syncBasalamContainer()->get(JobManager::class);
 
-        $jobTypes = [
-            'sync_basalam_create_single_product',
-            'sync_basalam_create_all_products',
-        ];
-
-        $deletedCount = 0;
-        foreach ($jobTypes as $jobType) {
-            $result = $jobManager->deleteJob([
-                'job_type' => $jobType,
-                'status'   => 'pending',
-            ]);
-            if ($result) {
-                $deletedCount += $result;
-            }
-
-            $result = $jobManager->deleteJob([
-                'job_type' => $jobType,
-                'status'   => 'processing',
-            ]);
-            if ($result) {
-                $deletedCount += $result;
-            }
+        if ($jobManager->cancelProductJobs('create') === false) {
+            wp_die('توقف عملیات کامل نشد؛ دوباره تلاش کنید.');
         }
+
         delete_option('sync_basalam_last_creatable_product_id');
         (new AsyncWorkerHealth())->clearInterruption();
     }

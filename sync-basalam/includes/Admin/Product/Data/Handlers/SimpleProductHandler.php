@@ -84,7 +84,6 @@ class SimpleProductHandler implements ProductDataHandlerInterface
         $stockStatus = $product->get_stock_status();
 
         $calculatedStock = $stockStatus === 'instock' ? $stock ?? $defaultStock : 0;
-
         if ($safeStock > 0 && $calculatedStock <= $safeStock) return 0;
 
         return $calculatedStock;

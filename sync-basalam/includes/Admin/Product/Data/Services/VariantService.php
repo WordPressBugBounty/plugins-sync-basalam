@@ -208,7 +208,6 @@ class VariantService
         [$stock, $stockStatus] = $this->resolveStockByPriority($stockSource, $variation, $parentProduct);
 
         $calculatedStock = $stockStatus === 'instock' ? $stock ?? $defaultStock : 0;
-
         if ($safeStock > 0 && $calculatedStock <= $safeStock) return 0;
 
         return $calculatedStock;

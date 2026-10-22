@@ -29,7 +29,7 @@ class CreateSingleProductJob extends AbstractJobType
 
     public function getPriority(): int
     {
-        return 4;
+        return 5;
     }
 
     public function execute(array $payload): JobResult

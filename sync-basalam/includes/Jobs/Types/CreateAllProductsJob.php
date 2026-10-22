@@ -24,7 +24,7 @@ class CreateAllProductsJob extends AbstractJobType
 
     public function getPriority(): int
     {
-        return 5;
+        return 6;
     }
 
     public function canRun(): bool

@@ -4,29 +4,24 @@
         <span class="basalam-modal-close"> <img class="basalam-modal-img-20" src="<?php echo esc_url(syncBasalamPlugin()->assetsUrl() . '/icons/close.svg'); ?>">
         </span>
         <h3 class="basalam-h basalam-modal-font-20">افزودن محصولات به باسلام</h3>
-
         <?php if ($has_active_create_jobs): ?>
             <!-- Display when jobs are running -->
             <div id="active-create-jobs-info" class="basalam-job-info-block">
                 <div class="basalam-p basalam-warning-bg">
                     <h4 class="basalam-h basalam-warning-header">
-                        عملیات افزودن محصولات در حال اجرا است
+                        صف افزودن محصولات
                     </h4>
 
                     <p class="basalam-warning-text">
                         <strong>نوع عملیات:</strong> افزودن محصولات به باسلام
                     </p>
 
-                    <?php
-                    $total_create_count = $single_create_count;
-            if ($total_create_count > 0): ?>
-                        <p class="basalam-warning-text">
+                        <p id="create-queue-count-row" class="basalam-warning-text" <?php echo $single_create_count > 0 ? '' : 'hidden'; ?>>
                             <strong>تعداد محصولات در صف:</strong>
-                            <span class="basalam-warning-badge">
-                                <?php echo esc_html($total_create_count > 1000 ? '+1000' : $total_create_count); ?> محصول
+                            <span id="create-queue-count" class="basalam-warning-badge">
+                                <?php echo esc_html($single_create_count); ?> محصول
                             </span>
                         </p>
-                    <?php endif; ?>
 
                     <p class="basalam-warning-justify-10">
                         لطفاً تا پایان عملیات جاری صبر کنید. می‌توانید پیشرفت را از صفحه لاگ‌ها مشاهده کنید.

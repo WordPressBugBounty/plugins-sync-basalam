@@ -12,6 +12,7 @@ defined('ABSPATH') || exit;
 class JobsRunner
 {
     private const ASYNC_ACTION = 'sync_basalam_run_jobs_async';
+    private const ADMIN_ACTION = 'sync_basalam_run_jobs_admin';
     private const ASYNC_DISPATCH_LOCK_TRANSIENT = 'sync_basalam_jobs_runner_async_dispatch_lock';
     private const ASYNC_IDLE_PROBE_TRANSIENT = 'sync_basalam_jobs_runner_idle_probe_lock';
     // Keep the dispatch lease longer than a normal async batch. Without this,
@@ -41,6 +42,8 @@ class JobsRunner
     ) {
         add_action('wp_ajax_' . self::ASYNC_ACTION, [$this, 'handleAsyncRequest']);
         add_action('wp_ajax_nopriv_' . self::ASYNC_ACTION, [$this, 'handleAsyncRequest']);
+        add_action('wp_ajax_' . self::ADMIN_ACTION, [$this, 'handleAdminRequest']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueueAdminWorker']);
         // Run before later shutdown callbacks can leave an unread mysqli result.
         add_action('shutdown', [$this, 'maybeDispatchAsyncRequest'], 2);
         add_action('sync_basalam_job_created', [$this, 'maybeDispatchAsyncRequest'], 10, 0);
@@ -78,7 +81,7 @@ class JobsRunner
 
     public function maybeDispatchAsyncRequest(): void
     {
-        if ($this->isCurrentAsyncRequest()) return;
+        if ($this->isAsyncBatch || $this->isCurrentAsyncRequest()) return;
 
         if ($this->isShutdownCallback()) {
             $this->repairDatabaseConnection();
@@ -117,7 +120,40 @@ class JobsRunner
         // Keep one watchdog for delayed retries or a worker lost by the host.
         // An empty queue lets this single event expire without rearming it.
         $this->scheduleRecovery();
-        $this->maybeDispatchAsyncRequest();
+        // Cron is already a background request. Re-dispatching the same failed
+        // loopback here leaves the watchdog unable to recover an unstarted job.
+        $this->prepareWorkerRequest();
+        $this->runAsyncBatch('cron');
+    }
+
+    public function enqueueAdminWorker(): void
+    {
+        if (!current_user_can('manage_woocommerce') && !current_user_can('manage_options')) return;
+
+        // Keep recovery available on every admin page, even after the product
+        // dialog closes. Nothing is enqueued for storefront visitors.
+        wp_enqueue_script('sync-basalam-queue-worker', plugin_dir_url(__FILE__) . 'assets/js/queue-worker.js', [], Plugin::VERSION, true);
+        wp_localize_script('sync-basalam-queue-worker', 'syncBasalamQueueWorker', [
+            'url' => add_query_arg('action', self::ADMIN_ACTION, admin_url('admin-ajax.php')),
+            'action' => self::ADMIN_ACTION,
+            'nonce' => wp_create_nonce(self::ADMIN_ACTION),
+        ]);
+    }
+
+    public function handleAdminRequest(): void
+    {
+        if (!current_user_can('manage_woocommerce') && !current_user_can('manage_options')) {
+            wp_send_json_error(['message' => 'Unauthorized queue worker.'], 403);
+            return;
+        }
+        if (!check_ajax_referer(self::ADMIN_ACTION, 'nonce', false)) {
+            wp_send_json_error(['message' => 'Invalid queue worker nonce.'], 403);
+            return;
+        }
+
+        $this->prepareWorkerRequest();
+        $processed = $this->runAsyncBatch('admin');
+        wp_send_json_success(['processed' => $processed]);
     }
 
     private function scheduleRecovery(): void
@@ -182,8 +218,17 @@ class JobsRunner
     {
         if (!check_ajax_referer(self::ASYNC_ACTION, 'nonce', false)) {
             wp_send_json_error(['message' => 'Invalid async jobs runner nonce.'], 403);
+            return;
         }
 
+        $this->prepareWorkerRequest();
+        $processed = $this->runAsyncBatch();
+
+        wp_send_json_success(['processed' => $processed]);
+    }
+
+    private function prepareWorkerRequest(): void
+    {
         if (function_exists('ignore_user_abort')) {
             ignore_user_abort(true);
         }
@@ -191,10 +236,6 @@ class JobsRunner
         if (function_exists('session_write_close')) {
             session_write_close();
         }
-
-        $processed = $this->runAsyncBatch();
-
-        wp_send_json_success(['processed' => $processed]);
     }
 
     public function checkAndRunJobs(): bool
@@ -209,7 +250,7 @@ class JobsRunner
         }
     }
 
-    private function runAsyncBatch(): int
+    private function runAsyncBatch(string $source = 'async'): int
     {
         if ($this->CheckHttpBlockService->SyncBasalamHttpBlock()) return 0;
 
@@ -228,7 +269,8 @@ class JobsRunner
         );
 
         try {
-            $this->workerHealth->observeAsyncEnvironment();
+            $this->workerHealth->recordWorkerStarted($source);
+            if ($source === 'async') $this->workerHealth->observeAsyncEnvironment();
             while (microtime(true) < $deadline) {
                 if (!$this->jobManager->hasPendingOrStaleProcessingJobs(self::STALE_PROCESSING_TIMEOUT_SECONDS)) {
                     break;
@@ -341,8 +383,10 @@ class JobsRunner
     {
         $url = add_query_arg('action', self::ASYNC_ACTION, admin_url('admin-ajax.php'));
 
-        wp_remote_post(esc_url_raw($url), [
-            'timeout'   => 0.01,
+        $result = wp_remote_post(esc_url_raw($url), [
+            // Allow DNS/TLS and the request body to reach slower hosts/WAFs.
+            // The response remains nonblocking; this is not a job time limit.
+            'timeout'   => 1,
             'blocking'  => false,
             'body'      => [
                 'action' => self::ASYNC_ACTION,
@@ -354,6 +398,7 @@ class JobsRunner
                 'X-WP-Async-Request' => self::ASYNC_ACTION,
             ],
         ]);
+        $this->workerHealth->recordDispatchResult($result);
     }
 
     private function isCurrentAsyncRequest(): bool
@@ -362,7 +407,7 @@ class JobsRunner
 
         $action = isset($_REQUEST['action']) ? sanitize_key(wp_unslash($_REQUEST['action'])) : '';
 
-        return $action === self::ASYNC_ACTION;
+        return in_array($action, [self::ASYNC_ACTION, self::ADMIN_ACTION], true);
     }
 
     private function secondsUntilNextAllowedRun(): float

@@ -10,6 +10,7 @@ use SyncBasalam\Admin\Product\Data\ProductDataFacade;
 use SyncBasalam\Utilities\ProductMetaKey;
 use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 use SyncBasalam\Services\VendorSyncPolicy;
+use SyncBasalam\Services\Products\ProductOwnership;
 
 defined('ABSPATH') || exit;
 
@@ -51,6 +52,7 @@ class CreateProduct extends AbstractProductOperation
     {
         if (!parent::validate($product_id)) return false;
 
+        (new ProductOwnership())->forgetForeignConnection($product_id);
         $basalamProductId = get_post_meta($product_id, ProductMetaKey::basalamProductId(), true);
         if (!empty($basalamProductId)) {
             Logger::warning(sprintf('محصول %d از قبل به باسلام متصل است.', $product_id), [

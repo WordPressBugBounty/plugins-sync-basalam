@@ -23,12 +23,9 @@ $job_manager = new JobManager();
 
 $update_queue_status = $job_manager->getProductUpdateStatus();
 
-$create_products_job = $job_manager->getJob(['job_type' => 'sync_basalam_create_all_products', 'status' => 'pending']);
-$create_products_processing_job = $job_manager->getJob(['job_type' => 'sync_basalam_create_all_products', 'status' => 'processing']);
-
-$single_create_count = $job_manager->getCountJobs(['job_type' => 'sync_basalam_create_single_product', 'status' => ['pending', 'processing']]);
-
-$has_active_create_jobs = ($create_products_job || $create_products_processing_job || $single_create_count > 0);
+$create_queue_status = $job_manager->getProductCreateStatus();
+$single_create_count = $create_queue_status['count'];
+$has_active_create_jobs = $create_queue_status['active'];
 
 $auto_connect_page_job = $job_manager->getJob(['job_type' => 'sync_basalam_auto_connect_products', 'status' => 'pending']) ?: $job_manager->getJob(['job_type' => 'sync_basalam_auto_connect_products', 'status' => 'processing']);
 

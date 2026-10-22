@@ -6,6 +6,7 @@ use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Admin\Components\CommonComponents;
 use SyncBasalam\Utilities\ProductMetaKey;
 use SyncBasalam\Services\VendorSyncPolicy;
+use SyncBasalam\Services\Products\ProductOwnership;
 
 defined('ABSPATH') || exit;
 
@@ -15,7 +16,12 @@ class MetaBox
     {
         global $post;
         $productId = $post->ID;
+        (new ProductOwnership())->forgetForeignConnection($productId);
         $productStatus = get_post_meta($productId, ProductMetaKey::basalamProductSyncStatus(), true);
+        $remoteId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
+        $ownership = (new ProductOwnership())->inspect($remoteId);
+        if (!$remoteId) $productStatus = '';
+        if ($remoteId && $ownership['status'] !== 'owned') $productStatus = 'invalid_connection';
 
         switch ($productStatus) {
             case 'synced':
@@ -30,7 +36,8 @@ class MetaBox
                 break;
             default:
                 $statusColor = 'red';
-                $statusTooltip = 'محصول با باسلام همگام نیست.';
+                $statusTooltip = $productStatus === 'invalid_connection'
+                    ? $ownership['message'] : 'محصول با باسلام همگام نیست.';
 
                 break;
         }
@@ -50,6 +57,7 @@ class MetaBox
     public static function renderMetaBox($post)
     {
         $productId = $post->ID;
+        (new ProductOwnership())->forgetForeignConnection($productId);
         $productStatus = get_post_status($productId);
 
         $basalamProductStatus = get_post_meta($productId, ProductMetaKey::basalamProductStatus(), true);
@@ -61,9 +69,16 @@ class MetaBox
         $syncBasalamVendorId = $settings->getSettings(SettingsConfig::VENDOR_ID);
         $vendorSyncPolicy = syncBasalamContainer()->get(VendorSyncPolicy::class);
         $vendorSyncState = $vendorSyncPolicy->getFrontendState();
+        $ownership = (new ProductOwnership())->inspect($syncBasalamProductId);
 
         if ($productStatus == 'publish') {
-            if ($basalamProductSyncStatus == 'pending') {
+            if ($syncBasalamProductId && $ownership['status'] !== 'owned') {
+                echo '<p class="basalam-p">' . esc_html($ownership['message']) . '</p>';
+                if (in_array($ownership['status'], ['mismatch', 'missing'], true)) {
+                    CommonComponents::renderLink('مشاهده محصول قبلی در باسلام', 'https://basalam.com/p/' . (int) $syncBasalamProductId);
+                    require syncBasalamPlugin()->templatePath('products/ConnectButton.php');
+                }
+            } elseif ($syncBasalamProductId && $basalamProductSyncStatus == 'pending') {
                 echo '<p class="basalam-p basalam-font-12">یک عملیات برای این محصول در جریان است.</p>';
             } elseif (!$BasalamAccessToken || !$syncBasalamVendorId) {
                 echo '<p class="basalam-p basalam-font-12">دسترسی های لازم دریافت نشده است ، ابتدا دسترسی ها را <a href="/wp-admin/admin.php?page=sync_basalam" target="_blank">دریافت</a> نمایید.</p>';

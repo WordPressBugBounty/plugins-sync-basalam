@@ -4,6 +4,7 @@ namespace SyncBasalam\Admin\Product\Validators;
 
 use SyncBasalam\Logger\Logger;
 use SyncBasalam\Services\Products\ProductConnection;
+use SyncBasalam\Services\Products\ProductOwnership;
 use SyncBasalam\Utilities\ProductMetaKey;
 
 defined('ABSPATH') || exit;
@@ -50,6 +51,8 @@ class ProductOperationValidator
                 'message' => ProductConnection::conflictMessage($basalamProductId, $conflictingIds)
             ];
         }
+
+        (new ProductOwnership())->assertOwned($basalamProductId);
 
         return [
             'valid' => true,

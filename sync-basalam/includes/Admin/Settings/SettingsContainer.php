@@ -11,6 +11,11 @@ class SettingsContainer
 {
     private ?array $settings = null;
 
+    public function reset(): void
+    {
+        $this->settings = null;
+    }
+
     public function getSettings($setting = null)
     {
         if ($this->settings === null) {

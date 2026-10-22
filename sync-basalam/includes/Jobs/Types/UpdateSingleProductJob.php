@@ -9,17 +9,20 @@ use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 use SyncBasalam\Logger\Logger;
 use SyncBasalam\Services\VendorSyncPolicy;
 use SyncBasalam\Admin\Settings\SettingsManager;
+use SyncBasalam\Services\Products\ProductOwnership;
 
 defined('ABSPATH') || exit;
 
 class UpdateSingleProductJob extends AbstractJobType
 {
     private $productOperations;
+    private $ownership;
 
-    public function __construct($jobManager, $productOperations)
+    public function __construct($jobManager, $productOperations, $ownership = null)
     {
         parent::__construct($jobManager);
         $this->productOperations = $productOperations;
+        $this->ownership = $ownership ?: new ProductOwnership();
     }
 
     public function getType(): string
@@ -29,7 +32,7 @@ class UpdateSingleProductJob extends AbstractJobType
 
     public function getPriority(): int
     {
-        return 1;
+        return 2;
     }
 
     public function execute(array $payload): JobResult
@@ -58,6 +61,9 @@ class UpdateSingleProductJob extends AbstractJobType
         }
 
         try {
+            if (!$this->ownership->prepareQueuedUpdate((int) $productId)) {
+                return $this->success(['product_id' => $productId, 'skipped' => true, 'reason' => 'product_not_connected']);
+            }
             $result = $this->productOperations->updateExistProduct($productId, null);
             return $this->success(['product_id' => $productId, 'result' => $result]);
         } catch (RetryableException $e) {

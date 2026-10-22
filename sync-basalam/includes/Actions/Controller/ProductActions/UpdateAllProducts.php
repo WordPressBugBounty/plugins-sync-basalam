@@ -33,26 +33,17 @@ class UpdateAllProducts extends ActionController
         $jobManager = syncBasalamContainer()->get(JobManager::class);
 
         if ($updateType === 'full') {
-            $existingJob = $jobManager->getJob([
-                'job_type' => 'sync_basalam_update_all_products',
-                'status'   => 'pending',
-            ]);
+            $result = $jobManager->createProductRootJob(
+                'sync_basalam_update_all_products',
+                'pending',
+                wp_json_encode(['last_updatable_product_id' => 0])
+            );
 
-            if ($existingJob) {
+            if ($result === 'exists') {
                 return wp_send_json_error(['message' => 'در حال حاضر یک عملیات بروزرسانی کامل در صف انتظار است.'], 409);
             }
 
-            $initialData = json_encode([
-                'offset' => 0,
-            ]);
-
-            $response = $jobManager->createJob(
-                'sync_basalam_update_all_products',
-                'pending',
-                $initialData
-            );
-
-            if (!$response) {
+            if ($result !== 'created') {
                 return wp_send_json_error(['message' => 'خطا در ایجاد فرایند بروزرسانی.'], 500);
             }
 
@@ -60,22 +51,17 @@ class UpdateAllProducts extends ActionController
                 'message' => 'بروزرسانی تمام اطلاعات محصول با موفقیت آغاز شد.',
             ], 200);
         } else {
-            $existingJob = $jobManager->getJob([
-                'job_type' => 'sync_basalam_bulk_update_products',
-                'status'   => 'pending',
-            ]);
+            $result = $jobManager->createProductRootJob(
+                'sync_basalam_bulk_update_products',
+                'pending',
+                wp_json_encode(['last_updatable_product_id' => 0])
+            );
 
-            if ($existingJob) {
+            if ($result === 'exists') {
                 return wp_send_json_error(['message' => 'در حال حاضر یک عملیات بروزرسانی در صف انتظار است.'], 409);
             }
 
-            $response = $jobManager->createJob(
-                'sync_basalam_bulk_update_products',
-                'pending',
-                0,
-            );
-
-            if (!$response) {
+            if ($result !== 'created') {
                 return wp_send_json_error(['message' => 'خطا در ایجاد فرایند بروزرسانی فوری محصولات.'], 500);
             }
 

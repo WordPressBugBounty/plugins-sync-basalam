@@ -4,6 +4,7 @@ namespace SyncBasalam\Admin\Product\Data\Services;
 
 use SyncBasalam\Logger\Logger;
 use SyncBasalam\Services\FileUploader;
+use SyncBasalam\Jobs\Exceptions\JobException;
 
 defined('ABSPATH') || exit;
 
@@ -65,6 +66,11 @@ class PhotoService
 
         try {
             return $this->fileUploader->upload($imagePathOrUrl);
+        } catch (JobException $e) {
+            // Preserve retry classification and API details for the queue executor.
+            // Wrapping a temporary upload error makes the product operation swallow
+            // it as an ordinary failure and the queue then removes the job.
+            throw $e;
         } catch (\Throwable $e) {
             // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- Message is escaped; $e is the previous Throwable passed for exception chaining, not output.
             throw new \RuntimeException(esc_html('آپلود تصویر محصول به باسلام ناموفق بود: ' . $e->getMessage()), 0, $e);

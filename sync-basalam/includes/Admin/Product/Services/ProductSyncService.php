@@ -34,12 +34,16 @@ class ProductSyncService
             ];
         }
 
-        $existingJob = $this->jobManager->getJob([
-            'job_type' => self::JOB_TYPE_CREATE_ALL,
-            'status'   => 'pending',
-        ]);
+        $result = $this->jobManager->createProductRootJob(
+            self::JOB_TYPE_CREATE_ALL,
+            'pending',
+            wp_json_encode([
+                'posts_per_page'       => $postsPerPage,
+                'include_out_of_stock' => $includeOutOfStock,
+            ])
+        );
 
-        if ($existingJob) {
+        if ($result === 'exists') {
             return [
                 'success'     => false,
                 'message'     => 'در حال حاضر یک عملیات در صف انتظار است.',
@@ -47,16 +51,13 @@ class ProductSyncService
             ];
         }
 
-        $initialData = json_encode([
-            'posts_per_page'       => $postsPerPage,
-            'include_out_of_stock' => $includeOutOfStock,
-        ]);
-
-        $this->jobManager->createJob(
-            self::JOB_TYPE_CREATE_ALL,
-            'pending',
-            $initialData
-        );
+        if ($result !== 'created') {
+            return [
+                'success'     => false,
+                'message'     => 'خطا در ایجاد فرایند ایجاد محصولات.',
+                'status_code' => 500,
+            ];
+        }
 
         return [
             'success'     => true,

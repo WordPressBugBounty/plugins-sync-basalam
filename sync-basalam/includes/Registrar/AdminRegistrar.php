@@ -575,6 +575,21 @@ class AdminRegistrar implements RegistrarInterface
             );
         }
 
+        if (self::isPluginPage('sync_basalam')) {
+            $queueScript = syncBasalamPlugin()->pluginPath() . '/assets/js/product-queue-status.js';
+            wp_enqueue_script(
+                'basalam-product-queue-status',
+                self::assetsUrl('js/product-queue-status.js'),
+                ['basalam-admin-script'],
+                $version . '-' . filemtime($queueScript),
+                true
+            );
+            wp_localize_script('basalam-product-queue-status', 'basalamProductQueueStatus', [
+                'url' => admin_url('admin-ajax.php'),
+                'nonce' => wp_create_nonce('get_update_queue_status_nonce'),
+            ]);
+        }
+
         if (self::isTicketPage()) {
             $ticketScriptPath = syncBasalamPlugin()->pluginPath() . '/assets/js/ticket.js';
             $ticketScriptVersion = file_exists($ticketScriptPath)

@@ -4,7 +4,7 @@ Tags: woocommerce, basalam, woosalam, integration
 Requires at least: 6.0  
 Tested up to: 7.0
 Requires PHP: 7.4 
-Stable tag: 1.10.33
+Stable tag: 1.10.36
 License: GPL-2.0-or-later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -146,6 +146,13 @@ API calls use HTTPS. Authenticated operations use the configured account and che
 1. تنظیمات اولیه افزونه در وردپرس
 
 == Changelog ==
+
+= 1.10.36 =
+* Execute queue recovery directly in WordPress cron instead of repeating a failed loopback dispatch.
+* Add an authenticated admin worker that keeps the connection open and continues product and order jobs when background loopbacks are blocked.
+* Allow one second for nonblocking dispatch to connect, and retain private dispatch/start diagnostics without credentials or payloads.
+* Preserve the shared queue lock, task rate, retries and cancellation across all execution paths.
+* Keep temporary photo-upload failures retryable so a DNS or network interruption does not discard the product creation task.
 
 = 1.10.33 =
 * Retry product updates rejected with HTTP 400 or 422 once using only price and stock, including single products, variations, batches and SKU follow-ups.

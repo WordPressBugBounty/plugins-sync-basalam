@@ -2,6 +2,36 @@
 
 <details>
 
+<summary>Unreleased</summary>
+
+### Fixed
+
+- Recover queues directly in WordPress cron and through connected, authenticated admin batches when the host drops loopback workers. Share locks, rate limits, retries and cancellation with the normal runner; allow a bounded one-second nonblocking dispatch connection and store private transport/start diagnostics.
+- Preserve retryable media-upload failures through product photo preparation so temporary network errors retain the product job for bounded retries.
+
+- Send a short Latin filename with a content-matching image extension in both the media upload request and multipart form; preserve the original WordPress media files and URLs.
+
+- Clamp configured and WooCommerce inventory values to Basalam's supported 0..10000 range, including legacy installations with an oversized fallback stock.
+
+- Refresh product queue counts and the last returned task time while the create/update dialog is visible; show update priority for waiting creations and preserve the last values on refresh failures.
+
+- Check the current vendor before executing queued product updates; skip foreign or absent connections, reconcile rejected mappings and keep foreign IDs out of quick-update batches without failed update tasks.
+
+- Stop automatic creation with creation cancellation, and stop automatic updates and periodic scheduling with update cancellation. Reject stale automatic/cron enqueues after a stop while retaining explicit manual runs and restart controls.
+- Isolate runner, job-type and product queue advisory locks by database and queue table, preventing unrelated WordPress installations from blocking each other on shared MySQL servers.
+
+- Verify the remote product's vendor before showing it as connected, accepting a manual connection, or sending product/status/batch updates. Treat a confirmed foreign mapping as an ordinary unconnected product with create/connect actions, retaining the rejected ID in private history.
+- Distinguish ownership mismatches from temporary API failures; preserve mappings on 403/timeouts and continue quick-update pagination past a page containing only invalid connections.
+- Prevent cancelled product creation/update workers and retries from recreating queue jobs, including when another run has already started.
+- Cancel each product operation atomically, preserve unrelated worker locks and report stop failures.
+- Keep an old empty quick-update batch from deleting a newly started update.
+- Accept scalar legacy queue cursors safely, including the quick-update cursor, so a task is inserted and dispatched instead of failing during payload admission.
+- Make product-operation roots exclusive under the queue lock so repeated full/quick/create requests and scheduled runs cannot build parallel 100-item chains.
+
+</details>
+
+<details>
+
 <summary>1.10.33 - 2026-10-20</summary>
 
 ### Added

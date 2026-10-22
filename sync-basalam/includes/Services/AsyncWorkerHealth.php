@@ -11,6 +11,26 @@ class AsyncWorkerHealth
 
     private ?bool $protection = null;
 
+    public function recordWorkerStarted(string $source): void
+    {
+        $state = $this->getState();
+        $state['last_started_at'] = time();
+        $state['last_started_source'] = $source;
+        $state['last_' . $source . '_started_at'] = time();
+        $this->save($state);
+    }
+
+    public function recordDispatchResult($result): void
+    {
+        // The dispatcher does not own the worker lock. Use a separate option
+        // so its request-local option cache cannot overwrite worker progress.
+        // A nonblocking HTTP result does not establish that PHP started.
+        update_option('sync_basalam_async_worker_dispatch', [
+            'attempted_at' => time(),
+            'error_code' => is_wp_error($result) ? sanitize_key($result->get_error_code()) : null,
+        ], false);
+    }
+
     public function observeAsyncEnvironment(): void
     {
         $this->protection = $this->detectLiteSpeedProtection();

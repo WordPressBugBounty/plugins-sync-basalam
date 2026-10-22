@@ -44,7 +44,7 @@ class MediaUploadService
 
         $headers = ['Authorization' => 'Bearer ' . $token];
         $request = $this->apiService->post(Endpoints::MEDIA_UPLOAD_REQUEST, [
-            'file_name' => basename($filePath),
+            'file_name' => MediaUploadFilename::forFile($filePath, $mimeType, $checksum),
             'mime_type' => $mimeType,
             'size' => (int) $fileSize,
             'file_type' => $fileType,

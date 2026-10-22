@@ -62,12 +62,11 @@ class ScheduledProductSync
         $vendorSyncPolicy = syncBasalamContainer()->get(VendorSyncPolicy::class);
         if (!$vendorSyncPolicy->canUpdate() || !SettingsManager::isProductUpdateSelectionValid()) return;
 
-        $jobManager = new JobManager();
-        $activeStatuses = ['pending', 'processing'];
-        foreach ([self::FULL_UPDATE_JOB, 'sync_basalam_bulk_update_products'] as $jobType) {
-            if ($jobManager->getCountJobs(['job_type' => $jobType, 'status' => $activeStatuses]) > 0) return;
-        }
-
-        $jobManager->createJob(self::FULL_UPDATE_JOB, 'pending', wp_json_encode(['last_updatable_product_id' => 0]));
+        $jobManager = syncBasalamContainer()->get(JobManager::class);
+        $jobManager->createProductRootJob(
+            self::FULL_UPDATE_JOB,
+            'pending',
+            wp_json_encode(['last_updatable_product_id' => 0, 'scheduled' => true])
+        );
     }
 }

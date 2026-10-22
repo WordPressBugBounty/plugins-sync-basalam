@@ -12,6 +12,8 @@ class SettingsConfig
     public const DEFAULT_PACKAGE_WEIGHT = "default_package_weight";
     public const DEFAULT_PREPARATION = "default_preparation";
     public const DEFAULT_STOCK_QUANTITY = "default_stock_quantity";
+    /** Basalam rejects product and variation inventory above this limit. */
+    public const MAX_STOCK_QUANTITY = 10000;
     public const WEBHOOK_ID = "webhook_id";
     public const TOKEN = "token";
     public const REFRESH_TOKEN = "refresh_token";

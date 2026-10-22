@@ -4,6 +4,7 @@ namespace SyncBasalam\Admin\Product\elements\ProductList;
 
 use SyncBasalam\Admin\Components\ProductListComponents;
 use SyncBasalam\Utilities\ProductMetaKey;
+use SyncBasalam\Services\Products\ProductOwnership;
 
 defined('ABSPATH') || exit;
 class StatusColumn
@@ -24,7 +25,20 @@ class StatusColumn
     public static function renderStatusColumnContent($column, $productId)
     {
         if ($column === 'sync_basalam_status') {
+            (new ProductOwnership())->forgetForeignConnection((int) $productId, false);
             $product = get_post_meta($productId, ProductMetaKey::basalamProductSyncStatus(), true);
+            $remoteId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
+            if (!$remoteId) {
+                ProductListComponents::renderSyncProductStatusUnsync();
+                return;
+            }
+            $ownership = (new ProductOwnership())->inspect($remoteId, null, false);
+            if ($remoteId && $ownership['status'] !== 'owned') {
+                echo '<span title="' . esc_attr($ownership['message']) . '">' . esc_html(
+                    $ownership['status'] === 'mismatch' ? 'متصل به غرفهٔ فعلی نیست' : 'نیازمند بررسی اتصال'
+                ) . '</span>';
+                return;
+            }
             if ($product && $product == 'synced') {
                 ProductListComponents::renderSyncProductStatusSynced();
             } elseif ($product == 'pending') {

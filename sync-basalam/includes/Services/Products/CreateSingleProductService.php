@@ -35,6 +35,11 @@ class CreateSingleProductService
         $productData = apply_filters('sync_basalam_product_data_before_create', $productData, $productId);
         $this->ValidCreateProductData($productData, $productId);
 
+        // A new product must never carry identities from a previous vendor.
+        foreach ($productData['variants'] ?? [] as $index => $variant) {
+            unset($productData['variants'][$index]['id']);
+        }
+
         do_action('sync_basalam_before_create_product_api', $productId, $productData);
 
         $vendorId = syncBasalamSettings()->getSettings(SettingsConfig::VENDOR_ID);
@@ -117,6 +122,7 @@ class CreateSingleProductService
 
         $responseData = json_decode($request['body'], true);
         if (isset($responseData['id'])) {
+            ProductOwnership::rememberCreated($responseData['id'], $vendorId);
             if (isset($responseData['variants'])) {
                 $product = wc_get_product($productId);
 

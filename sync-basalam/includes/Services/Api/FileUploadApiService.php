@@ -4,6 +4,7 @@ namespace SyncBasalam\Services\Api;
 
 use SyncBasalam\Logger\Logger;
 use SyncBasalam\Services\MediaMimeType;
+use SyncBasalam\Services\MediaUploadFilename;
 
 defined('ABSPATH') || exit;
 
@@ -51,7 +52,7 @@ class FileUploadApiService
     {
         $mimeType = MediaMimeType::detect($filePath);
         $fields = $data;
-        $fields['file'] = new \CURLFile($filePath, $mimeType, basename($filePath));
+        $fields['file'] = new \CURLFile($filePath, $mimeType, MediaUploadFilename::forFile($filePath, $mimeType));
         $headerLines = [];
 
         foreach ($headers as $name => $value) {
@@ -201,7 +202,7 @@ class FileUploadApiService
         }
 
         if ($localFile) {
-            $filename = basename($localFile);
+            $filename = MediaUploadFilename::forFile($localFile);
             $fileContent = file_get_contents($localFile);
 
             if ($fileContent === false) {

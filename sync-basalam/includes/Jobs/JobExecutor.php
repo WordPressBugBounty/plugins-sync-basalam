@@ -23,6 +23,13 @@ class JobExecutor
 
     public function execute(string $jobType, object $job): bool
     {
+        return $this->jobManager->runForJob($job, function () use ($jobType, $job) {
+            return $this->executeJob($jobType, $job);
+        });
+    }
+
+    private function executeJob(string $jobType, object $job): bool
+    {
         $jobExecutor = $this->jobRegistry->get($jobType);
 
         if (!$jobExecutor) return false;

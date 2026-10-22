@@ -8,6 +8,8 @@ class ConnectSingleProductService
 {
     public static function connectProductById($wooProductId, $syncBasalamProductId)
     {
+        (new ProductOwnership())->assertOwned($syncBasalamProductId);
+
         $existingPosts = get_posts([
             'post_type'  => 'product',
             'meta_query' => [

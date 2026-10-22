@@ -57,7 +57,7 @@
             <div id="quick-update-in-progress" class="basalam-display-block-10" <?php echo $update_queue_status['type'] === 'quick' ? '' : 'hidden'; ?>>
                 <div class="basalam-bg-warning-info-margin basalam-p">
                     <h4 class="basalam-h basalam-margin-warning-header">
-                        بروزرسانی فوری در حال اجرا است
+                        صف بروزرسانی فوری محصولات
                     </h4>
 
                     <p class="basalam-margin-warning">
@@ -90,7 +90,7 @@
             <div id="active-jobs-info" class="basalam-display-block-10" <?php echo $update_queue_status['type'] === 'full' ? '' : 'hidden'; ?>>
                 <div class="basalam-bg-warning-info-margin basalam-p">
                     <h4 class="basalam-h basalam-margin-warning-header">
-                        عملیات بروزرسانی در حال اجرا است
+                        صف بروزرسانی کامل محصولات
                     </h4>
 
                     <p class="basalam-margin-warning">

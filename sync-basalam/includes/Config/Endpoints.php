@@ -55,6 +55,9 @@ final class Endpoints
     /** GET product data list */
     const PRODUCTS_DATA = self::CORE_BASE . '/v4/products';
 
+    /** GET product details, including vendor.id */
+    const PRODUCT_INFO = self::CORE_BASE . '/v4/products/%d';
+
     /** GET commission percentage */
     const COMMISSION = self::CORE_BASE . '/api_v2/commission/get_percent';
 

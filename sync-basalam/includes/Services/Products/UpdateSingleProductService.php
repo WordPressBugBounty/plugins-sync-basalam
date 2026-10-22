@@ -50,6 +50,7 @@ class UpdateSingleProductService
 
         $syncBasalamProductId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
         ProductConnection::assertUnique($productId, $syncBasalamProductId);
+        (new ProductOwnership($this->apiservice))->assertOwned($syncBasalamProductId);
 
         // The dedicated variation endpoint is only used in the "custom" update mode with the
         // variation price/stock settings ticked. Every other mode (and every not-yet-connected
@@ -410,6 +411,8 @@ class UpdateSingleProductService
         $syncBasalamProductId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
 
         ProductConnection::assertUnique($productId, $syncBasalamProductId);
+
+        (new ProductOwnership($this->apiservice))->assertOwned($syncBasalamProductId);
 
         $url = sprintf(Endpoints::PRODUCT_UPDATE, $syncBasalamProductId);
 
