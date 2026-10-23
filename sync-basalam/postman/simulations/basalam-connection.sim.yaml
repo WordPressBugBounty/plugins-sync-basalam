@@ -1,5 +1,0 @@
-simulation: basalam-connection
-routing: header
-mocks:
-  - routeKey: basalam
-    path: ../mocks/basalam-connection/config.yaml

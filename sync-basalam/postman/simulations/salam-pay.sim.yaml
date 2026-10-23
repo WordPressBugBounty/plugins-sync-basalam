@@ -1,5 +1,0 @@
-simulation: woosalam-salam-pay
-routing: path
-mocks:
-  - routeKey: salam-pay
-    path: ../mocks/salam-pay/config.yaml

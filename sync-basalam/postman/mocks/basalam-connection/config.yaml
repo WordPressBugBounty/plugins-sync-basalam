@@ -1,9 +1,0 @@
-version: 1
-name: basalam-connection
-slug: basalam-connection
-protocol: http
-interceptRequests: true
-scenarios:
-  - name: default
-    path: ./default.js
-    default: true
