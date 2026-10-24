@@ -34,7 +34,7 @@ class ProductOwnership
         if (is_array($cached) && isset($cached['status'], $cached['message'])) return $cached;
 
         $state = $this->state('unverified', 'در حال حاضر امکان بررسی اتصال محصول به غرفه وجود ندارد. دوباره تلاش کنید.');
-        if (!$fetch) return $state;
+        if (!$fetch) return $this->state('unchecked', 'اتصال این محصول هنوز بررسی نشده است.');
         try {
             $api = $this->api ?: syncBasalamContainer()->get(ApiServiceManager::class);
             $response = $api->get(sprintf(Endpoints::PRODUCT_INFO, $productId), ['Prefer' => 'return=representation']);

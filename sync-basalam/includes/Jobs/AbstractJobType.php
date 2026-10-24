@@ -44,36 +44,16 @@ abstract class AbstractJobType implements JobType
 
     protected function hasProductJobInProgress(int $productId, string $jobType): bool
     {
-        global $wpdb;
-
-        $tableName = $wpdb->prefix . 'sync_basalam_job_manager';
-
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix, not user input.
-        $jobs = $wpdb->get_results($wpdb->prepare(
-            "SELECT payload FROM {$tableName}
-            WHERE job_type = %s
-            AND (status = %s OR status = %s)",
-            $jobType,
-            'pending',
-            'processing'
-        ));
-
-        if (empty($jobs)) return false;
-
-        foreach ($jobs as $job) {
-            $payload = json_decode($job->payload, true);
-            $jobProductId = $payload['product_id'] ?? $payload;
-
-            if (intval($jobProductId) === intval($productId)) return true;
-        }
-
-        return false;
+        return $this->jobManager->hasProductJobInProgress($productId, $jobType);
     }
 
     protected function areAllSingleJobsCompleted(string $jobType): bool
     {
-        $pendingJob = $this->jobManager->getJob(['job_type' => $jobType, 'status' => 'pending']);
-
-        return $pendingJob === null;
+        // A claimed child and a delayed retry both belong to the current page.
+        // Only terminal/deleted children allow another page to be expanded.
+        return $this->jobManager->getCountJobs([
+            'job_type' => $jobType,
+            'status' => ['pending', 'processing'],
+        ]) === 0;
     }
 }

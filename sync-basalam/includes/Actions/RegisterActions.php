@@ -6,6 +6,7 @@ use SyncBasalam\Actions\Controller\ProductActions\CreateAllProducts;
 use SyncBasalam\Actions\Controller\ProductActions\CancelCreateProducts;
 use SyncBasalam\Actions\Controller\ProductActions\UpdateAllProducts;
 use SyncBasalam\Actions\Controller\ProductActions\GetUpdateQueueStatus;
+use SyncBasalam\Actions\Controller\ProductActions\GetProductConnectionStatus;
 use SyncBasalam\Actions\Controller\ProductActions\CancelUpdateProducts;
 use SyncBasalam\Actions\Controller\ProductActions\ConnectAllProducts;
 use SyncBasalam\Actions\Controller\ProductActions\CancelConnectAllProducts;
@@ -59,6 +60,7 @@ class RegisterActions
         ActionHandler::postAction('cancel_update_jobs', CancelUpdateProducts::class);
         ActionHandler::postAjax('update_products_in_basalam', UpdateAllProducts::class);
         ActionHandler::postAjax('get_update_queue_status', GetUpdateQueueStatus::class);
+        ActionHandler::postAjax('get_product_connection_status', GetProductConnectionStatus::class);
         ActionHandler::postAction('cancel_update_products_in_basalam', CancelUpdateProducts::class);
         ActionHandler::postAjax('connect_products_with_basalam', ConnectAllProducts::class);
         ActionHandler::postAction('cancel_connect_products_with_basalam', CancelConnectAllProducts::class);

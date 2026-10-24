@@ -9,6 +9,7 @@ use SyncBasalam\Logger\Logger;
 use SyncBasalam\Services\Products\Discount\DiscountTaskProcessor;
 use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 use SyncBasalam\Services\VendorSyncPolicy;
+use SyncBasalam\Services\Products\ProductPriceStockRetry;
 
 defined('ABSPATH') || exit;
 
@@ -37,9 +38,34 @@ class UpdateProduct extends AbstractProductOperation
 
         $categoryIds = $args['category_ids'] ?? null;
 
-        $productData = ProductDataFacade::get($productId, $categoryIds);
+        $productData = null;
+        try {
+            $productData = ProductDataFacade::get($productId, $categoryIds);
+            // This operation owns the one fallback, including preparation failures.
+            $updateResult = $this->updateProductService->updateProductInBasalam($productData, $productId, false);
+        } catch (\Throwable $error) {
+            $requiredOnly = is_array($productData)
+                && ProductPriceStockRetry::onlyPriceStock($productData) === $productData;
+            $accessFailure = $productData !== null && in_array((int) $error->getCode(), [401, 403, 404], true);
+            if ($requiredOnly || $accessFailure) {
+                if ($error instanceof \Exception) throw $error;
+                throw new \RuntimeException($error->getMessage(), (int) $error->getCode(), $error);
+            }
 
-        $updateResult = $this->updateProductService->updateProductInBasalam($productData, $productId);
+            Logger::warning('بروزرسانی کامل انجام نشد؛ فقط قیمت و موجودی تازه ارسال می‌شود.', [
+                'product_id' => $productId,
+                'failed_stage' => $productData === null ? 'preparation' : 'full_update',
+                'error_class' => get_class($error),
+                'error_code' => $error->getCode(),
+            ]);
+            try {
+                $updateResult = $this->updateProductService->updatePriceStockInBasalam($productId);
+            } catch (\Throwable $fallbackError) {
+                // Do not turn an unsuccessful required-field update into success.
+                if ($fallbackError instanceof \Exception) throw $fallbackError;
+                throw new \RuntimeException($fallbackError->getMessage(), (int) $fallbackError->getCode(), $fallbackError);
+            }
+        }
 
         if ($updateResult['success']) $this->discountProcessor->handleProductDiscount($productId);
 

@@ -61,6 +61,11 @@ class UpdateProductStrategy implements DataStrategyInterface
             $data['variants'] = $handler->getVariants($product);
         }
 
+        if ($product->is_type('variable') && $data['variants'] === [] && $product->get_stock_status() === 'outofstock') {
+            if (!array_key_exists('stock', $data)) $data['stock'] = 0;
+            unset($data['variants']); // Stock-only availability repair preserves remote variants.
+        }
+
         if (!$product->is_type('variable')) {
             if (!array_key_exists('primary_price', $data)) {
                 $data['primary_price'] = $handler->getPrice($product);

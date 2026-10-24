@@ -234,7 +234,7 @@ class RequestStatusTracker
 
     private static function categorizeHttpStatus(int $statusCode): string
     {
-        if (in_array($statusCode, [200, 201, 202], true)) {
+        if ($statusCode >= 200 && $statusCode < 300) {
             return 'success';
         }
 

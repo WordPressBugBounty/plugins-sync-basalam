@@ -326,7 +326,7 @@ class JobsRunner
         $this->discountScheduler->process();
 
         $circuitBreaker = new CircuitBreaker();
-        if ($circuitBreaker->getState() === CircuitBreaker::STATE_OPEN) {
+        if (!$circuitBreaker->canAttemptRequest()) {
             return false;
         }
 

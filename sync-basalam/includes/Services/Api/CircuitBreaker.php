@@ -125,6 +125,18 @@ class CircuitBreaker
         return $this->state['state'];
     }
 
+    /** Check queue eligibility without reserving the HTTP recovery probe. */
+    public function canAttemptRequest(): bool
+    {
+        if ($this->state['state'] === self::STATE_OPEN) {
+            return $this->recoveryTimeoutElapsed();
+        }
+        if ($this->state['state'] === self::STATE_HALF_OPEN) {
+            return !$this->hasHalfOpenProbeInFlight() || $this->halfOpenProbeExpired();
+        }
+        return true;
+    }
+
     public function getFailureCount(): int
     {
         return $this->state['failure_count'];
@@ -213,7 +225,7 @@ class CircuitBreaker
         if (
             $state['state'] === self::STATE_HALF_OPEN &&
             !empty($state['probe_started_at']) &&
-            $this->halfOpenProbeExpired()
+            (time() - $state['probe_started_at']) >= $this->halfOpenProbeTimeout
         ) {
             $state['probe_started_at'] = null;
             update_option(self::OPTION_KEY, $state, false);

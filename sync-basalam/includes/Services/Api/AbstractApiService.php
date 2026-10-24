@@ -6,6 +6,7 @@ use SyncBasalam\Logger\Logger;
 use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Jobs\Exceptions\RetryableException;
+use SyncBasalam\Jobs\Exceptions\NonRetryableException;
 
 defined('ABSPATH') || exit;
 
@@ -73,6 +74,12 @@ abstract class AbstractApiService
         } catch (\Throwable $e) {
             if ($this->shouldRecordFailure($e, $url)) {
                 $this->circuitBreaker->recordFailure();
+            } elseif ($e instanceof NonRetryableException && isset($response) && !is_wp_error($response)) {
+                $status = (int) wp_remote_retrieve_response_code($response);
+                // A reachable client rejection completes the availability probe.
+                // Preserve the original validation/auth error, but allow an
+                // immediate price/stock retry after an HTTP 400 or 422.
+                if ($status >= 400 && $status < 500) $this->circuitBreaker->recordSuccess();
             }
             throw $e;
         }

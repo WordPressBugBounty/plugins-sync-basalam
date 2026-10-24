@@ -87,22 +87,27 @@
                 </form>
 
             </div>
-            <div id="active-jobs-info" class="basalam-display-block-10" <?php echo $update_queue_status['type'] === 'full' ? '' : 'hidden'; ?>>
+            <div id="active-jobs-info" class="basalam-display-block-10" <?php echo in_array($update_queue_status['type'], ['full', 'single'], true) ? '' : 'hidden'; ?>>
                 <div class="basalam-bg-warning-info-margin basalam-p">
-                    <h4 class="basalam-h basalam-margin-warning-header">
-                        صف بروزرسانی کامل محصولات
+                    <h4 id="update-queue-title" class="basalam-h basalam-margin-warning-header">
+                        <?php echo $update_queue_status['type'] === 'full' ? 'صف بروزرسانی کامل محصولات' : 'صف بروزرسانی محصولات'; ?>
                     </h4>
 
                     <p class="basalam-margin-warning">
-                        <strong>نوع عملیات:</strong> بروزرسانی کامل اطلاعات محصولات
+                        <strong>نوع عملیات:</strong>
+                        <span id="update-queue-operation"><?php echo $update_queue_status['type'] === 'full' ? 'بروزرسانی کامل اطلاعات محصولات' : 'بروزرسانی محصولات تکی'; ?></span>
                     </p>
 
                         <p id="update-queue-count-row" class="basalam-margin-warning" <?php echo $update_queue_status['count'] > 0 ? '' : 'hidden'; ?>>
-                            <strong>تعداد محصولات در صف:</strong>
+                            <strong>تعداد کل محصولات در صف بروزرسانی:</strong>
                             <span id="update-queue-count" class="basalam-badge-warning">
                                 <?php echo esc_html($update_queue_status['count']); ?> محصول
                             </span>
                         </p>
+
+                    <p id="full-update-waiting" class="basalam-margin-warning-justify-10" <?php echo $update_queue_status['type'] === 'full' && $update_queue_status['status'] === 'pending' && $update_queue_status['count'] > 0 ? '' : 'hidden'; ?>>
+                        بروزرسانی کامل منتظر پایان بروزرسانی‌های جاری محصولات است. این تعداد شامل بروزرسانی‌های خودکار هم می‌شود.
+                    </p>
 
                     <p class="basalam-margin-warning-justify-10">
                         لطفاً تا پایان عملیات جاری صبر کنید. می‌توانید پیشرفت را از صفحه لاگ‌ها مشاهده کنید.

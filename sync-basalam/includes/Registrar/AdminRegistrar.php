@@ -541,6 +541,23 @@ class AdminRegistrar implements RegistrarInterface
             );
         }
 
+        $screen = get_current_screen();
+        if ($screen && $screen->id === 'edit-product') {
+            $connectionScript = syncBasalamPlugin()->pluginPath() . '/assets/js/product-connection-status.js';
+            wp_enqueue_script(
+                'basalam-product-connection-status',
+                self::assetsUrl('js/product-connection-status.js'),
+                [],
+                $version . '-' . filemtime($connectionScript),
+                true
+            );
+            wp_localize_script('basalam-product-connection-status', 'basalamProductConnectionStatus', [
+                'url' => admin_url('admin-ajax.php'),
+                'nonce' => wp_create_nonce('get_product_connection_status_nonce'),
+                'vendorId' => (string) syncBasalamSettings()->getSettings(\SyncBasalam\Admin\Settings\SettingsConfig::VENDOR_ID),
+            ]);
+        }
+
         if ($isOrderScreen) {
             wp_enqueue_script(
                 "basalam-order-script",

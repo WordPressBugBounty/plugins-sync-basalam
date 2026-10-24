@@ -76,20 +76,24 @@ class UpdateProductVariationsService
                 }
 
                 $failed++;
-                $firstError = $firstError ?: $e->getMessage();
+                $firstError = $firstError ?: $e;
 
                 $this->logVariationError($e, $productId, $basalamProductId, $variant['id']);
             } catch (\Exception $e) {
                 $failed++;
-                $firstError = $firstError ?: $e->getMessage();
+                $firstError = $firstError ?: $e;
 
                 $this->logVariationError($e, $productId, $basalamProductId, $variant['id']);
             }
         }
 
-        // Every variation failed with a permanent error: report it instead of pretending success.
-        if ($updated === 0 && $failed > 0) {
-            throw NonRetryableException::permanent(esc_html('بروزرسانی متغیرهای محصول ناموفق بود: ' . $firstError));
+        // A mixed outcome is still incomplete. Propagate the original failure so
+        // the caller cannot mark the parent synced or discard the failed variants.
+        if ($failed > 0) {
+            if ($firstError instanceof NonRetryableException) throw $firstError;
+            // Product operations convert untyped exceptions to result arrays;
+            // retain a typed failure so the queue cannot mistake it for success.
+            throw NonRetryableException::permanent(esc_html('بروزرسانی متغیرهای محصول ناموفق بود: ' . $firstError->getMessage()));
         }
 
         return ['updated' => $updated, 'skipped' => $skipped, 'failed' => $failed];

@@ -14,6 +14,7 @@ use SyncBasalam\Jobs\Exceptions\StaleVariationException;
 use SyncBasalam\Logger\Logger;
 use SyncBasalam\Utilities\ProductMetaKey;
 use SyncBasalam\Services\VendorSyncPolicy;
+use SyncBasalam\Admin\Product\Data\PriceStockProductData;
 
 defined('ABSPATH') || exit;
 
@@ -34,7 +35,12 @@ class UpdateSingleProductService
         $this->variantDataService = $variantDataService ?: new VariantService();
     }
 
-    public function updateProductInBasalam($productData, $productId)
+    public function updatePriceStockInBasalam(int $productId): array
+    {
+        return $this->updateProductInBasalam(PriceStockProductData::get($productId), $productId, false, true);
+    }
+
+    public function updateProductInBasalam($productData, $productId, bool $recoverRejectedFields = true, bool $priceStockOnly = false)
     {
         if (!get_post_type($productId) === 'product') throw NonRetryableException::invalidData('نوع post محصول نیست.');
 
@@ -43,7 +49,10 @@ class UpdateSingleProductService
             throw NonRetryableException::invalidData($vendorSyncPolicy->getRestrictionMessage(false));
         }
 
-        $productData = apply_filters('sync_basalam_product_data_before_update', $productData, $productId);
+        // A restricted retry is built from WooCommerce above. A broad payload
+        // filter must neither fail again nor reintroduce the rejected fields.
+        if (!$priceStockOnly) $productData = apply_filters('sync_basalam_product_data_before_update', $productData, $productId);
+        if ($priceStockOnly) $productData = ProductPriceStockRetry::onlyPriceStock($productData);
         $productData = $vendorSyncPolicy->restrictUpdatePayload($productData, false);
 
         do_action('sync_basalam_before_update_product_api', $productId, $productData);
@@ -57,7 +66,7 @@ class UpdateSingleProductService
         // variation) sends the complete variants section inside one product PATCH, exactly like
         // earlier major versions: no Basalam variation ids in the payload, and the response
         // mapping stores the current ids.
-        if ($this->shouldUpdateVariationsSeparately($productId, $productData)) {
+        if (!$priceStockOnly && $this->shouldUpdateVariationsSeparately($productId, $productData)) {
             $variationMappingRecovered = false;
 
             try {
@@ -108,18 +117,20 @@ class UpdateSingleProductService
 
         while (true) {
             try {
-                $request = ProductPriceStockRetry::send(
+                $request = $recoverRejectedFields ? ProductPriceStockRetry::send(
                     fn(array $data) => $this->apiservice->patch($url, $data),
                     $productData,
                     fn() => $this->buildPriceStockFallback($productId, $productData)
-                );
+                ) : $this->apiservice->patch($url, $productData);
             } catch (RetryableException $e) {
+                if (!$recoverRejectedFields) throw $e;
                 if ($this->retryWithoutDuplicateSku($productData, $e, $skuRetry)) {
                     continue;
                 }
 
                 throw $e;
             } catch (NonRetryableException $e) {
+                if (!$recoverRejectedFields) throw $e;
                 if ($this->retryWithoutDuplicateSku($productData, $e, $skuRetry)) {
                     continue;
                 }
@@ -131,6 +142,7 @@ class UpdateSingleProductService
 
                 throw $e;
             } catch (\Exception $e) {
+                if (!$recoverRejectedFields) throw $e;
                 if ($this->retryWithoutDuplicateSku($productData, $e, $skuRetry)) {
                     continue;
                 }
@@ -139,7 +151,7 @@ class UpdateSingleProductService
             }
 
             // Some API adapters return a non-2xx response instead of throwing it.
-            if ($this->retryWithoutDuplicateSku($productData, $request, $skuRetry)) {
+            if ($recoverRejectedFields && $this->retryWithoutDuplicateSku($productData, $request, $skuRetry)) {
                 continue;
             }
 
@@ -178,12 +190,19 @@ class UpdateSingleProductService
         // not lost for variable products.
         // When the duplicate-SKU fallback was used, deliberately keep the
         // second request SKU-free; do not issue a follow-up SKU-only patch.
-        if (!$skuRetry) $this->ensureProductSkuUpdated($url, $productData, $body, $productId);
+        if (!$skuRetry && !$priceStockOnly) $this->ensureProductSkuUpdated($url, $productData, $body, $productId, $recoverRejectedFields);
 
         $product = \wc_get_product($productId);
-        if ($product && $product->is_type('variable')) {
+        if ($product && $product->is_type('variable') && (!$priceStockOnly || isset($productData['variants']))) {
             $variations = $product->get_children();
-            if (isset($body['variants'])) {
+            // An availability-only update did not submit variations. Keep their
+            // stored mapping even when the response includes old remote variants:
+            // absent local prices cannot be used to rebuild that mapping.
+            $preserveUnavailableMapping = !array_key_exists('variants', $productData)
+                && !array_key_exists('primary_price', $productData)
+                && isset($productData['stock']) && (int) $productData['stock'] === 0
+                && $product->get_stock_status() === 'outofstock';
+            if (isset($body['variants']) && !$preserveUnavailableMapping) {
                 $wcVariations = [];
                 $attributes = $product->get_attributes();
 
@@ -255,10 +274,12 @@ class UpdateSingleProductService
             }
         }
 
-        return $this->finishUpdate($productId, $body, 'فرایند بروزرسانی محصول با موفقیت انجام شد.');
+        return $this->finishUpdate($productId, $body,
+            $priceStockOnly ? 'فقط قیمت و موجودی بروزرسانی شد؛ اطلاعات جانبی بروزرسانی نشد.' : 'فرایند بروزرسانی محصول با موفقیت انجام شد.',
+            $priceStockOnly);
     }
 
-    private function finishUpdate($productId, $body, string $message): array
+    private function finishUpdate($productId, $body, string $message, bool $priceStockOnly = false): array
     {
         update_post_meta($productId, ProductMetaKey::basalamProductSyncStatus(), 'synced');
 
@@ -267,6 +288,10 @@ class UpdateSingleProductService
             'message'     => $message,
             'status_code' => 200,
         ];
+        if ($priceStockOnly) {
+            $result['partial'] = true;
+            $result['sync_scope'] = 'price_stock';
+        }
 
         do_action('sync_basalam_after_update_product_api', $productId, $body, $result);
 
@@ -296,7 +321,12 @@ class UpdateSingleProductService
                 unset($variant['id']);
             }
             unset($variant);
-            $productData['variants'] = $variants;
+            if (!$variants && $product->get_stock_status() === 'outofstock') {
+                $productData['stock'] = 0;
+                unset($productData['variants']);
+            } else {
+                $productData['variants'] = $variants;
+            }
         } elseif (!isset($productData['primary_price'], $productData['stock'])) {
             $handler = (new ProductDataFactory())->createHandler($product);
             $productData['primary_price'] = $productData['primary_price'] ?? $handler->getPrice($product);
@@ -450,7 +480,7 @@ class UpdateSingleProductService
         throw NonRetryableException::permanent("تغییر وضعیت محصول در باسلام ناموفق بود.");
     }
 
-    private function ensureProductSkuUpdated(string $url, array $productData, &$responseBody, int $productId): void
+    private function ensureProductSkuUpdated(string $url, array $productData, &$responseBody, int $productId, bool $recoverRejectedFields = true): void
     {
         if (!array_key_exists('sku', $productData) || $productData['sku'] === null) return;
 
@@ -464,11 +494,11 @@ class UpdateSingleProductService
         if ($responseSku !== null && (string) $responseSku === $requestedSku) return;
 
         $skuData = ['sku' => $productData['sku']];
-        $skuRequest = ProductPriceStockRetry::send(
+        $skuRequest = $recoverRejectedFields ? ProductPriceStockRetry::send(
             fn(array $data) => $this->apiservice->patch($url, $data),
             $skuData,
             fn() => $this->buildPriceStockFallback($productId, $productData)
-        );
+        ) : $this->apiservice->patch($url, $skuData);
         if (!is_array($skuRequest) || (int) ($skuRequest['status_code'] ?? 0) !== 200) {
             throw NonRetryableException::permanent('بروزرسانی شناسه محصول (SKU) در باسلام ناموفق بود.');
         }

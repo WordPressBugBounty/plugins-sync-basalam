@@ -2,7 +2,36 @@
 
 <details>
 
-<summary>Unreleased</summary>
+<summary>1.10.38 - 2026-10-24</summary>
+
+### Fixed
+
+- Continue existing-product updates with fresh price and stock when optional preparation or full-field updates fail; report partial success explicitly and preserve failures of required fields.
+- Send stock zero for unavailable variable products without eligible priced variations, preserving existing variation mappings.
+- Retain one follow-up for edits made while a product is syncing, coalesce pending edits, and keep full updates separate from price/stock-only retries.
+- Retry queue jobs by conditionally updating their existing row, avoiding lost work on database write failures and non-transactional tables.
+- Check every variation and batch result, including partial failures, incomplete HTTP 202 responses and failed SKU retries.
+- Persist temporary batch-item failures as independent price/stock jobs using fresh WooCommerce data; retain page continuation and wait for pending or processing children.
+- Resume queue attempts after circuit-breaker cooldown, recover expired half-open probes and allow restricted fallbacks after client validation errors.
+- Verify product connections from the product list, including rows replaced by quick edit, while distinguishing unchecked connections from failed checks.
+- Clarify full versus single-product queues, show actual cancellation counts and waiting reasons, and avoid duplicate form action parameters.
+- Count all successful HTTP 2xx responses in request statistics.
+
+</details>
+
+<details>
+
+<summary>1.10.37 - 2026-10-22</summary>
+
+### Fixed
+
+- Cancel current product creation/update jobs without changing automatic synchronization settings or periodic scheduling. Keep cancelled parents and retries from recreating their work while allowing new independent automatic, scheduled and manual operations.
+
+</details>
+
+<details>
+
+<summary>Earlier released fixes included in 1.10.36</summary>
 
 ### Fixed
 
@@ -17,7 +46,6 @@
 
 - Check the current vendor before executing queued product updates; skip foreign or absent connections, reconcile rejected mappings and keep foreign IDs out of quick-update batches without failed update tasks.
 
-- Stop automatic creation with creation cancellation, and stop automatic updates and periodic scheduling with update cancellation. Reject stale automatic/cron enqueues after a stop while retaining explicit manual runs and restart controls.
 - Isolate runner, job-type and product queue advisory locks by database and queue table, preventing unrelated WordPress installations from blocking each other on shared MySQL servers.
 
 - Verify the remote product's vendor before showing it as connected, accepting a manual connection, or sending product/status/batch updates. Treat a confirmed foreign mapping as an ordinary unconnected product with create/connect actions, retaining the rejected ID in private history.

@@ -149,7 +149,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function submitToServer(form, action, updateType = null) {
     const formData = new FormData(form);
-    formData.append("action", action);
+    formData.set("action", action);
 
     const submitButton = form.querySelector('button[type="submit"]');
     submitButton.disabled = true;

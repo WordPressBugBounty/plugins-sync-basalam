@@ -53,6 +53,25 @@ class JobManager
     }
 
     /**
+     * Coalesce pending edits, but retain one follow-up when an older snapshot
+     * is already being sent. Check and insert share the queue mutation lock.
+     *
+     * @return string created|exists|failed
+     */
+    public function createProductUpdateJob(int $productId, bool $automatic = true): string
+    {
+        if ($productId <= 0) return 'failed';
+        $type = 'sync_basalam_update_single_product';
+        $payload = json_encode(['product_id' => $productId, 'automatic' => $automatic]);
+        $result = $this->withProductQueueLock('update', function () use ($productId, $type, $payload) {
+            if ($this->hasProductJobInProgress($productId, $type, false, false)) return 'exists';
+            return $this->insertJobUnlocked($type, 'pending', $payload, 3) === false ? 'failed' : 'created';
+        });
+        if ($result === 'created') do_action('sync_basalam_job_created', $type, 'pending', $payload);
+        return in_array($result, ['created', 'exists'], true) ? $result : 'failed';
+    }
+
+    /**
      * Atomically enqueue a manual or scheduled product operation root.
      *
      * The caller's preflight check is not enough: another request can move a
@@ -154,10 +173,8 @@ class JobManager
         }
         return $this->withProductQueueLock($operation, function () use ($operation) {
             global $wpdb;
-            // Disable independent producers before clearing the queue. Admission
-            // rechecks persisted settings under this same lock, including for
-            // requests that read enabled settings before the stop.
-            if (!\SyncBasalam\Admin\Settings\SettingsManager::stopProductSync($operation)) return false;
+            // Cancellation only drains this queue. Automatic synchronization
+            // and scheduled updates remain controlled by their own settings.
             $types = self::PRODUCT_JOB_GROUPS[$operation];
             $placeholders = implode(', ', array_fill(0, count($types), '%s'));
             // One deletion covers the parent and all children under the same
@@ -235,7 +252,7 @@ class JobManager
 
         return [
             'active' => (bool) ($quickJob || $fullJob || $singleCount > 0),
-            'type' => $quickJob ? 'quick' : (($fullJob || $singleCount > 0) ? 'full' : ''),
+            'type' => $quickJob ? 'quick' : ($fullJob ? 'full' : ($singleCount > 0 ? 'single' : '')),
             'status' => $quickJob ? $quickJob->status : ($fullJob ? $fullJob->status : ''),
             'count' => $singleCount,
         ];
@@ -395,7 +412,7 @@ class JobManager
         );
     }
 
-    public function hasProductJobInProgress(int $productId, string $jobType): bool
+    public function hasProductJobInProgress(int $productId, string $jobType, bool $includeProcessing = true, bool $includePriceStockOnly = true): bool
     {
         global $wpdb;
 
@@ -406,7 +423,7 @@ class JobManager
             AND (status = %s OR status = %s)",
             $jobType,
             'pending',
-            'processing'
+            $includeProcessing ? 'processing' : 'pending'
         ));
 
         if (empty($jobs)) {
@@ -415,6 +432,8 @@ class JobManager
 
         foreach ($jobs as $job) {
             $payload = json_decode($job->payload, true);
+            // A quick retry cannot satisfy an edit of name/custom/full fields.
+            if (!$includePriceStockOnly && !empty($payload['price_stock_only'])) continue;
             $jobProductId = $payload['product_id'] ?? $payload;
 
             if (intval($jobProductId) === intval($productId)) {
@@ -445,7 +464,7 @@ class JobManager
             $jobId
         ));
 
-        if (!$job) return false;
+        if (!$job || !in_array($job->status, ['pending', 'processing'], true)) return false;
 
         $newAttempts = intval($job->attempts) + 1;
 
@@ -477,38 +496,20 @@ class JobManager
         $delaySeconds = 30 * (int) pow(2, $newAttempts - 1);
         $retryAfter   = time() + $delaySeconds;
 
-        // Atomic DELETE + INSERT inside a transaction so a crash can't lose the job.
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Transaction control for atomic job requeue; no object cache applicable.
-        $wpdb->query('START TRANSACTION');
-        try {
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom plugin table; no object cache for these operational queries.
-            $wpdb->delete($this->jobManagerTableName, ['id' => $jobId]);
+        // Update the existing row in one statement. DELETE + INSERT can lose
+        // work on MyISAM or when wpdb returns false without throwing.
+        $updated = $this->updateJob(
+            [
+                'status'        => 'pending',
+                'attempts'      => $newAttempts,
+                'error_message' => $encodedErrors,
+                'retry_after'   => $retryAfter,
+                'started_at'    => 0,
+            ],
+            ['id' => $jobId, 'status' => $job->status, 'attempts' => $job->attempts]
+        );
 
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom plugin table; no object cache for these operational queries.
-            $wpdb->insert(
-                $this->jobManagerTableName,
-                [
-                    'job_type'      => $job->job_type,
-                    'status'        => 'pending',
-                    'payload'       => $job->payload,
-                    'attempts'      => $newAttempts,
-                    'max_attempts'  => $job->max_attempts,
-                    'error_message' => $encodedErrors,
-                    'created_at'    => $job->created_at,
-                    'retry_after'   => $retryAfter,
-                    'started_at'    => 0,
-                ]
-            );
-
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Transaction control for atomic job requeue; no object cache applicable.
-            $wpdb->query('COMMIT');
-        } catch (\Exception $e) {
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Transaction control for atomic job requeue; no object cache applicable.
-            $wpdb->query('ROLLBACK');
-            throw $e;
-        }
-
-        return true;
+        return $updated !== false && $updated > 0;
     }
 
     public function failJob(int $jobId, ?string $errorMessage = null): bool

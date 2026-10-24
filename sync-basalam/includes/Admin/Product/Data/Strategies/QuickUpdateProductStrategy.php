@@ -22,6 +22,13 @@ class QuickUpdateProductStrategy implements DataStrategyInterface
             $data['sku'] = $sku;
         }
 
+        // No eligible priced variants must not leave an explicitly unavailable
+        // Woo product saleable through a stale parent inventory in Basalam.
+        if ($product->is_type('variable') && empty($data['variants']) && $product->get_stock_status() === 'outofstock') {
+            $data['stock'] = 0;
+            unset($data['variants']); // Do not replace or erase remote variations.
+        }
+
         if (!$product->is_type('variable')) {
             $data['primary_price'] = $handler->getPrice($product);
             $data['stock'] = $handler->getStock($product);

@@ -4,7 +4,7 @@ Tags: woocommerce, basalam, woosalam, integration
 Requires at least: 6.0  
 Tested up to: 7.0
 Requires PHP: 7.4 
-Stable tag: 1.10.36
+Stable tag: 1.10.38
 License: GPL-2.0-or-later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -146,6 +146,22 @@ API calls use HTTPS. Authenticated operations use the configured account and che
 1. تنظیمات اولیه افزونه در وردپرس
 
 == Changelog ==
+
+= 1.10.38 =
+* Continue existing-product updates with fresh price and stock when optional preparation or full-field updates fail; report partial success explicitly and preserve failures of required fields.
+* Send stock zero for unavailable variable products without eligible priced variations, preserving existing variation mappings.
+* Retain one follow-up for edits made while a product is syncing, coalesce pending edits, and keep full updates separate from price/stock-only retries.
+* Retry queue jobs by conditionally updating their existing row, avoiding lost work on database write failures and non-transactional tables.
+* Check every variation and batch result, including partial failures, incomplete HTTP 202 responses and failed SKU retries.
+* Persist temporary batch-item failures as independent price/stock jobs using fresh WooCommerce data; retain page continuation and wait for pending or processing children.
+* Resume queue attempts after circuit-breaker cooldown, recover expired half-open probes and allow restricted fallbacks after client validation errors.
+* Verify product connections from the product list, including rows replaced by quick edit, while distinguishing unchecked connections from failed checks.
+* Clarify full versus single-product queues, show actual cancellation counts and waiting reasons, and avoid duplicate form action parameters.
+* Count all successful HTTP 2xx responses in request statistics.
+
+= 1.10.37 =
+* Stop current product creation, full updates and quick updates without changing automatic synchronization settings or periodic schedules.
+* Retain cancelled-parent and retry protection while allowing independent future automatic, scheduled and manual work.
 
 = 1.10.36 =
 * Execute queue recovery directly in WordPress cron instead of repeating a failed loopback dispatch.

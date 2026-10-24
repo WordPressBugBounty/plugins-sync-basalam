@@ -33,9 +33,13 @@ class StatusColumn
                 return;
             }
             $ownership = (new ProductOwnership())->inspect($remoteId, null, false);
+            if ($ownership['status'] === 'unchecked') {
+                echo '<span data-basalam-check-product="' . esc_attr((int) $productId) . '" aria-live="polite">در انتظار بررسی اتصال…</span>';
+                return;
+            }
             if ($remoteId && $ownership['status'] !== 'owned') {
                 echo '<span title="' . esc_attr($ownership['message']) . '">' . esc_html(
-                    $ownership['status'] === 'mismatch' ? 'متصل به غرفهٔ فعلی نیست' : 'نیازمند بررسی اتصال'
+                    $ownership['status'] === 'unverified' ? 'بررسی اتصال موقتاً ممکن نیست' : 'نیازمند بررسی اتصال'
                 ) . '</span>';
                 return;
             }

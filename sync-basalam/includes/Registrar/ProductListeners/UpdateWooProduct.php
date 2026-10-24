@@ -39,12 +39,6 @@ class UpdateWooProduct extends ProductListenerAbstract
             return;
         }
 
-        if (!$this->jobManager->hasProductJobInProgress($productId, 'sync_basalam_update_single_product')) {
-            $this->jobManager->createJob(
-                'sync_basalam_update_single_product',
-                'pending',
-                json_encode(['product_id' => $productId, 'automatic' => true]),
-            );
-        }
+        $this->jobManager->createProductUpdateJob((int) $productId);
     }
 }

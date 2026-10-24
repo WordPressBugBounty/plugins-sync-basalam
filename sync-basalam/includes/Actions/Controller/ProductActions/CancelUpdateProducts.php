@@ -5,7 +5,7 @@ namespace SyncBasalam\Actions\Controller\ProductActions;
 use SyncBasalam\JobManager;
 use SyncBasalam\Actions\Controller\ActionController;
 use SyncBasalam\Services\AsyncWorkerHealth;
-use SyncBasalam\Services\ScheduledProductSync;
+use SyncBasalam\Utilities\ProductOperationNotice;
 
 defined('ABSPATH') || exit;
 
@@ -15,15 +15,15 @@ class CancelUpdateProducts extends ActionController
     {
         $jobManager = syncBasalamContainer()->get(JobManager::class);
 
-        if ($jobManager->cancelProductJobs('update') === false) {
+        $deletedCount = $jobManager->cancelProductJobs('update');
+        if ($deletedCount === false) {
             wp_die('توقف عملیات کامل نشد؛ دوباره تلاش کنید.');
         }
-
-        ScheduledProductSync::unschedule();
 
         $this->deleteAllBatches();
         $this->clearAllLocks();
         (new AsyncWorkerHealth())->clearInterruption();
+        ProductOperationNotice::push('update', (int) $deletedCount);
     }
 
     private function deleteAllBatches()

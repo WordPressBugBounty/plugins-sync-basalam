@@ -24,6 +24,16 @@ class JobExecutor
     public function execute(string $jobType, object $job): bool
     {
         return $this->jobManager->runForJob($job, function () use ($jobType, $job) {
+            // Recheck at execution too: callers may already have fetched or
+            // claimed a batch before its children appeared. Waiting is not a
+            // failed attempt and must not discard/advance the batch cursor.
+            if (!$this->canRun($jobType)) {
+                $this->jobManager->updateJob(
+                    ['status' => 'pending', 'started_at' => 0],
+                    ['id' => $job->id, 'status' => 'processing']
+                );
+                return false;
+            }
             return $this->executeJob($jobType, $job);
         });
     }

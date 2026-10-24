@@ -3,6 +3,7 @@
 use SyncBasalam\JobManager;
 use SyncBasalam\Services\VendorSyncPolicy;
 use SyncBasalam\Utilities\ProductMetaKey;
+use SyncBasalam\Utilities\ProductOperationNotice;
 
 defined('ABSPATH') || exit;
 
@@ -30,7 +31,21 @@ $has_active_create_jobs = $create_queue_status['active'];
 $auto_connect_page_job = $job_manager->getJob(['job_type' => 'sync_basalam_auto_connect_products', 'status' => 'pending']) ?: $job_manager->getJob(['job_type' => 'sync_basalam_auto_connect_products', 'status' => 'processing']);
 
 $auto_connect_product_job_exist = $auto_connect_page_job ? 'not-allowed' : '';
+$productStopNotice = ProductOperationNotice::pull();
 ?>
+
+<?php if ($productStopNotice): ?>
+    <div id="sync-basalam-product-stop-notice" class="notice notice-success is-dismissible" role="status">
+        <p>
+            <strong><?php echo esc_html(sprintf(
+                'عملیات %s متوقف شد؛ %s کار از صف حذف شد.',
+                $productStopNotice['operation'] === 'create' ? 'ایجاد محصولات' : 'بروزرسانی محصولات',
+                number_format_i18n($productStopNotice['deleted_count'])
+            )); ?></strong><br>
+            تنظیمات همگام‌سازی تغییر نکرده است. اگر همگام‌سازی خودکار یا زمان‌بندی فعال باشد، می‌تواند صف تازه‌ای بسازد.
+        </p>
+    </div>
+<?php endif; ?>
 
 <div class="basalam-dashboard">
     <?php

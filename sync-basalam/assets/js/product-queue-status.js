@@ -22,7 +22,12 @@ document.addEventListener('DOMContentLoaded', function () {
   function render(status) {
     show('update-type-selection', !status.active);
     show('quick-update-in-progress', status.active && status.type === 'quick');
-    show('active-jobs-info', status.active && status.type === 'full');
+    show('active-jobs-info', status.active && (status.type === 'full' || status.type === 'single'));
+    const title = document.getElementById('update-queue-title');
+    if (title) title.textContent = status.type === 'full' ? 'صف بروزرسانی کامل محصولات' : 'صف بروزرسانی محصولات';
+    const operation = document.getElementById('update-queue-operation');
+    if (operation) operation.textContent = status.type === 'full' ? 'بروزرسانی کامل اطلاعات محصولات' : 'بروزرسانی محصولات تکی';
+    show('full-update-waiting', status.active && status.type === 'full' && status.status === 'pending' && status.count > 0);
     count('update', status.count);
     const quickStatus = document.getElementById('quick-update-status');
     if (quickStatus) quickStatus.textContent = status.status === 'processing' ? 'در حال پردازش' : 'در انتظار';
