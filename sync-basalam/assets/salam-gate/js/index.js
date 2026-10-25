@@ -58,11 +58,39 @@ jQuery(function ($) {
     });
   });
 
+  function closeDeactivation(dialog) {
+    if (dialog && dialog.open && dialog.getAttribute("aria-busy") !== "true") dialog.close();
+  }
+
+  $(document).on("click", "[data-sg-deactivate-open]", function () {
+    var dialog = document.getElementById("sg-site-deactivate-dialog");
+    if (!dialog || dialog.open) return;
+    $(dialog).find("[data-sg-site-activation-message]").prop("hidden", true).text("");
+    dialog.showModal();
+    document.body.classList.add("sg-site-deactivate-open");
+    dialog.onclose = function () { document.body.classList.remove("sg-site-deactivate-open"); };
+    // Native dialog confines focus, handles Escape and restores trigger focus.
+    dialog.oncancel = function (event) {
+      if (dialog.getAttribute("aria-busy") === "true") event.preventDefault();
+    };
+  });
+  $(document).on("click", "[data-sg-deactivate-close]", function () {
+    closeDeactivation(this.closest(".sg-site-deactivate-dialog"));
+  });
+  $(document).on("click", ".sg-site-deactivate-dialog", function (event) {
+    if (event.target !== this) return;
+    var bounds = this.getBoundingClientRect();
+    if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) closeDeactivation(this);
+  });
+
   $(document).on("click", "[data-sg-site-enabled]", function () {
     var $button = $(this), enabled = $button.attr("data-sg-site-enabled");
     if ($button.prop("disabled")) return;
+    var dialog = $button.closest(".sg-site-deactivate-dialog")[0];
+    if (enabled === "0" && (!dialog || !dialog.open || dialog.getAttribute("aria-busy") === "true")) return;
     var $message = $button.closest(".sg-state, .sg-settings__activation").find("[data-sg-site-activation-message]");
     $message.prop("hidden", true).text("");
+    if (dialog) $(dialog).attr("aria-busy", "true").find("[data-sg-deactivate-close]").prop("disabled", true);
     sgBusy($button, true);
     $.ajax({ url: basalam_ajax.ajaxurl, type: "POST", dataType: "json", timeout: 30000,
       data: { action: "salam_gate_site_activation", enabled: enabled, _wpnonce: basalam_ajax.nonce }
@@ -78,6 +106,7 @@ jQuery(function ($) {
     });
     function fail(message) {
       sgBusy($button, false);
+      if (dialog) $(dialog).attr("aria-busy", "false").find("[data-sg-deactivate-close]").prop("disabled", false);
       $message.text(message || "نتیجه تغییر وضعیت دریافت نشد؛ صفحه را تازه‌سازی کنید. ثبت یا پرداخت جدیدی انجام نمی‌شود.").prop("hidden", false);
     }
   });
@@ -176,7 +205,7 @@ jQuery(function ($) {
         if (data.state.indexOf("error_") === 0) {
           var errors = { error_network: "دریافت وضعیت حساب سلام‌گیت انجام نشد؛ کمی بعد دوباره تلاش کنید.",
             error_auth: "اتصال حساب سلام‌گیت معتبر نیست؛ اتصال باسلام را دوباره بررسی کنید.",
-            error_forbidden: "مجوز دسترسی به سلام‌گیت تأیید نشد. لطفاً دوباره تلاش کنید." };
+            error_forbidden: "دسترسی‌های حساب را تأیید کنید." };
           sgRefreshError(typeof data.message === "string" && /[\u0600-\u06ff]/.test(data.message) ? data.message : errors[data.state]);
           return;
         }
@@ -5073,7 +5102,7 @@ jQuery(function ($) {
     var context = sgOrderContext();
     var readSequence = ++metaboxReadSequence;
     $box.addClass("sg-order-box-loading").attr("aria-busy", "true");
-    $box.find("[data-sg-order-box-loader], [data-sg-order-box-read-error]").remove();
+    $box.find("[data-sg-order-box-loader], [data-sg-order-box-read-error], [data-sg-order-box-read-retry]").remove();
     $("<p class='sg-order-box-loader' data-sg-order-box-loader role='status'>").text("در حال دریافت اطلاعات…").appendTo($box);
     function readFailed() {
       if (readSequence !== metaboxReadSequence || !sgCurrentOrderContext(context)) return;
@@ -5103,15 +5132,11 @@ jQuery(function ($) {
   }
   $box.on("click", "[data-sg-order-box-read-retry]", function () { if (!orderBusy) sgRefreshMetabox(); });
 
-  // One read on initial load repairs older orders whose parcel ID has no saved status.
-  // Keep this out of control updates so a failed read cannot create a retry loop.
+  // Never contact SalamGate merely by opening a Woo order, even for legacy
+  // parcels without a saved status. Let the merchant request reconciliation.
   if (!menuOrderHost && $box.attr("data-basalam-order") !== "1" && $box.find("[data-sg-order-status-missing]").length) {
-    var $missingStatus = $box.find("[data-sg-order-status-missing]");
-    var missingStatusLabel = $missingStatus.text();
-    $missingStatus.text("در حال دریافت وضعیت…");
-    sgRefreshMetabox().always(function () {
-      if ($missingStatus[0] && document.documentElement.contains($missingStatus[0])) $missingStatus.text(missingStatusLabel);
-    });
+    $("<button type='button' class='button' data-sg-order-box-read-retry>")
+      .text("دریافت وضعیت مرسوله").appendTo($box);
   }
 
   $box.add($modal).on("click", ".salam-gate-copy", function () {

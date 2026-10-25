@@ -338,7 +338,7 @@
       not_registered: ["فعال‌سازی نشده", "neutral"],
       not_connected: ["اتصال برقرار نیست", "error"],
       error_auth: ["نیاز به اتصال مجدد", "error"],
-      error_forbidden: ["مجوز دسترسی به سلام‌گیت تأیید نشد. لطفاً دوباره تلاش کنید.", "error"],
+      error_forbidden: ["دسترسی‌های حساب را تأیید کنید.", "error"],
       error_network: ["بررسی وضعیت ناموفق", "error"],
       loading: ["در حال بررسی وضعیت", "neutral"]
     };

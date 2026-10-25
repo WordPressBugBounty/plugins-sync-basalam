@@ -40,7 +40,7 @@ $isActionable = OrderMetabox::isActionableStatus($market, $order->get_status());
 $isPaid = $parcelId > 0 && ParcelStatuses::hasReceipt($parcelStatusId);
 $paymentUnknown = ! $isPaid && ($order->get_meta('_salam_gate_pay_unknown')
     || $order->get_meta('_salam_gate_paid_at') || (int) $order->get_meta('_salam_gate_invoice_id') > 0);
-$available = FeatureAvailability::isAvailable();
+$available = FeatureAvailability::isVisible();
 $shippingCostMeta = $order->get_meta('_salam_gate_shipping_cost_rial');
 $shippingCostRial = (is_int($shippingCostMeta) || (is_string($shippingCostMeta) && preg_match('/^(0|[1-9]\d*)$/D', $shippingCostMeta)))
     ? filter_var($shippingCostMeta, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]) : false;

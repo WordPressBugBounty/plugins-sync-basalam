@@ -8,7 +8,7 @@ use SyncBasalam\SalamGate\Order\OrderContext;
 $order = wc_get_order((int) $orderId);
 if (!$order) return;
 
-$available = FeatureAvailability::isAvailable();
+$available = FeatureAvailability::isVisible();
 
 ?>
 <div class="salam-gate-order-box" data-order-id="<?php echo esc_attr((string) $orderId); ?>" data-basalam-order="<?php echo OrderContext::marketFor((int) $orderId) === OrderContext::MARKET_BASALAM ? '1' : '0'; ?>">

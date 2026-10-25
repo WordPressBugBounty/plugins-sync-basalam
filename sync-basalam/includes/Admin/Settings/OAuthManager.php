@@ -15,6 +15,14 @@ class OAuthManager
     /** Lifetime of a pending OAuth authorization — the SSO round-trip window. */
     const OAUTH_STATE_TTL = 600; // 10 * MINUTE_IN_SECONDS
 
+    /** Set only after consuming a valid administrator-bound OAuth proof. */
+    private static string $verifiedReturnPage = '';
+
+    public static function verifiedReturnPage(): string
+    {
+        return self::$verifiedReturnPage;
+    }
+
     /**
      * Remember that the current admin has just started an OAuth authorization.
      *
@@ -30,14 +38,14 @@ class OAuthManager
      * cache flush during the OAuth round trip would otherwise invalidate a
      * legitimate callback.
      */
-    public static function issueOauthState()
+    public static function issueOauthState(string $returnPage = '')
     {
         $userId = get_current_user_id();
         if ($userId <= 0) return false;
 
         $state     = wp_generate_password(64, false);
         $expiresAt = time() + self::OAUTH_STATE_TTL;
-        $value     = self::buildOauthStateCookieValue($state, $userId, $expiresAt);
+        $value     = self::buildOauthStateCookieValue($state, $userId, $expiresAt, $returnPage);
 
         if (! self::writeOauthStateCookie($value, $expiresAt)) return false;
 
@@ -58,19 +66,25 @@ class OAuthManager
 
         self::clearOauthStateCookie();
 
-        return self::isOauthStateCookieValid(
+        self::$verifiedReturnPage = '';
+        $payload = self::validOauthStatePayload(
             $value,
             get_current_user_id(),
             time()
         );
+        if ($payload === null) return false;
+        self::$verifiedReturnPage = ($payload['return_page'] ?? '') === 'salam_gate' ? 'salam_gate' : '';
+        return true;
     }
 
-    private static function buildOauthStateCookieValue($state, $userId, $expiresAt)
+    private static function buildOauthStateCookieValue($state, $userId, $expiresAt, string $returnPage = '')
     {
         $payload = json_encode([
             'state'      => (string) $state,
             'user_id'    => (int) $userId,
             'expires_at' => (int) $expiresAt,
+            // A fixed local destination, never an arbitrary URL from the callback.
+            'return_page' => $returnPage === 'salam_gate' ? 'salam_gate' : '',
         ]);
 
         if (! is_string($payload)) return '';
@@ -81,17 +95,17 @@ class OAuthManager
         return $encodedPayload . '.' . $signature;
     }
 
-    private static function isOauthStateCookieValid($value, $userId, $now)
+    private static function validOauthStatePayload($value, $userId, $now): ?array
     {
-        if (! is_string($value) || $value === '' || (int) $userId <= 0) return false;
+        if (! is_string($value) || $value === '' || (int) $userId <= 0) return null;
 
         $parts = explode('.', $value, 2);
-        if (count($parts) !== 2) return false;
+        if (count($parts) !== 2) return null;
 
         [$encodedPayload, $signature] = $parts;
         $expectedSignature = hash_hmac('sha256', $encodedPayload, wp_salt('auth'));
 
-        if (! hash_equals($expectedSignature, $signature)) return false;
+        if (! hash_equals($expectedSignature, $signature)) return null;
 
         $padding = strlen($encodedPayload) % 4;
         if ($padding !== 0) $encodedPayload .= str_repeat('=', 4 - $padding);
@@ -99,11 +113,12 @@ class OAuthManager
         $payload = base64_decode(strtr($encodedPayload, '-_', '+/'), true);
         $data    = is_string($payload) ? json_decode($payload, true) : null;
 
-        if (! is_array($data)) return false;
+        if (! is_array($data)) return null;
 
-        return ! empty($data['state'])
+        $valid = ! empty($data['state'])
             && (int) ($data['user_id'] ?? 0) === (int) $userId
             && (int) ($data['expires_at'] ?? 0) >= (int) $now;
+        return $valid ? $data : null;
     }
 
     private static function writeOauthStateCookie($value, $expiresAt)

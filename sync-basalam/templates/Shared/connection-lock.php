@@ -5,7 +5,7 @@ defined('ABSPATH') || exit;
 /**
  * Decorative preview only: never include authenticated templates or real data
  * behind this overlay. Server-side API permissions remain the security boundary.
- * @var array{surface?: string, state?: string} $connectionLock
+ * @var array{surface?: string, state?: string, missing_scope?: bool} $connectionLock
  */
 $lockSurface = ($connectionLock['surface'] ?? '') === 'woosalam' ? 'woosalam' : 'salam-gate';
 $lockState = in_array($connectionLock['state'] ?? '', ['error_auth', 'error_forbidden'], true)
@@ -25,12 +25,16 @@ $lockCopy = [
     ],
     'error_forbidden' => [
         'title' => 'مجوز دسترسی به سلام‌گیت تأیید نشد',
-        'message' => 'مجوز دسترسی به سلام‌گیت تأیید نشد. لطفاً دوباره تلاش کنید.',
+        'message' => 'دسترسی به این بخش تأیید نشد. دسترسی‌های حساب را تأیید کنید.',
         'button' => 'تأیید مجوزهای سلام‌گیت',
     ],
 ];
 $lockTitle = $lockCopy[$lockState]['title'];
 $lockMessage = $lockCopy[$lockState]['message'];
+if ($lockState === 'error_forbidden' && !empty($connectionLock['missing_scope'])) {
+    $lockTitle = 'دسترسی ارسال مرسوله نیاز به تأیید دارد';
+    $lockMessage = \SyncBasalam\SalamGate\Auth\OAuthScopes::CONSENT_MESSAGE;
+}
 $lockSubmitLabel = $lockState === 'error_forbidden'
     ? $lockCopy[$lockState]['button']
     : ($lockState === 'error_auth' ? 'اتصال مجدد به باسلام' : 'اتصال به باسلام');
@@ -61,11 +65,17 @@ $previewLabels = $lockSurface === 'woosalam'
                 <form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" class="sg-connection-lock__action">
                     <input type="hidden" name="action" value="basalam_update_setting">
                     <input type="hidden" name="get_token" value="1">
+                    <?php if ($lockSurface === 'salam-gate') : ?>
+                        <input type="hidden" name="oauth_return_page" value="salam_gate">
+                    <?php endif; ?>
                     <?php wp_nonce_field('basalam_update_setting_nonce', '_wpnonce'); ?>
                     <button type="submit" class="sg-connection-lock__button"><?php echo esc_html($lockSubmitLabel); ?></button>
                 </form>
             <?php else : ?>
                 <a class="sg-connection-lock__button" href="<?php echo esc_url(admin_url('admin.php?page=sync_basalam')); ?>"><?php echo esc_html($lockCopy[$lockState]['button']); ?></a>
+            <?php endif; ?>
+            <?php if ($lockSurface === 'salam-gate' && $lockState === 'error_forbidden') : ?>
+                <p><button type="button" class="sg-button sg-button--secondary" data-sg-refresh aria-controls="sg-state-container">بررسی مجدد وضعیت</button></p>
             <?php endif; ?>
         </div>
     </div>

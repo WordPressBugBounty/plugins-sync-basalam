@@ -293,7 +293,7 @@ class SettingPageComponents
             <input type="text" class="basalam-input basalam-width-auto" id="woo-option-name" name="woo-option-name">
             <label for="Basalam-option-name" class="basalam-p__small">نام ویژگی در باسلام</label>
             <input type="text" class="basalam-input basalam-width-auto" id="Basalam-option-name" name="Basalam-option-name">
-            <button type="button" id="Basalam-map-option-submit" class="basalam-primary-button basalam-p basalam-button-auto">ذخیره</button>
+            <button type="button" id="Basalam-map-option-submit" class="basalam-primary-button basalam-p basalam-button-auto" hidden>ذخیره</button>
         </div>
 <?php
     }
@@ -332,7 +332,7 @@ class SettingPageComponents
     public static function renderDeveloperMode()
     {
         $current_value = syncBasalamSettings()->getSettings(SettingsConfig::DEVELOPER_MODE);
-        echo '<select name="sync_basalam_settings[' . esc_attr(SettingsConfig::DEVELOPER_MODE) . ']" class="basalam-select basalam-select-center" onchange="this.form.submit()">'
+        echo '<select name="sync_basalam_settings[' . esc_attr(SettingsConfig::DEVELOPER_MODE) . ']" class="basalam-select basalam-select-center" onchange="this.form.requestSubmit()">'
             . '<option value="false"' . selected($current_value, "false", false) . '>غیرفعال</option>'
             . '<option value="true"' . selected($current_value, "true", false) . '>فعال</option>'
             . '</select>';

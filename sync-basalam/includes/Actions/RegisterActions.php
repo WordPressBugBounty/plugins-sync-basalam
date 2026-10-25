@@ -74,6 +74,7 @@ class RegisterActions
         ActionHandler::postAjax('archive_exist_product_on_basalam', ArchiveProduct::class);
         ActionHandler::postAjax('disconnect_exist_product_on_basalam', DisconnectProduct::class);
         ActionHandler::postAction('basalam_update_setting', UpdateSettings::class);
+        ActionHandler::postAjax('basalam_update_setting', UpdateSettings::class);
         ActionHandler::postAjax('confirm_basalam_order', ConfirmOrder::class);
         ActionHandler::postAjax('cancel_basalam_order', CancelOrder::class);
         ActionHandler::postAjax('request_cancel_basalam_order', RequestCancelOrder::class);

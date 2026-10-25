@@ -2,6 +2,26 @@
 
 <details>
 
+<summary>1.10.39 - 2026-10-25</summary>
+
+### Added
+
+- Save product, advanced and debug settings through AJAX with a success toast and an actionable product-update dialog when persisted product settings change. Start the existing full-update queue from the dialog or dismiss it while keeping the saved settings.
+
+### Changed
+
+- Show the attribute-name mapping save button beside its inputs only after both names are filled, with clear saving feedback.
+- Show concise product creation/update cancellation messages through the shared success toast.
+
+### Fixed
+
+- Keep shared settings and advanced-form change tracking synchronized after AJAX saves, while preserving unchecked checkbox values and normalized settings.
+- Improve SalamGate permission recovery guidance, back off denied account checks, confirm deactivation and correct the settings help video link.
+
+</details>
+
+<details>
+
 <summary>1.10.38 - 2026-10-24</summary>
 
 ### Fixed

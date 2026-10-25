@@ -34,7 +34,7 @@ final class Module
         foreach ([Admin\AccountStateRouter::class, Admin\HelpContent::class,
             Admin\ConnectionGate::class, Auth\OAuthScopes::class, Order\BasalamOrderProducts::class,
             StatusSyncScheduler::class, Admin\OrderMetabox::class, Admin\OrderShippingStatus::class,
-            Admin\OrderBulkActions::class, Admin\OrderFeatureGate::class] as $registrar) {
+            Admin\OrderBulkActions::class] as $registrar) {
             $registrar::register();
         }
         foreach (self::ajaxCallbacks() as $action => $callback) {

@@ -343,10 +343,12 @@ class SalamGateClient
             $errors = [['location' => 'auth', 'message' => $message]];
         } elseif ($kind === SalamGateException::KIND_FORBIDDEN) {
             // 403 is an authorization failure, not proof of token expiry.
-            // Keep a single safe error; raw details can contain sensitive data or
-            // the authentication fallback above and must not reach an AJAX UI.
-            $message = 'مجوز دسترسی به سلام‌گیت تأیید نشد. لطفاً دوباره تلاش کنید.';
-            $errors = [['location' => 'forbidden', 'message' => $message]];
+            // Only explicit ordinary scope failures call for renewed consent.
+            // Never expose raw auth details or request privileged .admin grants.
+            $missingScope = Auth\OAuthScopes::isMissingRequiredScope($body);
+            $message = $missingScope ? Auth\OAuthScopes::CONSENT_MESSAGE
+                : 'مجوز دسترسی به سلام‌گیت تأیید نشد. ' . Auth\OAuthScopes::CONSENT_MESSAGE;
+            $errors = [['location' => $missingScope ? 'auth.scope' : 'forbidden', 'message' => $message]];
         } elseif ($kind === SalamGateException::KIND_RATE_LIMITED && $message === '') {
             $message = 'تعداد درخواست‌ها زیاد است؛ کمی بعد دوباره تلاش کنید.';
         } elseif ($kind === SalamGateException::KIND_SERVER && $message === '') {

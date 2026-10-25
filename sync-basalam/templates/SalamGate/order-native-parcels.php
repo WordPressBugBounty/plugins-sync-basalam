@@ -11,7 +11,7 @@ use SyncBasalam\SalamGate\Settings\SalamGateSettings;
 
 include __DIR__ . '/order-source-status.php';
 
-if (!FeatureAvailability::isAvailable()) : ?>
+if (!FeatureAvailability::isVisible()) : ?>
     <p class="basalam-p sg-order-helper">سلام‌گیت غرفه فعال نیست؛ وضعیت اتصال را از <a href="<?php echo esc_url(admin_url('admin.php?page=salam_gate')); ?>">صفحه سلام‌گیت</a> بررسی کنید.</p>
     <?php return;
 endif;

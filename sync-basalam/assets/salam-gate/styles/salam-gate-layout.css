@@ -4,6 +4,24 @@
 .salam-gate-page .sg-state--disabled .sg-card__text { max-width: 780px; font-size: 14px; line-height: 2; }
 .salam-gate-page .sg-state--disabled .sg-button { margin-top: 8px; }
 .salam-gate-page .sg-site-activation-message { color: #a3321b; line-height: 1.9; margin: 16px 0 0; }
+body.sg-site-deactivate-open { overflow: hidden; }
+.salam-gate-page .sg-site-deactivate-dialog { box-sizing: border-box; width: min(440px, calc(100% - 32px)); max-height: calc(100dvh - 32px); margin: auto; padding: 28px; border: 1px solid #f4dedb; border-radius: 22px; background: #fff; color: #334155; box-shadow: 0 24px 80px #17203333; font-family: var(--sg-font-body, inherit); text-align: right; direction: rtl; overflow: auto; }
+.salam-gate-page .sg-site-deactivate-dialog::backdrop { background: #17203366; backdrop-filter: blur(6px); }
+.salam-gate-page .sg-site-deactivate-dialog[open] { animation: sg-site-deactivate-in .18s ease-out; }
+.salam-gate-page .sg-site-deactivate-dialog__close { position: absolute; top: 16px; left: 16px; display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 9px; background: #f8fafc; color: #64748b; cursor: pointer; }
+.salam-gate-page .sg-site-deactivate-dialog__icon { display: grid; place-items: center; width: 52px; height: 52px; margin-bottom: 16px; border-radius: 16px; background: #fff1f0; color: #b42318; font-size: 26px; }
+.salam-gate-page .sg-site-deactivate-dialog h3 { margin: 0 0 10px; font: 700 20px/1.7 var(--sg-font-heading); color: #263348; }
+.salam-gate-page .sg-site-deactivate-dialog > p { margin: 0; font-size: 13px; line-height: 2; color: #64748b; }
+.salam-gate-page .sg-site-deactivate-dialog .sg-site-activation-message { margin-top: 12px; color: #a3321b; }
+.salam-gate-page .sg-site-deactivate-dialog__actions { display: flex; gap: 10px; margin-top: 24px; }
+.salam-gate-page .sg-site-deactivate-dialog__actions .sg-button { flex: 1; min-width: 0; justify-content: center; min-height: 44px; padding: 9px 12px; font-size: 13px; }
+.salam-gate-page .sg-site-deactivate-dialog .sg-site-deactivate-dialog__confirm { background: #b42318; border-color: #b42318; color: #fff; }
+.salam-gate-page .sg-site-deactivate-dialog .sg-site-deactivate-dialog__confirm:hover:not(:disabled) { background: #912018; border-color: #912018; }
+.salam-gate-page .sg-site-deactivate-dialog button:focus-visible { outline: 2px solid #b42318; outline-offset: 3px; }
+.salam-gate-page .sg-site-deactivate-dialog button:disabled { opacity: .65; cursor: wait; }
+@keyframes sg-site-deactivate-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 480px) { .salam-gate-page .sg-site-deactivate-dialog { padding: 24px 20px 20px; } }
+@media (prefers-reduced-motion: reduce) { .salam-gate-page .sg-site-deactivate-dialog[open] { animation: none; } }
 .salam-gate-page .sg-dashboard__main,
 .salam-gate-page .sg-calculator__main {
   min-width: 0;

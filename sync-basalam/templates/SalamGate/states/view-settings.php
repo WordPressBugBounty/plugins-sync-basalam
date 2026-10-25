@@ -39,12 +39,18 @@ $trackingUrl = admin_url('admin.php?page=salam_gate&view=tracking');
                 <h3 class="sg-card__title" id="sg-settings-activation-title">وضعیت سلام‌گیت در این سایت</h3>
                 <p class="sg-card__detail">با غیرفعال‌سازی، امکانات سلام‌گیت از سفارش‌های ووکامرس پنهان می‌شود. حساب پستی و مرسوله‌های قبلی حذف نمی‌شوند و فعال‌سازی دوباره هزینه ندارد.</p>
             </div>
-            <details class="sg-settings__deactivate-confirm">
-                <summary class="sg-button sg-button--secondary">غیرفعال‌سازی سلام‌گیت</summary>
-                <p class="sg-card__detail">سلام‌گیت فقط در همین سایت غیرفعال می‌شود؛ پرداخت یا ارسال قبلی لغو نخواهد شد. ادامه می‌دهید؟</p>
-                <button type="button" class="sg-button sg-button--secondary" data-sg-site-enabled="0">بله، غیرفعال شود</button>
-            </details>
-            <p class="sg-site-activation-message" data-sg-site-activation-message role="status" aria-live="polite" hidden></p>
+            <button type="button" class="sg-button sg-button--secondary sg-settings__deactivate-trigger" data-sg-deactivate-open aria-haspopup="dialog" aria-controls="sg-site-deactivate-dialog">غیرفعال‌سازی سلام‌گیت</button>
+            <dialog id="sg-site-deactivate-dialog" class="sg-site-deactivate-dialog" aria-labelledby="sg-site-deactivate-title" aria-describedby="sg-site-deactivate-description">
+                <button type="button" class="sg-site-deactivate-dialog__close" data-sg-deactivate-close aria-label="بستن پنجره تأیید"><span class="dashicons dashicons-no-alt" aria-hidden="true"></span></button>
+                <span class="sg-site-deactivate-dialog__icon" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3v9M6.3 5.7a9 9 0 1 0 11.4 0"/></svg></span>
+                <h3 id="sg-site-deactivate-title">سلام‌گیت غیرفعال شود؟</h3>
+                <p id="sg-site-deactivate-description">سلام‌گیت فقط در همین سایت غیرفعال می‌شود؛ حساب پستی و مرسوله‌های قبلی باقی می‌مانند و پرداخت یا ارسال قبلی لغو نمی‌شود.</p>
+                <p class="sg-site-activation-message" data-sg-site-activation-message role="status" aria-live="polite" hidden></p>
+                <div class="sg-site-deactivate-dialog__actions">
+                    <button type="button" class="sg-button sg-button--secondary" data-sg-deactivate-close autofocus>انصراف</button>
+                    <button type="button" class="sg-button sg-button--secondary sg-site-deactivate-dialog__confirm" data-sg-site-enabled="0">غیرفعال‌سازی</button>
+                </div>
+            </dialog>
         </section>
 
         <section class="sg-card sg-settings__group sg-settings__help" id="sg-settings-help" aria-labelledby="sg-settings-help-title">

@@ -96,7 +96,8 @@ class SettingsPageHandler
         // Mark this authorization as started by the current (authenticated) admin
         // so the OAuth callback can reject forged requests. This runs only after
         // the nonce-protected settings POST, so it cannot be triggered cross-site.
-        if (! OAuthManager::issueOauthState()) {
+        $returnPage = ($_POST['oauth_return_page'] ?? '') === 'salam_gate' ? 'salam_gate' : '';
+        if (! OAuthManager::issueOauthState($returnPage)) {
             wp_die(
                 esc_html__('امکان شروع فرایند دریافت دسترسی وجود ندارد. لطفاً دوباره تلاش کنید.', 'sync-basalam'),
                 esc_html__('خطای دریافت دسترسی', 'sync-basalam'),
@@ -123,6 +124,9 @@ class SettingsPageHandler
 
         if (!$onboardingCompleted) {
             wp_safe_redirect(admin_url('admin.php?page=basalam-onboarding&step=3'));
+        } elseif ($oauthSaved && OAuthManager::verifiedReturnPage() === 'salam_gate') {
+            // Recheck the actual account with the new token; do not register/pay.
+            wp_safe_redirect(admin_url('admin.php?page=salam_gate'));
         } else {
             wp_safe_redirect(admin_url('admin.php?page=sync_basalam'));
         }

@@ -684,18 +684,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
       formData.forEach((value, key) => {
         if (isTrackedAdvancedSettingField(key)) {
-          entries.push(`${key}=${String(value)}`);
+          entries.push([key, String(value)]);
         }
       });
 
-      return entries.join("&");
+      return Object.fromEntries(entries);
     };
 
-    let initialSettingsSnapshot = "";
+    let initialSettingsSnapshot = {};
 
     const toggleAdvancedSubmitVisibility = () => {
       const currentSnapshot = serializeAdvancedSettings();
-      const hasChanges = currentSnapshot !== initialSettingsSnapshot;
+      const hasChanges = JSON.stringify(currentSnapshot) !== JSON.stringify(initialSettingsSnapshot);
 
       advancedSubmitSection.classList.toggle(
         "basalam-submit-section-hidden",
@@ -723,6 +723,18 @@ document.addEventListener("DOMContentLoaded", function () {
       "change",
       handleSettingsFieldMutation
     );
+    document.addEventListener('basalam:settings-saved', event => {
+      if (event.detail.form === advancedSettingsForm) {
+        captureInitialSnapshot();
+        return;
+      }
+      const current = serializeAdvancedSettings();
+      Object.keys(event.detail.settings).forEach(key => {
+        const name = 'sync_basalam_settings[' + key + ']';
+        if (Object.prototype.hasOwnProperty.call(current, name)) initialSettingsSnapshot[name] = current[name];
+      });
+      toggleAdvancedSubmitVisibility();
+    });
 
     captureInitialSnapshot();
     window.requestAnimationFrame(captureInitialSnapshot);

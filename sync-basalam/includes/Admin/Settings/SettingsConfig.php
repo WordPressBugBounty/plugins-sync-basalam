@@ -81,6 +81,27 @@ class SettingsConfig
     public const VIDEO_META_KEY = "video_meta_key";
     public const CAP_PREPARATION_TO_CATEGORY_MAX = "cap_preparation_to_category_max";
 
+    public const PRODUCT_SETTINGS = [
+        self::DEFAULT_WEIGHT, self::DEFAULT_PACKAGE_WEIGHT, self::DEFAULT_PREPARATION,
+        self::CAP_PREPARATION_TO_CATEGORY_MAX, self::PRICE_CHANGE_VALUE, self::ROUND_PRICE,
+        self::DEFAULT_STOCK_QUANTITY, self::SAFE_STOCK, self::VARIABLE_PRODUCT_STOCK_SOURCE,
+        self::SYNC_PRODUCT_FIELDS, self::PRODUCT_PREFIX_TITLE, self::PRODUCT_SUFFIX_TITLE,
+        self::PRODUCT_ATTRIBUTE_SUFFIX_ENABLED, self::PRODUCT_ATTRIBUTE_SUFFIX_PRIORITY,
+        self::ALL_PRODUCTS_WHOLESALE, self::ADD_ATTR_TO_DESC_PRODUCT,
+        self::ADD_SHORT_DESC_TO_DESC_PRODUCT, self::PRODUCT_PRICE_FIELD,
+        self::DISCOUNT_DURATION, self::DISCOUNT_REDUCTION_PERCENT,
+        self::VIDEO_SOURCE, self::VIDEO_INHERIT_MODE, self::VIDEO_META_KEY,
+        ...self::CUSTOM_PRODUCT_UPDATE_FIELDS,
+    ];
+
+    public const EDITABLE_SETTINGS = [
+        ...self::PRODUCT_SETTINGS,
+        self::ORDER_STATUES_TYPE, self::ORDER_SHIPPING_METHOD,
+        self::CUSTOMER_PREFIX_NAME, self::CUSTOMER_SUFFIX_NAME,
+        self::TASKS_PER_MINUTE, self::TASKS_PER_MINUTE_AUTO,
+        self::DEVELOPER_MODE,
+    ];
+
     public static function getDefaultSettings(): array
     {
         return [

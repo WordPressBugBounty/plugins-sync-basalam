@@ -6,18 +6,18 @@ use SyncBasalam\Admin\Components\CommonComponents;
 
 defined('ABSPATH') || exit;
 ?>
-<form action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post">
-    <input type="hidden" name="action" value="basalam_update_setting">
-    <?php wp_nonce_field('basalam_update_setting_nonce', '_wpnonce'); ?>
-
-    <div id="sync-basalam-onboarding-settings" class="basalam-action-card basalam-relative">
+<div id="sync-basalam-onboarding-settings" class="basalam-action-card basalam-relative">
         <div class="basalam-info-icon basalam-info-icon-small">
-            <a href="https://www.aparat.com/v/fdcbuj0" target="_blank">
+            <a href="https://www.aparat.com/v/bkb482q" target="_blank">
                 <img src="<?php echo esc_url(syncBasalamPlugin()->assetsUrl() . "/icons/info-black.svg"); ?>" alt="اطلاعات" class="basalam-img-22 basalam-cursor-pointer">
             </a>
         </div>
         <h3 class="basalam-h">تنظیمات</h3>
         <p class="basalam-p basalam-p__small">تنظیمات پیشرفته افزونه</p>
+
+<form id="basalam-settings-form" data-basalam-ajax-settings action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post">
+    <input type="hidden" name="action" value="basalam_update_setting">
+    <?php wp_nonce_field('basalam_update_setting_nonce', '_wpnonce'); ?>
 
         <div class="basalam-form-row">
             <div class="basalam-form-group basalam-form-group-full basalam-p">
@@ -36,6 +36,7 @@ defined('ABSPATH') || exit;
             </div>
         </div>
 
+        <p class="basalam-p basalam-settings-feedback" role="status" aria-live="polite"></p>
         <center class="basalam-center">
             <button type="submit" class="basalam-primary-button basalam-p basalam-btn-fill basalam-btn-no-margin-bottom">
                 <span class="dashicons dashicons-saved"></span>
@@ -43,7 +44,6 @@ defined('ABSPATH') || exit;
             </button>
         </center>
 </form>
-
 <center class="basalam-center-margin">
     <button
         type="button"
@@ -54,12 +54,17 @@ defined('ABSPATH') || exit;
         تنظیمات بیشتر
     </button>
 </center>
+<form id="basalam-debug-settings-form" data-basalam-ajax-settings action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post">
+    <input type="hidden" name="action" value="basalam_update_setting">
+    <?php wp_nonce_field('basalam_update_setting_nonce', '_wpnonce'); ?>
 <div class="basalam-p basalam-flex-responsive">
     <div class="basalam-flex-align-center-33">
         <?php echo CommonComponents::renderLabelWithTooltip('دیباگ', 'حالت دیباگ فقط برای توسعه‌دهندگان توصیه می‌شود.', 'right'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML built and escaped inside the component/callback. ?>
     </div>
     <?php SettingPageComponents::renderDeveloperMode(); ?>
 </div>
+<p class="basalam-p basalam-settings-feedback" role="status" aria-live="polite"></p>
+</form>
 </div>
 
 <div id="basalam-modal" class="basalam-modal">
@@ -85,7 +90,7 @@ defined('ABSPATH') || exit;
             </button>
         </div>
 
-        <form id="basalam-advanced-settings-form" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" class="basalam-margin-bottom-20">
+        <form id="basalam-advanced-settings-form" data-basalam-ajax-settings action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" class="basalam-margin-bottom-20">
             <input type="hidden" name="action" value="basalam_update_setting">
             <?php wp_nonce_field('basalam_update_setting_nonce', '_wpnonce'); ?>
 
@@ -307,6 +312,7 @@ defined('ABSPATH') || exit;
                 })(jQuery);
             </script>
 
+            <p class="basalam-p basalam-settings-feedback" role="status" aria-live="polite"></p>
             <center class="basalam-center-block basalam-submit-section basalam-submit-section-hidden" id="basalam-advanced-submit-section">
                 <button type="submit" class="basalam-primary-button basalam-p basalam-btn-fill">
                     <span class="dashicons dashicons-saved"></span>
@@ -316,3 +322,18 @@ defined('ABSPATH') || exit;
         </form>
     </section>
 </div>
+
+<dialog id="basalam-settings-update-dialog" class="basalam-settings-update-dialog" dir="rtl" aria-labelledby="basalam-settings-update-title" aria-describedby="basalam-settings-update-description">
+    <div class="basalam-settings-update-content">
+        <h3 id="basalam-settings-update-title" class="basalam-h">تنظیمات محصول ذخیره شد</h3>
+        <p id="basalam-settings-update-description" class="basalam-p">
+            با تغییر تنظیمات، لازم است محصولات را بروزرسانی کنید تا تغییرات در باسلام اعمال شود.
+        </p>
+        <p class="basalam-p basalam-settings-feedback" role="status" aria-live="polite"></p>
+        <input type="hidden" name="_wpnonce" value="<?php echo esc_attr(wp_create_nonce('update_products_in_basalam_nonce')); ?>">
+        <div class="basalam-settings-update-actions">
+            <button type="button" class="basalam-secondary-button basalam-p" data-basalam-settings-dismiss autofocus>بعداً انجام می‌دهم</button>
+            <button type="button" class="basalam-primary-button basalam-p" data-basalam-settings-update>بروزرسانی در باسلام</button>
+        </div>
+    </div>
+</dialog>

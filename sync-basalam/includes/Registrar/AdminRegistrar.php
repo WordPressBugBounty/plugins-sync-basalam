@@ -23,6 +23,7 @@ use SyncBasalam\Services\Products\DuplicateConnectionReport;
 use SyncBasalam\Services\Products\ProductConnection;
 use SyncBasalam\Services\SystemResourceMonitor;
 use SyncBasalam\Utilities\ProductMetaKey;
+use SyncBasalam\Utilities\ProductOperationNotice;
 use SyncBasalam\Utilities\ChatWidget;
 use SyncBasalam\Utilities\TicketFlashNotice;
 use SyncBasalam\Admin\Settings\SettingsPageHandler;
@@ -423,6 +424,22 @@ class AdminRegistrar implements RegistrarInterface
             true
         );
 
+        $productStopNotice = $isMainPage ? ProductOperationNotice::pull() : null;
+        if ($productStopNotice !== null) {
+            $message = sprintf(
+                'عملیات %s متوقف شد',
+                $productStopNotice['operation'] === 'create' ? 'ایجاد محصولات' : 'بروزرسانی محصولات'
+            );
+            wp_add_inline_script(
+                'basalam-admin-toast-script',
+                sprintf(
+                    'window.addEventListener("DOMContentLoaded",function(){if(window.BasalamToast){window.BasalamToast.success(%s);}});',
+                    wp_json_encode($message, JSON_UNESCAPED_UNICODE)
+                ),
+                'after'
+            );
+        }
+
         $vendorStatusScriptPath = syncbasalamplugin()->pluginPath() . '/assets/js/vendor-status.js';
         $vendorStatusScriptVersion = file_exists($vendorStatusScriptPath)
             ? $version . '-' . filemtime($vendorStatusScriptPath)
@@ -522,11 +539,12 @@ class AdminRegistrar implements RegistrarInterface
         }
 
         if ($isMainPage) {
+            $mappingScript = syncBasalamPlugin()->pluginPath() . '/assets/js/map-category-option.js';
             wp_enqueue_script(
                 "basalam-map-category-option-script",
                 self::assetsUrl("js/map-category-option.js"),
                 ["jquery", "basalam-admin-toast-script"],
-                $version,
+                $version . '-' . filemtime($mappingScript),
                 true
             );
         }
@@ -593,6 +611,15 @@ class AdminRegistrar implements RegistrarInterface
         }
 
         if (self::isPluginPage('sync_basalam')) {
+            $settingsScript = syncBasalamPlugin()->pluginPath() . '/assets/js/product-settings.js';
+            wp_enqueue_script(
+                'basalam-product-settings',
+                self::assetsUrl('js/product-settings.js'),
+                ['basalam-admin-script', 'basalam-round-script'],
+                $version . '-' . filemtime($settingsScript),
+                true
+            );
+
             $queueScript = syncBasalamPlugin()->pluginPath() . '/assets/js/product-queue-status.js';
             wp_enqueue_script(
                 'basalam-product-queue-status',

@@ -51,7 +51,14 @@ final class ConnectionCache
         return self::read(self::PREFIX . $name . '_' . substr(sha1($token), 0, 12));
     }
 
-    private static function read(string $key)
+    /** Last verified snapshot for UI only. Never use this to authorize an operation. */
+    public static function lastForTokenForDisplay(string $name, string $token)
+    {
+        if ($token === '') return null;
+        return self::read(self::PREFIX . $name . '_' . substr(sha1($token), 0, 12), true);
+    }
+
+    private static function read(string $key, bool $allowExpiredForDisplay = false)
     {
         $value = get_option($key, null);
 
@@ -60,7 +67,7 @@ final class ConnectionCache
         }
 
         // TTL داخلی (سازگار با کش‌هایی که قبلاً expires_at داشتند)
-        if (isset($value['expires_at']) && (int) $value['expires_at'] <= time()) {
+        if (!$allowExpiredForDisplay && isset($value['expires_at']) && (int) $value['expires_at'] <= time()) {
             return null;
         }
 

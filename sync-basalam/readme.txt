@@ -4,7 +4,7 @@ Tags: woocommerce, basalam, woosalam, integration
 Requires at least: 6.0  
 Tested up to: 7.0
 Requires PHP: 7.4 
-Stable tag: 1.10.38
+Stable tag: 1.10.39
 License: GPL-2.0-or-later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -146,6 +146,14 @@ API calls use HTTPS. Authenticated operations use the configured account and che
 1. تنظیمات اولیه افزونه در وردپرس
 
 == Changelog ==
+
+= 1.10.39 =
+* Save product, advanced and debug settings without reloading the page and confirm successful saves with a toast.
+* Offer a full product update after saved product settings change, with an option to do it later.
+* Show the attribute-name mapping save button beside the inputs only when both names are filled.
+* Use concise success toasts when product creation or updates are stopped.
+* Preserve shared settings, checkbox values and advanced-form change tracking after AJAX saves.
+* Improve SalamGate permission recovery guidance, back off denied account checks, confirm deactivation and correct the settings help video link.
 
 = 1.10.38 =
 * Continue existing-product updates with fresh price and stock when optional preparation or full-field updates fail; report partial success explicitly and preserve failures of required fields.

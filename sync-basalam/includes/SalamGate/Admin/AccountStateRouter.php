@@ -11,6 +11,7 @@ use SyncBasalam\SalamGate\Services\ShopsService;
 use SyncBasalam\SalamGate\Services\ConnectionCache;
 use SyncBasalam\SalamGate\Services\AccountService;
 use SyncBasalam\SalamGate\Services\SiteActivation;
+use SyncBasalam\SalamGate\Services\ShopCheckCache;
 
 if (! defined('ABSPATH')) exit;
 
@@ -97,6 +98,7 @@ class AccountStateRouter
             $data['state'] = $resolved['state'];
             $data['shops'] = $resolved['shops'];
             $data['message'] = $resolved['message'];
+            $data['missing_scope'] = !empty($resolved['missing_scope']);
         }
 
         $template = __DIR__ . '/../../../templates/SalamGate/page-router.php';
@@ -122,6 +124,9 @@ class AccountStateRouter
         if (!is_string($token) || trim($token) === '') {
             return ['state' => self::STATE_NOT_CONNECTED, 'shops' => [], 'message' => ''];
         }
+
+        $failure = ShopCheckCache::forToken($token);
+        if ($failure !== null) return self::errorState($failure);
 
         $cached = ConnectionCache::getForToken(ShopsService::CACHE_NAME, $token);
         if (isset($cached['data']['shops']) && is_array($cached['data']['shops'])) {
@@ -168,15 +173,7 @@ class AccountStateRouter
                 }
             }
         } catch (SalamGateException $exception) {
-            if ($exception->isKind(SalamGateException::KIND_UNAUTHENTICATED)) {
-                return ['state' => self::STATE_ERROR_AUTH, 'shops' => [], 'message' => $exception->getMessage()];
-            }
-            if ($exception->isKind(SalamGateException::KIND_FORBIDDEN)) {
-                return ['state' => self::STATE_ERROR_FORBIDDEN, 'shops' => [], 'message' => $exception->getMessage()];
-            }
-
-            // خطای شبکه/سرور: کاربر تازه‌وارد فرض نمی‌شود — فرم ثبت تکراری ممنوع.
-            return ['state' => self::STATE_ERROR_NETWORK, 'shops' => [], 'message' => $exception->getMessage()];
+            return self::errorState($exception);
         }
 
         if (!SiteActivation::isEnabled()) {
@@ -187,6 +184,16 @@ class AccountStateRouter
             'shops' => $shops,
             'message' => '',
         ];
+    }
+
+    private static function errorState(SalamGateException $exception): array
+    {
+        $state = self::STATE_ERROR_NETWORK;
+        if ($exception->isKind(SalamGateException::KIND_UNAUTHENTICATED)) $state = self::STATE_ERROR_AUTH;
+        if ($exception->isKind(SalamGateException::KIND_FORBIDDEN)) $state = self::STATE_ERROR_FORBIDDEN;
+        // A failed read is never proof of an unregistered account.
+        return ['state' => $state, 'shops' => [], 'message' => $exception->getMessage(),
+            'missing_scope' => $exception->errorsAt('auth.scope') !== []];
     }
 
     /** A queued/ambiguous local attempt is not proof of an active postal shop. */

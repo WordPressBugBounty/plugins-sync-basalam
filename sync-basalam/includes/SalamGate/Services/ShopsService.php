@@ -7,6 +7,7 @@ use SyncBasalam\SalamGate\Contracts\ShopNormalizer;
 use SyncBasalam\SalamGate\Contracts\ShopStatuses;
 use SyncBasalam\SalamGate\SalamGateClient;
 use SyncBasalam\SalamGate\SalamGateException;
+use SyncBasalam\SalamGate\Utils\OptionLock;
 
 defined('ABSPATH') || exit;
 
@@ -40,15 +41,68 @@ class ShopsService
      */
     public function getShops(bool $fresh = false): array
     {
-        if (!$fresh) {
-            $cached = ConnectionCache::get(self::CACHE_NAME);
-
-            if ($cached !== null && isset($cached['data']['shops']) && is_array($cached['data']['shops'])) {
-                return $cached['data']['shops'];
-            }
+        $token = ClientFactory::make()->token();
+        if ($token === null) {
+            throw new SalamGateException('اتصال به باسلام برقرار نیست؛ از تنظیمات ووسلام دوباره متصل شوید.',
+                401, [], SalamGateException::KIND_UNAUTHENTICATED, true);
         }
+        $identity = substr(sha1($token), 0, 12);
+        ConnectionCache::assertCurrentIdentity($identity);
+        $failure = ShopCheckCache::forToken($token, $fresh);
+        if ($failure !== null) throw $failure;
+        $cached = $this->cachedShops($token, $fresh);
+        if ($cached !== null) return $cached;
 
-        $identity = ConnectionCache::identityHash();
+        $lockKey = 'salam_gate_shop_check_' . $identity;
+        $lease = OptionLock::acquire($lockKey, 120);
+        if ($lease === null) throw self::checkBusy();
+        try {
+            // Another worker may have completed between our first read and acquire.
+            wp_cache_delete(ConnectionCache::key(ShopCheckCache::CACHE_NAME), 'options');
+            wp_cache_delete(ConnectionCache::key(self::CACHE_NAME), 'options');
+            $failure = ShopCheckCache::forToken($token, $fresh);
+            if ($failure !== null) throw $failure;
+            $cached = $this->cachedShops($token, $fresh);
+            if ($cached !== null) return $cached;
+
+            $renew = static function () use ($lockKey, &$lease): void {
+                $next = OptionLock::renew($lockKey, $lease, 120);
+                if ($next === null) throw self::checkBusy();
+                $lease = $next;
+            };
+            try {
+                $shops = $this->fetchShops($fresh, $identity, $renew);
+            } catch (SalamGateException $exception) {
+                $renew(); // An expired worker must not overwrite its successor's result.
+                // A response is cached only for the credential that actually sent it.
+                $failedIdentity = ClientFactory::make()->lastRequestIdentityHash() ?? $identity;
+                ShopCheckCache::remember($exception, $failedIdentity);
+                throw $exception;
+            }
+            ShopCheckCache::clear($identity);
+            return $shops;
+        } finally {
+            OptionLock::release($lockKey, $lease);
+        }
+    }
+
+    private function cachedShops(string $token, bool $fresh): ?array
+    {
+        $cached = ConnectionCache::getForToken(self::CACHE_NAME, $token);
+        if (!isset($cached['data']['shops']) || !is_array($cached['data']['shops'])) return null;
+        if ($fresh && (int) ($cached['data']['checked_at'] ?? 0) + ShopCheckCache::FRESH_COOLDOWN <= time()) return null;
+        ConnectionCache::assertCurrentIdentity(substr(sha1($token), 0, 12));
+        return $cached['data']['shops'];
+    }
+
+    private static function checkBusy(): SalamGateException
+    {
+        return new SalamGateException('بررسی وضعیت حساب در حال انجام است؛ کمی بعد دوباره تلاش کنید.',
+            429, [], SalamGateException::KIND_RATE_LIMITED, true);
+    }
+
+    private function fetchShops(bool $fresh, string &$identity, callable $renew): array
+    {
         $rawShops = [];
         $seenIds = [];
         $seenCursors = [];
@@ -61,6 +115,7 @@ class ShopsService
         // The upstream contract defaults to ten and caps per_page at thirty.
         // Never publish a partial list as "no active shop" or cache it.
         for ($page = 0; $page < 100; $page++) {
+            $renew();
             ConnectionCache::assertCurrentIdentity($identity);
             $query = ['per_page' => 30];
             if ($cursor !== null) $query['cursor'] = $cursor;
@@ -126,7 +181,8 @@ class ShopsService
         }
         $shops = ShopNormalizer::normalizeList($rawShops);
 
-        ConnectionCache::setForIdentity(self::CACHE_NAME, ['shops' => $shops], self::CACHE_TTL, $identity);
+        $renew();
+        ConnectionCache::setForIdentity(self::CACHE_NAME, ['shops' => $shops, 'checked_at' => time()], self::CACHE_TTL, $identity);
 
         return $shops;
     }

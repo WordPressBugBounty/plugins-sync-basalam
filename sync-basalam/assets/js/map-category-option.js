@@ -1,4 +1,19 @@
 jQuery(document).ready(function ($) {
+  const $mapping = $('#Basalam-map-option-form');
+  const $wooInput = $('#woo-option-name');
+  const $basalamInput = $('#Basalam-option-name');
+  const $saveButton = $('#Basalam-map-option-submit');
+  let saving = false;
+
+  function syncSaveButton() {
+    const ready = !!($wooInput.val()?.trim() && $basalamInput.val()?.trim());
+    $saveButton.prop('hidden', !ready).prop('disabled', saving);
+    $mapping.toggleClass('has-values', ready);
+  }
+
+  $wooInput.add($basalamInput).on('input change', syncSaveButton);
+  syncSaveButton();
+
   function getDeleteNonce() {
     return (
       $(".options_mapping_section").data("delete-nonce") ||
@@ -8,6 +23,7 @@ jQuery(document).ready(function ($) {
   }
 
   function submitMapOption() {
+    if (saving) return;
     const wooName = $("#woo-option-name").val().trim();
     const basalamName = $("#Basalam-option-name").val().trim();
     const nonce = $("#basalam_add_map_option_nonce").val();
@@ -17,6 +33,10 @@ jQuery(document).ready(function ($) {
       return;
     }
 
+    saving = true;
+    syncSaveButton();
+    $saveButton.text('در حال ذخیره…');
+    $mapping.attr('aria-busy', 'true');
     $.ajax({
       url: ajaxurl,
       type: "POST",
@@ -31,19 +51,15 @@ jQuery(document).ready(function ($) {
           window.BasalamToast.success("ویژگی با موفقیت ذخیره شد.");
           $("#Basalam-map-option-result").text("ویژگی با موفقیت ذخیره شد.");
           $(".options_mapping_section").show();
-          $("#woo-option-name").val("");
-          $("#Basalam-option-name").val("");
+          if ($wooInput.val().trim() === wooName) $wooInput.val('');
+          if ($basalamInput.val().trim() === basalamName) $basalamInput.val('');
 
           const deleteNonce = getDeleteNonce();
-          const newRow = `
-        <tr data-woo="${wooName}" data-basalam="${basalamName}">
-          <td>${wooName}</td>
-          <td>${basalamName}</td>
-          <td>
-            <button type="button" class="Basalam-delete-option basalam-primary-button basalam-delete-option-auto" data-_wpnonce="${deleteNonce}">حذف</button>
-          </td>
-        </tr>
-      `;
+          const newRow = $('<tr>').attr({'data-woo': wooName, 'data-basalam': basalamName})
+            .append($('<td>').text(wooName), $('<td>').text(basalamName),
+              $('<td>').append($('<button>', {type: 'button',
+                class: 'Basalam-delete-option basalam-primary-button basalam-delete-option-auto',
+                text: 'حذف'}).attr('data-_wpnonce', deleteNonce)));
 
           const $tableBody = $(".basalam-table tbody");
           if ($tableBody.length > 0) {
@@ -60,6 +76,12 @@ jQuery(document).ready(function ($) {
           xhr.responseJSON?.data?.message || "خطا در ارسال درخواست.";
         window.BasalamToast.error(errorMessage);
         $("#Basalam-map-option-result").text(errorMessage);
+      },
+      complete: function () {
+        saving = false;
+        $saveButton.text('ذخیره');
+        $mapping.removeAttr('aria-busy');
+        syncSaveButton();
       },
     });
   }
