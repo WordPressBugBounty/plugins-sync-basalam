@@ -254,7 +254,7 @@ class VariantService
 
             $properties[] = [
                 'property' => $attributeLabel,
-                'value' => str_replace('-', ' ', mb_convert_encoding($valueName, 'UTF-8', 'auto')),
+                'value' => mb_convert_encoding($valueName, 'UTF-8', 'auto'),
             ];
         }
 

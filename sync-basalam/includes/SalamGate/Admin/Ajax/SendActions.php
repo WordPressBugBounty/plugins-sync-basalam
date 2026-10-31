@@ -40,10 +40,16 @@ class SendActions
             $activeShops = array_values(array_filter($shops, static fn (array $s): bool =>
                 (int) ($s['status_id'] ?? 0) === ShopStatuses::ACTIVE
             ));
-            if ($activeShops === []) $errors['shops'] = 'آدرس فرستنده فعالی پیدا نشد؛ وضعیت اتصال و آدرس فرستنده را بررسی کنید.';
+            if ($activeShops === []) {
+                wp_send_json_error(['message' => 'آدرس فرستنده فعالی پیدا نشد؛ وضعیت حساب سلام‌گیت را در بخش ارسال مرسوله بررسی کنید.',
+                    'code' => 'account_unavailable'], 409);
+                return;
+            }
         } catch (SalamGateException $e) {
-            $activeShops = [];
-            $errors['shops'] = 'آدرس‌های فرستنده دریافت نشد؛ دوباره تلاش کنید.';
+            // An expired active snapshot can discover a new denial here. Do
+            // not fan out to categories/boxes/locations after the account fails.
+            wp_send_json_error(['message' => $e->firstMessage(), 'code' => 'account_unavailable'], 409);
+            return;
         }
         try {
             $categories = (new CategoriesService())->all();

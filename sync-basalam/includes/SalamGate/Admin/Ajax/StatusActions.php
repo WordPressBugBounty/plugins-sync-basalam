@@ -56,6 +56,13 @@ class StatusActions
     public static function refreshShops(): void
     {
         self::guard();
+        // Also protect direct/internal invocations; an old tab is not consent
+        // to query the provider after this site has explicitly opted out.
+        if (!\SyncBasalam\SalamGate\Services\SiteActivation::isEnabled()) {
+            wp_send_json_error(['message' => 'سلام‌گیت در این سایت غیرفعال است؛ ابتدا آن را از بخش ارسال مرسوله فعال کنید.',
+                'code' => 'site_disabled', 'kind' => 'validation', 'errors' => [], 'request_dispatched' => false], 409);
+            return;
+        }
 
         try {
             $service = new ShopsService();

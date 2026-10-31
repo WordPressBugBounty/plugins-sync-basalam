@@ -46,6 +46,13 @@ final class StatusSyncScheduler
             return;
         }
         try {
+            $access = StatusSyncAccess::snapshot();
+            if ($access['reason'] !== '') {
+                update_option(StatusSyncService::LAST_SYNC_KEY, [
+                    'ran_at' => time(), 'checked' => 0, 'updated' => 0, 'failed' => 0, 'skipped' => $access['reason'],
+                ], false);
+                return;
+            }
             (new StatusSyncService())->syncBatch();
         } catch (\Throwable $exception) {
             // Includes failures before the service acquires its lease; never break wp-cron.

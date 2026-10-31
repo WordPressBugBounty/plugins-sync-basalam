@@ -2,6 +2,41 @@
 
 <details>
 
+<summary>1.10.41 - 2026-10-31</summary>
+
+### Fixed
+
+- Preserve hyphens in variation option display names sent to Basalam, including grouped SIM numbers and model names, for both custom and global attributes. Keep existing variation ID matching compatible with previously spaced values.
+
+</details>
+
+<details>
+
+<summary>1.10.40 - 2026-10-26</summary>
+
+### Added
+
+- Show a SalamPay activation notice with a merchant registration link across WordPress admin pages, ahead of other notices where supported by the screen.
+- Add authenticated order counts and exact rial order totals for today, the last seven days, the last thirty days and all time, supporting both legacy and HPOS order storage.
+- Add vendor-scoped product links with signed cursor pagination for large catalogs.
+
+### Changed
+
+- Hide the SalamPay notice for ten days per administrator only after choosing the dismiss button, then show it again. Opening the activation link or configuring the gateway does not dismiss the notice.
+- Show the missing Basalam authorization notice across admin pages except WooSalam menu pages, including submenus registered by add-ons.
+- Simplify the SalamGate introduction and keep tools behind the verified account state, with retry feedback when account checks fail.
+
+### Fixed
+
+- Keep both notices available in classic and React WooCommerce payment settings, with a separate dismissal form and a return to the current page after dismissal.
+- Display saved product synchronization status for the currently configured vendor without probing Basalam when rendering the product list.
+- Enforce local SalamGate account access before remote actions and activation exceptions; stop follow-up requests after account denial and pause status synchronization after authorization failures.
+- Reject site API tokens unless the validator explicitly returns boolean success, including HTTP 200 rejection responses, and aggregate legacy order metadata without repeated per-order lookups.
+
+</details>
+
+<details>
+
 <summary>1.10.39 - 2026-10-25</summary>
 
 ### Added

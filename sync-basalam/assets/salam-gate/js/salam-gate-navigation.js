@@ -6,15 +6,12 @@
     if (!root || !window.basalam_ajax || !$) return;
     var body = root.querySelector("#sg-state-container, .salam-gate-parcels-page");
     if (!body) return;
-    var nav = root.querySelector("[data-sg-current-view]");
-    var view = nav ? nav.getAttribute("data-sg-current-view") : "";
-    var publicView = view === "calculator" || view === "post-offices" || view === "tracking";
     var request = null, leaving = false;
     var reloadKey = "salam-gate-account-reload:" + window.location.pathname + window.location.search;
     var states = ["not_connected", "error_network", "error_auth", "error_forbidden", "not_registered", "pending", "rejected", "inactive", "active", "disabled"];
 
     function loading(on) {
-      if (!publicView) body.setAttribute("aria-busy", on ? "true" : "false");
+      body.setAttribute("aria-busy", on ? "true" : "false");
       if (on) {
         var title = body.querySelector(".sg-loading__text"), hint = body.querySelector("[data-sg-account-load-message]");
         if (title) title.textContent = "در حال دریافت اطلاعات…";
@@ -24,7 +21,7 @@
       body.querySelectorAll(".sg-state--loading .sg-loading-spinner").forEach(function (spinner) { spinner.hidden = !on; });
     }
     function failure(message) {
-      if (publicView || leaving) return;
+      if (leaving) return;
       var title = body.querySelector(".sg-loading__text");
       if (title) title.textContent = "دریافت وضعیت حساب انجام نشد";
       var hint = body.querySelector("[data-sg-account-load-message]");
@@ -77,12 +74,12 @@
             ? data.message : "وضعیت حساب سلام‌گیت دریافت نشد؛ کمی بعد دوباره تلاش کنید.");
           return;
         }
-        notifyState(data.state);
-        if (publicView) return; // Never erase an in-progress calculation or map selection.
         if (data.state.indexOf("error_") === 0 || data.state === "not_connected" || data.state === "not_registered" || data.state === "disabled") {
           $(body).html(data.html);
+          notifyState(data.state);
           return;
         }
+        // Tools are initialized only after a full render with a verified active account.
         if (!reloadOnce()) failure("وضعیت حساب دریافت شد، اما صفحه آماده نشد. برای ادامه یک‌بار صفحه را تازه کنید.");
       }).fail(function (xhr, status) {
         if (status === "abort") return;

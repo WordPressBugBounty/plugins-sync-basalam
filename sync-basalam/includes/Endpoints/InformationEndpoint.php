@@ -7,6 +7,7 @@ use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Services\Api\RequestStatusTracker;
 use SyncBasalam\Utilities\DateConverter;
 use SyncBasalam\Services\ApiServiceManager;
+use SyncBasalam\Services\Orders\OrderStatistics;
 
 defined('ABSPATH') || exit;
 
@@ -61,6 +62,7 @@ class InformationEndpoint
         global $wp_version;
 
         $settings = syncBasalamSettings()->getSettings();
+        $orderStatistics = OrderStatistics::getSnapshot();
 
         return rest_ensure_response([
             'domain'                => get_site_url(),
@@ -70,6 +72,8 @@ class InformationEndpoint
             'connection_status'     => !empty($settings[SettingsConfig::TOKEN]),
             'settings'              => self::getPublicSettings($settings),
             'request_status'        => RequestStatusTracker::getSummary(),
+            'order_counts'          => $orderStatistics['counts'],
+            'order_amounts'         => $orderStatistics['amounts'],
             'last_10_log'           => [
                 'info'  => self::getLastLogsByLevel('INFO', 10),
                 'error' => self::getLastLogsByLevel('ERROR', 10),
@@ -126,13 +130,20 @@ class InformationEndpoint
 
         $apiServiceManager = syncBasalamContainer()->get(ApiServiceManager::class);
 
-        $response = $apiServiceManager->get($url);
-
-        if ($response['success'] == true) {
-            return true;
+        try {
+            $response = $apiServiceManager->get($url);
+        } catch (\Throwable $exception) {
+            // The shared HTTP client throws for rejected tokens and outages.
+            return false;
         }
 
-        return false;
+        // The HTTP client marks every 2xx response successful. The validator
+        // also returns HTTP 200 for rejected/expired tokens, with success:false.
+        $body = $response['body'] ?? null;
+        $validation = is_string($body) ? json_decode($body, true) : $body;
+
+        return !empty($response['success']) && is_array($validation)
+            && ($validation['success'] ?? false) === true;
     }
 
 

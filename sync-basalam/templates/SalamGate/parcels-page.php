@@ -10,6 +10,12 @@ use SyncBasalam\SalamGate\Utils\Digits;
 
 $data = AccountStateRouter::resolveForPage();
 $available = $data['state'] === AccountStateRouter::STATE_ACTIVE;
+if (!$available) {
+    // A bookmarked parcels URL follows the same activation/consent dashboard policy.
+    $data['view'] = '';
+    include __DIR__ . '/page-router.php';
+    return;
+}
 $sgView = 'parcels';
 
 $queryText = static function (string $key, string $default = ''): string {

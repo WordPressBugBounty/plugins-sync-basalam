@@ -3,8 +3,8 @@
 namespace SyncBasalam\Admin\Product\elements\ProductList;
 
 use SyncBasalam\Admin\Components\ProductListComponents;
+use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Utilities\ProductMetaKey;
-use SyncBasalam\Services\Products\ProductOwnership;
 
 defined('ABSPATH') || exit;
 class StatusColumn
@@ -25,22 +25,16 @@ class StatusColumn
     public static function renderStatusColumnContent($column, $productId)
     {
         if ($column === 'sync_basalam_status') {
-            (new ProductOwnership())->forgetForeignConnection((int) $productId, false);
-            $product = get_post_meta($productId, ProductMetaKey::basalamProductSyncStatus(), true);
-            $remoteId = get_post_meta($productId, ProductMetaKey::basalamProductId(), true);
-            if (!$remoteId) {
+            $vendorId = syncBasalamSettings()->getSettings(SettingsConfig::VENDOR_ID);
+            if ((!is_int($vendorId) && !is_string($vendorId))
+                || !ctype_digit((string) $vendorId) || (int) $vendorId <= 0) {
                 ProductListComponents::renderSyncProductStatusUnsync();
                 return;
             }
-            $ownership = (new ProductOwnership())->inspect($remoteId, null, false);
-            if ($ownership['status'] === 'unchecked') {
-                echo '<span data-basalam-check-product="' . esc_attr((int) $productId) . '" aria-live="polite">در انتظار بررسی اتصال…</span>';
-                return;
-            }
-            if ($remoteId && $ownership['status'] !== 'owned') {
-                echo '<span title="' . esc_attr($ownership['message']) . '">' . esc_html(
-                    $ownership['status'] === 'unverified' ? 'بررسی اتصال موقتاً ممکن نیست' : 'نیازمند بررسی اتصال'
-                ) . '</span>';
+            $product = get_post_meta($productId, ProductMetaKey::basalamProductSyncStatus($vendorId), true);
+            $remoteId = get_post_meta($productId, ProductMetaKey::basalamProductId($vendorId), true);
+            if (!$remoteId) {
+                ProductListComponents::renderSyncProductStatusUnsync();
                 return;
             }
             if ($product && $product == 'synced') {

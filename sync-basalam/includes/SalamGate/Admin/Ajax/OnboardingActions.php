@@ -121,6 +121,9 @@ class OnboardingActions
         try {
             $shops = $shopsService->getShops($activation);
         } catch (SalamGateException $exception) {
+            // A newly discovered denial must stop this bootstrap before it
+            // reads providers, locations, balances or activation identity.
+            if (in_array($exception->getStatus(), [401, 403], true)) throw $exception;
             $shops = null;
         }
         $account->assertSnapshot($profile);

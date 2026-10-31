@@ -7,6 +7,16 @@ defined('ABSPATH') || exit;
 /** Shared presentation metadata; account routing and permissions stay in their existing handlers. */
 class PageChrome
 {
+    /** Only the dashboard and the explicit first-activation flow exist before account readiness. */
+    public static function viewForState(string $view, string $state): string
+    {
+        if ($view === 'activation') {
+            return $state === 'not_registered' ? $view : '';
+        }
+
+        return $state === 'active' ? $view : '';
+    }
+
     public static function status(string $state): array
     {
         $statuses = [
@@ -44,15 +54,16 @@ class PageChrome
 
     public static function navigation(string $view, string $state): array
     {
+        $view = self::viewForState($view, $state);
         $current = in_array($view, ['', 'activation'], true) ? 'dashboard' : $view;
         $mainUrl = admin_url('admin.php?page=' . Menus::MAIN_SLUG);
         $items = [
             ['id' => 'dashboard', 'label' => 'داشبورد', 'url' => $mainUrl, 'requires_active' => false],
             ['id' => 'send', 'label' => 'ثبت مرسوله', 'url' => $mainUrl . '&view=send', 'requires_active' => true],
             ['id' => 'parcels', 'label' => 'مرسوله‌ها', 'url' => admin_url('admin.php?page=' . Menus::PARCELS_SLUG), 'requires_active' => true],
-            ['id' => 'tracking', 'label' => 'پیگیری مرسوله', 'url' => $mainUrl . '&view=tracking', 'requires_active' => false],
-            ['id' => 'calculator', 'label' => 'ماشین‌حساب', 'url' => $mainUrl . '&view=calculator', 'requires_active' => false],
-            ['id' => 'post-offices', 'label' => 'مراکز تحویل', 'url' => $mainUrl . '&view=post-offices', 'requires_active' => false],
+            ['id' => 'tracking', 'label' => 'پیگیری مرسوله', 'url' => $mainUrl . '&view=tracking', 'requires_active' => true],
+            ['id' => 'calculator', 'label' => 'ماشین‌حساب', 'url' => $mainUrl . '&view=calculator', 'requires_active' => true],
+            ['id' => 'post-offices', 'label' => 'مراکز تحویل', 'url' => $mainUrl . '&view=post-offices', 'requires_active' => true],
             ['id' => 'settings', 'label' => 'تنظیمات', 'url' => $mainUrl . '&view=settings', 'requires_active' => true],
         ];
 

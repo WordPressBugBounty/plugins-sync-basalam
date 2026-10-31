@@ -4,7 +4,7 @@ Tags: woocommerce, basalam, woosalam, integration
 Requires at least: 6.0  
 Tested up to: 7.0
 Requires PHP: 7.4 
-Stable tag: 1.10.39
+Stable tag: 1.10.41
 License: GPL-2.0-or-later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -146,6 +146,20 @@ API calls use HTTPS. Authenticated operations use the configured account and che
 1. تنظیمات اولیه افزونه در وردپرس
 
 == Changelog ==
+
+= 1.10.41 =
+* Preserve hyphens in variation option names, including SIM numbers and model names, instead of replacing them with spaces.
+* Retain existing variation ID matching when updating previously spaced option names.
+
+= 1.10.40 =
+* Show the SalamPay activation notice throughout admin; dismiss it per administrator for ten days without hiding it after activation-link clicks.
+* Keep the Basalam authorization warning outside WooSalam menu pages and support both classic and React WooCommerce payment settings.
+* Display saved product synchronization status for the current vendor without remote product-list probes.
+* Enforce SalamGate account access before remote actions, stop requests after account denial and back off unauthorized status synchronization.
+* Simplify the SalamGate introduction and improve account-check retry feedback for tools.
+* Add authenticated order counts and exact rial order totals for today, seven days, thirty days and all time, supporting legacy and HPOS storage.
+* Add vendor-scoped product links with signed cursor pagination for large catalogs.
+* Require explicit successful site-token validation and aggregate legacy order metadata without repeated per-order lookups.
 
 = 1.10.39 =
 * Save product, advanced and debug settings without reloading the page and confirm successful saves with a toast.

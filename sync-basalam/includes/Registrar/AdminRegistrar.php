@@ -207,11 +207,16 @@ class AdminRegistrar implements RegistrarInterface
             || self::isOrderAdminScreen($hook);
     }
 
-    private static function isPluginAdminPage($hook = ''): bool
+    public static function isPluginAdminPage($hook = ''): bool
     {
         $page = self::currentAdminPage();
 
         if ($page !== '' && in_array($page, self::pluginAdminPages(), true)) {
+            return true;
+        }
+
+        $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+        if ($screen && $screen->parent_base === 'sync_basalam') {
             return true;
         }
 
@@ -557,23 +562,6 @@ class AdminRegistrar implements RegistrarInterface
                 $version,
                 true
             );
-        }
-
-        $screen = get_current_screen();
-        if ($screen && $screen->id === 'edit-product') {
-            $connectionScript = syncBasalamPlugin()->pluginPath() . '/assets/js/product-connection-status.js';
-            wp_enqueue_script(
-                'basalam-product-connection-status',
-                self::assetsUrl('js/product-connection-status.js'),
-                [],
-                $version . '-' . filemtime($connectionScript),
-                true
-            );
-            wp_localize_script('basalam-product-connection-status', 'basalamProductConnectionStatus', [
-                'url' => admin_url('admin-ajax.php'),
-                'nonce' => wp_create_nonce('get_product_connection_status_nonce'),
-                'vendorId' => (string) syncBasalamSettings()->getSettings(\SyncBasalam\Admin\Settings\SettingsConfig::VENDOR_ID),
-            ]);
         }
 
         if ($isOrderScreen) {

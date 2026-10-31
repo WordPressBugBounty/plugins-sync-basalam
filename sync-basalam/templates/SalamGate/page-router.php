@@ -9,15 +9,14 @@ if (! defined('ABSPATH')) exit;
  */
 
 $router = \SyncBasalam\SalamGate\Admin\AccountStateRouter::class;
-$sgView = (string) ($data['view'] ?? '');
-$connectionUnavailable = in_array($data['state'] ?? '', ['not_connected', 'error_auth', 'error_forbidden'], true);
-$protectedView = in_array($sgView, ['send', 'settings', 'activation'], true);
-$siteDisabled = ($data['state'] ?? '') === 'disabled';
+$sgView = \SyncBasalam\SalamGate\Admin\PageChrome::viewForState(
+    (string) ($data['view'] ?? ''),
+    (string) ($data['state'] ?? 'loading')
+);
 $accountLoading = ($data['state'] ?? '') === 'loading';
-$requiresActiveAccount = in_array($sgView, ['send', 'settings'], true) && ($data['state'] ?? '') !== 'active';
-$loadView = !$siteDisabled && !$requiresActiveAccount && !((($connectionUnavailable || $accountLoading) && $protectedView))
-    && (in_array($sgView, ['send', 'settings', 'calculator', 'post-offices'], true)
-        || ($sgView === 'activation' && in_array($data['state'] ?? '', ['', 'not_registered'], true)));
+// Do not render tool controllers while account access is unknown or unavailable.
+// Direct URLs use the same dashboard state as the main menu, without extra API reads.
+$loadView = in_array($sgView, ['send', 'settings', 'calculator', 'post-offices', 'activation'], true);
 ?>
 <!-- WordPress relocates admin notices here, outside the SalamGate styling boundary. -->
 <hr class="wp-header-end">
@@ -29,11 +28,9 @@ $loadView = !$siteDisabled && !$requiresActiveAccount && !((($connectionUnavaila
             <?php include __DIR__ . '/partials/loading-region.php'; ?>
             <div data-sg-load-content inert>
         <?php endif; ?>
-        <?php if ($siteDisabled || (($connectionUnavailable || $accountLoading) && $protectedView) || $requiresActiveAccount) : ?>
-            <?php echo $router::renderStatePartial($data); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped — internal synthetic lock template ?>
-        <?php elseif (!empty($data['view'])) : ?>
+        <?php if ($sgView !== '') : ?>
             <?php
-            $viewTemplate = __DIR__ . '/states/view-' . $data['view'] . '.php';
+            $viewTemplate = __DIR__ . '/states/view-' . $sgView . '.php';
             if (file_exists($viewTemplate)) {
                 include $viewTemplate;
             }

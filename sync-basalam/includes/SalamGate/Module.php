@@ -158,15 +158,21 @@ final class Module
         wp_enqueue_script($handle, Paths::assetsUrl($relative), $dependencies, file_exists($file) ? (string) filemtime($file) : null, true);
     }
 
-    /** Reject stale shipping screens after a site opt-out; control/read-only probes remain available. */
+    /** Reject stale screens locally before their controllers can initialize any remote services. */
     public static function guardDisabledActions(): void
     {
-        if (!function_exists('wp_doing_ajax') || !wp_doing_ajax() || Services\SiteActivation::isEnabled()) return;
+        if (!function_exists('wp_doing_ajax') || !wp_doing_ajax()) return;
         $action = $_REQUEST['action'] ?? '';
-        if (!is_string($action) || !isset(self::ajaxCallbacks()[$action])
-            || in_array($action, ['salam_gate_site_activation', 'salam_gate_order_availability', 'salam_gate_refresh_shops'], true)) return;
-        wp_send_json_error(['message' => 'سلام‌گیت در این سایت غیرفعال است؛ ابتدا آن را از بخش ارسال مرسوله فعال کنید.',
-            'code' => 'site_disabled'], 409);
+        if (!is_string($action) || !isset(self::ajaxCallbacks()[$action])) return;
+        if (!Services\SiteActivation::isEnabled()) {
+            // Re-enabling performs its own explicit verification. The availability
+            // probe is cache-only; legacy refresh_shops is NOT an opt-out exception.
+            if (in_array($action, ['salam_gate_site_activation', 'salam_gate_order_availability'], true)) return;
+            wp_send_json_error(['message' => 'سلام‌گیت در این سایت غیرفعال است؛ ابتدا آن را از بخش ارسال مرسوله فعال کنید.',
+                'code' => 'site_disabled', 'kind' => 'validation', 'errors' => [], 'request_dispatched' => false], 409);
+            return;
+        }
+        Ajax\AccountAccess::guard($action);
     }
 
     /** Exact public/admin shipping action inventory; no anonymous mutation hooks. */

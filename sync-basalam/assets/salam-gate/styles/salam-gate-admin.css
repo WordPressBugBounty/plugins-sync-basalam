@@ -231,6 +231,7 @@
   border-color: #ffd8cc;
 }
 
+.salam-gate-page .sg-page-nav[hidden],
 .salam-gate-page .sg-page-nav__item[hidden] {
   display: none;
 }

@@ -18,6 +18,7 @@ final class Module
         if (!class_exists('WC_Payment_Gateway')) {
             return;
         }
+        AdminPromotion::register();
         // The standalone plugin keeps ownership until explicitly deactivated.
         // It shares settings, gateway ID, metadata and callback route with us.
         if (class_exists('Salampay_Plugin', false) || class_exists('WC_Gateway_Salampay', false)) {

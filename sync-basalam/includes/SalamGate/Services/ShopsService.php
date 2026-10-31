@@ -80,6 +80,7 @@ class ShopsService
                 throw $exception;
             }
             ShopCheckCache::clear($identity);
+            StatusSyncAccess::clear($identity);
             return $shops;
         } finally {
             OptionLock::release($lockKey, $lease);

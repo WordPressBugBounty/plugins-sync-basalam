@@ -8,6 +8,7 @@ use SyncBasalam\SalamGate\Contracts\ParcelViewNormalizer;
 use SyncBasalam\SalamGate\Order\BasalamParcelOrder;
 use SyncBasalam\SalamGate\Order\OrderContext;
 use SyncBasalam\SalamGate\SalamGateClient;
+use SyncBasalam\SalamGate\SalamGateException;
 use SyncBasalam\SalamGate\Utils\OptionLock;
 
 defined('ABSPATH') || exit;
@@ -40,10 +41,12 @@ final class StatusSyncService
     /** Fill missing sidebar metadata without replacing a newer known status. */
     public function syncMissingOrder(int $orderId, ?int $nativeId = null): bool
     {
+        if (StatusSyncAccess::snapshot()['reason'] !== '') return false;
         $root = $this->freshOrder($orderId);
         if (!$root) return false;
         $updated = false;
         foreach ($this->scopesFor($root) as $scope) {
+            if (StatusSyncAccess::snapshot()['reason'] !== '') break;
             if ($nativeId !== null && $scope['native_id'] !== $nativeId) continue;
             $updated = $this->syncMissingScope($scope['order'], $scope['native_id']) || $updated;
         }
@@ -52,6 +55,9 @@ final class StatusSyncService
 
     private function syncMissingScope($order, ?int $nativeId): bool
     {
+        $access = StatusSyncAccess::snapshot();
+        if ($access['reason'] !== '') return false;
+        $identity = $access['identity'];
         if (ParcelStatuses::isValid(ParcelService::positiveId($order->get_meta('_salam_gate_status')) ?? 0)) return false;
         $orderId = (int) $order->get_id();
         $expected = $this->identityFor($order);
@@ -65,12 +71,17 @@ final class StatusSyncService
         try {
             $client = ClientFactory::make();
             if ($client->token() === null) return false;
+            if (StatusSyncAccess::snapshot($identity)['reason'] !== '') return false;
+            ConnectionCache::assertCurrentIdentity($identity);
             $snapshot = $this->localSnapshot($order, $expected['parcel_id']);
             // An unavailable service must not receive another read on each sidebar render.
             set_transient($attemptKey, $expected['parcel_id'], 60);
             $response = $client->get(SalamGateClient::PATH_PARCELS, [
                 'ids' => [$expected['parcel_id']], 'market_name' => [$expected['market']], 'per_page' => 1,
             ]);
+            ConnectionCache::assertCurrentIdentity($identity);
+            if (ConnectionCache::responseIdentity($response, $identity) !== $identity
+                || StatusSyncAccess::snapshot($identity)['reason'] !== '') return false;
             $data = $response['body']['data'] ?? null;
             if (!is_array($data)) return false;
             $items = $this->indexItems($data);
@@ -94,6 +105,12 @@ final class StatusSyncService
             delete_transient($attemptKey);
             return true;
         } catch (\Throwable $exception) {
+            if ($exception instanceof SalamGateException && in_array($exception->getStatus(), [401, 403], true)) {
+                try {
+                    StatusSyncAccess::remember($exception, isset($client)
+                        ? ($client->lastRequestIdentityHash() ?? $identity) : $identity);
+                } catch (\Throwable $ignored) { /* A changed connection must not inherit this denial. */ }
+            }
             $this->logFailure('دریافت وضعیت اولیه مرسوله انجام نشد.', ['order_id' => $orderId]);
             return false;
         } finally {
@@ -109,6 +126,13 @@ final class StatusSyncService
             $stats['skipped'] = 'woocommerce_unavailable';
             return $stats;
         }
+        $access = StatusSyncAccess::snapshot();
+        if ($access['reason'] !== '') {
+            $stats['skipped'] = $access['reason'];
+            update_option(self::LAST_SYNC_KEY, ['ran_at' => time()] + $stats, false);
+            return $stats;
+        }
+        $connectionIdentity = $access['identity'];
         $lease = OptionLock::acquire(self::LOCK_KEY);
         if ($lease === null) {
             $stats['skipped'] = 'locked';
@@ -119,6 +143,12 @@ final class StatusSyncService
             $client = ClientFactory::make();
             if ($client->token() === null) {
                 $stats['skipped'] = 'no_token';
+                update_option(self::LAST_SYNC_KEY, ['ran_at' => time()] + $stats, false);
+                return $stats;
+            }
+            $reason = StatusSyncAccess::snapshot($connectionIdentity)['reason'];
+            if ($reason !== '') {
+                $stats['skipped'] = $reason;
                 update_option(self::LAST_SYNC_KEY, ['ran_at' => time()] + $stats, false);
                 return $stats;
             }
@@ -154,6 +184,11 @@ final class StatusSyncService
             }
 
             foreach (array_chunk(array_keys($ordersByParcel), 30) as $parcelIds) {
+                $reason = StatusSyncAccess::snapshot($connectionIdentity)['reason'];
+                if ($reason !== '') {
+                    $stats['skipped'] = $reason;
+                    break;
+                }
                 $renewed = OptionLock::renew(self::LOCK_KEY, $lease);
                 if ($renewed === null) {
                     $stats['skipped'] = 'lock_lost';
@@ -161,11 +196,22 @@ final class StatusSyncService
                 }
                 $lease = $renewed;
                 try {
+                    ConnectionCache::assertCurrentIdentity($connectionIdentity);
                     $response = $client->get(SalamGateClient::PATH_PARCELS, [
                         'ids' => $parcelIds,
                         'market_name' => [OrderContext::MARKET_BASALAM, OrderContext::MARKET_WEBSITE],
                         'per_page' => 30,
                     ]);
+                    ConnectionCache::assertCurrentIdentity($connectionIdentity);
+                    if (ConnectionCache::responseIdentity($response, $connectionIdentity) !== $connectionIdentity) {
+                        $stats['skipped'] = 'connection_changed';
+                        break;
+                    }
+                    $reason = StatusSyncAccess::snapshot($connectionIdentity)['reason'];
+                    if ($reason !== '') {
+                        $stats['skipped'] = $reason;
+                        break;
+                    }
                     $data = $response['body']['data'] ?? null;
                     if (!is_array($data)) {
                         throw new \RuntimeException('Invalid parcel-list envelope.');
@@ -183,6 +229,19 @@ final class StatusSyncService
                         $stats['failed'] += count($ordersByParcel[$parcelId]);
                     }
                     $this->logFailure('دریافت یک دسته از وضعیت مرسوله‌ها ناموفق بود.', ['parcel_count' => count($parcelIds)]);
+                    if ($exception instanceof SalamGateException && in_array($exception->getStatus(), [401, 403], true)) {
+                        $stats['skipped'] = 'authorization_failed';
+                        try {
+                            StatusSyncAccess::remember($exception, $client->lastRequestIdentityHash() ?? $connectionIdentity);
+                        } catch (\Throwable $ignored) {
+                            $stats['skipped'] = 'connection_changed';
+                        }
+                        break; // Never multiply a denied account read by the number of batches.
+                    }
+                    if (StatusSyncAccess::snapshot($connectionIdentity)['reason'] !== '') {
+                        $stats['skipped'] = StatusSyncAccess::snapshot($connectionIdentity)['reason'];
+                        break;
+                    }
                     continue;
                 }
 
@@ -191,6 +250,12 @@ final class StatusSyncService
                         $workflowKey = 'salam_gate_quote_workflow_' . $parcelId;
                         $workflowLease = null;
                         try {
+                            $reason = StatusSyncAccess::snapshot($connectionIdentity)['reason'];
+                            if ($reason !== '') {
+                                $stats['skipped'] = $reason;
+                                break 3;
+                            }
+                            ConnectionCache::assertCurrentIdentity($connectionIdentity);
                             // Foreground creation recovery, quote selection, edits and payment
                             // use this same lease. The batch lease alone cannot exclude them.
                             $workflowLease = OptionLock::acquire($workflowKey);
@@ -264,7 +329,7 @@ final class StatusSyncService
             }
 
             // Failed orders are retried next cycle; they never block all later orders.
-            if ($ids !== [] && $stats['skipped'] !== 'lock_lost') {
+            if ($ids !== [] && $stats['skipped'] === '') {
                 update_option(self::CURSOR_KEY, (int) end($ids), false);
             }
             // Retain diagnostics without emitting a routine INFO entry on every run.

@@ -15,7 +15,7 @@ defined('ABSPATH') || exit;
 
 class Plugin
 {
-    public const VERSION = '1.10.39';
+    public const VERSION = '1.10.41';
 
     public function __construct()
     {
@@ -61,12 +61,16 @@ class Plugin
         }
 
         if (!syncBasalamSettings()->hasToken()) {
-            add_action('admin_notices', function () {
-                if (!AdminRegistrar::isWoosalamRelatedAdminScreen()) return;
+            $accessNotice = static function () {
+                if (AdminRegistrar::isPluginAdminPage()) return;
+                if (doing_action('admin_notices') && \SyncBasalam\SalamPay\AdminPromotion::isPaymentScreen()) return;
 
                 $template = syncBasalamPlugin()->templatePath("notifications/AccessAlert.php");
                 require_once($template);
-            });
+            };
+            add_action('admin_notices', $accessNotice);
+            // React payment settings suppress the regular admin notices.
+            add_action('woocommerce_settings_checkout', $accessNotice, 6);
         }
         add_action('admin_notices', function () {
             if (!AdminRegistrar::isWoosalamRelatedAdminScreen()) return;
