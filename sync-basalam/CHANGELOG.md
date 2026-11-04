@@ -2,6 +2,21 @@
 
 <details>
 
+<summary>1.10.42 - 2026-11-04</summary>
+
+### Changed
+
+- Use the v4 embedding endpoint for automatic product category detection, preserving ranked category paths and titles.
+- Include current master fixes for OAuth credential storage without a vendor and shared SalamGate consent scopes.
+
+### Fixed
+
+- Encode product titles once at the category API boundary so Persian text, ampersands, plus signs and percent characters reach the classifier unchanged.
+
+</details>
+
+<details>
+
 <summary>1.10.41 - 2026-10-31</summary>
 
 ### Fixed

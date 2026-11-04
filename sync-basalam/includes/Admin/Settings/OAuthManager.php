@@ -215,16 +215,9 @@ class OAuthManager
         // Allow pro version to handle custom fields
         $extraData = apply_filters('sync_basalam_oauth_save_extra_data', []);
 
-        if ($isVendor == 'false') {
-            $data = [SettingsConfig::IS_VENDOR => false];
-            $data = apply_filters('sync_basalam_oauth_non_vendor_data', $data, $vendorId, $accessToken, $refreshToken, $extraData);
-            SettingsManager::updateSettings($data);
-            return true;
-        }
-
         $data = [
             SettingsConfig::VENDOR_ID         => $vendorId,
-            SettingsConfig::IS_VENDOR         => $isVendor,
+            SettingsConfig::IS_VENDOR         => $isVendor == 'false' ? false : $isVendor,
             SettingsConfig::TOKEN             => $accessToken,
             SettingsConfig::REFRESH_TOKEN     => $refreshToken,
             SettingsConfig::HAMSALAM_TOKEN => $hamsalamToken,
@@ -233,6 +226,12 @@ class OAuthManager
         ];
 
         $data = array_merge($data, $extraData);
+
+        // Both vendor and non-vendor callbacks carry the current account's
+        // Basalam credentials and v1 Hamsalam session/business identifiers.
+        if ($isVendor == 'false') {
+            $data = apply_filters('sync_basalam_oauth_non_vendor_data', $data, $vendorId, $accessToken, $refreshToken, $extraData);
+        }
 
         SettingsManager::updateSettings($data);
 
@@ -244,7 +243,7 @@ class OAuthManager
         $oauthData = $this->getOauthData();
         $siteUrl = get_site_url();
 
-        $scopes = apply_filters('sync_basalam_oauth_scopes', "vendor.product.write vendor.product.read vendor.parcel.write customer.profile.read vendor.profile.read vendor.parcel.read vendor.profile.write vendor.financial.read vendor.financial.write customer.chat.read customer.chat.write customer.identity.read");
+        $scopes = apply_filters('sync_basalam_oauth_scopes', "vendor.product.write vendor.product.read vendor.parcel.write customer.profile.read vendor.profile.read vendor.parcel.read vendor.profile.write vendor.financial.read vendor.financial.write customer.chat.read customer.chat.write customer.identity.read vendor.salamgate.read vendor.salamgate.write");
 
         return [
             'redirect_uri' => $oauthData['redirect_uri'],

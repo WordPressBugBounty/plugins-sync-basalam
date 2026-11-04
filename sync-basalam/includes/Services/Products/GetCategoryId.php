@@ -15,7 +15,7 @@ class GetCategoryId
     {
         $apiservice = syncBasalamContainer()->get(ApiServiceManager::class);
 
-        $url = Endpoints::CATEGORY_DETECT . '?title=' . $productTitle;
+        $url = Endpoints::CATEGORY_DETECT . '?title=' . rawurlencode($productTitle);
 
         try {
             $result = $apiservice->get($url, []);

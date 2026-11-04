@@ -40,8 +40,8 @@ final class Endpoints
     /** GET vendor information — sprintf($url, $vendorId) */
     const VENDOR_INFO = self::OPENAPI_BASE . '/v1/vendors/%d';
 
-    /** GET category-detection prediction — append encoded title as query param */
-    const CATEGORY_DETECT = self::CATEGORY_BASE . '/category_detection/api_v2.0/predict/';
+    /** GET v4 embedding prediction — append a URL-encoded title query parameter */
+    const CATEGORY_DETECT = self::CATEGORY_BASE . '/category_detection/api_v4.0/predict/embedding/';
 
     /** POST initialize a product media upload */
     const MEDIA_UPLOAD_REQUEST = self::UPLOAD_BASE . '/v3/media/upload-request';

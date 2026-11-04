@@ -48,7 +48,7 @@ class CategoryService
         if (!empty($suffix)) $productTitle = $productTitle . ' ' . $suffix;
 
         $productTitle = mb_substr($productTitle, 0, 120);
-        $detectedCategories = GetCategoryId::getCategoryIdFromBasalam(urlencode($productTitle), 'multi', false, true);
+        $detectedCategories = GetCategoryId::getCategoryIdFromBasalam($productTitle, 'multi', false, true);
 
         $detectedCategories = $this->normalizeCategoryIds(is_array($detectedCategories) ? $detectedCategories : []);
 

@@ -4,7 +4,7 @@ Tags: woocommerce, basalam, woosalam, integration
 Requires at least: 6.0  
 Tested up to: 7.0
 Requires PHP: 7.4 
-Stable tag: 1.10.41
+Stable tag: 1.10.42
 License: GPL-2.0-or-later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -146,6 +146,11 @@ API calls use HTTPS. Authenticated operations use the configured account and che
 1. تنظیمات اولیه افزونه در وردپرس
 
 == Changelog ==
+
+= 1.10.42 =
+* Use the v4 embedding API for automatic product category detection.
+* Preserve Persian titles and special characters in category prediction requests.
+* Include the latest OAuth credential storage and shared SalamGate consent scopes.
 
 = 1.10.41 =
 * Preserve hyphens in variation option names, including SIM numbers and model names, instead of replacing them with spaces.

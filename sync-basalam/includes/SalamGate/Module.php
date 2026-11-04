@@ -32,7 +32,7 @@ final class Module
         self::$ownsShipping = true;
         add_action('sync_basalam_after_register_menus', [Admin\Menus::class, 'register'], 11);
         foreach ([Admin\AccountStateRouter::class, Admin\HelpContent::class,
-            Admin\ConnectionGate::class, Auth\OAuthScopes::class, Order\BasalamOrderProducts::class,
+            Admin\ConnectionGate::class, Order\BasalamOrderProducts::class,
             StatusSyncScheduler::class, Admin\OrderMetabox::class, Admin\OrderShippingStatus::class,
             Admin\OrderBulkActions::class] as $registrar) {
             $registrar::register();
