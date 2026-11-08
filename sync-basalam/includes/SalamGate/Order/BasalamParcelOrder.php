@@ -7,7 +7,6 @@ use SyncBasalam\SalamGate\Utils\OptionLock;
 use SyncBasalam\SalamGate\Services\ConnectionCache;
 
 defined('ABSPATH') || exit;
-require_once __DIR__ . '/BasalamParcelOrderItem.php';
 
 /** Shipping-only view: one real native parcel, never another Woo order or financial line. */
 final class BasalamParcelOrder
@@ -20,8 +19,6 @@ final class BasalamParcelOrder
 
     public static function open(\WC_Order $root, int $nativeId): self
     {
-        require_once __DIR__ . '/BasalamParcelSet.php';
-        require_once dirname(__DIR__) . '/Utils/OptionLock.php';
         $connection = ConnectionCache::identityHash();
         $snapshot = BasalamParcelSet::load($root, $nativeId);
         $key = 'salam_gate_native_registry_' . (int) $root->get_id();
@@ -202,11 +199,22 @@ final class BasalamParcelOrder
         if ($note !== '') { $this->add_order_note($note); }
     }
 
-    public function __call($method, $arguments)
-    {
-        if (strpos($method, 'get_') === 0) { return $this->root->$method(...$arguments); }
-        throw self::error('عملیات تغییر سفارش اصلی از مسیر مرسوله مجاز نیست.');
-    }
+    public function get_currency() { return $this->root->get_currency(); }
+    public function get_status() { return $this->root->get_status(); }
+    public function get_type() { return $this->root->get_type(); }
+    public function get_order_number() { return $this->root->get_order_number(); }
+    public function get_edit_order_url() { return $this->root->get_edit_order_url(); }
+    public function get_shipping_first_name() { return $this->root->get_shipping_first_name(); }
+    public function get_shipping_last_name() { return $this->root->get_shipping_last_name(); }
+    public function get_shipping_address_1() { return $this->root->get_shipping_address_1(); }
+    public function get_shipping_address_2() { return $this->root->get_shipping_address_2(); }
+    public function get_shipping_city() { return $this->root->get_shipping_city(); }
+    public function get_shipping_state() { return $this->root->get_shipping_state(); }
+    public function get_shipping_postcode() { return $this->root->get_shipping_postcode(); }
+    public function get_shipping_phone() { return $this->root->get_shipping_phone(); }
+    public function get_shipping_methods() { return $this->root->get_shipping_methods(); }
+    public function get_formatted_shipping_full_name() { return $this->root->get_formatted_shipping_full_name(); }
+    public function get_formatted_billing_full_name() { return $this->root->get_formatted_billing_full_name(); }
 
     private function key(string $suffix): string { return '_salam_gate_bp_' . $this->nativeId . '_' . $suffix; }
     private function isStateKey(string $key): bool { return strpos($key, '_salam_gate_') === 0 || $key === '_basalam_order_tracking_code'; }

@@ -8,7 +8,7 @@ use SyncBasalam\SalamGate\Utils\Digits;
 defined('ABSPATH') || exit;
 
 /**
- * تنظیمات قابلیت سلام‌گیت افزونه پرو (option مستقل از تنظیمات پلاگین پایه).
+ * تنظیمات قابلیت سلام‌گیت ووسلام (option مستقل از تنظیمات عمومی افزونه).
  */
 class SalamGateSettings
 {

@@ -29,20 +29,20 @@ class ParcelsListActions
         $id = ParcelService::positiveId($_POST['parcel_id'] ?? null);
         $confirm = $_POST['confirm'] ?? null;
         if ($id === null || !in_array($confirm, ['0', '1'], true)) {
-            wp_send_json_error(['message' => 'درخواست لغو مرسوله معتبر نیست.', 'request_dispatched' => false], 422);
+            ResponseBoundary::error(['message' => 'درخواست لغو مرسوله معتبر نیست.', 'request_dispatched' => false], 422);
             return;
         }
         try {
             $result = (new \SyncBasalam\SalamGate\Services\ParcelCancellationService())->run($id, $confirm === '1');
         } catch (SalamGateException $exception) {
-            wp_send_json_error(['message' => $exception->firstMessage(), 'request_dispatched' => false], 422);
+            ResponseBoundary::error(['message' => $exception->firstMessage(), 'request_dispatched' => false], 422);
             return;
         } catch (\Throwable $exception) {
-            wp_send_json_error(['message' => 'بررسی لغو کامل نشد؛ وضعیت مرسوله را دوباره بررسی کنید.', 'code' => 'cancel_review'], 422);
+            ResponseBoundary::error(['message' => 'بررسی لغو کامل نشد؛ وضعیت مرسوله را دوباره بررسی کنید.', 'code' => 'cancel_review'], 422);
             return;
         }
         // The service releases its lease before wp_send_json terminates PHP.
-        wp_send_json_success($result);
+        ResponseBoundary::success($result);
     }
 
     public static function parcelsList(): void
@@ -60,9 +60,9 @@ class ParcelsListActions
         ];
 
         try {
-            wp_send_json_success((new ParcelsListService())->list($filters));
+            ResponseBoundary::success((new ParcelsListService())->list($filters));
         } catch (SalamGateException $exception) {
-            wp_send_json_error(['message' => $exception->firstMessage()]);
+            ResponseBoundary::error(['message' => $exception->firstMessage()]);
         }
     }
 
@@ -75,7 +75,7 @@ class ParcelsListActions
 
         $parcelId = isset($_POST['parcel_id']) ? (int) $_POST['parcel_id'] : 0;
         if ($parcelId <= 0) {
-            wp_send_json_error(['message' => 'شناسه مرسوله نامعتبر است.']);
+            ResponseBoundary::error(['message' => 'شناسه مرسوله نامعتبر است.']);
             return;
         }
 
@@ -83,14 +83,14 @@ class ParcelsListActions
             $response = ClientFactory::make()->get(sprintf(SalamGateClient::PATH_PARCELS . '/%d', $parcelId));
             $detail = is_array($response['body'] ?? null) ? $response['body'] : [];
 
-            wp_send_json_success([
+            ResponseBoundary::success([
                 // خروجی detail فیلدهای tracking/invoice/market ندارد — adapter مستقل، بدون جعل مقدار.
                 'parcel' => ParcelsListService::normalizeDetail($detail),
                 'detail' => $detail,
                 'tracking_provider' => 'post',
             ]);
         } catch (SalamGateException $exception) {
-            wp_send_json_error(['message' => $exception->firstMessage()]);
+            ResponseBoundary::error(['message' => $exception->firstMessage()]);
         }
     }
 
@@ -107,7 +107,7 @@ class ParcelsListActions
                 if ((!is_int($parcelId) && !is_string($parcelId))
                     || !preg_match('/^[1-9]\d*$/D', (string) $parcelId)
                     || filter_var($parcelId, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) === false) {
-                    wp_send_json_error(['message' => 'شناسه مرسوله نامعتبر است.', 'request_dispatched' => false]);
+                    ResponseBoundary::error(['message' => 'شناسه مرسوله نامعتبر است.', 'request_dispatched' => false]);
                 }
                 $parcelIds[] = (int) $parcelId;
             }
@@ -115,10 +115,10 @@ class ParcelsListActions
         $parcelIds = array_values(array_unique($parcelIds));
 
         if (count($parcelIds) === 0) {
-            wp_send_json_error(['message' => 'هیچ مرسوله‌ای انتخاب نشده است.', 'request_dispatched' => false]);
+            ResponseBoundary::error(['message' => 'هیچ مرسوله‌ای انتخاب نشده است.', 'request_dispatched' => false]);
         }
         if (count($parcelIds) > 100) {
-            wp_send_json_error(['message' => 'در هر درخواست حداکثر ۱۰۰ مرسوله را انتخاب کنید.', 'request_dispatched' => false]);
+            ResponseBoundary::error(['message' => 'در هر درخواست حداکثر ۱۰۰ مرسوله را انتخاب کنید.', 'request_dispatched' => false]);
         }
 
         $template = isset($_POST['template']) ? sanitize_text_field(wp_unslash($_POST['template'])) : '';
@@ -162,12 +162,12 @@ class ParcelsListActions
                     : ($unfinished !== []
                         ? 'فرایند پرداخت و تکمیل ارسال مرسوله انجام نشده است؛ پس از پرداخت موفق و صدور کد رهگیری، برچسب را چاپ کنید.'
                         : 'ثبت ارسال و صدور کد رهگیری این مرسوله تأیید نشد یا رسید آن ابطال شده است؛ وضعیت را دوباره بررسی کنید.');
-                wp_send_json_error(['message' => $message, 'code' => 'label_not_ready', 'request_dispatched' => false]);
+                ResponseBoundary::error(['message' => $message, 'code' => 'label_not_ready', 'request_dispatched' => false]);
             }
             $requestDispatched = true;
-            wp_send_json_success((new ParcelService())->getLabelUrl($parcelIds, $template));
+            ResponseBoundary::success((new ParcelService())->getLabelUrl($parcelIds, $template));
         } catch (SalamGateException $exception) {
-            wp_send_json_error(['message' => self::mapLabelError($exception), 'request_dispatched' => $requestDispatched]);
+            ResponseBoundary::error(['message' => self::mapLabelError($exception), 'request_dispatched' => $requestDispatched]);
         }
     }
 
@@ -181,13 +181,13 @@ class ParcelsListActions
         $rawRequestId = $_POST['request_id'] ?? 0;
         $requestId = in_array($rawRequestId, [0, '0', ''], true) ? 0 : ParcelService::positiveId($rawRequestId);
         if ($requestId === null) {
-            wp_send_json_error(['message' => 'شناسه درخواست برچسب معتبر نیست.']);
+            ResponseBoundary::error(['message' => 'شناسه درخواست برچسب معتبر نیست.']);
         }
 
         try {
-            wp_send_json_success((new ParcelService())->getLabelStatus($requestId));
+            ResponseBoundary::success((new ParcelService())->getLabelStatus($requestId));
         } catch (SalamGateException $exception) {
-            wp_send_json_error(['message' => self::mapLabelError($exception)]);
+            ResponseBoundary::error(['message' => self::mapLabelError($exception)]);
         }
     }
 
@@ -198,7 +198,7 @@ class ParcelsListActions
         $request = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'POST') === 'GET' ? $_GET : $_POST;
         self::guard($request);
         $requestId = ParcelService::positiveId($request['request_id'] ?? null);
-        if ($requestId === null) { wp_send_json_error(['message'=>'شناسه فایل برچسب معتبر نیست.'], 422); }
+        if ($requestId === null) { ResponseBoundary::error(['message'=>'شناسه فایل برچسب معتبر نیست.'], 422); }
         try {
             $bytes = \SyncBasalam\SalamGate\Services\LabelPreviewService::read($requestId);
             nocache_headers();
@@ -208,7 +208,7 @@ class ParcelsListActions
             echo $bytes;
             exit;
         } catch (SalamGateException $exception) {
-            wp_send_json_error(['message'=>$exception->firstMessage()], 422);
+            ResponseBoundary::error(['message'=>$exception->firstMessage()], 422);
         }
     }
 
@@ -228,7 +228,7 @@ class ParcelsListActions
         $toJ = self::parseJalaliDate(Digits::toEnglish($post('to_jalali')));
 
         if ($fromJ === null || $toJ === null) {
-            wp_send_json_error(['message' => 'بازه تاریخ را کامل انتخاب کنید (از تاریخ / تا تاریخ).', 'request_dispatched' => false]);
+            ResponseBoundary::error(['message' => 'بازه تاریخ را کامل انتخاب کنید (از تاریخ / تا تاریخ).', 'request_dispatched' => false]);
         }
 
         // جلالی → میلادی ISO با تهران +03:30
@@ -236,7 +236,7 @@ class ParcelsListActions
         $toIso = self::jalaliToTehranIso($toJ['y'], $toJ['m'], $toJ['d'], '23:59:59');
 
         if ($fromIso === null || $toIso === null || $fromIso > $toIso) {
-            wp_send_json_error(['message' => 'بازه تاریخ نامعتبر است (از باید قبل از تا باشد).', 'request_dispatched' => false]);
+            ResponseBoundary::error(['message' => 'بازه تاریخ نامعتبر است (از باید قبل از تا باشد).', 'request_dispatched' => false]);
         }
 
         // بازارهای scope صفحه — فقط بازارهای انتخابی در فیلتر (مرسوله باسلام ناخواسته وارد نمی‌شود)
@@ -258,60 +258,8 @@ class ParcelsListActions
             $template = 'invoice';
         }
 
-        $requestDispatched = false;
-        try {
-            // Resolve the date range to verified, completed shipments before generating any label.
-            // API date ranges use updated_at (the registration/payment update), not draft creation.
-            $ids = self::registeredIdsByDate($fromIso, $toIso, $markets);
-            if ($ids === []) {
-                wp_send_json_error(['message' => 'در این بازه مرسوله‌ای با پرداخت و ثبت ارسال کامل پیدا نشد.', 'code' => 'label_not_ready', 'request_dispatched' => false]);
-            }
-            $requestDispatched = true;
-            wp_send_json_success((new ParcelService())->getLabelUrl($ids, $template));
-        } catch (SalamGateException $exception) {
-            wp_send_json_error(['message' => self::mapLabelError($exception), 'request_dispatched' => $requestDispatched]);
-        }
-    }
-
-    /** Paginate within the authenticated account; no browser-provided account identifiers. */
-    private static function registeredIdsByDate(string $fromIso, string $toIso, array $markets): array
-    {
-        $query = ParcelsListService::buildListQuery(['market_name' => $markets, 'sort' => 'desc']);
-        $from = strtotime($fromIso);
-        $to = strtotime($toIso);
-        $ids = [];
-        $seen = [];
-        for ($page = 0; $page < 50; ++$page) {
-            $response = ClientFactory::make()->get(SalamGateClient::PATH_PARCELS, $query);
-            $body = $response['body'] ?? null;
-            if (!is_array($body) || !is_array($body['data'] ?? null)) {
-                throw new SalamGateException('فهرست مرسولات برای چاپ تأیید نشد؛ دوباره تلاش کنید.', 200, [], SalamGateException::KIND_UNEXPECTED_RESPONSE);
-            }
-            foreach ($body['data'] as $parcel) {
-                if (!is_array($parcel) || !LabelEligibility::validListShape($parcel)) {
-                    throw new SalamGateException('فهرست مرسولات برای چاپ تأیید نشد؛ دوباره تلاش کنید.', 200, [], SalamGateException::KIND_UNEXPECTED_RESPONSE);
-                }
-                if (!LabelEligibility::canPrintListItem($parcel)) { continue; }
-                $updated = $parcel['updated_at'] ?? null;
-                $stamp = is_string($updated) ? strtotime($updated) : false;
-                if ($stamp === false) {
-                    throw new SalamGateException('تاریخ مرسوله برای چاپ تأیید نشد؛ دوباره بررسی کنید.', 200, [], SalamGateException::KIND_UNEXPECTED_RESPONSE);
-                }
-                if ( $stamp >= $from && $stamp <= $to) {
-                    $ids[] = (int) $parcel['id'];
-                    if (count(array_unique($ids)) > 100) {
-                        throw new SalamGateException('این بازه بیش از ۱۰۰ مرسوله دارد؛ بازه تاریخ را کوتاه‌تر کنید.', 422);
-                    }
-                }
-            }
-            $next = $body['next_cursor'] ?? null;
-            if (!is_string($next) || $next === '') { return array_values(array_unique($ids)); }
-            if (isset($seen[$next])) { break; }
-            $seen[$next] = true;
-            $query['cursor'] = $next;
-        }
-        // Never send a silently truncated label batch if the source pagination is incomplete.
-        throw new SalamGateException('بازه چاپ به طور کامل بررسی نشد؛ بازه تاریخ را کوتاه‌تر کنید و دوباره تلاش کنید.', 422);
+        ActionResponder::run(static fn (): array => (new \SyncBasalam\SalamGate\Application\DateLabelJob())->step(
+            $fromIso, $toIso, $markets, $template, $post('generate') === '1'));
     }
 
     /**
@@ -371,15 +319,6 @@ class ParcelsListActions
 
     private static function guard(?array $request = null): void
     {
-        if (!current_user_can('manage_woocommerce')) {
-            wp_send_json_error(['message' => 'دسترسی غیرمجاز!'], 403);
-        }
-
-        $request ??= $_POST;
-        $nonce = is_string($request['_wpnonce'] ?? null) ? sanitize_text_field(wp_unslash($request['_wpnonce'])) : '';
-
-        if (!wp_verify_nonce($nonce, 'basalam_pro_nonce')) {
-            wp_send_json_error(['message' => 'دسترسی غیرمجاز!'], 403);
-        }
+        ActionGuard::forController(self::class, $request);
     }
 }

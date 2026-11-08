@@ -4,6 +4,8 @@ namespace SyncBasalam\SalamGate;
 
 use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Admin\Settings\OAuthTokenRefresher;
+use SyncBasalam\SalamGate\Contracts\Endpoints;
+use SyncBasalam\SalamGate\Infrastructure\HttpIdentity;
 
 defined('ABSPATH') || exit;
 
@@ -111,9 +113,13 @@ class SalamGateClient
      */
     private function request(string $method, string $path, ?array $body, array $query, bool $withAuth = true): array
     {
-        // A failed read has no uncertain mutation to reconcile. The public
-        // calculator uses POST for an estimate but does not register or pay.
-        $readOnly = $method === 'GET' || ($method === 'POST' && $path === self::PATH_CALCULATOR);
+        $endpoint = Endpoints::resolve($method, $path);
+        if ($endpoint === null || $endpoint['auth'] === Endpoints::AUTH_CLIENT
+            || (!$withAuth && $endpoint['auth'] !== Endpoints::AUTH_PUBLIC)) {
+            throw new SalamGateException('مسیر درخواست سلام‌گیت مجاز نیست.', 422, [], SalamGateException::KIND_VALIDATION, true);
+        }
+        $withAuth = $endpoint['auth'] !== Endpoints::AUTH_PUBLIC;
+        $readOnly = !$endpoint['side_effects'];
         if (!$readOnly) Services\SiteActivation::assertEnabled();
         $token = $withAuth ? $this->token() : null;
         $this->lastRequestIdentityHash = $withAuth && $token !== null ? substr(sha1($token), 0, 12) : null;
@@ -138,7 +144,7 @@ class SalamGateClient
         $headers = [
             'Content-Type' => 'application/json',
             'Accept'       => 'application/json',
-            'User-Agent'   => 'Woosalam-Pro',
+            'User-Agent'   => HttpIdentity::userAgent(),
         ];
 
         if ($withAuth) {
@@ -166,9 +172,8 @@ class SalamGateClient
         // Let the payment owner retain its durable guard; a later read can renew
         // OAuth and reconcile the result without dispatching another payment.
         // Cancellation includes a refund; neither debit nor refund may be replayed by OAuth.
-        $paymentWrite = $method === 'POST' && preg_match('#^/v1/parcels/[1-9][0-9]*/(?:pay|cancel)$#D', $path) === 1;
         if (!is_wp_error($response) && $withAuth
-            && !$paymentWrite
+            && $endpoint['replay_safe']
             && (int) wp_remote_retrieve_response_code($response) === 401
             && class_exists(OAuthTokenRefresher::class)) {
             $freshToken = OAuthTokenRefresher::refresh($token);
@@ -215,7 +220,7 @@ class SalamGateClient
 
         if ($code >= 200 && $code < 300) {
             $noLabelRequest = $decoded === null && json_last_error() === JSON_ERROR_NONE
-                && $method === 'GET' && $path === self::PATH_GENERATE_LABEL
+                && $endpoint['latest_label_nullable']
                 && !array_key_exists('request_id', $query);
             if ($noLabelRequest) {
                 // The latest-label lookup explicitly returns JSON null when
@@ -223,16 +228,7 @@ class SalamGateClient
                 // a known request ID, a label POST or an empty/malformed body.
                 return ['success' => true, 'code' => $code, 'body' => [], 'no_label_request' => true];
             }
-            if ($decoded === null && json_last_error() === JSON_ERROR_NONE
-                && $method === 'GET'
-                && preg_match('#^/v1/providers/[1-9][0-9]*(?:/(?:locations|nodes))?$#D', $path)) {
-                // نبود پوشش/مرکز طبق OpenAPI با JSON null پاسخ داده می‌شود.
-                $decoded = [];
-            }
-            if ($decoded === null && json_last_error() === JSON_ERROR_NONE && $method === 'GET'
-                && preg_match('#^/v1/tracking/[0-9]{24}$#D', $path)) {
-                // The public tracking contract is nullable when no events exist.
-                // Empty/HTML responses and redirects remain genuine failures.
+            if ($decoded === null && json_last_error() === JSON_ERROR_NONE && $endpoint['nullable_response']) {
                 $decoded = [];
             }
             if (!is_array($decoded)) {

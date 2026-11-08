@@ -25,7 +25,7 @@ final class Endpoints
      */
     public static function all(): array
     {
-        return [
+        $definitions = [
             'locations.list' => ['method' => 'GET', 'path' => '/v1/locations', 'auth' => self::AUTH_PUBLIC, 'side_effects' => false],
             'box_types.list' => ['method' => 'GET', 'path' => '/v1/parcels/box-types', 'auth' => self::AUTH_PUBLIC, 'side_effects' => false],
             'calculator.estimate' => ['method' => 'POST', 'path' => '/v1/base/calculator', 'auth' => self::AUTH_PUBLIC, 'side_effects' => false, 'note' => 'بدون hash/selected — برآورد بدون مرسوله'],
@@ -68,6 +68,33 @@ final class Endpoints
             'market_parcel.payment_query' => ['method' => 'POST', 'path' => '/v1/markets/{market_name}/parcels/{external_id}/payments', 'auth' => self::AUTH_CLIENT, 'side_effects' => false, 'note' => 'ادغام سمت سرور — از افزونه استفاده نمی‌شود'],
             'payments.*' => ['method' => '-', 'path' => '/v1/payments/...', 'auth' => self::AUTH_CLIENT, 'side_effects' => false, 'note' => 'در router سرویس سوار نشده — قابل اتکا نیست'],
         ];
+        foreach ($definitions as $key => &$definition) {
+            // Replay after an authentication rejection is independent of the HTTP verb.
+            $definition['replay_safe'] = !$definition['side_effects'];
+            $definition['nullable_response'] = in_array($key, ['providers.show', 'providers.locations', 'providers.nodes', 'tracking.public'], true);
+            $definition['latest_label_nullable'] = $key === 'parcels.label_status';
+        }
+        unset($definition);
+        return $definitions;
+    }
+
+    /** Resolve exact paths before parameterized paths (e.g. generate-label before {id}). */
+    public static function resolve(string $method, string $path): ?array
+    {
+        $definitions = self::all();
+        foreach ([false, true] as $parameterized) {
+            foreach ($definitions as $key => $definition) {
+                if ($definition['method'] !== $method || (strpos($definition['path'], '{') !== false) !== $parameterized) { continue; }
+                $pattern = preg_quote($definition['path'], '#');
+                $pattern = preg_replace_callback('/\\\\\{([a-z_]+)\\\\\}/', static function (array $match): string {
+                    if ($match[1] === 'tracking_code') { return '[0-9]{24}'; }
+                    if ($match[1] === 'market_name') { return '[a-z][a-z0-9_-]*'; }
+                    return '[1-9][0-9]*';
+                }, $pattern);
+                if (preg_match('#^' . $pattern . '$#D', $path)) { return ['key' => $key] + $definition; }
+            }
+        }
+        return null;
     }
 
     public static function meta(string $key): ?array

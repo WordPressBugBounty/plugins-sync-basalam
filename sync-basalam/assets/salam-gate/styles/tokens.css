@@ -1,0 +1,16 @@
+/* Shared design tokens; page rules consume them without redefining them. */
+:root {
+  --sg-font-body: "PelakFA", Tahoma, sans-serif;
+  --sg-font-heading: "Morabba", "PelakFA", Tahoma, sans-serif;
+}
+
+.salam-gate-page {
+  --sg-accent: var(--basalam-primary-color, #ff5c35);
+  --sg-accent-hover: var(--basalam-primary-hover, #e54e2a);
+  --sg-text: var(--basalam-gray-800, #2d3748);
+  --sg-muted: var(--basalam-gray-700, #4a5568);
+  --sg-border: var(--basalam-gray-300, #e2e8f0);
+  --sg-surface-soft: var(--basalam-gray-100, #f7fafc);
+  --sg-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --sg-select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%234a5568' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}

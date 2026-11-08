@@ -15,9 +15,6 @@ use SyncBasalam\SalamGate\Utils\Digits;
 
 defined('ABSPATH') || exit;
 
-require_once __DIR__ . '/../Order/BasalamShippingPreflight.php';
-require_once __DIR__ . '/../Order/BasalamOrderProducts.php';
-
 /** Real vendor orders only; selection never creates, charges, or posts a remote parcel. */
 final class BasalamOrdersService
 {
@@ -207,7 +204,6 @@ final class BasalamOrdersService
         // A stale local item set or an old parcel association cannot bypass the existing order guards.
         // Native selections always carry an explicit parcel identity. Existing
         // one-parcel orders retain their legacy repair path until first scoped send.
-        require_once __DIR__ . '/../Order/BasalamParcelOrder.php';
         if ($nativeScope || BasalamParcelOrder::hasScopes($order)) {
             $scope = BasalamParcelOrder::open($order, $selectedParcelId);
             BasalamShippingPreflight::check($scope);

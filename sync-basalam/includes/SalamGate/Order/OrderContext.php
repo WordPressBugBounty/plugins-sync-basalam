@@ -4,8 +4,6 @@ namespace SyncBasalam\SalamGate\Order;
 
 defined('ABSPATH') || exit;
 
-require_once __DIR__ . '/WebsiteOrderIdentity.php';
-
 /**
  * کانتکست بازار سفارش: بسالم (از جدول payments) یا وب‌سایت خودت.
  */
@@ -13,6 +11,14 @@ class OrderContext
 {
     public const MARKET_BASALAM = 'basalam';
     public const MARKET_WEBSITE = 'website';
+
+    public static function shipment(object $order): ShipmentOrderPort
+    {
+        if ($order instanceof ShipmentOrderPort) return $order;
+        if ($order instanceof BasalamParcelOrder) return new BasalamParcelAdapter($order);
+        if ($order instanceof \WC_Order) return new WooOrderAdapter($order);
+        throw new \TypeError('Unsupported shipment source.');
+    }
 
     /** Preserve the WC_Order|BasalamParcelOrder contract without PHP 8 union syntax. */
     public static function assertSupportedOrder(object $order): void

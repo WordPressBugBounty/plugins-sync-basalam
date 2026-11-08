@@ -65,15 +65,6 @@ final class PaymentRejection
             || !PayMethods::isValidParcelMethodForMarket($method, $baseline['market'])) {
             return false;
         }
-        $expected = [
-            PayMethods::PARCEL_VENDOR_BALANCE => ['vendor_balance', 'تراز غرفه کافی نیست.'],
-            PayMethods::PARCEL_WALLET => ['user_wallet', 'موجودی کیف پول کافی نیست.'],
-        ][$method] ?? null;
-        $errors = $exception->getErrors();
-        if ($expected === null || count($errors) !== 1
-            || $errors[0]['location'] !== $expected[0] || trim($errors[0]['message']) !== $expected[1]) {
-            return false;
-        }
-        return true;
+        return \SyncBasalam\SalamGate\Contracts\UpstreamFailure::insufficientBalance($exception, $method);
     }
 }

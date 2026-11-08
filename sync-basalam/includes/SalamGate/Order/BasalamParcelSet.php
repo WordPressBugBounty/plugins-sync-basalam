@@ -8,9 +8,6 @@ use SyncBasalam\SalamGate\Services\ConnectionCache;
 
 defined('ABSPATH') || exit;
 
-require_once __DIR__ . '/BasalamOrderContext.php';
-require_once __DIR__ . '/BasalamOrderState.php';
-
 /** Authenticated native parcel discovery; never imports, allocates, creates or pays. */
 final class BasalamParcelSet
 {

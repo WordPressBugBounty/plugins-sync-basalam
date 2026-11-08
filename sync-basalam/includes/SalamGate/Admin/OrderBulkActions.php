@@ -15,7 +15,6 @@ use SyncBasalam\SalamGate\Services\CreationAttemptService;
 use SyncBasalam\SalamGate\Utils\Digits;
 
 if (! defined('ABSPATH')) exit;
-require_once __DIR__ . '/../Services/CreationAttemptService.php';
 
 /**
  * Bulk shipping entry on HPOS and legacy order lists. Opening a selection is
@@ -162,7 +161,6 @@ class OrderBulkActions
         $preflight = null;
         if ($market === OrderContext::MARKET_BASALAM) {
             try {
-                require_once __DIR__ . '/../Order/BasalamParcelOrder.php';
                 if (\SyncBasalam\SalamGate\Order\BasalamParcelOrder::hasScopes($order)) {
                     return ['ok' => false, 'message' => 'این سفارش مرسوله‌های جداگانه دارد؛ مرسوله موردنظر را از صفحه سفارش انتخاب کنید. ثبت گروهی آن را تغییر نداد.'];
                 }

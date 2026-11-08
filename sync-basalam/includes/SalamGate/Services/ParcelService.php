@@ -200,34 +200,13 @@ class ParcelService
 
     private static function claimPaymentOutcome(string $key, array $attempt): bool
     {
-        global $wpdb;
-
-        // add_option از ON DUPLICATE KEY UPDATE استفاده می‌کند و برای قفل مالی کافی نیست.
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Atomic claim; table identifier is supplied by WordPress.
-        $inserted = $wpdb->query($wpdb->prepare(
-            "INSERT IGNORE INTO `{$wpdb->options}` (option_name, option_value, autoload) VALUES (%s, %s, %s)",
-            $key,
-            serialize($attempt),
-            'no'
-        ));
-
-        wp_cache_delete($key, 'options');
-        wp_cache_delete('notoptions', 'options');
-
-        return (int) $inserted === 1;
+        return \SyncBasalam\SalamGate\Infrastructure\AttemptRepository::exchange($key, null, $attempt);
     }
 
     /** A late worker must never overwrite/delete a successor's financial guard. */
     private static function replacePaymentOutcome(string $key, array $previous, ?array $next): bool
     {
-        global $wpdb;
-        $sql = $next === null
-            ? $wpdb->prepare("DELETE FROM `{$wpdb->options}` WHERE option_name = %s AND BINARY option_value = BINARY %s", $key, serialize($previous))
-            : $wpdb->prepare("UPDATE `{$wpdb->options}` SET option_value = %s WHERE option_name = %s AND BINARY option_value = BINARY %s", serialize($next), $key, serialize($previous));
-        $changed = $wpdb->query($sql);
-        wp_cache_delete($key, 'options');
-        wp_cache_delete('notoptions', 'options');
-        return (int) $changed === 1;
+        return \SyncBasalam\SalamGate\Infrastructure\AttemptRepository::exchange($key, $previous, $next);
     }
 
     /**

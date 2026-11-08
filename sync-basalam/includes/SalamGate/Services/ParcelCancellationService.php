@@ -213,16 +213,10 @@ final class ParcelCancellationService
     private function store(string $key, $previous, $next): void
     {
         if ($previous === $next) { return; }
-        global $wpdb;
-        $encode = static fn ($value): string => is_array($value) ? serialize($value) : (string) $value;
-        $sql = $previous === null
-            ? $wpdb->prepare("INSERT IGNORE INTO `{$wpdb->options}` (option_name, option_value, autoload) VALUES (%s, %s, %s)", $key, $encode($next), 'no')
-            : ($next === null
-                ? $wpdb->prepare("DELETE FROM `{$wpdb->options}` WHERE option_name = %s AND BINARY option_value = BINARY %s", $key, $encode($previous))
-                : $wpdb->prepare("UPDATE `{$wpdb->options}` SET option_value = %s WHERE option_name = %s AND BINARY option_value = BINARY %s", $encode($next), $key, $encode($previous)));
-        $changed = $wpdb->query($sql);
-        wp_cache_delete($key, 'options');
-        wp_cache_delete('notoptions', 'options');
-        if ((int) $changed !== 1) { throw new \RuntimeException('Cancellation evidence could not be persisted.'); }
+        $encode = static fn ($value): ?string => $value === null ? null : (is_array($value) ? serialize($value) : (string) $value);
+        $result = \SyncBasalam\SalamGate\Infrastructure\AtomicOptionStore::exchange($key, $encode($previous), $encode($next));
+        if (!\SyncBasalam\SalamGate\Infrastructure\AtomicOptionStore::succeeded($result)) {
+            throw new \RuntimeException('Cancellation evidence changed concurrently.');
+        }
     }
 }

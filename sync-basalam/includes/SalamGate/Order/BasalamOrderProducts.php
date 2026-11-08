@@ -7,11 +7,6 @@ use SyncBasalam\SalamGate\Services\ConnectionCache;
 
 defined('ABSPATH') || exit;
 
-require_once __DIR__ . '/BasalamShippingPreflight.php';
-if (!class_exists(ConnectionCache::class)) {
-    require_once __DIR__ . '/../Services/ConnectionCache.php';
-}
-
 /** Keep the purchased Basalam line identity without inventing a Woo catalog product. */
 final class BasalamOrderProducts
 {

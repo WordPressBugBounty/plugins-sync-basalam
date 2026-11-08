@@ -32,7 +32,7 @@
     }
     function number(value) { var text = raw(value); return /^\d+$/.test(text) ? Number(text) : NaN; }
     function fa(value) { return Number.isFinite(Number(value)) ? Number(value).toLocaleString("fa-IR") : "—"; }
-    function money(rial) { return Math.floor(rial / 10).toLocaleString("fa-IR", { maximumFractionDigits: 0 }) + " تومان"; }
+    function money(rial) { return window.SalamGateAmount.fromRial(rial); }
     function cityPath(value) {
       return typeof value === "string" ? value : own(value) ? [value.province, value.city].filter(function (title) { return typeof title === "string" && title; }).join(" — ") : "";
     }
@@ -73,7 +73,8 @@
     }
     function financialError(data) {
       return !own(data) || ["pay_unknown", "create_unknown", "update_unknown", "quote_unknown", "create_recovered", "already_paid", "parcel_replaced"].indexOf(data.code) !== -1
-        || ["pending", "unknown", "paid"].indexOf(data.payment_state) !== -1;
+        || ["pending", "unknown", "paid"].indexOf(data.payment_state) !== -1
+        || data.operation && data.operation.state === "unknown";
     }
     function definite(data) {
       return own(data) && !financialError(data) && typeof data.message === "string"
@@ -81,7 +82,7 @@
     }
     function funds(data) {
       return own(data) && (/insufficient|balance|wallet/.test(String(data.code || ""))
-        || /موجودی|اعتبار|تراز|کیف پول/.test(String(data.message || "")) && /کافی|کمبود|ناکافی|کسری/.test(String(data.message || "")));
+        || Array.isArray(data.errors) && data.errors.some(function (error) { return error && ["vendor_balance", "user_wallet"].indexOf(error.location) !== -1; }));
     }
     function sessionError(data) {
       return own(data) && (["auth", "forbidden"].indexOf(data.kind) !== -1

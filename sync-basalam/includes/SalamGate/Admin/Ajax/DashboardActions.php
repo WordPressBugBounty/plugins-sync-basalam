@@ -35,7 +35,7 @@ class DashboardActions
 
         try {
             $stats = (new AccountService())->stats();
-            wp_send_json_success([
+            ResponseBoundary::success([
                 'order_count'       => (int) $stats['order_count'],
                 // فقط مبالغ ریال→تومان؛ order_count دست‌نخورده
                 'avg_shipping_cost_toman' => $stats['avg_shipping_cost'] !== null
@@ -47,13 +47,13 @@ class DashboardActions
             ]);
         } catch (SalamGateException $exception) {
             // صفر واقعی ≠ خطا ≠ loading — خطا با kind جدا برمی‌گردد.
-            wp_send_json_error([
+            ResponseBoundary::error([
                 'message' => $exception->firstMessage(),
                 'kind'    => $exception->getKind(),
             ]);
         } catch (\Throwable $exception) {
             // A report failure must remain a JSON response, not an HTML fatal/parse error.
-            wp_send_json_error([
+            ResponseBoundary::error([
                 'message' => 'دریافت گزارش عملکرد انجام نشد؛ پاسخ سرور سایت را بررسی کنید.',
                 'kind' => SalamGateException::KIND_UNEXPECTED_RESPONSE,
             ], 503);
@@ -73,7 +73,7 @@ class DashboardActions
             $shops = (new ShopsService())->getShops();
             $account->assertSnapshot($senderProfile);
         } catch (SalamGateException $exception) {
-            wp_send_json_error(self::errorPayload($exception));
+            ResponseBoundary::error(self::errorPayload($exception));
         }
 
         try {
@@ -82,7 +82,7 @@ class DashboardActions
             $addresses = null; // خطا ≠ خالی
         }
         try { $account->assertSnapshot($senderProfile); }
-        catch (SalamGateException $exception) { wp_send_json_error(self::errorPayload($exception)); }
+        catch (SalamGateException $exception) { ResponseBoundary::error(self::errorPayload($exception)); }
 
         try {
             $providerResponse = ClientFactory::make()->get('/v1/providers/1');
@@ -105,8 +105,8 @@ class DashboardActions
 
         $vendor = self::connectedVendor();
         try { $account->assertSnapshot($senderProfile); }
-        catch (SalamGateException $exception) { wp_send_json_error(self::errorPayload($exception)); }
-        wp_send_json_success([
+        catch (SalamGateException $exception) { ResponseBoundary::error(self::errorPayload($exception)); }
+        ResponseBoundary::success([
             'shops'     => $shops,      // همه غرفه‌ها — انتخاب اولین active ممنوع؛ UI وضعیت هرکدام را نشان می‌دهد
             'addresses' => $addresses, // null = خطا؛ [] = بدون آدرس؛ items = آدرس‌های واقعی
             'activation_cost_rial' => $activationCost,
@@ -171,7 +171,7 @@ class DashboardActions
         // address.id — نه active_version_id
         $addressId = isset($_POST['address_id']) ? (int) Digits::toEnglish((string) wp_unslash($_POST['address_id'])) : 0;
         if ($addressId <= 0) {
-            wp_send_json_error(['message' => 'شناسه آدرس نامعتبر است.']);
+            ResponseBoundary::error(['message' => 'شناسه آدرس نامعتبر است.']);
         }
 
         $post = static fn (string $key): string => isset($_POST[$key]) && is_scalar($_POST[$key]) ? trim((string) wp_unslash($_POST[$key])) : '';
@@ -202,15 +202,15 @@ class DashboardActions
             foreach (['latitude' => 90, 'longitude' => 180] as $key => $limit) {
                 $raw = $_POST[$key] ?? null;
                 if ((!is_string($raw) && !is_int($raw) && !is_float($raw))) {
-                    wp_send_json_error(['message' => 'موقعیت آدرس را به‌صورت کامل و معتبر روی نقشه انتخاب کنید.', 'code' => 'invalid_coordinates']);
+                    ResponseBoundary::error(['message' => 'موقعیت آدرس را به‌صورت کامل و معتبر روی نقشه انتخاب کنید.', 'code' => 'invalid_coordinates']);
                 }
                 $normalized = str_replace('٫', '.', Digits::toEnglish(trim((string) wp_unslash($raw))));
                 if ($normalized === '' || !is_numeric($normalized)) {
-                    wp_send_json_error(['message' => 'موقعیت آدرس را به‌صورت کامل و معتبر روی نقشه انتخاب کنید.', 'code' => 'invalid_coordinates']);
+                    ResponseBoundary::error(['message' => 'موقعیت آدرس را به‌صورت کامل و معتبر روی نقشه انتخاب کنید.', 'code' => 'invalid_coordinates']);
                 }
                 $coordinate = (float) $normalized;
                 if (!is_finite($coordinate) || $coordinate < -$limit || $coordinate > $limit) {
-                    wp_send_json_error(['message' => 'موقعیت انتخاب‌شده روی نقشه معتبر نیست؛ نقطه دیگری انتخاب کنید.', 'code' => 'invalid_coordinates']);
+                    ResponseBoundary::error(['message' => 'موقعیت انتخاب‌شده روی نقشه معتبر نیست؛ نقطه دیگری انتخاب کنید.', 'code' => 'invalid_coordinates']);
                 }
                 $coordinates[$key] = $coordinate;
             }
@@ -219,9 +219,9 @@ class DashboardActions
 
         try {
             $address = (new AddressesService())->update($addressId, $fields);
-            wp_send_json_success(['address' => $address]);
+            ResponseBoundary::success(['address' => $address]);
         } catch (SalamGateException $exception) {
-            wp_send_json_error(self::errorPayload($exception));
+            ResponseBoundary::error(self::errorPayload($exception));
         }
     }
 
@@ -235,7 +235,7 @@ class DashboardActions
 
         $shopId = isset($_POST['shop_id']) ? (int) Digits::toEnglish((string) wp_unslash($_POST['shop_id'])) : 0;
         if ($shopId <= 0) {
-            wp_send_json_error(['message' => 'شناسه غرفه نامعتبر است.']);
+            ResponseBoundary::error(['message' => 'شناسه غرفه نامعتبر است.']);
         }
 
         $post = static fn (string $key): string => isset($_POST[$key]) && is_scalar($_POST[$key]) ? trim((string) wp_unslash($_POST[$key])) : '';
@@ -244,11 +244,11 @@ class DashboardActions
         $serial = strtoupper(Digits::toEnglish($post('national_code_serial')));
 
         if ($nodeId <= 0 && $serial === '') {
-            wp_send_json_error(['message' => 'چیزی برای ویرایش ارسال نشده است (فقط مرکز تحویل و سریال کارت ملی قابل ویرایش‌اند).']);
+            ResponseBoundary::error(['message' => 'چیزی برای ویرایش ارسال نشده است (فقط مرکز تحویل و سریال کارت ملی قابل ویرایش‌اند).']);
         }
 
         if ($serial !== '' && !preg_match('/^[A-Z0-9]{10}$/', $serial)) {
-            wp_send_json_error([
+            ResponseBoundary::error([
                 'message' => 'سریال کارت ملی باید دقیقاً ۱۰ کاراکتر لاتین حرف/عدد باشد.',
                 'errors'  => [['location' => 'national_code_serial', 'message' => 'سریال نامعتبر است.']],
             ]);
@@ -295,13 +295,13 @@ class DashboardActions
                 }
             }
             $shop = (new ShopsService())->update($shopId, $body['provider_node_id'] ?? null, $body['national_code_serial'] ?? null);
-            wp_send_json_success([
+            ResponseBoundary::success([
                 'shop'     => $shop,
                 // تغییر واقعی → وضعیت سرور به pending برمی‌گردد؛ برچسب «فعال» قبلی نگه داشته نمی‌شود.
                 'status_id' => $shop['status_id'] ?? ShopStatuses::PENDING_APPROVAL,
             ]);
         } catch (SalamGateException $exception) {
-            wp_send_json_error(self::errorPayload($exception));
+            ResponseBoundary::error(self::errorPayload($exception));
         }
     }
 
@@ -330,14 +330,6 @@ class DashboardActions
 
     private static function guard(): void
     {
-        if (!current_user_can('manage_options')) {
-            wp_send_json_error(['message' => 'دسترسی غیرمجاز!'], 403);
-        }
-
-        $nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
-
-        if (!wp_verify_nonce($nonce, 'basalam_pro_nonce')) {
-            wp_send_json_error(['message' => 'دسترسی غیرمجاز!'], 403);
-        }
+        ActionGuard::forController(self::class, null);
     }
 }

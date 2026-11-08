@@ -6,8 +6,6 @@ use SyncBasalam\SalamGate\SalamGateException;
 
 defined('ABSPATH') || exit;
 
-require_once __DIR__ . '/BasalamParcelReader.php';
-
 /**
  * شناسه سفارش باسلام (invoice_id) و شناسه مستقل مرسوله غرفه هرگز جایگزین هم نمی‌شوند.
  */

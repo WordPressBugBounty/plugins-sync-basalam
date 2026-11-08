@@ -62,6 +62,17 @@ class FetchOrdersJob extends AbstractJobType
 
         $syncResult = $this->syncOrderService->syncOrders($orders);
 
+        if (!empty($syncResult['errors'])) {
+            // Retry this page; successful invoices are idempotently skipped on replay.
+            // Do not advance the cursor and silently drop invoices that failed to persist.
+            return $this->retryable('برخی سفارش‌ها ذخیره نشدند؛ واردسازی این صفحه دوباره تلاش می‌شود.', 0, [
+                'synced' => $syncResult['synced'],
+                'skipped' => $syncResult['skipped'],
+                'errors_count' => count($syncResult['errors']),
+                'errors' => $syncResult['errors'],
+            ]);
+        }
+
         if ($nextCursor) {
             $this->jobManager->createJob(
                 'sync_basalam_fetch_orders',

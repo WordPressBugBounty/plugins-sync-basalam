@@ -6,7 +6,7 @@ use SyncBasalam\SalamGate\Services\ShopsService;
 use SyncBasalam\SalamGate\Services\SiteActivation;
 use SyncBasalam\SalamGate\Services\ConnectionCache;
 use SyncBasalam\Admin\Settings\SettingsConfig;
-use SyncBasalam\SalamGate\Admin\AccountStateRouter;
+use SyncBasalam\SalamGate\Domain\AccountStateResolver;
 
 defined('ABSPATH') || exit;
 
@@ -24,7 +24,7 @@ class FeatureAvailability
         if (!is_string($token) || trim($token) === '') return false;
         $cached = ConnectionCache::lastForTokenForDisplay(ShopsService::CACHE_NAME, $token);
         $shops = $cached['data']['shops'] ?? null;
-        return is_array($shops) && AccountStateRouter::stateForShops($shops) === AccountStateRouter::STATE_ACTIVE;
+        return is_array($shops) && AccountStateResolver::stateForShops($shops) === AccountStateResolver::STATE_ACTIVE;
     }
 
     public static function isAvailable(): bool

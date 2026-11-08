@@ -260,7 +260,6 @@ class ParcelsListService
         $status = $parcel['status_id'] ?? null;
         $invoice = $parcel['invoice_status'] ?? null;
         $order = self::linkedOrderForParcel($parcel);
-        require_once __DIR__ . '/WebsitePaymentGuard.php';
         // An older website draft can have a different SalamGate id while still
         // belonging to an order whose shipping was paid through WooCommerce.
         // This read-only guard never widens the mapping used for order writes.
@@ -335,7 +334,6 @@ class ParcelsListService
     public static function linkedOrderForParcel(array $parcel): ?object
     {
         if (!function_exists('wc_get_order')) { return null; }
-        require_once dirname(__DIR__) . '/Order/OrderParcelMapping.php';
         $market = $parcel['market'] ?? '';
         $parcelId = ParcelService::positiveId($parcel['id'] ?? null);
         if ($parcelId === null || !in_array($market, ['website', 'basalam'], true)) { return null; }
@@ -348,7 +346,6 @@ class ParcelsListService
         $orderId = \SyncBasalam\SalamGate\Order\OrderParcelMapping::orderIdForParcel($parcelId);
         $order = $orderId !== null ? wc_get_order($orderId) : null;
         if ($order instanceof \WC_Order && $market === 'basalam') {
-            require_once dirname(__DIR__) . '/Order/BasalamParcelOrder.php';
             $nativeLink = $order->get_meta('_salam_gate_native_link_' . $parcelId);
             if ($nativeLink !== '' && $nativeLink !== null) {
                 $nativeId = ParcelService::positiveId($nativeLink);
@@ -416,7 +413,6 @@ class ParcelsListService
             || !in_array($market, [OrderContext::MARKET_WEBSITE, OrderContext::MARKET_BASALAM], true)) {
             return null;
         }
-        require_once dirname(__DIR__) . '/Order/OrderParcelMapping.php';
         $orderId = \SyncBasalam\SalamGate\Order\OrderParcelMapping::orderIdForExternalId($externalId);
         $order = $orderId !== null ? wc_get_order($orderId) : null;
         if ($order instanceof \WC_Order && $market === OrderContext::MARKET_BASALAM) {
@@ -428,7 +424,6 @@ class ParcelsListService
                 ]) : null;
                 return $scope instanceof BasalamParcelOrder && (int) $scope->get_id() === $orderId ? $orderId : null;
             }
-            require_once dirname(__DIR__) . '/Order/BasalamParcelOrder.php';
             if (BasalamParcelOrder::hasScopes($order)) { return null; }
         }
         if (!$order instanceof \WC_Order || OrderContext::marketFor($orderId) !== $market

@@ -93,20 +93,14 @@ final class WebsitePaymentGuard
         $existing = get_option($key, null);
         if ($existing === $next) { return; }
         if ($existing !== null) { throw self::identityError(); }
-        global $wpdb;
-        $wpdb->query($wpdb->prepare(
-            "INSERT IGNORE INTO `{$wpdb->options}` (option_name, option_value, autoload) VALUES (%s, %s, %s)",
-            $key, serialize($next), 'no'
-        ));
-        wp_cache_delete($key, 'options');
-        wp_cache_delete('notoptions', 'options');
+        $written = \SyncBasalam\SalamGate\Infrastructure\AtomicOptionStore::exchange($key, null, serialize($next));
+        \SyncBasalam\SalamGate\Infrastructure\AtomicOptionStore::succeeded($written);
         if (get_option($key, null) !== $next) { throw self::identityError(); }
     }
 
     private static function identity(array $parcel): array
     {
         if (($parcel['market'] ?? '') !== 'website') { return ['keys' => [], 'order' => null, 'external_id' => null]; }
-        require_once dirname(__DIR__) . '/Order/OrderParcelMapping.php';
         $id = ParcelService::positiveId($parcel['id'] ?? null);
         $external = ParcelService::positiveId($parcel['external_id'] ?? null);
         if ($id === null || (isset($parcel['external_id']) && $external === null)) { throw self::identityError(); }

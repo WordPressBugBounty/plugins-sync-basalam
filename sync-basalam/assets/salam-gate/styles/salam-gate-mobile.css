@@ -5,11 +5,10 @@
   .salam-gate-page.sg-router { width: calc(100% - 16px); margin: 12px auto; }
   .salam-gate-page .sg-page-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .salam-gate-page .sg-page-nav__item { min-width: 0; min-height: 44px; padding: 8px 4px; font-size: 12px; text-align: center; }
-  .salam-gate-page :is(.sg-card, .sg-section) { min-width: 0; padding: 16px; }
+
   .salam-gate-page .sg-section--tight { padding-inline: 0; }
   .salam-gate-page :is(.sg-card__title, .sg-section__title, .sg-send__section-title) { overflow-wrap: anywhere; }
-  .salam-gate-page :is(.sg-button, .sgp-tool, .sg-check, .sg-faq__q),
-  .salam-gate-order-box :is(.sg-order-primary, .sg-order-secondary, .sg-native-parcel__action) { min-height: 44px; }
+
   /* 16px editable text also avoids automatic input zoom on iOS. */
   :is(.salam-gate-page, .salam-gate-order-box) :is(.sg-field__input, .basalam-input),
   #salam-gate-parcel-modal :is(.basalam-input, .sg-item-weight),
@@ -131,7 +130,7 @@
 }
 
 @media (max-width: 360px) {
-  .salam-gate-page :is(.sg-card, .sg-section) { padding: 14px; }
+
   .salam-gate-page .sg-section--tight { padding-inline: 0; }
   .salam-gate-page .sg-modal-overlay .sg-modal__footer { flex-direction: column; align-items: stretch; }
   .salam-gate-page .sg-modal-overlay .sg-modal__footer .sg-button { flex: 0 0 auto; width: 100%; }

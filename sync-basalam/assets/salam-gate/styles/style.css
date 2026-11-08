@@ -1,8 +1,5 @@
 /* SalamGate shares the font faces loaded by Woosalam's assets/css/font.css. */
-:root {
-  --sg-font-body: "PelakFA", Tahoma, sans-serif;
-  --sg-font-heading: "Morabba", "PelakFA", Tahoma, sans-serif;
-}
+
 
 :where(.salam-gate-page, .salam-gate-order-box, #salam-gate-parcel-modal, #sg-bulk-shipping-modal, .sg-help, .sg-connection-lock, .sg-picker-dialog, .sg-product-search, .sg-load-indicator, .woosalam-sg-feedback .basalam-toast) {
   font-family: var(--sg-font-body);
@@ -688,52 +685,6 @@
   text-decoration: underline;
 }
 
-.salam-gate-page .sg-card {
-  background: #fff;
-  border: 1px solid var(--basalam-gray-200, #e5e7eb);
-  border-radius: 12px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  align-items: flex-start;
-}
-
-.salam-gate-page .sg-card--error {
-  border-color: #fecaca;
-  background: #fef2f2;
-}
-
-.salam-gate-page .sg-card__title {
-  margin: 0;
-  font-family: Morabba, PelakFA, tahoma, sans-serif;
-  font-size: 1.15rem;
-  font-weight: 700;
-}
-
-.salam-gate-page .sg-card--error .sg-card__title {
-  color: #991b1b;
-}
-
-.salam-gate-page .sg-card__text {
-  margin: 0;
-  font-size: 0.9rem;
-  line-height: 1.8;
-  color: #374151;
-}
-
-.salam-gate-page .sg-card__detail {
-  margin: 0;
-  font-size: 0.8rem;
-  color: #6b7280;
-}
-
-.salam-gate-page .sg-card__actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
 .salam-gate-page .sg-shop-row {
   display: flex;
   align-items: center;
@@ -747,62 +698,6 @@
 .salam-gate-page .sg-shop-row__id {
   font-weight: 700;
   font-size: 0.88rem;
-}
-
-/* دکمه‌های اختصاصی سلام‌گیت — ارتفاع صریح برای اجتناب از برخورد 40/52px پایه */
-.salam-gate-page .sg-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  height: 44px;
-  padding: 0 20px;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  font-family: PelakFA, tahoma, sans-serif;
-  font-size: 0.88rem;
-  font-weight: 600;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
-}
-
-.salam-gate-page .sg-button--lg {
-  height: 52px;
-  font-size: 1rem;
-  padding: 0 28px;
-}
-
-.salam-gate-page .sg-button--primary {
-  background: var(--basalam-primary-color, #ff5c35);
-  color: #fff;
-}
-
-.sg-button--primary:hover,
-.salam-gate-page .sg-button--primary:focus-visible {
-  background: var(--basalam-primary-hover, #e54e2a);
-  color: #fff;
-}
-
-.salam-gate-page .sg-button--secondary {
-  background: #fff;
-  color: var(--basalam-primary-color, #ff5c35);
-  border-color: var(--basalam-primary-color, #ff5c35);
-}
-
-.sg-button--secondary:hover,
-.salam-gate-page .sg-button--secondary:focus-visible {
-  background: #fff7f4;
-  color: var(--basalam-primary-hover, #e54e2a);
-  border-color: var(--basalam-primary-hover, #e54e2a);
-}
-
-.sg-router .sg-button:focus-visible,
-.sg-state .sg-button:focus-visible,
-.sg-hero .sg-button:focus-visible,
-.salam-gate-page .sg-cta .sg-button:focus-visible {
-  outline: 2px solid var(--basalam-primary-color, #ff5c35);
-  outline-offset: 2px;
 }
 
 .salam-gate-page .sg-dev-note {

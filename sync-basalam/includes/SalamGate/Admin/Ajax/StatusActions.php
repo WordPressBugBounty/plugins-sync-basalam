@@ -20,16 +20,16 @@ class StatusActions
         self::guard();
         $enabled = $_POST['enabled'] ?? null;
         if (!is_string($enabled) || !in_array($enabled, ['0', '1'], true)) {
-            wp_send_json_error(['message' => 'وضعیت درخواستی معتبر نیست.'], 422);
+            ResponseBoundary::error(['message' => 'وضعیت درخواستی معتبر نیست.'], 422);
         }
         try {
             \SyncBasalam\SalamGate\Services\SiteActivation::setEnabled($enabled === '1');
         } catch (SalamGateException $exception) {
-            wp_send_json_error(['message' => $exception->firstMessage()], 422);
+            ResponseBoundary::error(['message' => $exception->firstMessage()], 422);
         } catch (\Throwable $exception) {
-            wp_send_json_error(['message' => 'تغییر وضعیت انجام نشد؛ دوباره تلاش کنید. ثبت یا پرداخت جدیدی انجام نشده است.'], 503);
+            ResponseBoundary::error(['message' => 'تغییر وضعیت انجام نشد؛ دوباره تلاش کنید. ثبت یا پرداخت جدیدی انجام نشده است.'], 503);
         }
-        wp_send_json_success(['enabled' => $enabled === '1', 'redirect' => admin_url('admin.php?page=salam_gate')]);
+        ResponseBoundary::success(['enabled' => $enabled === '1', 'redirect' => admin_url('admin.php?page=salam_gate')]);
     }
 
     /**
@@ -43,13 +43,13 @@ class StatusActions
 
         try {
             $data = AccountStateRouter::resolveCurrent($fresh);
-            wp_send_json_success([
+            ResponseBoundary::success([
                 'state' => $data['state'],
                 'message' => (string) ($data['message'] ?? ''),
                 'html'  => AccountStateRouter::renderStatePartial($data),
             ]);
         } catch (\Throwable $exception) {
-            wp_send_json_error(['message' => 'بررسی وضعیت سلام‌گیت ناموفق بود؛ کمی بعد دوباره تلاش کنید.']);
+            ResponseBoundary::error(['message' => 'بررسی وضعیت سلام‌گیت ناموفق بود؛ کمی بعد دوباره تلاش کنید.']);
         }
     }
 
@@ -59,7 +59,7 @@ class StatusActions
         // Also protect direct/internal invocations; an old tab is not consent
         // to query the provider after this site has explicitly opted out.
         if (!\SyncBasalam\SalamGate\Services\SiteActivation::isEnabled()) {
-            wp_send_json_error(['message' => 'سلام‌گیت در این سایت غیرفعال است؛ ابتدا آن را از بخش ارسال مرسوله فعال کنید.',
+            ResponseBoundary::error(['message' => 'سلام‌گیت در این سایت غیرفعال است؛ ابتدا آن را از بخش ارسال مرسوله فعال کنید.',
                 'code' => 'site_disabled', 'kind' => 'validation', 'errors' => [], 'request_dispatched' => false], 409);
             return;
         }
@@ -69,9 +69,9 @@ class StatusActions
             $service->flushCache();
             $shops = $service->getShops(true);
 
-            wp_send_json_success(['shops' => $shops]);
+            ResponseBoundary::success(['shops' => $shops]);
         } catch (SalamGateException $exception) {
-            wp_send_json_error(['message' => $exception->firstMessage()]);
+            ResponseBoundary::error(['message' => $exception->firstMessage()]);
         }
     }
 
@@ -94,9 +94,9 @@ class StatusActions
 
         try {
             (new ReferenceDataService())->flush();
-            wp_send_json_success(['message' => 'مراجع بروزرسانی شد.']);
+            ResponseBoundary::success(['message' => 'مراجع بروزرسانی شد.']);
         } catch (\Throwable $exception) {
-            wp_send_json_error(['message' => 'خطا در بروزرسانی مراجع.']);
+            ResponseBoundary::error(['message' => 'خطا در بروزرسانی مراجع.']);
         }
     }
 
@@ -110,15 +110,15 @@ class StatusActions
         $shopId = preg_match('/^\d+$/', $rawId) ? (int) $rawId : 0;
 
         if ($shopId <= 0) {
-            wp_send_json_error(['message' => 'شناسه غرفه نامعتبر است.']);
+            ResponseBoundary::error(['message' => 'شناسه غرفه نامعتبر است.']);
         }
 
         try {
             (new ShopsService())->{$action}($shopId);
 
-            wp_send_json_success(['message' => $action === 'activate' ? 'غرفه با موفقیت فعال شد.' : 'غرفه با موفقیت غیرفعال شد.']);
+            ResponseBoundary::success(['message' => $action === 'activate' ? 'غرفه با موفقیت فعال شد.' : 'غرفه با موفقیت غیرفعال شد.']);
         } catch (SalamGateException $exception) {
-            wp_send_json_error(['message' => $exception->firstMessage()]);
+            ResponseBoundary::error(['message' => $exception->firstMessage()]);
         }
     }
 
@@ -127,14 +127,6 @@ class StatusActions
      */
     private static function guard(): void
     {
-        if (!current_user_can('manage_options')) {
-            wp_send_json_error(['message' => 'دسترسی غیرمجاز!'], 403);
-        }
-
-        $nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
-
-        if (!wp_verify_nonce($nonce, 'basalam_pro_nonce')) {
-            wp_send_json_error(['message' => 'دسترسی غیرمجاز!'], 403);
-        }
+        ActionGuard::forController(self::class, null);
     }
 }

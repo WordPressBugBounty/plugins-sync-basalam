@@ -2,7 +2,7 @@
 
 namespace SyncBasalam\SalamGate\Services;
 
-use SyncBasalam\SalamGate\Admin\OrderMetabox;
+use SyncBasalam\SalamGate\Domain\OrderShippingPolicy;
 use SyncBasalam\SalamGate\Order\OrderContext;
 use SyncBasalam\SalamGate\SalamGateException;
 use Automattic\WooCommerce\Utilities\OrderUtil;
@@ -17,7 +17,7 @@ final class WebsiteShippingEligibility
     {
         if (!$order instanceof \WC_Order || OrderContext::marketFor((int) $order->get_id()) !== 'website') { return; }
         $status = self::persistedStatus((int) $order->get_id());
-        if ($status === null || !OrderMetabox::isActionableStatus('website', $status)) {
+        if ($status === null || !OrderShippingPolicy::isActionableStatus('website', $status)) {
             throw new SalamGateException('وضعیت این سفارش اجازه ارسال ندارد؛ سفارش‌های لغوشده، ناموفق یا مستردشده قابل ارسال نیستند.',
                 422, [['location' => 'order.status', 'message' => 'order-not-actionable']]);
         }

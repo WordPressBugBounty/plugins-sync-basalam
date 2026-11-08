@@ -1,0 +1,132 @@
+/* Compatibility for buttons outside the page shell. */
+.sg-button--primary:hover { background: var(--basalam-primary-hover, #e54e2a); color: #fff; }
+.sg-button--secondary:hover { background: #fff7f4; color: var(--basalam-primary-hover, #e54e2a); border-color: var(--basalam-primary-hover, #e54e2a); }
+/* WordPress and dedicated buttons share the same proportions within this page. */
+.salam-gate-page .sg-button,
+.salam-gate-page .button,
+.salam-gate-page .basalam-primary-button,
+.salam-gate-page .basalam-secondary-button,
+.salam-gate-page .sgp-print-btn,
+.salam-gate-page .sgp-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: auto;
+  min-height: 42px;
+  height: auto;
+  margin: 0;
+  padding: 8px 18px;
+  border: 1px solid var(--sg-border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--sg-text);
+  box-shadow: none;
+  font-family: var(--sg-font-body);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.7;
+  text-decoration: none;
+  cursor: pointer;
+  vertical-align: middle;
+  white-space: normal;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.salam-gate-page .sg-button:hover,
+.salam-gate-page .button:hover,
+.salam-gate-page .basalam-secondary-button:hover,
+.salam-gate-page .sgp-filter-btn:hover {
+  border-color: var(--sg-accent);
+  color: var(--sg-accent-hover);
+  background: #fff5f0;
+}
+
+.salam-gate-page .sg-button--primary,
+.salam-gate-page .button-primary,
+.salam-gate-page .basalam-primary-button {
+  background: var(--sg-accent);
+  border-color: var(--sg-accent);
+  color: #fff;
+}
+
+.salam-gate-page .sg-button--primary:hover,
+.salam-gate-page .sg-button--primary:focus-visible,
+.salam-gate-page .button-primary:hover,
+.salam-gate-page .button-primary:focus-visible,
+.salam-gate-page .basalam-primary-button:hover,
+.salam-gate-page .basalam-primary-button:focus-visible {
+  background: var(--sg-accent-hover);
+  border-color: var(--sg-accent-hover);
+  color: #fff;
+}
+
+.salam-gate-page .sg-button--secondary,
+.salam-gate-page .basalam-secondary-button,
+.salam-gate-page .sgp-print-btn {
+  background: #fff;
+  border-color: #ffd8cc;
+  color: #c24120;
+}
+
+.salam-gate-page .sg-button--secondary:hover,
+.salam-gate-page .sg-button--secondary:focus-visible,
+.salam-gate-page .basalam-secondary-button:hover,
+.salam-gate-page .basalam-secondary-button:focus-visible,
+.salam-gate-page .sgp-print-btn:hover {
+  background: #fff5f0;
+  border-color: var(--sg-accent);
+  color: var(--sg-accent-hover);
+}
+
+.salam-gate-page .sg-button--lg {
+  min-height: 48px;
+  padding: 10px 24px;
+  font-size: 15px;
+}
+
+.salam-gate-page .button-small,
+.salam-gate-page .sgp-actions .button {
+  min-height: 34px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.salam-gate-page .sgp-actions .button + .button {
+  margin-inline-start: 4px;
+}
+
+.salam-gate-page .button-link,
+.salam-gate-page .sgp-track {
+  color: #c24120;
+  font-family: var(--sg-font-body);
+}
+
+.salam-gate-page .sg-button:disabled,
+.salam-gate-page .button:disabled,
+.salam-gate-page .basalam-primary-button:disabled,
+.salam-gate-page .basalam-secondary-button:disabled,
+.salam-gate-page .sgp-print-btn:disabled,
+.salam-gate-page .sgp-filter-btn:disabled {
+  background: var(--sg-surface-soft);
+  color: var(--sg-muted);
+  border-color: var(--sg-border);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sg-router .sg-button:focus-visible,
+.sg-state .sg-button:focus-visible,
+.sg-hero .sg-button:focus-visible,
+.salam-gate-page .sg-cta .sg-button:focus-visible {
+  outline: 2px solid var(--basalam-primary-color, #ff5c35);
+  outline-offset: 2px;
+}
+
+
+@media (max-width: 600px), (max-width: 900px) and (max-height: 500px) {
+  .salam-gate-page :is(.sg-button, .sgp-tool, .sg-check, .sg-faq__q),
+  .salam-gate-order-box :is(.sg-order-primary, .sg-order-secondary, .sg-native-parcel__action) { min-height: 44px; }
+}

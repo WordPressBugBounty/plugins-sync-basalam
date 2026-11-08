@@ -88,9 +88,13 @@ final class Gateway extends \WC_Payment_Gateway
 			'client_secret'        => array(
 				'title'       => __( 'سکرت کلاینت', 'sync-basalam' ),
 				'type'        => 'password',
-				'description' => __( 'کلید اتصال دریافتی از سلام‌پی را وارد کنید.', 'sync-basalam' ),
+				'description' => sprintf(
+					/* translators: %s: Salam Pay seller panel URL. */
+					__( 'برای دریافت مرچنت‌کد سلام‌پی، <a href="%s" target="_blank" rel="noopener noreferrer">از اینجا اقدام کنید</a>. سپس کلید اتصال دریافتی را در این فیلد وارد و تغییرات را ذخیره کنید.', 'sync-basalam' ),
+					esc_url( 'https://salampay-seller.basalam.com/' )
+				),
 				'default'     => '',
-				'desc_tip'    => true,
+				'desc_tip'    => false,
 			),
 			'success_order_status' => array(
 				'title'       => __( 'وضعیت سفارش بعد از پرداخت موفق', 'sync-basalam' ),

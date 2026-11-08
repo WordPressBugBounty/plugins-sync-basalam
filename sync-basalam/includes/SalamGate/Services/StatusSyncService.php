@@ -13,8 +13,6 @@ use SyncBasalam\SalamGate\Utils\OptionLock;
 
 defined('ABSPATH') || exit;
 
-require_once __DIR__ . '/../Order/BasalamParcelOrder.php';
-
 /** Read-only remote reconciliation; never creates, selects a quote or pays. */
 final class StatusSyncService
 {

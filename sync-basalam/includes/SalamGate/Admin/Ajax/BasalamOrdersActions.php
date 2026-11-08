@@ -8,8 +8,6 @@ use SyncBasalam\SalamGate\Utils\Digits;
 
 defined('ABSPATH') || exit;
 
-require_once __DIR__ . '/../../Services/BasalamOrdersService.php';
-
 final class BasalamOrdersActions
 {
     public static function listOrders(): void
@@ -27,9 +25,9 @@ final class BasalamOrdersActions
                 $search = '';
             }
             $result = (new BasalamOrdersService())->listOrders($cursor !== '' ? $cursor : null, $exactId, 90, $search);
-        } catch (SalamGateException $error) { wp_send_json_error(self::errorPayload($error)); }
-        catch (\Throwable $error) { wp_send_json_error(['message' => 'دریافت سفارش‌های باسلام انجام نشد؛ دوباره تلاش کنید.']); }
-        wp_send_json_success($result);
+        } catch (SalamGateException $error) { ResponseBoundary::error(self::errorPayload($error)); }
+        catch (\Throwable $error) { ResponseBoundary::error(['message' => 'دریافت سفارش‌های باسلام انجام نشد؛ دوباره تلاش کنید.']); }
+        ResponseBoundary::success($result);
     }
 
     public static function selectOrder(): void
@@ -43,10 +41,10 @@ final class BasalamOrdersActions
             }
             $importConfirmed = self::stringInput('import_confirmed') === '1';
             $result = (new BasalamOrdersService())->selectOrder($invoiceId, $parcelId, $importConfirmed);
-        } catch (SalamGateException $error) { wp_send_json_error(self::errorPayload($error)); }
-        catch (\Throwable $error) { wp_send_json_error(['message' => 'انتخاب سفارش کامل نشد؛ وضعیت سفارش‌های ووسلام را بررسی کنید و دوباره همین سفارش را انتخاب کنید.']); }
-        if (isset($result['code'])) { wp_send_json_error($result); }
-        wp_send_json_success($result);
+        } catch (SalamGateException $error) { ResponseBoundary::error(self::errorPayload($error)); }
+        catch (\Throwable $error) { ResponseBoundary::error(['message' => 'انتخاب سفارش کامل نشد؛ وضعیت سفارش‌های ووسلام را بررسی کنید و دوباره همین سفارش را انتخاب کنید.']); }
+        if (isset($result['code'])) { ResponseBoundary::error($result); }
+        ResponseBoundary::success($result);
     }
 
     private static function stringInput(string $key): string
@@ -60,13 +58,7 @@ final class BasalamOrdersActions
 
     private static function guard(): void
     {
-        if (!current_user_can('manage_options') || !current_user_can('manage_woocommerce')) {
-            wp_send_json_error(['message' => 'اجازه انتخاب سفارش‌های باسلام را ندارید.'], 403);
-        }
-        $nonce = $_POST['_wpnonce'] ?? '';
-        if (!is_string($nonce) || !wp_verify_nonce(wp_unslash($nonce), 'basalam_pro_nonce')) {
-            wp_send_json_error(['message' => 'اعتبار صفحه تمام شده است؛ صفحه را تازه‌سازی کنید.'], 403);
-        }
+        ActionGuard::forController(self::class, null);
     }
 
     private static function errorPayload(SalamGateException $error): array

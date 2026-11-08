@@ -20,11 +20,11 @@
       } catch (ignore) { /* The server also maintains the financial outcome. */ }
     }
     function amount(value) { return typeof value === "number" && Number.isSafeInteger(value) && value >= 0; }
-    function money(rial) { return Math.floor(rial / 10).toLocaleString("fa-IR", { maximumFractionDigits: 0 }) + " تومان"; }
+    function money(rial) { return window.SalamGateAmount.fromRial(rial); }
     function message(data, fallback) {
       var value = data && data.message;
       if (data && (["pay_unknown", "unknown"].indexOf(data.code) !== -1 || ["pending", "unknown"].indexOf(data.payment_state) !== -1)
-        || typeof value === "string" && /پرداخت/.test(value) && /نامعلوم|نامشخص|مشخص نیست|قطعی نیست/.test(value)) {
+        || data && data.operation && data.operation.state === "unknown") {
         return "در حال بررسی پرداخت؛ تأیید پرداخت هنوز دریافت نشده؛ وضعیت را بررسی کنید. دوباره پرداخت نکنید.";
       }
       return typeof value === "string" && /[\u0600-\u06ff]/.test(value) ? value.replace(/بسالم/g, "باسلام") : fallback;
@@ -123,7 +123,7 @@
           .append($radio, $("<strong>").text(serviceName), $("<b>").text(money(quote.total_rial))));
         var $costs = $("<dl class='sgp-quote__costs'>");
         function addCost(title, value) {
-          $costs.append($("<div>").append($("<dt>").text(title), $("<dd>").text(Math.floor(value).toLocaleString("fa-IR") + " تومان")));
+          $costs.append($("<div>").append($("<dt>").text(title), $("<dd>").text(window.SalamGateAmount.toman(value))));
         }
         var fare = quote.fare_cost_toman != null ? quote.fare_cost_toman : quote.raw_cost_toman;
         if (typeof fare === "number" && Number.isFinite(fare) && fare >= 0) {

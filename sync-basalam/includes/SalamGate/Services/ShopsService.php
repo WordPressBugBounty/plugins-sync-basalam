@@ -438,40 +438,19 @@ class ShopsService
 
     private static function readRegistration(string $key): ?array
     {
-        global $wpdb;
-        if (!is_object($wpdb) || !isset($wpdb->options) || !method_exists($wpdb, 'get_var') || !method_exists($wpdb, 'prepare')) {
-            return null; // Claim below still fails closed without a WordPress datastore.
-        }
-        $raw = $wpdb->get_var($wpdb->prepare("SELECT option_value FROM `{$wpdb->options}` WHERE option_name = %s LIMIT 1", $key));
-        $record = is_string($raw) ? @unserialize($raw, ['allowed_classes' => false]) : $raw;
-        return is_array($record) ? $record : null;
+        return \SyncBasalam\SalamGate\Infrastructure\AttemptRepository::read($key);
     }
 
     private static function claimRegistration(string $key, array $record): bool
     {
-        global $wpdb;
-        if (!is_object($wpdb) || !isset($wpdb->options) || !method_exists($wpdb, 'query') || !method_exists($wpdb, 'prepare')) return false;
-        $changed = $wpdb->query($wpdb->prepare("INSERT IGNORE INTO `{$wpdb->options}` (option_name, option_value, autoload) VALUES (%s, %s, %s)", $key, serialize($record), 'no'));
-        self::flushRegistrationOption($key);
-        return (int) $changed === 1;
+        return \SyncBasalam\SalamGate\Infrastructure\AttemptRepository::exchange($key, null, $record);
     }
 
     private static function replaceRegistration(string $key, array $previous, ?array $next): bool
     {
-        global $wpdb;
-        $sql = $next === null
-            ? $wpdb->prepare("DELETE FROM `{$wpdb->options}` WHERE option_name = %s AND BINARY option_value = BINARY %s", $key, serialize($previous))
-            : $wpdb->prepare("UPDATE `{$wpdb->options}` SET option_value = %s WHERE option_name = %s AND BINARY option_value = BINARY %s", serialize($next), $key, serialize($previous));
-        $changed = $wpdb->query($sql);
-        self::flushRegistrationOption($key);
-        return (int) $changed === 1;
+        return \SyncBasalam\SalamGate\Infrastructure\AttemptRepository::exchange($key, $previous, $next);
     }
 
-    private static function flushRegistrationOption(string $key): void
-    {
-        wp_cache_delete($key, 'options');
-        wp_cache_delete('notoptions', 'options');
-    }
 
     private static function registrationBlocked(string $code): SalamGateException
     {

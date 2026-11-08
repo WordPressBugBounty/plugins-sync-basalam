@@ -9,11 +9,6 @@ use SyncBasalam\SalamGate\Services\ParcelsListService;
 use SyncBasalam\SalamGate\Utils\Units;
 
 defined('ABSPATH') || exit;
-require_once __DIR__ . '/BasalamParcelSet.php';
-require_once __DIR__ . '/BasalamParcelOrder.php';
-require_once __DIR__ . '/BasalamShippingPreflight.php';
-require_once __DIR__ . '/OrderWeightConfirmation.php';
-require_once __DIR__ . '/OrderParcelMapping.php';
 
 /** Read-only source checks for existing Basalam parcels, including unlinked account drafts. */
 final class BasalamCheckoutPreflight

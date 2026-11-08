@@ -77,6 +77,8 @@ final class CreationAttemptService
     public static function externalIdForWebsiteParcel(int $parcelId): ?int
     {
         if ($parcelId < 1) { return null; }
+        $indexed = \SyncBasalam\SalamGate\Infrastructure\CreationIdentityIndex::lookup($parcelId);
+        if ($indexed !== null) return $indexed;
         global $wpdb;
         $error = static fn (): SalamGateException => new SalamGateException(
             'ارتباط ثبت قبلی این مرسوله قابل تأیید نیست؛ برای جلوگیری از پرداخت تکراری، پرداخت انجام نمی‌شود.',
@@ -163,6 +165,7 @@ final class CreationAttemptService
                 }
                 $created = $saved;
             }
+            \SyncBasalam\SalamGate\Infrastructure\CreationIdentityIndex::remember($key, $created);
             return ['ok' => true, 'payload' => $this->payload($attempt, $created) + ['reused' => false]];
         } catch (SalamGateException $exception) {
             if (ParcelService::isResultUnknown($exception)) {
@@ -199,6 +202,7 @@ final class CreationAttemptService
     private function recover(string $attempt, string $key, array $record, callable $recover): array
     {
         if (($record['state'] ?? '') === 'created' && ParcelService::positiveId($record['parcel_id'] ?? null) !== null) {
+            \SyncBasalam\SalamGate\Infrastructure\CreationIdentityIndex::remember($key, $record);
             return ['ok' => true, 'payload' => $this->payload($attempt, $record) + ['reused' => true]];
         }
         $externalId = ParcelService::positiveId($record['external_id'] ?? null);
@@ -210,6 +214,7 @@ final class CreationAttemptService
                 if ($parcelId !== null) {
                     $created = array_replace($record, ['state' => 'created', 'parcel_id' => $parcelId]);
                     if ($this->replace($key, $record, $created)) {
+                        \SyncBasalam\SalamGate\Infrastructure\CreationIdentityIndex::remember($key, $created);
                         return ['ok' => true, 'payload' => $this->payload($attempt, $created) + ['reused' => true]];
                     }
                     $latest = $this->read($key);
@@ -240,39 +245,22 @@ final class CreationAttemptService
 
     private function read(string $key): ?array
     {
-        global $wpdb;
-        $raw = $wpdb->get_var($wpdb->prepare("SELECT option_value FROM `{$wpdb->options}` WHERE option_name = %s LIMIT 1", $key));
-        if (is_array($raw)) { return $raw; } // Isolated SQL fixtures use decoded values.
-        $value = is_string($raw) ? @unserialize($raw, ['allowed_classes' => false]) : null;
-        return is_array($value) ? $value : null;
+        return \SyncBasalam\SalamGate\Infrastructure\AttemptRepository::read($key);
     }
 
     private function claim(string $key, array $record): bool
     {
-        global $wpdb;
-        $changed = $wpdb->query($wpdb->prepare("INSERT IGNORE INTO `{$wpdb->options}` (option_name, option_value, autoload) VALUES (%s, %s, %s)", $key, serialize($record), 'no'));
-        $this->flush($key);
-        return (int) $changed === 1;
+        return \SyncBasalam\SalamGate\Infrastructure\AttemptRepository::exchange($key, null, $record);
     }
 
     private function replace(string $key, array $old, array $next): bool
     {
-        global $wpdb;
-        $changed = $wpdb->query($wpdb->prepare("UPDATE `{$wpdb->options}` SET option_value = %s WHERE option_name = %s AND BINARY option_value = BINARY %s", serialize($next), $key, serialize($old)));
-        $this->flush($key);
-        return (int) $changed === 1;
+        return \SyncBasalam\SalamGate\Infrastructure\AttemptRepository::exchange($key, $old, $next);
     }
 
     private function remove(string $key, array $record): void
     {
-        global $wpdb;
-        $wpdb->query($wpdb->prepare("DELETE FROM `{$wpdb->options}` WHERE option_name = %s AND BINARY option_value = BINARY %s", $key, serialize($record)));
-        $this->flush($key);
+        \SyncBasalam\SalamGate\Infrastructure\AttemptRepository::exchange($key, $record, null);
     }
 
-    private function flush(string $key): void
-    {
-        wp_cache_delete($key, 'options');
-        wp_cache_delete('notoptions', 'options');
-    }
 }

@@ -3,8 +3,8 @@
 namespace SyncBasalam\SalamGate\Services;
 
 use SyncBasalam\SalamGate\Utils\Arrays;
-use SyncBasalam\SalamGate\Admin\OrderMetabox;
-use SyncBasalam\SalamGate\Admin\OrderShippingStatus;
+use SyncBasalam\SalamGate\Domain\OrderShippingPolicy;
+use SyncBasalam\SalamGate\Presentation\OrderShippingPresenter;
 use SyncBasalam\SalamGate\Contracts\ParcelStatuses;
 use SyncBasalam\SalamGate\Order\OrderContext;
 use SyncBasalam\SalamGate\SalamGateException;
@@ -74,8 +74,8 @@ final class WebsiteOrdersService
             $reason = self::blockReason($order);
             $products = self::products($order);
             $titles = array_values(array_filter(array_column($products, 'title')));
-            $shipping = OrderShippingStatus::forOrder($order);
-            $action = \SyncBasalam\SalamGate\Admin\OrderListAction::forOrder($order);
+            $shipping = OrderShippingPresenter::forOrder($order);
+            $action = \SyncBasalam\SalamGate\Order\ShipmentActionPolicy::forOrder($order);
             if ($action['awaiting_payment'] && !in_array($shipping['tone'], ['sent', 'delivered', 'returned'], true)) {
                 $shipping = ['label' => 'در انتظار پرداخت', 'tone' => 'waiting'];
             }
@@ -125,7 +125,7 @@ final class WebsiteOrdersService
 
     private static function blockReason(\WC_Order $order): ?string
     {
-        if (!OrderMetabox::isActionableStatus(OrderContext::MARKET_WEBSITE, $order->get_status())) {
+        if (!OrderShippingPolicy::isActionableStatus(OrderContext::MARKET_WEBSITE, $order->get_status())) {
             return 'این سفارش در وضعیت قابل ارسال نیست؛ ابتدا وضعیت سفارش ووکامرس را بررسی کنید.';
         }
         $parcelId = self::positiveId($order->get_meta('_salam_gate_parcel_id'));

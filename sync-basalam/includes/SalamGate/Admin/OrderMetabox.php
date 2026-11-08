@@ -18,44 +18,36 @@ class OrderMetabox
 {
     // The base importer can intentionally store Basalam orders as Woo "processing".
     // This controls visibility only; fresh original-order eligibility is checked before sending.
-    public const ACTIONABLE_STATUSES = ['bslm-wait-vendor', 'bslm-preparation', 'processing'];
-    public const WEBSITE_ACTIONABLE_STATUSES = ['on-hold', 'processing', 'completed'];
+    public const ACTIONABLE_STATUSES = \SyncBasalam\SalamGate\Domain\OrderShippingPolicy::ACTIONABLE_STATUSES;
+    public const WEBSITE_ACTIONABLE_STATUSES = \SyncBasalam\SalamGate\Domain\OrderShippingPolicy::WEBSITE_ACTIONABLE_STATUSES;
 
     public static function register(): void
     {
         add_action('add_meta_boxes', [self::class, 'registerMetaBox']);
         add_action('add_meta_boxes_shop_order', [self::class, 'registerMetaBox']);
-        add_action('wp_ajax_salam_gate_basalam_order_state', [self::class, 'sourceState']);
     }
 
     /** A bounded authenticated source-state GET, independent of SalamGate activation. */
     public static function sourceState(): void
     {
-        if (!current_user_can('manage_woocommerce')) {
-            wp_send_json_error(['message' => 'اجازه بررسی وضعیت این سفارش را ندارید.'], 403);
-        }
-        $nonce = $_POST['_wpnonce'] ?? '';
-        if (!is_string($nonce) || !wp_verify_nonce(wp_unslash($nonce), 'basalam_pro_nonce')) {
-            wp_send_json_error(['message' => 'اعتبار صفحه تمام شده است؛ صفحه را تازه‌سازی کنید.'], 403);
-        }
+        Ajax\ActionGuard::forController(self::class);
         $id = $_POST['order_id'] ?? null;
         $id = (is_int($id) || (is_string($id) && preg_match('/^[1-9][0-9]*$/D', $id)))
             ? filter_var($id, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) : false;
         $order = $id !== false ? wc_get_order($id) : null;
         if (!$order instanceof \WC_Order || !BasalamOrderContext::isBasalamOrder((int) $id)) {
-            wp_send_json_error(['message' => 'ارتباط این سفارش با سفارش باسلام تأیید نشد.'], 422);
+            \SyncBasalam\SalamGate\Admin\Ajax\ResponseBoundary::error(['message' => 'ارتباط این سفارش با سفارش باسلام تأیید نشد.'], 422);
         }
         try {
-            require_once dirname(__DIR__) . '/Order/BasalamOrderState.php';
             $state = BasalamOrderState::refresh($order);
         } catch (SalamGateException $exception) {
-            wp_send_json_error(['message' => $exception->firstMessage(), 'code' => 'source_state_unavailable',
+            \SyncBasalam\SalamGate\Admin\Ajax\ResponseBoundary::error(['message' => $exception->firstMessage(), 'code' => 'source_state_unavailable',
                 'shipping_allowed' => false]);
         } catch (\Throwable $exception) {
-            wp_send_json_error(['message' => 'وضعیت سفارش باسلام دریافت نشد؛ قبل از ارسال، دوباره وضعیت را بررسی کنید.',
+            \SyncBasalam\SalamGate\Admin\Ajax\ResponseBoundary::error(['message' => 'وضعیت سفارش باسلام دریافت نشد؛ قبل از ارسال، دوباره وضعیت را بررسی کنید.',
                 'code' => 'source_state_unavailable', 'shipping_allowed' => false]);
         }
-        wp_send_json_success(['source_state' => $state]);
+        \SyncBasalam\SalamGate\Admin\Ajax\ResponseBoundary::success(['source_state' => $state]);
     }
 
     /**
@@ -63,11 +55,7 @@ class OrderMetabox
      */
     public static function isActionableStatus(string $market, string $status): bool
     {
-        $statuses = $market === OrderContext::MARKET_WEBSITE
-            ? self::WEBSITE_ACTIONABLE_STATUSES
-            : self::ACTIONABLE_STATUSES;
-
-        return in_array($status, $statuses, true);
+        return \SyncBasalam\SalamGate\Domain\OrderShippingPolicy::isActionableStatus($market, $status);
     }
 
     public static function registerMetaBox(): void

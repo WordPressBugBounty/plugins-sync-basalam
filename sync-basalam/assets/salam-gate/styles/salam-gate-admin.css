@@ -31,14 +31,6 @@
 }
 
 .salam-gate-page {
-  --sg-accent: var(--basalam-primary-color, #ff5c35);
-  --sg-accent-hover: var(--basalam-primary-hover, #e54e2a);
-  --sg-text: var(--basalam-gray-800, #2d3748);
-  --sg-muted: var(--basalam-gray-700, #4a5568);
-  --sg-border: var(--basalam-gray-300, #e2e8f0);
-  --sg-surface-soft: var(--basalam-gray-100, #f7fafc);
-  --sg-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  --sg-select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%234a5568' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   color: var(--sg-text);
   direction: rtl;
   font-family: var(--sg-font-body);
@@ -236,63 +228,6 @@
   display: none;
 }
 
-.salam-gate-page .sg-card,
-.salam-gate-page .sg-section,
-.salam-gate-page .salam-gate-card,
-.salam-gate-page .sg-po-card {
-  min-width: 0;
-  border: 1px solid var(--sg-border);
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: var(--sg-shadow);
-}
-
-.salam-gate-page .sg-card {
-  width: 100%;
-  align-items: stretch;
-  gap: 16px;
-  padding: 24px;
-}
-
-.salam-gate-page .sg-card > .sg-button,
-.salam-gate-page .sg-card > .button {
-  align-self: flex-start;
-}
-
-.salam-gate-page .sg-card__title,
-.salam-gate-page .sg-section__title,
-.salam-gate-page .sg-dash-section-title {
-  color: var(--sg-text);
-  font-family: var(--sg-font-heading);
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 1.7;
-}
-
-.salam-gate-page .sg-card__text,
-.salam-gate-page .sg-section__desc {
-  color: var(--sg-muted);
-  font-size: 14px;
-  line-height: 1.9;
-  font-weight: 400;
-}
-
-.salam-gate-page .sg-card__detail {
-  color: var(--sg-muted);
-  font-size: 13px;
-  line-height: 1.8;
-}
-
-.salam-gate-page .sg-card--error {
-  border-color: #fecaca;
-  background: #fef2f2;
-}
-
-.salam-gate-page .sg-card--error .sg-card__title,
-.salam-gate-page .sg-card__detail--error {
-  color: #991b1b;
-}
-
 .salam-gate-page .sg-section--highlight {
   background: #fff5f0;
   border-color: #ffd8cc;
@@ -312,122 +247,6 @@
 .salam-gate-page .sgp-filter-bar {
   gap: 10px;
   flex-wrap: wrap;
-}
-
-/* WordPress and dedicated buttons share the same proportions within this page. */
-.salam-gate-page .sg-button,
-.salam-gate-page .button,
-.salam-gate-page .basalam-primary-button,
-.salam-gate-page .basalam-secondary-button,
-.salam-gate-page .sgp-print-btn,
-.salam-gate-page .sgp-filter-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  width: auto;
-  min-height: 42px;
-  height: auto;
-  margin: 0;
-  padding: 8px 18px;
-  border: 1px solid var(--sg-border);
-  border-radius: 10px;
-  background: #fff;
-  color: var(--sg-text);
-  box-shadow: none;
-  font-family: var(--sg-font-body);
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.7;
-  text-decoration: none;
-  cursor: pointer;
-  vertical-align: middle;
-  white-space: normal;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
-}
-
-.salam-gate-page .sg-button:hover,
-.salam-gate-page .button:hover,
-.salam-gate-page .basalam-secondary-button:hover,
-.salam-gate-page .sgp-filter-btn:hover {
-  border-color: var(--sg-accent);
-  color: var(--sg-accent-hover);
-  background: #fff5f0;
-}
-
-.salam-gate-page .sg-button--primary,
-.salam-gate-page .button-primary,
-.salam-gate-page .basalam-primary-button {
-  background: var(--sg-accent);
-  border-color: var(--sg-accent);
-  color: #fff;
-}
-
-.salam-gate-page .sg-button--primary:hover,
-.salam-gate-page .sg-button--primary:focus-visible,
-.salam-gate-page .button-primary:hover,
-.salam-gate-page .button-primary:focus-visible,
-.salam-gate-page .basalam-primary-button:hover,
-.salam-gate-page .basalam-primary-button:focus-visible {
-  background: var(--sg-accent-hover);
-  border-color: var(--sg-accent-hover);
-  color: #fff;
-}
-
-.salam-gate-page .sg-button--secondary,
-.salam-gate-page .basalam-secondary-button,
-.salam-gate-page .sgp-print-btn {
-  background: #fff;
-  border-color: #ffd8cc;
-  color: #c24120;
-}
-
-.salam-gate-page .sg-button--secondary:hover,
-.salam-gate-page .sg-button--secondary:focus-visible,
-.salam-gate-page .basalam-secondary-button:hover,
-.salam-gate-page .basalam-secondary-button:focus-visible,
-.salam-gate-page .sgp-print-btn:hover {
-  background: #fff5f0;
-  border-color: var(--sg-accent);
-  color: var(--sg-accent-hover);
-}
-
-.salam-gate-page .sg-button--lg {
-  min-height: 48px;
-  padding: 10px 24px;
-  font-size: 15px;
-}
-
-.salam-gate-page .button-small,
-.salam-gate-page .sgp-actions .button {
-  min-height: 34px;
-  padding: 5px 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  white-space: nowrap;
-}
-
-.salam-gate-page .sgp-actions .button + .button {
-  margin-inline-start: 4px;
-}
-
-.salam-gate-page .button-link,
-.salam-gate-page .sgp-track {
-  color: #c24120;
-  font-family: var(--sg-font-body);
-}
-
-.salam-gate-page .sg-button:disabled,
-.salam-gate-page .button:disabled,
-.salam-gate-page .basalam-primary-button:disabled,
-.salam-gate-page .basalam-secondary-button:disabled,
-.salam-gate-page .sgp-print-btn:disabled,
-.salam-gate-page .sgp-filter-btn:disabled {
-  background: var(--sg-surface-soft);
-  color: var(--sg-muted);
-  border-color: var(--sg-border);
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 
 .salam-gate-page .sg-field {

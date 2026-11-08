@@ -2,6 +2,24 @@
 
 <details>
 
+<summary>1.10.43 - 2026-11-08</summary>
+
+### Fixed
+
+- Recover Basalam invoices whose saved connection points to a missing WooCommerce order, while preserving trashed orders and unrelated records.
+- Defer LiteSpeed/Rank Math sitemap invalidation until the order transaction finishes, verify persisted orders and mappings, and report transaction failures for retry.
+- Serialize imports of the same invoice and skip completed imports without creating duplicate orders or reducing stock twice, with CPT and HPOS support.
+- Retry partially failed order queue pages before advancing their cursor and use the validated importer for manual synchronization.
+- Keep Salam Pay merchant registration and connection guidance visible in payment settings.
+
+### Changed
+
+- Include the latest SalamGate workflow, account access and storage refinements while preserving the product settings, variation names and category detection fixes from earlier releases.
+
+</details>
+
+<details>
+
 <summary>1.10.42 - 2026-11-04</summary>
 
 ### Changed

@@ -7,8 +7,6 @@ use SyncBasalam\SalamGate\Services\ConnectionCache;
 
 defined('ABSPATH') || exit;
 
-require_once __DIR__ . '/BasalamOrderContext.php';
-
 /** Original order state, distinct from a postal receipt or Woo's local financial state. */
 final class BasalamOrderState
 {

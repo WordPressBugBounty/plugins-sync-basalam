@@ -22,21 +22,15 @@ final class OrderPreviewActions
 {
     public static function preview(): void
     {
-        if (!current_user_can('manage_options') || !current_user_can('manage_woocommerce')) {
-            wp_send_json_error(['message' => 'اجازه مشاهده سفارش را ندارید.'], 403);
-        }
-        $nonce = $_POST['_wpnonce'] ?? '';
-        if (!is_string($nonce) || !wp_verify_nonce(wp_unslash($nonce), 'basalam_pro_nonce')) {
-            wp_send_json_error(['message' => 'اعتبار صفحه تمام شده است؛ صفحه را تازه‌سازی کنید.'], 403);
-        }
+        ActionGuard::forController(self::class);
         try {
             $result = self::read($_POST);
         } catch (SalamGateException $error) {
-            wp_send_json_error(['message' => $error->firstMessage()]);
+            ResponseBoundary::error(['message' => $error->firstMessage()]);
         } catch (\Throwable $error) {
-            wp_send_json_error(['message' => 'جزئیات سفارش دریافت نشد؛ دوباره تلاش کنید.']);
+            ResponseBoundary::error(['message' => 'جزئیات سفارش دریافت نشد؛ دوباره تلاش کنید.']);
         }
-        wp_send_json_success($result);
+        ResponseBoundary::success($result);
     }
 
     /** Authenticated local identity remains distinct from native invoice/parcel IDs. */
@@ -122,7 +116,7 @@ final class OrderPreviewActions
         $items = $order->get_items();
         $money = static function ($amount) use ($order): string {
             $rial = Units::orderAmountToRial($amount, $order->get_currency());
-            if ($rial !== null) { return Units::formatToman(Units::toToman($rial)) . ' تومان'; }
+            if ($rial !== null) { return Units::formatRial($rial) . ' تومان'; }
             return wp_strip_all_tags(wc_price($amount, ['currency' => $order->get_currency()]));
         };
         $recipient = trim($order->get_formatted_shipping_full_name()) ?: trim($order->get_formatted_billing_full_name());

@@ -8,10 +8,6 @@ use SyncBasalam\SalamGate\Utils\Digits;
 
 defined('ABSPATH') || exit;
 
-require_once __DIR__ . '/BasalamOrderContext.php';
-require_once __DIR__ . '/BasalamGoodsValue.php';
-require_once __DIR__ . '/BasalamOrderState.php';
-
 /** Fresh original-order checks; never confirms, charges, splits, or posts an order. */
 final class BasalamShippingPreflight
 {
@@ -114,7 +110,7 @@ final class BasalamShippingPreflight
                     'quantity' => self::positiveQuantity($scoped ? ($parcelItems[$externalId]['quantity'] ?? null) : ($original['quantity'] ?? null))];
             }
         } else {
-            foreach ($order->get_items() as $item) {
+            foreach (\SyncBasalam\SalamGate\Order\OrderContext::shipment($order)->items() as $item) {
                 $externalId = self::positiveInteger($order->get_meta('_sync_basalam_item_id_' . $item->get_id()));
                 $quantity = self::positiveQuantity($item->get_quantity());
                 if ($externalId === null || $quantity === null || isset($localItems[$externalId])) {

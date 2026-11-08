@@ -6,6 +6,7 @@ use SyncBasalam\SalamGate\ClientFactory;
 use SyncBasalam\SalamGate\SalamGateException;
 use SyncBasalam\Admin\Settings\OAuthTokenRefresher;
 use SyncBasalam\Services\Api\OpenApiConnectionFallback;
+use SyncBasalam\SalamGate\Infrastructure\HttpIdentity;
 
 defined('ABSPATH') || exit;
 
@@ -52,7 +53,7 @@ final class BasalamParcelReader
         }
         $args = [
             'method' => 'GET', 'timeout' => 20, 'sslverify' => true, 'redirection' => 0,
-            'headers' => ['Accept' => 'application/json', 'Authorization' => 'Bearer ' . $token, 'User-Agent' => 'Woosalam-Pro'],
+            'headers' => ['Accept' => 'application/json', 'Authorization' => 'Bearer ' . $token, 'User-Agent' => HttpIdentity::userAgent()],
         ];
         $url = ($openapi ? 'https://openapi.basalam.com' : 'https://order-processing.basalam.com') . $path;
         $send = static function (string $requestUrl) use (&$args) {

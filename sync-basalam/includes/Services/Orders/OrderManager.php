@@ -165,11 +165,24 @@ class OrderManager
             )
         );
 
-        if ($existingOrderId) {
+        // A failed lookup is not proof that the invoice is new. In particular,
+        // missing plugin tables must never cause another stock-reducing order.
+        if ($wpdb->last_error !== '') {
+            return self::orderStorageUnavailable($wpdb->last_error);
+        }
+
+        try {
+            $existingOrderIsValid = $existingOrderId && self::persistedOrderExists($existingOrderId);
+        } catch (\Throwable $error) {
+            return self::orderStorageUnavailable($error->getMessage());
+        }
+
+        if ($existingOrderIsValid) {
             return [
                 'success'  => true,
                 'message'  => 'Order already exists.',
                 'order_id' => (int) $existingOrderId,
+                'created'  => false,
                 'status'   => 200,
             ];
         }
@@ -180,12 +193,17 @@ class OrderManager
             $wpdb->prepare("SELECT GET_LOCK(%s, 0)", $lockName)
         );
 
+        if ($wpdb->last_error !== '' || $gotLock === null) {
+            return self::orderStorageUnavailable($wpdb->last_error ?: 'Could not acquire the invoice lock.');
+        }
+
         if ($gotLock !== '1' && $gotLock !== 1) {
             Logger::debug("ریکوئست تکراری webhook برای invoice_id {$invoice_id} ـ نادیده گرفته شد (در حال پردازش توسط ریکوئست دیگر).");
             return [
-                'success' => true,
+                'success' => false,
                 'message' => 'Order is already being processed by another request.',
-                'status'  => 200,
+                'error'   => 'Retry after the current invoice import finishes.',
+                'status'  => 409,
             ];
         }
 
@@ -198,16 +216,27 @@ class OrderManager
                 )
             );
 
-            if ($existingOrderId) {
+            if ($wpdb->last_error !== '') {
+                return self::orderStorageUnavailable($wpdb->last_error);
+            }
+
+            try {
+                $existingOrderIsValid = $existingOrderId && self::persistedOrderExists($existingOrderId);
+            } catch (\Throwable $error) {
+                return self::orderStorageUnavailable($error->getMessage());
+            }
+
+            if ($existingOrderIsValid) {
                 return [
                     'success'  => true,
                     'message'  => 'Order already exists.',
                     'order_id' => (int) $existingOrderId,
+                    'created'  => false,
                     'status'   => 200,
                 ];
             }
 
-            return self::createOrderWooLocked($params, $invoice_id, $payment_id, $user_id, $city_id, $province_id, $table_name);
+            return self::createOrderWooLocked($params, $invoice_id, $payment_id, $user_id, $city_id, $province_id, $table_name, $existingOrderId);
         } finally {
             // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Named MySQL advisory lock; no object cache applicable.
             $wpdb->query(
@@ -216,12 +245,69 @@ class OrderManager
         }
     }
 
-    private static function createOrderWooLocked($params, $invoice_id, $payment_id, $user_id, $city_id, $province_id, $table_name)
+    private static function orderStorageUnavailable($databaseError)
+    {
+        Logger::error('امکان بررسی سفارش‌های ثبت‌شده در جدول sync_basalam_payments وجود ندارد: ' . $databaseError);
+
+        return [
+            'success' => false,
+            'message' => 'Order synchronization storage is unavailable.',
+            'error'   => 'Existing invoices could not be checked. Repair the order mapping table before retrying.',
+            'status'  => 503,
+        ];
+    }
+
+    /** Read the authoritative store, bypassing objects cached before a rollback. */
+    private static function persistedOrderExists($orderId): bool
+    {
+        global $wpdb;
+        $hpos = class_exists('Automattic\\WooCommerce\\Utilities\\OrderUtil')
+            && \Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled();
+        $table = $hpos ? $wpdb->prefix . 'wc_orders' : $wpdb->posts;
+        $typeColumn = $hpos ? 'type' : 'post_type';
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Identifiers selected from core storage names; fresh read is required after rollback.
+        $type = $wpdb->get_var($wpdb->prepare("SELECT {$typeColumn} FROM {$table} WHERE id = %d", $orderId));
+        if ($wpdb->last_error !== '') {
+            throw new \RuntimeException($wpdb->last_error);
+        }
+        if ($type !== null && $type !== 'shop_order') {
+            // A refund, HPOS placeholder or another post is not evidence of a deleted order.
+            throw new \RuntimeException('Mapped order ID belongs to another record type.');
+        }
+        return $type === 'shop_order';
+    }
+
+    private static function assertOrderPersisted($orderId, int $expectedItems): void
+    {
+        global $wpdb;
+        if (!$orderId || !self::persistedOrderExists($orderId)) {
+            throw new \RuntimeException('The WooCommerce order was not persisted.');
+        }
+        $itemsTable = $wpdb->prefix . 'woocommerce_order_items';
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Core WooCommerce table, count persisted product lines rather than the in-memory order.
+        $count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$itemsTable} WHERE order_id = %d AND order_item_type = 'line_item'", $orderId));
+        if ($wpdb->last_error !== '' || (int) $count !== $expectedItems) {
+            throw new \RuntimeException('The WooCommerce order items were not fully persisted. ' . $wpdb->last_error);
+        }
+    }
+
+    private static function assertMappingPersisted($table, $invoiceId, $orderId): void
+    {
+        global $wpdb;
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom mapping table; verify the write, including after COMMIT.
+        $count = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$table} WHERE invoice_id = %d AND order_id = %d", $invoiceId, $orderId));
+        if ($wpdb->last_error !== '' || (int) $count !== 1) {
+            throw new \RuntimeException('The invoice mapping was not persisted. ' . $wpdb->last_error);
+        }
+    }
+
+    private static function createOrderWooLocked($params, $invoice_id, $payment_id, $user_id, $city_id, $province_id, $table_name, $staleOrderId)
     {
         global $wpdb;
 
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Transaction control statement; no object cache applicable.
-        $wpdb->query('START TRANSACTION');
+        $transaction = new OrderImportTransaction($wpdb);
+        $order = null;
+        $completed = false;
         try {
 
             $vendor_id = syncBasalamSettings()->getSettings(SettingsConfig::VENDOR_ID);
@@ -233,8 +319,6 @@ class OrderManager
             $response = $apiServiceManager->get($api_url);
 
             if (isset($response['success']) && !$response['success']) {
-                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Transaction control statement; no object cache applicable.
-                $wpdb->query('ROLLBACK');
                 Logger::error("درخواست API ناموفق بود: " . ($response['error'] ?? 'خطای نامشخص'));
 
                 return [
@@ -249,9 +333,6 @@ class OrderManager
             $data = json_decode($api_response, true);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
-                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Transaction control statement; no object cache applicable.
-                $wpdb->query('ROLLBACK');
-
                 return [
                     'success' => false,
                     'message' => 'Failed to parse API response.',
@@ -261,8 +342,6 @@ class OrderManager
             }
 
             if (empty($data)) {
-                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Transaction control statement; no object cache applicable.
-                $wpdb->query('ROLLBACK');
                 Logger::error("پاسخ خالی از API برای فاکتور دریافت شد: $invoice_id");
 
                 return [
@@ -277,6 +356,23 @@ class OrderManager
             $city_id = $city_id ?? ($data['customer_data']['city']['id'] ?? null);
             $province_id = $province_id ?? ($data['customer_data']['city']['parent']['id'] ?? null);
 
+            if (empty($data['items']) || !is_array($data['items'])) {
+                throw new \RuntimeException('The invoice has no product items.');
+            }
+            foreach ($data['items'] as $item) {
+                if (!is_array($item) || empty($item['product']['id']) || (int) ($item['quantity'] ?? 1) < 1) {
+                    throw new \RuntimeException('The invoice contains an invalid product item.');
+                }
+            }
+
+            // Fetching the invoice must not keep a database transaction open over HTTP.
+            $transaction->begin();
+            // Only remove a proven missing mapping, under the invoice lock and in the same transaction as its replacement.
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; invoice and prior order are prepared.
+            if ($wpdb->query($wpdb->prepare("DELETE FROM {$table_name} WHERE invoice_id = %d AND (order_id = %d OR order_id IS NULL)", $invoice_id, (int) $staleOrderId)) === false) {
+                throw new \RuntimeException('The stale invoice mapping could not be replaced.');
+            }
+
             $order = self::executeWithoutWccfOrderSaveHooks(function () {
                 return wc_create_order();
             }, $invoice_id, 'wc_create_order');
@@ -290,7 +386,7 @@ class OrderManager
             }
             if (isset($data['items']) && is_array($data['items'])) {
                 foreach ($data['items'] as $item) {
-                    self::addBasalamItemToOrder($order, $item);
+                    self::addBasalamItemToOrder($order, $item, true);
                 }
             }
 
@@ -460,7 +556,7 @@ class OrderManager
                 $order->set_status($order_status);
             }
 
-            $purchase_count = $data['customer_data']['purchase_count'];
+            $purchase_count = $data['customer_data']['purchase_count'] ?? 0;
             $fee_amount = $data['financial_report']['product_cost']['report_items'][2]['amount'] ?? 0;
             $balance_amount = $data['financial_report']['product_cost']['total']['amount'] ?? 0;
 
@@ -468,6 +564,7 @@ class OrderManager
             $order->update_meta_data('_basalam_fee_amount', intval($fee_amount / 10));
             $order->update_meta_data('_basalam_balance_amount', intval($balance_amount / 10));
             $order->update_meta_data('_basalam_purchase_count', $purchase_count);
+            $order->update_meta_data('_is_sync_basalam_order', true);
 
             if (isset($data['hash_id'])) {
                 $order->update_meta_data('_sync_basalam_hash_id', $data['hash_id']);
@@ -479,6 +576,9 @@ class OrderManager
 
             $order_id = $order->get_id();
             if ($order_id) {
+
+                $transaction->assertActive();
+                self::assertOrderPersisted($order_id, count($data['items']));
 
                 // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom plugin table; no object cache for these operational queries.
                 $insert_result = $wpdb->insert(
@@ -498,32 +598,71 @@ class OrderManager
                     throw new \Exception("خطا در ذخیره اطلاعات سفارش در جدول sync_basalam_payments");
                 }
 
-                update_post_meta($order_id, '_is_sync_basalam_order', true);
-
-                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Transaction control statement; no object cache applicable.
-                $wpdb->query('COMMIT');
+                self::assertMappingPersisted($table_name, $invoice_id, $order_id);
+                $transaction->commit();
+                self::assertOrderPersisted($order_id, count($data['items']));
+                self::assertMappingPersisted($table_name, $invoice_id, $order_id);
+                $completed = true;
 
                 return [
                     'success'  => true,
                     'message'  => 'Order created successfully',
                     'order_id' => $order_id,
+                    'created'  => true,
                     'status'   => 200,
                 ];
             } else {
                 throw new \Exception("خطا در ایجاد سفارش با شناسه $invoice_id ، از گزینه بررسی سفارشات استفاده نمایید.");
             }
-        } catch (\Exception $e) {
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Transaction control statement; no object cache applicable.
-            $wpdb->query('ROLLBACK');
-
+        } catch (\Throwable $e) {
             Logger::error($e->getMessage());
 
             return [
                 'success' => false,
                 'message' => 'Failed to create order.',
-                'error'   => $e->getMessage(),
+                'error'   => 'The order could not be fully stored. Retry the invoice import.',
                 'status'  => 500,
             ];
+        } finally {
+            $transaction->finish();
+            if (!$completed && $order instanceof \WC_Order) {
+                // A hook may have rolled back immediately before INSERT, leaving that INSERT in autocommit.
+                // Remove only this attempt's mapping and only when its order is proven absent.
+                try {
+                    if (!self::persistedOrderExists($order->get_id())) {
+                        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Guarded cleanup of this failed attempt; never deletes a surviving order or another mapping.
+                        if ($wpdb->query($wpdb->prepare("DELETE FROM {$table_name} WHERE invoice_id = %d AND order_id = %d", $invoice_id, $order->get_id())) === false) {
+                            Logger::error('Could not remove the failed import mapping: ' . $wpdb->last_error);
+                        }
+                    }
+                } catch (\Throwable $error) {
+                    Logger::warning('Could not verify the failed import mapping: ' . $error->getMessage());
+                }
+                self::clearRolledBackOrderCaches($order);
+            }
+        }
+    }
+
+    private static function clearRolledBackOrderCaches(\WC_Order $order): void
+    {
+        try {
+            clean_post_cache($order->get_id());
+            if (class_exists('Automattic\\WooCommerce\\Caches\\OrderCache')) {
+                wc_get_container()->get(\Automattic\WooCommerce\Caches\OrderCache::class)->remove($order->get_id());
+            }
+            $hposStore = 'Automattic\\WooCommerce\\Internal\\DataStores\\Orders\\OrdersTableDataStore';
+            if (class_exists($hposStore) && method_exists($hposStore, 'clear_cached_data')) {
+                wc_get_container()->get($hposStore)->clear_cached_data([$order->get_id()]);
+            }
+            foreach ($order->get_items() as $item) {
+                foreach (array_filter([$item->get_product_id(), $item->get_variation_id()]) as $productId) {
+                    clean_post_cache($productId);
+                    wc_delete_product_transients($productId);
+                    \WC_Cache_Helper::invalidate_cache_group('product_' . $productId);
+                }
+            }
+        } catch (\Throwable $error) {
+            Logger::warning('Could not clear rolled-back order caches: ' . $error->getMessage());
         }
     }
 
@@ -549,23 +688,11 @@ class OrderManager
 
     public static function updateOrderStatus($invoice_id, $status, $job = null)
     {
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'sync_basalam_payments';
-
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix, not user input.
-        $order_id = $wpdb->get_var(
-            $wpdb->prepare("SELECT order_id FROM {$table_name} WHERE invoice_id = %d", $invoice_id)
-        );
-
-        if (!$order_id) {
-            $create_result = self::createOrderWoo([
-                'invoice_id' => $invoice_id,
-            ]);
-
-            if (!empty($create_result['success']) && !empty($create_result['order_id'])) {
-                $order_id = $create_result['order_id'];
-            }
+        $create_result = self::createOrderWoo(['invoice_id' => $invoice_id]);
+        if (empty($create_result['success'])) {
+            return $create_result;
         }
+        $order_id = $create_result['order_id'] ?? null;
 
         if (!$order_id) {
             return [
@@ -577,22 +704,36 @@ class OrderManager
             ];
         }
 
-        $order = wc_get_order($order_id);
+        try {
+            $order = wc_get_order($order_id);
 
-        if ($order && $order instanceof \WC_Order) {
-            $order->update_status($status);
+            if ($order && $order instanceof \WC_Order) {
+                if (!$order->update_status($status)) {
+                    throw new \RuntimeException('WooCommerce could not save the order status.');
+                }
+                return [
+                    'success'    => true,
+                    'message'    => 'Order status updated successfully.',
+                    'order_id'   => $order_id,
+                    'invoice_id' => $invoice_id,
+                    'job'        => $job,
+                    'status_key' => $status,
+                    'status'     => 200,
+                ];
+            }
+        } catch (\Throwable $error) {
+            Logger::error('Order status update failed: ' . $error->getMessage());
             return [
-                'success'    => true,
-                'message'    => 'Order status updated successfully.',
-                'order_id'   => $order_id,
+                'success' => false,
+                'message' => 'Order status could not be saved.',
+                'error' => 'Retry the order status update.',
+                'order_id' => $order_id,
                 'invoice_id' => $invoice_id,
-                'job'        => $job,
-                'status_key' => $status,
-                'status'     => 200,
+                'status' => 500,
             ];
         }
 
-        self::logError("آبجکت سفارش ووکامرس برای order_id {$order_id} و invoice_id {$invoice_id} معتبر نیست");
+        Logger::error("آبجکت سفارش ووکامرس برای order_id {$order_id} و invoice_id {$invoice_id} معتبر نیست");
         return [
             'success'    => false,
             'message'    => 'Invalid WooCommerce order object.',
@@ -665,7 +806,7 @@ class OrderManager
     public const LEGACY_BASALAM_ITEM_NAME_META_KEY = 'نام محصول در باسلام';
     public const LEGACY_BASALAM_ITEM_LINK_META_KEY = 'لینک محصول در باسلام';
 
-    public static function addBasalamItemToOrder(\WC_Order $order, array $item)
+    public static function addBasalamItemToOrder(\WC_Order $order, array $item, bool $strict = false)
     {
         $sync_basalam_product_id = $item['product']['id'] ?? null;
         $quantity = $item['quantity'] ?? 1;
@@ -701,10 +842,16 @@ class OrderManager
             }
 
             if (!$product) {
+                if ($strict) {
+                    throw new \RuntimeException('The invoice product could not be loaded.');
+                }
                 return;
             }
 
             $order_item_id = $order->add_product($product, $quantity);
+            if ($strict && !$order_item_id) {
+                throw new \RuntimeException('The invoice product could not be added to the order.');
+            }
 
             if ($item_id && $order_item_id) {
                 $order->update_meta_data('_sync_basalam_item_id_' . $order_item_id, $item_id);
@@ -714,6 +861,9 @@ class OrderManager
             self::set_item_price_from_financial_report($order, $order_item_id, $item, $quantity);
         } catch (\Exception $e) {
             Logger::error('خطا در ایجاد سفارش: ' . $e->getMessage());
+            if ($strict) {
+                throw $e;
+            }
         }
     }
 

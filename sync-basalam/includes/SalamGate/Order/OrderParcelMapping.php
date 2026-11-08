@@ -135,8 +135,6 @@ final class OrderParcelMapping
 
     private static function validScope(\WC_Order $root, int $nativeId, int $parcelId): bool
     {
-        require_once __DIR__ . '/BasalamOrderContext.php';
-        require_once __DIR__ . '/BasalamParcelOrder.php';
         if (self::metaId($root, '_salam_gate_native_link_' . $parcelId) !== $nativeId
             || self::metaId($root, '_salam_gate_native_origin_' . $nativeId) !== $parcelId) { return false; }
         $scope = BasalamParcelOrder::stored($root, $nativeId);

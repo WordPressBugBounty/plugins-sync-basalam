@@ -4,7 +4,7 @@ Tags: woocommerce, basalam, woosalam, integration
 Requires at least: 6.0  
 Tested up to: 7.0
 Requires PHP: 7.4 
-Stable tag: 1.10.42
+Stable tag: 1.10.43
 License: GPL-2.0-or-later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -146,6 +146,14 @@ API calls use HTTPS. Authenticated operations use the configured account and che
 1. تنظیمات اولیه افزونه در وردپرس
 
 == Changelog ==
+
+= 1.10.43 =
+* Recover invoices connected to missing WooCommerce orders while preserving trashed orders and unrelated records.
+* Protect order persistence from LiteSpeed/Rank Math cache failures and retry transaction failures safely.
+* Prevent duplicate orders and repeated stock reduction during simultaneous or repeated imports, with CPT and HPOS support.
+* Retry partially failed order queue pages before advancing and validate manual imports through the same recovery path.
+* Keep Salam Pay merchant setup guidance visible and include the latest SalamGate workflow, account access and storage refinements.
+* Preserve the product settings, variation names and category detection fixes from earlier releases.
 
 = 1.10.42 =
 * Use the v4 embedding API for automatic product category detection.

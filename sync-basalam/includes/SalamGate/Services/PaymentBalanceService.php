@@ -6,6 +6,7 @@ use SyncBasalam\Admin\Settings\OAuthTokenRefresher;
 use SyncBasalam\SalamGate\ClientFactory;
 use SyncBasalam\SalamGate\Contracts\PayMethods;
 use SyncBasalam\SalamGate\SalamGateException;
+use SyncBasalam\SalamGate\Infrastructure\HttpIdentity;
 
 defined('ABSPATH') || exit;
 
@@ -27,7 +28,7 @@ final class PaymentBalanceService
             throw new SalamGateException('روش پرداخت نامعتبر است.', 422, [], SalamGateException::KIND_VALIDATION);
         }
 
-        // Reuse the shared OAuth manager, including its safe expiry preflight.
+        // Resolve the current credential through the shared shipping client.
         // No token, URL, account ID or browser cookie is accepted from the form.
         $token = ClientFactory::make()->token();
         if (!is_string($token) || $token === '') {
@@ -53,7 +54,7 @@ final class PaymentBalanceService
             'headers' => [
                 'Authorization' => 'Bearer ' . $token,
                 'Accept' => 'application/json',
-                'User-Agent' => 'Woosalam-Pro',
+                'User-Agent' => HttpIdentity::userAgent(),
             ],
         ];
         $response = wp_remote_request($url, $args);

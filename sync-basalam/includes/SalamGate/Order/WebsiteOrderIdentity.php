@@ -4,8 +4,6 @@ namespace SyncBasalam\SalamGate\Order;
 
 defined('ABSPATH') || exit;
 
-require_once __DIR__ . '/NumericIdentity.php';
-
 /** A site's order number is not globally unique in the website market. */
 final class WebsiteOrderIdentity
 {
@@ -39,20 +37,9 @@ final class WebsiteOrderIdentity
             return null;
         }
 
-        global $wpdb;
-        // Persist before the first remote write, including timeout/retry and
-        // subsequent domain changes. A competing request cannot replace it.
-        $inserted = $wpdb->query($wpdb->prepare(
-            "INSERT IGNORE INTO `{$wpdb->options}` (option_name, option_value, autoload) VALUES (%s, %s, %s)",
-            $key,
-            (string) $candidate,
-            'no'
-        ));
-        wp_cache_delete($key, 'options');
-        wp_cache_delete('notoptions', 'options');
-        if ($inserted === false) {
-            return null;
-        }
+        // Persist identity before the first remote write; a competitor cannot replace it.
+        $inserted = \SyncBasalam\SalamGate\Infrastructure\AtomicOptionStore::exchange($key, null, (string) $candidate);
+        if ($inserted === \SyncBasalam\SalamGate\Infrastructure\AtomicOptionStore::STORAGE_ERROR) { return null; }
 
         return self::positiveId(get_option($key, null));
     }

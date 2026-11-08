@@ -31,7 +31,11 @@ final class TrackingService
         ];
     }
 
-    /** Flatten every provider group and return newest dated events first. */
+    /**
+     * Flatten every provider group and return newest dated events first.
+     * @deprecated P3 legacy response adapter; lookup() now returns a postal URL.
+     * Retained for external consumers; see docs/salam-gate/compatibility.md.
+     */
     public static function normalizeEvents($body): array
     {
         if ($body === null || $body === []) return [];

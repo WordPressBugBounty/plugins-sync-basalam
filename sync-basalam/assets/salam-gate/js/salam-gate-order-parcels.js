@@ -11,7 +11,7 @@
   }
   function localStatusTitle(value) {
     var title = readable(value, "");
-    return /پرداخت/.test(title) && /نامعلوم|نامشخص|مشخص نیست|قطعی نیست/.test(title) ? "در حال بررسی پرداخت" : title;
+    return title;
   }
   function errorMessage(response) {
     var value = response && response.success === false && response.data && response.data.message;

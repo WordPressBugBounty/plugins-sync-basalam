@@ -3,18 +3,11 @@
 if (! defined('ABSPATH')) exit;
 
 use SyncBasalam\SalamGate\Parcel\ParcelPayloadBuilder;
-use SyncBasalam\SalamGate\Services\ReferenceDataService;
 use SyncBasalam\SalamGate\Settings\SalamGateSettings;
 
-$referenceData = new ReferenceDataService();
-
-try {
-    $boxTypes = $referenceData->getBoxTypes();
-    $provinceTree = $referenceData->getProvinceTree();
-} catch (\Throwable $exception) {
-    $boxTypes = [];
-    $provinceTree = [];
-}
+// Render a network-free shell; the controller fills references on explicit open.
+$boxTypes = [];
+$provinceTree = [];
 
 ?>
 <div class="salam-gate-modal-overlay salam-gate-page" id="salam-gate-parcel-modal" style="display:none;">

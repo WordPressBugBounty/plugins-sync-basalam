@@ -42,13 +42,23 @@ final class Units
      * نمایش تومان با جداکننده هزارگان و ارقام فارسی.
      * @param int|float $toman
      */
+    public static function formatRial(int $rial): string
+    {
+        // Integer quotient/remainder avoids losing the final rial at the JS-safe ceiling.
+        $whole = intdiv($rial, 10);
+        $fraction = abs($rial % 10);
+        $display = ($rial < 0 ? '−' : '') . number_format(abs($whole), 0, '.', ',');
+        return Digits::toPersian($display . ($fraction ? '٫' . $fraction : ''));
+    }
+
     public static function formatToman($toman): string
     {
         if (!is_int($toman) && !is_float($toman)) {
             throw new \TypeError('Toman display amount must be an integer or float.');
         }
         // Display only: preserve exact rial/toman values in conversions and payment.
-        return Digits::toPersian(number_format(floor($toman), 0));
+        if (!is_finite((float) $toman)) return '—';
+        return Digits::toPersian(str_replace('.', '٫', rtrim(rtrim(number_format($toman, 1, '.', ','), '0'), '.')));
     }
 
     /** Persian/Arabic digits and presentation-only grouping must not truncate submitted prices. */

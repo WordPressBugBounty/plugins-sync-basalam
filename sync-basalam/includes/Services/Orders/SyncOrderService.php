@@ -22,28 +22,12 @@ class SyncOrderService
             ];
         }
 
-        global $wpdb;
-        $tableName = $wpdb->prefix . 'sync_basalam_payments';
-
         foreach ($orders as $order) {
             $invoiceId = $order['order']['id'] ?? null;
 
             if (!$invoiceId) {
                 $message = "سفارش بدون شناسه فاکتور پیدا شد: " . wp_json_encode($order, JSON_UNESCAPED_UNICODE);
                 Logger::warning($message);
-                continue;
-            }
-
-            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom plugin table; identifier from $wpdb->prefix, not user input.
-            $exists = $wpdb->get_var(
-                $wpdb->prepare(
-                    "SELECT invoice_id FROM {$tableName} WHERE invoice_id = %d",
-                    $invoiceId
-                )
-            );
-
-            if ($exists) {
-                $skipped++;
                 continue;
             }
 
@@ -59,11 +43,13 @@ class SyncOrderService
                     $errorMsg = $result['error'] ?? 'خطای نامشخص';
                     Logger::error("خطا در ایجاد سفارش {$invoiceId}: " . $errorMsg);
                     $errors[] = "سفارش {$invoiceId}: " . $errorMsg;
+                } elseif (empty($result['created'])) {
+                    $skipped++;
                 } else {
                     $synced++;
                     Logger::info("سفارش {$invoiceId} با موفقیت ایجاد شد.");
                 }
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 Logger::error("خطا در ایجاد سفارش {$invoiceId}: " . $e->getMessage());
                 $errors[] = "سفارش {$invoiceId}: " . $e->getMessage();
             }

@@ -47,14 +47,7 @@ final class HelpContent
     public static function enqueue(): void
     {
         if (($_GET['page'] ?? '') !== 'sync_basalam_help' || !current_user_can('manage_options')) return;
-        $root = dirname(__DIR__, 3);
-        $plugin = $root . '/sync-basalam.php';
-        wp_enqueue_style('woosalam-salam-gate-help', plugins_url('assets/salam-gate/styles/salam-gate-help.css', $plugin),
-            ['basalam-admin-style', 'basalam-admin-font-style'], (string) filemtime($root . '/assets/salam-gate/styles/salam-gate-help.css'));
-        wp_enqueue_style('woosalam-salam-gate-icons', plugins_url('assets/salam-gate/styles/salam-gate-icons.css', $plugin),
-            ['woosalam-salam-gate-help'], (string) filemtime($root . '/assets/salam-gate/styles/salam-gate-icons.css'));
-        wp_enqueue_script('woosalam-salam-gate-help', plugins_url('assets/salam-gate/js/salam-gate-help.js', $plugin),
-            ['jquery', 'basalam-admin-help-script'], (string) filemtime($root . '/assets/salam-gate/js/salam-gate-help.js'), true);
+        \SyncBasalam\SalamGate\Admin\Assets\AssetRegistrar::help();
     }
 
     public static function steps(): array

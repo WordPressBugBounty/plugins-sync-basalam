@@ -27,10 +27,6 @@
   function toggleVisible($element, visible) {
     if ($element.prop("hidden") !== !visible) $element.prop("hidden", !visible);
   }
-  function formatToman(value) {
-    var formatted = Math.floor(Number(value)).toLocaleString("fa-IR", { maximumFractionDigits: 0 }).replace(/٬/g, ",");
-    return formatted + " تومان";
-  }
   function finiteAmount(value) {
     if (typeof value !== "number" && (typeof value !== "string" || !/^-?\d+(?:\.\d+)?$/.test(value))) return null;
     var number = Number(value);
@@ -59,7 +55,7 @@
       $status.attr("data-sg-balance-method", value).attr("aria-busy", state === "loading" ? "true" : "false");
       $status.toggleClass("is-loading", state === "loading").toggleClass("is-unavailable", state === "error" || methodBlocked(value));
       setText($status.find(".sg-wallet-status__title"), value === "21" ? "موجودی کیف پول" : "موجودی تراز غرفه");
-      setText($status.find(".sg-wallet-status__amount"), methodBlocked(value) ? "این روش در دسترس نیست" : state === "ready" ? formatToman(cached.balance) : (state === "error" ? "در دسترس نیست" : "در حال دریافت…"));
+      setText($status.find(".sg-wallet-status__amount"), methodBlocked(value) ? "این روش در دسترس نیست" : state === "ready" ? window.SalamGateAmount.fromRial(Math.max(0, cached.rial)) : (state === "error" ? "در دسترس نیست" : "در حال دریافت…"));
       setText($status.find("small"), state === "error" ? "دریافت موجودی انجام نشد. دوباره تلاش کنید." : "");
       $status.find("small").toggleClass("sg-feedback-toast-only", state === "error" && typeof window.woosalamNotify === "function");
       toggleVisible($status.find("small"), state === "error");

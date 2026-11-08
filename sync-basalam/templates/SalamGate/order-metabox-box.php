@@ -98,7 +98,7 @@ endif;
         <span class="salam-gate-badge sg-order-meta-value<?php echo $isPaid ? ' is-paid' : (($statusMissing || $parcelStatusId === ParcelStatuses::NEW) ? ' is-pending' : ''); ?>" role="status" aria-live="polite"<?php echo $statusMissing ? ' data-sg-order-status-missing' : ''; ?>><?php echo esc_html($statusLabel); ?></span>
     </li>
     <?php if ($isPaid && $shippingCostRial !== false) : ?>
-    <li class="sg-order-summary-row"><strong class="sg-order-meta-label">هزینه نهایی ارسال:</strong><span class="sg-order-meta-value"><?php echo esc_html(Units::formatToman(Units::toToman($shippingCostRial)) . ' تومان'); ?></span></li>
+    <li class="sg-order-summary-row"><strong class="sg-order-meta-label">هزینه نهایی ارسال:</strong><span class="sg-order-meta-value"><?php echo esc_html(Units::formatRial($shippingCostRial) . ' تومان'); ?></span></li>
     <?php endif; ?>
 </ul>
 
