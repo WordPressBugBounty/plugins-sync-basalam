@@ -4,7 +4,7 @@ Tags: woocommerce, basalam, woosalam, integration
 Requires at least: 6.0  
 Tested up to: 7.0
 Requires PHP: 7.4 
-Stable tag: 1.10.43
+Stable tag: 1.10.44
 License: GPL-2.0-or-later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -146,6 +146,11 @@ API calls use HTTPS. Authenticated operations use the configured account and che
 1. تنظیمات اولیه افزونه در وردپرس
 
 == Changelog ==
+
+= 1.10.44 =
+* Use a saved independent Salam Pay session reference within the provider int32 limit instead of the local order number.
+* Preserve existing payment references and stop automatic retry or inquiry when a new session reference conflicts.
+* Omit an empty optional mobile number so Salam Pay can open its hosted checkout page.
 
 = 1.10.43 =
 * Recover invoices connected to missing WooCommerce orders while preserving trashed orders and unrelated records.

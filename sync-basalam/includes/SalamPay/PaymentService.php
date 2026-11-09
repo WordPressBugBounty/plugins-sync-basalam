@@ -27,6 +27,9 @@ final class PaymentService
                 return $payload;
             }
             $previous = (string) $order->get_meta('_salampay_session_state');
+            if ($previous === 'conflict') {
+                return self::referenceConflict();
+            }
             $key = (string) $order->get_meta('_salampay_session_key');
             if ($key !== '') {
                 if ((int) $order->get_meta('_salampay_expected_amount') !== $payload['amount']
@@ -42,7 +45,12 @@ final class PaymentService
                 || $order->get_meta('_salampay_reference_id')) {
                 return self::error('uncertain', __('پرداخت قبلی این سفارش نیاز به بررسی دارد؛ درخواست تکراری ارسال نشد.', 'sync-basalam'));
             }
-            $order->update_meta_data('_salampay_reference_id', $orderId);
+            // Local order numbers can already belong to another payment at the
+            // provider. Persist an independent reference before the only POST;
+            // Session references must fit the provider's signed int32 limit.
+            $reference = random_int(1000000000, 2147483647);
+            $payload['reference_id'] = $reference;
+            $order->update_meta_data('_salampay_reference_id', $reference);
             $order->update_meta_data('_salampay_expected_amount', $payload['amount']);
             $order->update_meta_data('_salampay_currency', $order->get_currency());
             $order->update_meta_data('_salampay_session_state', 'creating');
@@ -50,6 +58,14 @@ final class PaymentService
             self::schedule($orderId);
             $result = Settings::client()->createSession($payload);
             if (is_wp_error($result)) {
+                if ((int) ($result->get_error_data()['status_code'] ?? 0) === 409) {
+                    // This reference may identify somebody else's successful
+                    // payment. Never inquire it into this order or retry it.
+                    $order->update_meta_data('_salampay_session_state', 'conflict');
+                    $order->save();
+                    wp_clear_scheduled_hook(self::HOOK, [$orderId]);
+                    return self::referenceConflict();
+                }
                 $rejected = ApiClient::definitiveRejection($result);
                 $order->update_meta_data('_salampay_session_state', $rejected ? 'rejected' : 'unknown');
                 if ($rejected) {
@@ -65,7 +81,7 @@ final class PaymentService
             if (!is_array($session) || !is_string($session['key'] ?? null) || $session['key'] === ''
                 || !self::positiveInteger($session['id'] ?? null)
                 || !self::integerEquals($session['amount'] ?? null, $payload['amount'])
-                || !self::integerEquals($session['reference_id'] ?? null, $orderId)
+                || !self::integerEquals($session['reference_id'] ?? null, $reference)
                 || !$expires || $expires <= time()) {
                 $order->update_meta_data('_salampay_session_state', 'unknown');
                 $order->save();
@@ -127,12 +143,17 @@ final class PaymentService
             } elseif ($difference < 0) {
                 $discount -= $difference; // Negative fees are an additional discount.
             }
-            return [
-                'amount' => $amount, 'reference_id' => $order->get_id(), 'mobile' => $mobile,
+            $payload = [
+                'amount' => $amount, 'reference_id' => (int) ($order->get_meta('_salampay_reference_id') ?: $order->get_id()),
                 'callback_url' => add_query_arg(['order_id' => $order->get_id(), 'key' => $order->get_order_key()], rest_url('salampay/v1/callback')),
                 'items' => $items, 'discount' => $discount,
                 'metadata' => (object) ['integration' => 'woosalam'],
             ];
+            // The provider accepts an omitted optional mobile, but rejects "".
+            if ($mobile !== '') {
+                $payload['mobile'] = $mobile;
+            }
+            return $payload;
         } catch (\InvalidArgumentException $e) {
             return self::error('currency', __('مبلغ یا واحد پول سفارش برای سلام‌پی معتبر نیست.', 'sync-basalam'));
         }
@@ -148,6 +169,9 @@ final class PaymentService
             $order = wc_get_order($orderId);
             if (!$order || $order->get_payment_method() !== 'salampay' || !$order->get_meta('_salampay_reference_id')) {
                 return self::error('order', __('سابقه پرداخت سلام‌پی پیدا نشد.', 'sync-basalam'), 404);
+            }
+            if ($order->get_meta('_salampay_session_state') === 'conflict') {
+                return self::referenceConflict();
             }
             // Never overwrite an administrator's later completion/refund/cancellation.
             if ($order->get_meta('_salampay_paid') || $order->get_date_paid()) {
@@ -217,7 +241,7 @@ final class PaymentService
             return;
         }
         $result = self::verify($orderId);
-        if ($result === 'paid') {
+        if ($result === 'paid' || (is_wp_error($result) && $result->get_error_code() === 'salampay_reference_conflict')) {
             return;
         }
         $order = wc_get_order($orderId);
@@ -236,7 +260,8 @@ final class PaymentService
 
     public static function resume($order): void
     {
-        if ($order->get_meta('_salampay_reference_id') && !$order->get_date_paid()
+        if ($order->get_meta('_salampay_session_state') !== 'conflict'
+            && $order->get_meta('_salampay_reference_id') && !$order->get_date_paid()
             && (int) $order->get_meta('_salampay_inquiry_attempts') < 96) {
             self::schedule($order->get_id());
         }
@@ -281,6 +306,11 @@ final class PaymentService
     private static function redirect(string $key): array
     {
         return ['result' => 'success', 'redirect' => 'https://salampay.basalam.com/payment-interface/' . rawurlencode($key)];
+    }
+
+    private static function referenceConflict(): \WP_Error
+    {
+        return self::error('reference_conflict', __('شناسه مرجع پرداخت سلام‌پی با پرداخت دیگری تداخل دارد؛ برای بررسی با پشتیبانی تماس بگیرید.', 'sync-basalam'), 409);
     }
 
     private static function error(string $code, string $message, int $status = 400): \WP_Error

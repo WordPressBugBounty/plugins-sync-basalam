@@ -2,6 +2,18 @@
 
 <details>
 
+<summary>1.10.44 - 2026-11-09</summary>
+
+### Fixed
+
+- Persist an independent Salam Pay session reference within the provider's signed int32 range before the first request instead of using the local WooCommerce order number.
+- Preserve ready, unknown and legacy payment references, and isolate new HTTP 409 conflicts from automatic retry and inquiry.
+- Omit the optional mobile field when empty so session creation does not fail validation.
+
+</details>
+
+<details>
+
 <summary>1.10.43 - 2026-11-08</summary>
 
 ### Fixed
