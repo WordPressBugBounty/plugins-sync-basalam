@@ -29,7 +29,7 @@ class BasalamItemMeta
 
     public static function render($itemId, $item, $product): void
     {
-        if (!$item instanceof \WC_Order_Item_Product) {
+        if (!$item instanceof \WC_Order_Item_Product || !self::isOrderEditorRequest()) {
             return;
         }
 
@@ -59,5 +59,53 @@ class BasalamItemMeta
             echo '<tr><th>لینک محصول در باسلام:</th><td><a href="' . $url . '" target="_blank" rel="noopener noreferrer">مشاهده محصول در باسلام</a></td></tr>';
         }
         echo '</table></div>';
+    }
+
+    private static function isOrderEditorRequest(): bool
+    {
+        if (!is_admin()) {
+            return false;
+        }
+
+        // The editor refreshes its items through admin-ajax, without a screen.
+        // Check the running WooCommerce handler, not a caller-supplied action.
+        if (wp_doing_ajax()) {
+            foreach ([
+                'load_order_items',
+                'save_order_items',
+                'add_order_item',
+                'add_order_fee',
+                'add_order_shipping',
+                'add_order_tax',
+                'add_coupon_discount',
+                'remove_order_coupon',
+                'remove_order_item',
+                'remove_order_tax',
+                'calc_line_taxes',
+            ] as $action) {
+                if (doing_action('wp_ajax_woocommerce_' . $action)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+        if (!$screen) {
+            return false;
+        }
+
+        $action = $_GET['action'] ?? '';
+        if (!is_string($action)) {
+            return false;
+        }
+
+        if ($screen->id === 'shop_order' && $screen->base === 'post') {
+            return in_array($action, ['', 'edit', 'new'], true);
+        }
+
+        return in_array($screen->id, ['woocommerce_page_wc-orders', 'admin_page_wc-orders'], true)
+            && in_array($action, ['edit', 'new'], true);
     }
 }

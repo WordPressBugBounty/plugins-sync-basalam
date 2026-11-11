@@ -2,6 +2,16 @@
 
 <details>
 
+<summary>1.10.45 - 2026-11-11</summary>
+
+### Fixed
+
+- Restrict Basalam item details to the WooCommerce order editor and its item AJAX refreshes, preventing extra name and link rows in invoice and postal-label output. Preserve legacy metadata and normal product attributes.
+
+</details>
+
+<details>
+
 <summary>1.10.44 - 2026-11-09</summary>
 
 ### Fixed

@@ -4,7 +4,7 @@ Tags: woocommerce, basalam, woosalam, integration
 Requires at least: 6.0  
 Tested up to: 7.0
 Requires PHP: 7.4 
-Stable tag: 1.10.44
+Stable tag: 1.10.45
 License: GPL-2.0-or-later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -146,6 +146,9 @@ API calls use HTTPS. Authenticated operations use the configured account and che
 1. تنظیمات اولیه افزونه در وردپرس
 
 == Changelog ==
+
+= 1.10.45 =
+* Keep Basalam product name and link in the WooCommerce order editor and its item AJAX refreshes, without adding extra rows to invoice or postal-label output.
 
 = 1.10.44 =
 * Use a saved independent Salam Pay session reference within the provider int32 limit instead of the local order number.
