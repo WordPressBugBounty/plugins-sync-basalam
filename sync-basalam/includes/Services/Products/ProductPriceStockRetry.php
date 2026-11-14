@@ -49,7 +49,11 @@ final class ProductPriceStockRetry
                 );
             }, $restricted['variants']);
 
-            if (empty($restricted['variants'])) unset($restricted['variants']);
+            // An explicit [] converts a simple Woo product's remote counterpart
+            // to simple. Missing variants means preserve its current variations.
+            if ($restricted['variants'] === [] && ($restricted['type'] ?? null) === 'variable') {
+                unset($restricted['variants']);
+            }
         }
 
         return $restricted;

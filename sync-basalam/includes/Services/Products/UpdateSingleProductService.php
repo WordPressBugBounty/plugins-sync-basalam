@@ -321,16 +321,19 @@ class UpdateSingleProductService
                 unset($variant['id']);
             }
             unset($variant);
-            if (!$variants && $product->get_stock_status() === 'outofstock') {
-                $productData['stock'] = 0;
+            if (!$variants) {
+                if ($product->get_stock_status() === 'outofstock') $productData['stock'] = 0;
                 unset($productData['variants']);
             } else {
                 $productData['variants'] = $variants;
             }
-        } elseif (!isset($productData['primary_price'], $productData['stock'])) {
-            $handler = (new ProductDataFactory())->createHandler($product);
-            $productData['primary_price'] = $productData['primary_price'] ?? $handler->getPrice($product);
-            $productData['stock'] = $productData['stock'] ?? $handler->getStock($product);
+        } else {
+            if (!isset($productData['primary_price'], $productData['stock'])) {
+                $handler = (new ProductDataFactory())->createHandler($product);
+                $productData['primary_price'] = $productData['primary_price'] ?? $handler->getPrice($product);
+                $productData['stock'] = $productData['stock'] ?? $handler->getStock($product);
+            }
+            $productData['variants'] = [];
         }
 
         return $productData;

@@ -4,7 +4,7 @@ Tags: woocommerce, basalam, woosalam, integration
 Requires at least: 6.0  
 Tested up to: 7.0
 Requires PHP: 7.4 
-Stable tag: 1.10.45
+Stable tag: 1.10.46
 License: GPL-2.0-or-later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -146,6 +146,10 @@ API calls use HTTPS. Authenticated operations use the configured account and che
 1. تنظیمات اولیه افزونه در وردپرس
 
 == Changelog ==
+
+= 1.10.46 =
+* Fixed HTTP 422 updates for simple products previously connected to Basalam variations by preserving the explicit empty variants payload through restricted updates and retries.
+* Preserved existing Basalam variations for variable products without eligible priced variations.
 
 = 1.10.45 =
 * Keep Basalam product name and link in the WooCommerce order editor and its item AJAX refreshes, without adding extra rows to invoice or postal-label output.

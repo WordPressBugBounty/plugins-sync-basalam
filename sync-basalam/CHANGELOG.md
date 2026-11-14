@@ -2,6 +2,17 @@
 
 <details>
 
+<summary>1.10.46 - 2026-11-14</summary>
+
+### Fixed
+
+- Preserve explicit empty variants when a simple WooCommerce product replaces existing Basalam variations, including inactive-vendor restrictions, price/stock fallbacks and batch retries.
+- Preserve existing Basalam variations when a variable WooCommerce product has no eligible priced variations, both in and out of stock.
+
+</details>
+
+<details>
+
 <summary>1.10.45 - 2026-11-11</summary>
 
 ### Fixed

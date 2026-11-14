@@ -32,6 +32,6 @@ final class PriceStockProductData
         if ($price === null || $price <= 0) {
             throw NonRetryableException::invalidData('قیمت معتبر برای بروزرسانی محصول وجود ندارد.');
         }
-        return ['primary_price' => $price, 'stock' => $handler->getStock($product)];
+        return ['primary_price' => $price, 'stock' => $handler->getStock($product), 'variants' => []];
     }
 }
