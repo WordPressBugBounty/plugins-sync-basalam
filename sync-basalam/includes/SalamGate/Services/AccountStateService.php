@@ -17,6 +17,17 @@ final class AccountStateService extends \SyncBasalam\SalamGate\Domain\AccountSta
 {
     public static function resolveForPage(): array
     {
+        return self::localState(false);
+    }
+
+    /** Presentation only: an expired snapshot never starts a tool-page account check. */
+    public static function resolveForDisplay(): array
+    {
+        return self::localState(true);
+    }
+
+    private static function localState(bool $allowHistory): array
+    {
         if (!SiteActivation::isEnabled()) {
             return ['state' => self::STATE_DISABLED, 'shops' => [], 'message' => ''];
         }
@@ -28,7 +39,9 @@ final class AccountStateService extends \SyncBasalam\SalamGate\Domain\AccountSta
         $failure = ShopCheckCache::forToken($token);
         if ($failure !== null) return self::errorState($failure);
 
-        $cached = ConnectionCache::getForToken(ShopsService::CACHE_NAME, $token);
+        $cached = $allowHistory
+            ? ConnectionCache::lastForTokenForDisplay(ShopsService::CACHE_NAME, $token)
+            : ConnectionCache::getForToken(ShopsService::CACHE_NAME, $token);
         if (isset($cached['data']['shops']) && is_array($cached['data']['shops'])) {
             $shops = $cached['data']['shops'];
             if ($shops === [] && in_array($cached['data']['registration_state'] ?? null, ['pending', 'unknown'], true)) {

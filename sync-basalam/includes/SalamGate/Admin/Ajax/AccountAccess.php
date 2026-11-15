@@ -55,11 +55,16 @@ final class AccountAccess
         $activation = $requirement === 'bootstrap'
             && is_string($_POST['purpose'] ?? null) && wp_unslash($_POST['purpose']) === 'activation';
         $registration = $activation || $requirement === 'registration';
+        // Activation balances are read-only and use the same administrator
+        // permission as onboarding. This exception needs only the local snapshot,
+        // never another shop probe, and cannot unlock shipping/payment actions.
+        $activationBalance = $requirement === 'balance' && current_user_can('manage_options')
+            && is_string($_POST['purpose'] ?? null) && wp_unslash($_POST['purpose']) === 'activation';
         $references = $requirement === 'references';
 
         // Registration is an exception to active-shop readiness, never to a
         // known access denial. Reference pickers are also needed by new accounts.
-        if ($state === AccountStateResolver::STATE_NOT_REGISTERED && ($registration || $references)) return;
+        if ($state === AccountStateResolver::STATE_NOT_REGISTERED && ($registration || $references || $activationBalance)) return;
         if ($state === AccountStateResolver::STATE_INACTIVE && $requirement === 'activate') return;
 
         if (!$registration && $requirement !== 'activate' && $state === AccountStateResolver::STATE_ACTIVE) {

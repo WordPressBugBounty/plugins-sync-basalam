@@ -113,7 +113,8 @@ class VendorSyncPolicy
         $restricted = array_intersect_key($productData, $allowed);
 
         if (isset($restricted['variants']) && is_array($restricted['variants'])) {
-            $clearVariants = $restricted['variants'] === [] && ($restricted['type'] ?? null) !== 'variable';
+            $clearVariants = $restricted['variants'] === []
+                && (($restricted['type'] ?? null) !== 'variable' || ($restricted['stock'] ?? null) === 0);
             $variantFields = [
                 'id' => true,
                 'primary_price' => true,
@@ -136,7 +137,7 @@ class VendorSyncPolicy
                 }
             ));
 
-            // Preserve an intentional simple-product conversion, but never turn
+            // Preserve an intentional conversion, but never turn
             // a nonempty list of disconnected variants into a deletion request.
             if (empty($restricted['variants']) && !$clearVariants) unset($restricted['variants']);
         }

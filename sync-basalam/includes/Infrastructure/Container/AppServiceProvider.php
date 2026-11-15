@@ -9,8 +9,10 @@ use SyncBasalam\Jobs\DiscountTaskScheduler;
 use SyncBasalam\Jobs\JobExecutor;
 use SyncBasalam\Jobs\JobRegistry;
 use SyncBasalam\Jobs\LockManager;
+use SyncBasalam\Jobs\Types\ArchiveUnmappedProductsJob;
 use SyncBasalam\Jobs\Types\AutoConnectProductsJob;
 use SyncBasalam\Jobs\Types\BulkUpdateProductsJob;
+use SyncBasalam\Jobs\Types\FindUnmappedProductsJob;
 use SyncBasalam\Jobs\Types\CreateAllProductsJob;
 use SyncBasalam\Jobs\Types\CreateSingleProductJob;
 use SyncBasalam\Jobs\Types\FetchOrdersJob;
@@ -112,6 +114,14 @@ class AppServiceProvider implements ServiceProviderInterface
             );
         });
 
+        $container->singleton(FindUnmappedProductsJob::class, function (ContainerInterface $container) {
+            return new FindUnmappedProductsJob($container->get(JobManager::class));
+        });
+
+        $container->singleton(ArchiveUnmappedProductsJob::class, function (ContainerInterface $container) {
+            return new ArchiveUnmappedProductsJob($container->get(JobManager::class));
+        });
+
         $container->singleton(FetchOrdersService::class, function () {
             return new FetchOrdersService();
         });
@@ -137,6 +147,8 @@ class AppServiceProvider implements ServiceProviderInterface
                 $container->get(CreateAllProductsJob::class),
                 $container->get(AutoConnectProductsJob::class),
                 $container->get(FetchOrdersJob::class),
+                $container->get(FindUnmappedProductsJob::class),
+                $container->get(ArchiveUnmappedProductsJob::class),
             ]);
         });
 

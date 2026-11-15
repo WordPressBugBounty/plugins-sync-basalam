@@ -46,9 +46,20 @@ class CalculatorService
             $body['service_type'] = $serviceType;
         }
 
+        // Public estimates contain no account data. Repeated identical clicks can
+        // reuse a short-lived estimate; shipping/payment always obtains its own quote.
+        $cacheKey = 'salam_gate_estimate_' . hash('sha256', (string) wp_json_encode($body));
+        $cached = get_transient($cacheKey);
+        if (is_array($cached) && is_array($cached['quotes'] ?? null) && $cached['quotes'] !== []) return $cached;
+
         $response = ClientFactory::make()->publicPost(SalamGateClient::PATH_CALCULATOR, $body);
         $decoded = is_array($response['body'] ?? null) ? $response['body'] : [];
 
-        return ['quotes' => is_array($decoded['quotes'] ?? null) ? $decoded['quotes'] : []];
+        $result = ['quotes' => is_array($decoded['quotes'] ?? null) ? $decoded['quotes'] : []];
+        if ($result['quotes'] !== [] && array_filter($result['quotes'], static fn ($quote): bool =>
+            is_array($quote) && empty($quote['error']) && isset($quote['costs']['total'])) !== []) {
+            set_transient($cacheKey, $result, 60);
+        }
+        return $result;
     }
 }

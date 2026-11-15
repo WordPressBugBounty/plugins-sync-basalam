@@ -45,7 +45,7 @@ final class AssetRegistrar
         wp_localize_script('woosalam-salam-gate-script', 'basalam_ajax', ['ajaxurl' => admin_url('admin-ajax.php'), 'nonce' => wp_create_nonce('basalam_pro_nonce')]);
         if ($shipping) {
             self::style('woosalam-salam-gate-activation');
-            self::script('woosalam-salam-gate-navigation');
+            if (!\SyncBasalam\SalamGate\Admin\PageChrome::isPublicTool($view)) self::script('woosalam-salam-gate-navigation');
         }
         if ($shipping && in_array($view, ['settings', 'tracking'], true)) self::style('woosalam-salam-gate-' . $view);
         if ($shipping && $view === 'tracking') self::script('woosalam-salam-gate-tracking');

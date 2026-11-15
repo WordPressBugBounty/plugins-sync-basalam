@@ -3,9 +3,12 @@
 namespace SyncBasalam;
 
 use SyncBasalam\Admin\Settings;
+use SyncBasalam\Jobs\FairJobScheduler;
+use SyncBasalam\Logger\Logger;
 use SyncBasalam\Registrar\AdminRegistrar;
 use SyncBasalam\Services\Api\CircuitBreaker;
 use SyncBasalam\Services\AsyncWorkerHealth;
+use SyncBasalam\Services\Products\UnmappedProducts\ScheduledUnmappedScan;
 
 defined('ABSPATH') || exit;
 
@@ -31,6 +34,8 @@ class JobsRunner
     private $discountScheduler;
     private $CheckHttpBlockService;
     private $workerHealth;
+    private $unmappedScanScheduler;
+    private $jobScheduler;
     private bool $isAsyncBatch = false;
 
     public function __construct(
@@ -38,7 +43,9 @@ class JobsRunner
         $jobExecutor,
         $discountScheduler,
         $CheckHttpBlockService,
-        ?AsyncWorkerHealth $workerHealth = null
+        ?AsyncWorkerHealth $workerHealth = null,
+        ?ScheduledUnmappedScan $unmappedScanScheduler = null,
+        ?FairJobScheduler $jobScheduler = null
     ) {
         add_action('wp_ajax_' . self::ASYNC_ACTION, [$this, 'handleAsyncRequest']);
         add_action('wp_ajax_nopriv_' . self::ASYNC_ACTION, [$this, 'handleAsyncRequest']);
@@ -55,6 +62,8 @@ class JobsRunner
         $this->discountScheduler = $discountScheduler;
         $this->CheckHttpBlockService = $CheckHttpBlockService;
         $this->workerHealth = $workerHealth ?? new AsyncWorkerHealth();
+        $this->unmappedScanScheduler = $unmappedScanScheduler ?? new ScheduledUnmappedScan();
+        $this->jobScheduler = $jobScheduler ?? new FairJobScheduler();
     }
 
     public function inspectWorkerHealth(): void
@@ -88,6 +97,8 @@ class JobsRunner
         }
 
         if ($this->CheckHttpBlockService->SyncBasalamHttpBlock()) return;
+        // A due daily scan must also wake an otherwise empty queue, without WP-Cron.
+        $this->unmappedScanScheduler->process();
         $isNewJob = function_exists('current_filter') && current_filter() === 'sync_basalam_job_created';
         if ($isNewJob) $this->scheduleRecovery();
         if (!$isNewJob && $this->hasActiveAsyncLease(self::ASYNC_IDLE_PROBE_TRANSIENT)) return;
@@ -244,6 +255,7 @@ class JobsRunner
         if (!$this->jobExecutor->acquireGlobalJobsLock(0)) return false;
 
         try {
+            $this->unmappedScanScheduler->process();
             return $this->runEligibleJobs();
         } finally {
             $this->jobExecutor->releaseGlobalJobsLock();
@@ -271,6 +283,7 @@ class JobsRunner
         try {
             $this->workerHealth->recordWorkerStarted($source);
             if ($source === 'async') $this->workerHealth->observeAsyncEnvironment();
+            $this->unmappedScanScheduler->process();
             while (microtime(true) < $deadline) {
                 if (!$this->jobManager->hasPendingOrStaleProcessingJobs(self::STALE_PROCESSING_TIMEOUT_SECONDS)) {
                     break;
@@ -341,32 +354,33 @@ class JobsRunner
             return false;
         }
 
-        $sortedJobTypes = $this->jobExecutor->getSortedJobTypes();
-
-        foreach ($sortedJobTypes as $jobType => $jobExecutor) {
-            if (!$this->jobExecutor->canRun($jobType)) {
-                continue;
-            }
-
+        $selection = $this->jobScheduler->select($this->jobExecutor->getSortedJobTypes(), function ($jobType) {
+            if (!$this->jobExecutor->canRun($jobType)) return null;
             $job = $this->jobManager->getNextEligibleJob($jobType);
-            $processingJob = $this->jobManager->getJob(['job_type' => $jobType, 'status' => 'processing']);
+            if (!$job || $this->jobManager->getJob(['job_type' => $jobType, 'status' => 'processing'])) return null;
+            return $job;
+        });
+        if ($selection === null) return false;
 
-            if (!$job || $processingJob) {
-                continue;
-            }
+        $job = $selection['job'];
+        $claimed = $this->jobManager->updateJob(
+            ['status' => 'processing', 'started_at' => time()],
+            ['id' => $job->id, 'status' => 'pending']
+        );
+        if ($claimed === false || $claimed < 1) return false;
 
-            update_option(self::GLOBAL_RUNNER_LAST_RUN_OPTION, microtime(true), false);
-
+        if (!$this->jobScheduler->commit($selection)) {
             $this->jobManager->updateJob(
-                ['status' => 'processing', 'started_at' => time()],
-                ['id' => $job->id]
+                ['status' => 'pending', 'started_at' => 0],
+                ['id' => $job->id, 'status' => 'processing']
             );
-
-            $this->executeJob($job);
-            return true;
+            Logger::error('ثبت نوبت اجرای صف ناموفق بود؛ کار برای تلاش دوباره در صف باقی ماند.', ['job_id' => (int) $job->id]);
+            return false;
         }
 
-        return false;
+        update_option(self::GLOBAL_RUNNER_LAST_RUN_OPTION, microtime(true), false);
+        $this->executeJob($job);
+        return true;
     }
 
     private function executeJob(object $job): void

@@ -14,7 +14,7 @@ final class ActionDefinition
 
     public function __construct(array $callback, array $capabilities, bool $allCapabilities, string $account, string $kind, bool $site)
     {
-        if ($capabilities === [] || !in_array($account, ['active', 'control', 'independent', 'registration', 'bootstrap', 'references', 'activate'], true)
+        if ($capabilities === [] || !in_array($account, ['active', 'control', 'independent', 'registration', 'bootstrap', 'balance', 'references', 'activate'], true)
             || !in_array($kind, ['read', 'mutation', 'quote'], true)) throw new \InvalidArgumentException('Missing AJAX action policy.');
         $this->callback = $callback;
         $this->capabilities = $capabilities;

@@ -53,7 +53,9 @@ class AccountStateRouter extends \SyncBasalam\SalamGate\Domain\AccountStateResol
         } else {
             // viewها هم وضعیت واقعی حساب را بدانند (مثلاً ویزارد ثبت فقط برای «بدون ثبت»).
             // refresh/بازگشت کاربر وضعیت سرور را بازیابی می‌کند — دوباره ثبت نمی‌زند.
-            $resolved = self::resolveForPage();
+            $resolved = PageChrome::isPublicTool($data['view'])
+                ? \SyncBasalam\SalamGate\Services\AccountStateService::resolveForDisplay()
+                : self::resolveForPage();
             $data['state'] = $resolved['state'];
             $data['shops'] = $resolved['shops'];
             $data['message'] = $resolved['message'];

@@ -4,7 +4,7 @@ Tags: woocommerce, basalam, woosalam, integration
 Requires at least: 6.0  
 Tested up to: 7.0
 Requires PHP: 7.4 
-Stable tag: 1.10.46
+Stable tag: 1.10.47
 License: GPL-2.0-or-later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -146,6 +146,15 @@ API calls use HTTPS. Authenticated operations use the configured account and che
 1. تنظیمات اولیه افزونه در وردپرس
 
 == Changelog ==
+
+= 1.10.47 =
+* Add a report for active Basalam products without WooCommerce mappings, with connect, ignore, archive and bulk archive stop/resume.
+* Run daily scans through the WooSalam JobManager queue without a dedicated WP-Cron event; prevent a new scan until the report is resolved.
+* Reserve two of every ten non-order job starts for scans and archives, retaining first priority for orders.
+* Clear unavailable unpriced product variants and remove obsolete local mappings only after confirmed deletion.
+* Make cancelled/failed-order exclusions visible in site order-statistics responses.
+* Include SalamGate discovery, calculator/post-office tools and activation/account-balance refinements.
+* Fix invoice/address-label bulk printing when another plugin returns no redirect.
 
 = 1.10.46 =
 * Fixed HTTP 422 updates for simple products previously connected to Basalam variations by preserving the explicit empty variants payload through restricted updates and retries.

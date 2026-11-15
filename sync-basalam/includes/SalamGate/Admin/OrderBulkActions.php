@@ -30,8 +30,8 @@ class OrderBulkActions
     {
         add_filter('bulk_actions-edit-shop_order', [self::class, 'registerAction']);
         add_filter('bulk_actions-woocommerce_page_wc-orders', [self::class, 'registerAction']);
-        add_action('handle_bulk_actions-edit-shop_order', [self::class, 'handle'], 10, 3);
-        add_action('handle_bulk_actions-woocommerce_page_wc-orders', [self::class, 'handle'], 10, 3);
+        add_filter('handle_bulk_actions-edit-shop_order', [self::class, 'handle'], 10, 3);
+        add_filter('handle_bulk_actions-woocommerce_page_wc-orders', [self::class, 'handle'], 10, 3);
         add_action('admin_notices', [self::class, 'renderNotice']);
         add_action('admin_footer', [self::class, 'renderBulkHost']);
     }
@@ -45,9 +45,12 @@ class OrderBulkActions
     }
 
     /**
+     * Earlier invoice/label filters can render their output and return null.
+     * Preserve that result for actions owned by other plugins.
+     *
      * @param array<int, int> $orderIds
      */
-    public static function handle(string $redirectUrl, string $action, array $orderIds): string
+    public static function handle(?string $redirectUrl, string $action, array $orderIds): ?string
     {
         if ($action !== self::ACTION) {
             return $redirectUrl;
@@ -61,6 +64,11 @@ class OrderBulkActions
 
         $ids = array_values(array_unique(array_filter(array_map('intval', $orderIds), static fn (int $id): bool => $id > 0)));
         if (!$ids) return $redirectUrl;
+        if ($redirectUrl === null || $redirectUrl === '') {
+            $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+            $redirectUrl = admin_url($screen && $screen->id === 'edit-shop_order'
+                ? 'edit.php?post_type=shop_order' : 'admin.php?page=wc-orders');
+        }
         if (count($ids) > 20) return add_query_arg(['salam_gate_bulk_error' => 'limit'], $redirectUrl);
 
         // WordPress checks the ordinary bulk-action nonce. The modal then uses

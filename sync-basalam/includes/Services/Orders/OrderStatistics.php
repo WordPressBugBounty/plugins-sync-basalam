@@ -129,6 +129,7 @@ class OrderStatistics
     private static function getStatuses(): array
     {
         return array_values(array_diff(array_keys(wc_get_order_statuses()), [
+            'wc-cancelled', 'cancelled', 'wc-failed', 'failed',
             'wc-checkout-draft', 'wc-auto-draft', 'auto-draft', 'wc-trash', 'trash',
         ]));
     }

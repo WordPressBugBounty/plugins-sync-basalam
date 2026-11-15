@@ -10,6 +10,9 @@ final class ScriptModules
     {
         if ($orderScreen) { return ['order-modal']; }
         if ($page === 'salam_gate_status') { return ['status']; }
+        if ($page === 'salam_gate' && \SyncBasalam\SalamGate\Admin\PageChrome::isPublicTool($view)) {
+            return $view === 'tracking' ? [] : [$view];
+        }
         $modules = ['status', 'account', 'activation'];
         if ($page === 'salam_gate_parcels') { $modules[] = 'parcels'; }
         elseif ($view === 'send') { $modules = array_merge($modules, ['send', 'order-modal']); }

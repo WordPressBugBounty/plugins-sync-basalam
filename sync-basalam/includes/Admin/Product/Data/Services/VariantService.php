@@ -24,6 +24,18 @@ class VariantService
         return array_column($this->getVariantEntries($product), 'data');
     }
 
+    /** Only call after the provider has confirmed an explicit variant deletion. */
+    public static function clearVariationIds(int $productId): void
+    {
+        $product = wc_get_product($productId);
+        if (!$product instanceof \WC_Product_Variable) return;
+
+        foreach ($product->get_children() as $variationId) {
+            delete_post_meta($variationId, 'sync_basalam_variation_id');
+            delete_post_meta($variationId, 'sync_basalam_variation_map');
+        }
+    }
+
     private function getVariantEntries($product): array
     {
         $entries = [];

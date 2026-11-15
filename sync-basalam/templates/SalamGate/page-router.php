@@ -13,9 +13,9 @@ $sgView = \SyncBasalam\SalamGate\Admin\PageChrome::viewForState(
     (string) ($data['view'] ?? ''),
     (string) ($data['state'] ?? 'loading')
 );
-$accountLoading = ($data['state'] ?? '') === 'loading';
-// Do not render tool controllers while account access is unknown or unavailable.
-// Direct URLs use the same dashboard state as the main menu, without extra API reads.
+$publicTool = \SyncBasalam\SalamGate\Admin\PageChrome::isPublicTool($sgView);
+$accountLoading = !$publicTool && ($data['state'] ?? '') === 'loading';
+// Public tools never mount the deferred account-check controller, even with no cache.
 $loadView = in_array($sgView, ['send', 'settings', 'calculator', 'post-offices', 'activation'], true);
 ?>
 <!-- WordPress relocates admin notices here, outside the SalamGate styling boundary. -->

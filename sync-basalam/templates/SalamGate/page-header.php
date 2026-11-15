@@ -23,9 +23,9 @@ $sgPage = $sgChrome::page($sgView, $sgState);
         </div>
     </div>
 </header>
-<?php if ($sgState === 'active') : ?>
 <nav class="sg-page-nav" aria-label="بخش‌های سلام‌گیت" data-sg-nav data-sg-current-view="<?php echo esc_attr($sgView); ?>">
     <?php foreach ($sgChrome::navigation($sgView, $sgState) as $sgNavItem) : ?>
+        <?php if (!$sgNavItem['visible']) continue; ?>
         <a class="sg-page-nav__item<?php echo $sgNavItem['current'] ? ' is-active' : ''; ?>"
            href="<?php echo esc_url($sgNavItem['url']); ?>"
            data-sg-nav-item="<?php echo esc_attr($sgNavItem['id']); ?>"
@@ -35,4 +35,3 @@ $sgPage = $sgChrome::page($sgView, $sgState);
            <?php if (!$sgNavItem['visible']) : ?>hidden<?php endif; ?>><?php echo esc_html($sgNavItem['label']); ?></a>
     <?php endforeach; ?>
 </nav>
-<?php endif; ?>

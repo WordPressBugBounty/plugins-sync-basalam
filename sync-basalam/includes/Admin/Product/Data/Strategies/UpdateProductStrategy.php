@@ -62,8 +62,11 @@ class UpdateProductStrategy implements DataStrategyInterface
         }
 
         if ($product->is_type('variable') && $data['variants'] === []) {
-            if ($product->get_stock_status() === 'outofstock' && !array_key_exists('stock', $data)) $data['stock'] = 0;
-            unset($data['variants']); // No eligible variants must never erase remote variants.
+            if ($product->get_stock_status() === 'outofstock') {
+                $data['stock'] = 0; // Parent stock requires clearing the remote variants first.
+            } else {
+                unset($data['variants']);
+            }
         }
 
         if (!$product->is_type('variable')) {

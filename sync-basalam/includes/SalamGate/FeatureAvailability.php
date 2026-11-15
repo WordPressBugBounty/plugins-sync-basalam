@@ -22,6 +22,8 @@ class FeatureAvailability
         if (!SiteActivation::isEnabled()) return false;
         $token = syncBasalamSettings()->getSettings(SettingsConfig::TOKEN);
         if (!is_string($token) || trim($token) === '') return false;
+        $failure = \SyncBasalam\SalamGate\Services\ShopCheckCache::forToken($token);
+        if ($failure !== null && in_array($failure->getKind(), [SalamGateException::KIND_UNAUTHENTICATED, SalamGateException::KIND_FORBIDDEN], true)) return false;
         $cached = ConnectionCache::lastForTokenForDisplay(ShopsService::CACHE_NAME, $token);
         $shops = $cached['data']['shops'] ?? null;
         return is_array($shops) && AccountStateResolver::stateForShops($shops) === AccountStateResolver::STATE_ACTIVE;

@@ -26,7 +26,7 @@ class QuickUpdateProductStrategy implements DataStrategyInterface
         // Woo product saleable through a stale parent inventory in Basalam.
         if ($product->is_type('variable') && empty($data['variants'])) {
             if ($product->get_stock_status() === 'outofstock') $data['stock'] = 0;
-            unset($data['variants']); // Do not replace or erase remote variations.
+            else unset($data['variants']);
         }
 
         if (!$product->is_type('variable')) {

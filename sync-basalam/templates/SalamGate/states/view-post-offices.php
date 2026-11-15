@@ -18,6 +18,7 @@ if (! defined('ABSPATH')) exit;
             <div>
                 <h3 class="sg-card__title" id="sg-po-title">پیداکردن مرکز تحویل</h3>
                 <p class="sg-card__text">نزدیک‌ترین مرکز را پیدا کنید و پس از پرداخت هزینه ارسال، بسته را به آن تحویل دهید.</p>
+                <p class="sg-po-catalog-date" data-po-catalog-date hidden></p>
             </div>
         </div>
 

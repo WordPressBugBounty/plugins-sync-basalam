@@ -65,9 +65,15 @@ class CustomUpdateProductStrategy implements DataStrategyInterface
             $variants = $this->collectVariants($product, $handler);
             if (!empty($variants)) $data['variants'] = $variants;
             elseif ($this->shouldSyncField(SettingsConfig::SYNC_PRODUCT_FIELD_VARIANT_STOCK)
-                && $product->get_stock_status() === 'outofstock' && !array_key_exists('stock', $data)) {
+                && $product->get_stock_status() === 'outofstock') {
                 $data['stock'] = 0;
+                $data['variants'] = [];
             }
+        }
+
+        if (!$product->is_type('variable')
+            && (isset($data['primary_price']) || isset($data['stock']))) {
+            $data['variants'] = [];
         }
 
         if (!array_key_exists('weight', $data) && $this->shouldSyncField(SettingsConfig::SYNC_PRODUCT_FIELD_WEIGHT)) {

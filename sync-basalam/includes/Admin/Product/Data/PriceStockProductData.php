@@ -24,7 +24,7 @@ final class PriceStockProductData
             foreach ($product->get_children() as $childId) clean_post_cache($childId);
             $variants = $handler->getVariants($product);
             if ($variants) return ProductPriceStockRetry::onlyPriceStock(['variants' => $variants]);
-            if ($product->get_stock_status() === 'outofstock') return ['stock' => 0];
+            if ($product->get_stock_status() === 'outofstock') return ['stock' => 0, 'variants' => []];
             throw NonRetryableException::invalidData('هیچ تنوع دارای قیمت معتبر برای بروزرسانی وجود ندارد.');
         }
 

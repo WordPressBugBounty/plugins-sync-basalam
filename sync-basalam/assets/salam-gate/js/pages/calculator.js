@@ -120,6 +120,7 @@ jQuery(function ($) {
 
   function resetCalculation() {
     calculationRevision += 1;
+    $view.find("[data-calc-activation-cta]").prop("hidden", true);
     $result.hide().empty().removeClass("sg-calc-result--error sg-feedback-toast-only");
     $submitBtn.prop("disabled", !referencesReady);
     $submitLabel.text("محاسبه هزینه ارسال");
@@ -192,7 +193,7 @@ jQuery(function ($) {
     fillCities($receiverProvince, $receiverCity, "گیرنده");
     $box.empty().append($("<option>").val("").text("در حال دریافت بسته‌بندی‌ها…")).prop("disabled", true);
     $boxState.removeClass("sg-field__state--error sg-feedback-toast-only").text("در حال دریافت اطلاعات…");
-    sgPost("salam_gate_onboarding_bootstrap")
+    sgPost("salam_gate_public_calculator_references")
     .done(function (res) {
       if (res && res.success && res.data) {
         provinces = (Array.isArray(res.data.provinces) ? res.data.provinces : []).filter(validReference).map(function (province) {
@@ -246,6 +247,7 @@ jQuery(function ($) {
     var serviceType = $view.find("[data-calc-service]").val();
 
     $result.hide().empty().removeClass("sg-feedback-toast-only");
+    $view.find("[data-calc-activation-cta]").prop("hidden", true);
 
     if (window.SalamGateValidation && !window.SalamGateValidation.validate($view)) return;
     if (!$senderProvince.val() || !$receiverProvince.val()) { calculationError("استان فرستنده و گیرنده را انتخاب کنید."); return; }
@@ -259,7 +261,7 @@ jQuery(function ($) {
     $spinner.show();
     var revision = ++calculationRevision;
 
-    sgPost("salam_gate_calculate", {
+    sgPost("salam_gate_public_calculate", {
       sender_city_id: sender,
       receiver_city_id: receiver,
       weight: String(weight),
@@ -293,6 +295,7 @@ jQuery(function ($) {
             .append($("<p class='sg-calc-disclaimer'>").text("نتیجه برآوردی است؛ هزینه نهایی هنگام ثبت مرسوله محاسبه می‌شود."))
             .append($grid)
             .show();
+          $view.find("[data-calc-activation-cta]").prop("hidden", $unavailable.length === quotes.length);
           return;
         }
         var message = (res && res.data && res.data.message) || "محاسبه ناموفق بود.";

@@ -15,16 +15,19 @@ jQuery(function ($) {
   var $btnPrev = $wizard.find("[data-wizard-prev]");
   var $btnNext = $wizard.find("[data-wizard-next]");
   var $btnSubmit = $wizard.find("[data-wizard-submit]");
+  var $btnTopup = $wizard.find("[data-wizard-topup]");
 
   var currentStep = 1;
   var TOTAL_STEPS = 4;
   var submitting = false;
   var bootstrapReady = false;
   var registrationBlocked = false;
+  var registrationBlockMessage = "";
   var locationsVersion = 0, nodesVersion = 0;
   var locationsRequest = null, nodesRequest = null;
   var bootstrapVersion = 0;
-  var activationBalances = {}, balanceVersion = 0, balancePending = false, serialHelpTrigger = null, paymentMethodManual = false;
+  var activationBalances = {}, balanceVersion = 0, balancePending = false, balanceRequest = null, paymentStepPending = false;
+  var serialHelpTrigger = null, paymentMethodManual = false;
   var statusUrl = $wizard.attr("data-status-url") || window.location.href.split("&view=")[0].replace(/#.*$/, "");
   var $checkStatus = $wizard.find("[data-wizard-check]");
   var bootstrap = { provinces: [], provider: null, payMethods: [], leapYears: [], currentJy: 1400, minimumJy: 1301, birthBounds: null };
@@ -91,20 +94,37 @@ jQuery(function ($) {
   }
 
   function syncButtons() {
-    var blocked = !bootstrapReady || registrationBlocked || submitting;
+    var blocked = !bootstrapReady || registrationBlocked || submitting || paymentStepPending;
     $btnNext.prop("disabled", blocked);
-    $btnPrev.prop("disabled", submitting || registrationBlocked);
-    $btnSubmit.prop("disabled", blocked || !activationFunded() || !$form.find("[data-accept-rules]").prop("checked"));
+    $btnPrev.prop("disabled", submitting || registrationBlocked || paymentStepPending);
+    // Keep the primary action usable; explain validation on click instead of
+    // greying it out. The click handler still prevents duplicate submissions.
+    $btnSubmit.prop("disabled", false).attr("aria-busy", submitting ? "true" : "false");
     renderActivationFunding();
-    $form.attr("aria-busy", submitting ? "true" : "false");
+    $form.attr("aria-busy", submitting || paymentStepPending ? "true" : "false");
   }
 
   function blockRegistration(message, unknown) {
     registrationBlocked = true;
+    registrationBlockMessage = message;
     $checkStatus.prop("hidden", false).attr("href", statusUrl);
     $btnSubmit.text(unknown !== false ? "در حال بررسی" : "ابتدا وضعیت فعال‌سازی را بررسی کنید");
     notice(message, false);
     syncButtons();
+  }
+
+  function handleRegistrationFailure(xhr) {
+    var response = xhr && xhr.responseJSON, data = response && response.data;
+    // Only an explicit local rejection proves that no financial request left
+    // WordPress. A bare HTTP status or a timeout cannot prove rejection.
+    if (response && response.success === false && data && data.request_dispatched === false) {
+      var message = data.code === "access_denied"
+        ? "اعتبار صفحه یا دسترسی شما تأیید نشد؛ صفحه را تازه‌سازی کنید و دوباره تلاش کنید."
+        : typeof data.message === "string" && data.message.trim() ? data.message : "درخواست فعال‌سازی ارسال نشد؛ دوباره تلاش کنید.";
+      notice(message + " درخواست پرداختی به سلام‌گیت ارسال نشده است.", false);
+      return;
+    }
+    blockRegistration("در حال بررسی پرداخت؛ تأیید پرداخت هنوز دریافت نشده؛ وضعیت فعال‌سازی را بررسی کنید. دوباره پرداخت نکنید.");
   }
 
   function activationFee() {
@@ -114,26 +134,29 @@ jQuery(function ($) {
 
   function activationMethod() { return Number($form.find("[name=pay_method]:checked").val()); }
 
-  function activationFunded() {
-    var method = activationMethod(), fee = activationFee(), record = activationBalances[method];
-    return [8, 2].includes(method) && fee !== null && (fee === 0
-      || !!record && record.state === "ready" && record.rial >= fee);
+  function renderActivationAction() {
+    var finalStep = currentStep === TOTAL_STEPS;
+    var topup = finalStep && !submitting && !registrationBlocked && activationMethod() === 2;
+    $btnTopup.prop("hidden", !topup);
+    $btnSubmit.toggle(finalStep);
+    if (!registrationBlocked) $btnSubmit.text(submitting ? "در حال ثبت…" : "فعال‌سازی و پرداخت هزینه");
   }
 
   function activationFundingMessage() {
     var method = activationMethod(), fee = activationFee(), record = activationBalances[method];
-    if (![8, 2].includes(method) || fee === null || fee === 0 || activationFunded()) return "";
+    if (![8, 2].includes(method) || fee === null || fee === 0 || record && record.state === "ready" && record.rial >= fee) return "";
     if (!record || record.state === "loading") return "در حال دریافت موجودی روش پرداخت انتخاب‌شده…";
-    if (record.state !== "ready") return "موجودی روش انتخاب‌شده دریافت نشد؛ موجودی را تازه‌سازی کنید.";
-    return method === 8 ? "موجودی تراز غرفه برای فعال‌سازی کافی نیست. کیف پول باسلام را انتخاب کنید و در صورت نیاز آن را شارژ کنید."
-      : "موجودی کیف پول برای فعال‌سازی کافی نیست. ابتدا کیف پول باسلام را شارژ کنید.";
+    if (record.state === "insufficient") return "موجودی ناکافی است.";
+    if (record.state !== "ready") return record.message || "موجودی دریافت نشد؛ می‌توانید پرداخت را امتحان کنید یا موجودی را تازه‌سازی کنید.";
+    return "موجودی ناکافی است.";
   }
 
   function balanceRecord(data, method) {
     var rial = data && data.balance_rial;
     if (typeof rial === "string" && /^-?\d+$/.test(rial)) rial = Number(rial);
     return data && Number(data.method) === method && Number.isSafeInteger(rial)
-      && (!data.state || data.state === "ready") ? {state: "ready", rial: rial} : {state: "unavailable"};
+      && (!data.state || data.state === "ready") ? {state: "ready", rial: rial}
+      : {state: "unavailable", message: data && typeof data.message === "string" ? data.message : ""};
   }
 
   function selectActivationMethod() {
@@ -153,6 +176,7 @@ jQuery(function ($) {
       var record = activationBalances[method];
       $wizard.find("[data-activation-balance='" + method + "']").text(record && record.state === "ready"
         ? "موجودی: " + faThousands(Math.max(0, record.rial)) + " تومان"
+        : record && record.state === "insufficient" ? "موجودی ناکافی"
         : record && record.state === "loading" ? "در حال دریافت موجودی…" : "موجودی در دسترس نیست");
     });
     var message = activationFundingMessage();
@@ -160,33 +184,60 @@ jQuery(function ($) {
     $wizard.find("[data-wizard-balance-refresh]").prop("disabled", submitting || registrationBlocked || balancePending)
       .attr("aria-busy", balancePending ? "true" : "false").toggleClass("is-refreshing", balancePending)
       .find("[data-wizard-balance-refresh-label]").text(balancePending ? "در حال به‌روزرسانی…" : "تازه‌سازی موجودی");
-    var wallet = activationBalances[2], fee = activationFee();
-    $wizard.find("[data-wizard-topup]").prop("hidden", !(bootstrapReady && activationMethod() === 2
-      && wallet && wallet.state === "ready" && fee !== null && wallet.rial < fee));
+    renderActivationAction();
   }
 
   function refreshActivationBalances() {
-    if (submitting || registrationBlocked || !bootstrapReady || balancePending) return;
-    var version = ++balanceVersion, remaining = 2;
+    if (submitting || registrationBlocked || !bootstrapReady) return null;
+    if (balancePending) return balanceRequest;
+    var version = ++balanceVersion, remaining = 2, completed = $.Deferred();
+    balanceRequest = completed.promise();
     balancePending = true;
     activationBalances = {8: {state: "loading"}, 2: {state: "loading"}};
-    $form.find("[data-accept-rules]").prop("checked", false);
     syncButtons();
     [8, 2].forEach(function (method) {
       var parcelMethod = method === 8 ? 20 : 21;
-      sgWPost("salam_gate_payment_balance", {method: parcelMethod, fresh: 1}).done(function (res) {
+      sgWPost("salam_gate_payment_balance", {method: parcelMethod, fresh: 1, purpose: "activation"}).done(function (res) {
         if (version !== balanceVersion) return;
-        var data = res && res.success === true && res.data;
+        var data = res && res.data;
+        if (!res || res.success !== true) {
+          activationBalances[method] = {state: "unavailable", message: data && typeof data.message === "string" ? data.message : ""};
+          return;
+        }
         var record = balanceRecord(data, parcelMethod);
         if (record.state === "ready" && (!Number.isFinite(Number(data.balance_toman))
           || Math.abs(Number(data.balance_toman) - record.rial / 10) > .001)) record = {state: "unavailable"};
         activationBalances[method] = record;
-      }).fail(function () { if (version === balanceVersion) activationBalances[method] = {state: "unavailable"}; })
+      }).fail(function (xhr) {
+        if (version !== balanceVersion) return;
+        var data = xhr && xhr.responseJSON && xhr.responseJSON.data;
+        activationBalances[method] = {state: "unavailable", message: data && typeof data.message === "string" ? data.message : ""};
+      })
         .always(function () {
           if (version !== balanceVersion) return;
-          if (--remaining === 0) { balancePending = false; selectActivationMethod(); }
+          var finished = --remaining === 0;
+          if (finished) balancePending = false;
           syncButtons();
+          if (finished) completed.resolve();
         });
+    });
+    return completed.promise();
+  }
+
+  function preparePaymentStep() {
+    if (!bootstrapReady || submitting || registrationBlocked || paymentStepPending) return;
+    paymentStepPending = true;
+    $steps.attr("inert", "");
+    syncButtons();
+    var loading = window.WoosalamGateLoading && window.WoosalamGateLoading.begin($form[0], "activation-balances");
+    refreshActivationBalances().done(function () {
+      paymentStepPending = false;
+      $steps.removeAttr("inert");
+      // Wait for both reads before revealing payment. A failed read is shown
+      // as unavailable, never as a zero balance or a reason to block payment.
+      selectActivationMethod();
+      if (loading) loading.ready();
+      showWizardStep(TOTAL_STEPS);
     });
   }
 
@@ -273,8 +324,6 @@ jQuery(function ($) {
       }
       if (!$form.find("[data-pay-methods] input[type=radio]:checked").length) {
         errors.push(["pay_method", "روش پرداخت هزینه فعال‌سازی را انتخاب کنید."]);
-      } else if (!activationFunded()) {
-        errors.push(["pay_method", activationFundingMessage() || "موجودی کافی برای هزینه فعال‌سازی تأیید نشده است."]);
       }
       if (!$form.find("[data-accept-rules]").is(":checked")) {
         errors.push(["accept_rules", "پذیرش قوانین برای ثبت الزامی است."]);
@@ -305,6 +354,14 @@ jQuery(function ($) {
   }
 
   function goToStep(step) {
+    if (step === TOTAL_STEPS && currentStep !== TOTAL_STEPS) {
+      preparePaymentStep();
+      return;
+    }
+    showWizardStep(step);
+  }
+
+  function showWizardStep(step) {
     currentStep = step;
     $steps.prop("hidden", true).removeClass("is-active").filter('[data-step="' + step + '"]').prop("hidden", false).addClass("is-active");
     $navItems.removeClass("is-active is-done").removeAttr("aria-current");
@@ -313,7 +370,7 @@ jQuery(function ($) {
     $btnPrev.toggle(step > 1);
     $btnNext.toggle(step < TOTAL_STEPS);
     $btnSubmit.toggle(step === TOTAL_STEPS);
-    if (step === TOTAL_STEPS) { renderReview(); refreshActivationBalances(); }
+    if (step === TOTAL_STEPS) renderReview();
     $wizard.find("[data-wizard-progress]").text("مرحله " + faNum(step) + " از " + faNum(TOTAL_STEPS));
     syncButtons();
     $steps.filter('[data-step="' + step + '"]').find("h4[tabindex]").trigger("focus");
@@ -505,10 +562,10 @@ jQuery(function ($) {
   goToStep(1);
 
   function loadActivationBootstrap() {
-  if (submitting || registrationBlocked) return;
+  if (submitting || registrationBlocked || paymentStepPending) return;
   var version = ++bootstrapVersion;
   bootstrapReady = false;
-  ++balanceVersion; balancePending = false; activationBalances = {};
+  ++balanceVersion; balancePending = false; balanceRequest = null; activationBalances = {};
   $form.find("[data-accept-rules]").prop("checked", false);
   syncButtons();
   $wizard.find("[data-wizard-retry]").prop("hidden", true);
@@ -677,14 +734,14 @@ jQuery(function ($) {
   $wizard.find("[data-wizard-retry]").on("click", loadActivationBootstrap);
 
   $btnNext.on("click", function () {
-    if (!bootstrapReady || submitting || registrationBlocked) return;
+    if (!bootstrapReady || submitting || registrationBlocked || paymentStepPending) return;
     $notice.hide();
     if (!validateStep(currentStep)) { return; }
     goToStep(Math.min(currentStep + 1, TOTAL_STEPS));
   });
 
   $btnPrev.on("click", function () {
-    if (submitting || registrationBlocked) return;
+    if (submitting || registrationBlocked || paymentStepPending) return;
     $notice.hide();
     goToStep(Math.max(currentStep - 1, 1));
   });
@@ -692,7 +749,22 @@ jQuery(function ($) {
   $form.on("submit", function (e) { e.preventDefault(); });
 
   $btnSubmit.on("click", function () {
-    if (submitting || registrationBlocked || !bootstrapReady) return;
+    if (submitting) {
+      notice("درخواست پرداخت در حال بررسی است؛ لطفاً منتظر بمانید.", false);
+      return;
+    }
+    if (registrationBlocked) {
+      notice(registrationBlockMessage || "درخواست فعال‌سازی ثبت شده است؛ وضعیت آن را بررسی کنید.", false);
+      return;
+    }
+    if (!bootstrapReady) {
+      notice("اطلاعات فعال‌سازی آماده نیست؛ دریافت دوباره اطلاعات را بزنید.", false);
+      return;
+    }
+    if (paymentStepPending) {
+      notice("در حال دریافت موجودی‌ها؛ لطفاً منتظر بمانید.", false);
+      return;
+    }
 
     for (var s = 1; s <= TOTAL_STEPS; s++) {
       if (!validateStep(s)) {
@@ -702,7 +774,7 @@ jQuery(function ($) {
     }
 
     submitting = true;
-    $btnSubmit.prop("disabled", true).text("در حال ثبت…");
+    $btnSubmit.text("در حال ثبت…");
     $notice.hide();
 
     var payload = {};
@@ -716,7 +788,16 @@ jQuery(function ($) {
 
     sgWPost("salam_gate_register_shop", payload)
       .done(function (res) {
-        if (res && res.success && res.data) {
+        if (!res || typeof res.success !== "boolean" || !res.data || typeof res.data !== "object" || Array.isArray(res.data)
+          || res.success === false && (typeof res.data.code !== "string" || !res.data.code.trim())) {
+          handleRegistrationFailure(null);
+          return;
+        }
+        if (res.success === false && res.data.request_dispatched === false) {
+          handleRegistrationFailure({responseJSON: res});
+          return;
+        }
+        if (res.success === true) {
           if (!res.data.shop || !Number.isSafeInteger(res.data.shop.id) || res.data.shop.id <= 0
             || [14, 15, 16, 17].indexOf(res.data.shop.status_id) === -1) {
             blockRegistration("در حال بررسی پرداخت؛ تأیید پرداخت هنوز دریافت نشده؛ وضعیت فعال‌سازی را بررسی کنید. دوباره پرداخت نکنید.");
@@ -763,9 +844,8 @@ jQuery(function ($) {
         }
         if (code === "insufficient_balance" || code === "balance_unavailable") {
           var method = activationMethod();
-          activationBalances[method] = {state: "unavailable"};
-          $form.find("[data-accept-rules]").prop("checked", false);
-          notice(data.message || "موجودی کافی برای فعال‌سازی تأیید نشد؛ موجودی را تازه‌سازی کنید.", false);
+          activationBalances[method] = {state: code === "insufficient_balance" ? "insufficient" : "unavailable", message: data.message || ""};
+          notice(code === "insufficient_balance" ? "موجودی ناکافی است." : data.message || "موجودی دریافت نشد؛ دوباره تلاش کنید.", false);
           return;
         }
         if (code === "activation_cost_changed") {
@@ -785,9 +865,7 @@ jQuery(function ($) {
         notice(data.message || "ثبت ناموفق بود؛ موارد مشخص‌شده را اصلاح کنید.", false);
         $btnSubmit.text("فعال‌سازی و پرداخت هزینه");
       })
-      .fail(function () {
-        blockRegistration("در حال بررسی پرداخت؛ تأیید پرداخت هنوز دریافت نشده؛ وضعیت فعال‌سازی را بررسی کنید. دوباره پرداخت نکنید.");
-      })
+      .fail(handleRegistrationFailure)
       .always(function () {
         submitting = false;
         $steps.removeAttr("inert");

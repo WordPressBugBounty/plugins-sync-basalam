@@ -10,8 +10,7 @@
         }
     },
     "scripts": {
-        "test": "phpunit --configuration phpunit.xml",
-        "di:guard": "@php tools/di-guard.php"
+        "test": "phpunit --configuration phpunit.xml"
     },
     "authors": [
         {

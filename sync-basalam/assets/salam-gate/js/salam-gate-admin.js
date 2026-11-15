@@ -362,7 +362,9 @@
       }
       var nav = page.querySelector("[data-sg-nav]");
       if (!nav) return;
-      nav.hidden = state !== "active";
+      // The navigation also contains tools available before activation. Only
+      // individual shipping links depend on the verified account state.
+      nav.hidden = false;
       nav.querySelectorAll("[data-sg-nav-item]").forEach(function (link) {
         if (link.getAttribute("data-sg-requires-active") === "true") link.hidden = state !== "active";
         if (link.getAttribute("data-sg-requires-registration") === "true") {

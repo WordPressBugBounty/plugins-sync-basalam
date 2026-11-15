@@ -6,7 +6,7 @@ jQuery(function ($) {
   var $view = $("[data-view='post-offices']");
   if (!$view.length) return;
 
-  var provinces = [];
+  var provinces = [], unassignedNodes = [];
   var $province = $view.find("[data-po-province]");
   var $location = $view.find("[data-po-location]");
   var $locationState = $view.find("[data-po-location-state]");
@@ -29,7 +29,7 @@ jQuery(function ($) {
     $select.empty().append($("<option>").val("").text(text)).prop("disabled", !!disabled);
   }
   function showResults() {
-    var ready = !!$province.val() && !!$location.val();
+    var ready = $province.val() === "unassigned" || (!!$province.val() && !!$location.val());
     $resultSection.prop("hidden", !ready);
     return ready;
   }
@@ -105,7 +105,7 @@ jQuery(function ($) {
     $referenceState.text("در حال دریافت فهرست استان‌ها…").removeClass("sg-field__state--error sg-feedback-toast-only");
     $retry.prop("hidden", true).hide();
     resultMessage("برای مشاهده مراکز، استان و منطقه پستی را انتخاب کنید.");
-    referenceRequest = sgPost("salam_gate_post_offices_references", { fresh: fresh ? "1" : "0" })
+    referenceRequest = sgPost("salam_gate_public_post_offices")
       .done(function (res) {
         if (epoch !== referenceEpoch) return;
         if (!res || !res.success || !res.data || !validOptions(res.data.provinces)) {
@@ -113,8 +113,14 @@ jQuery(function ($) {
           return;
         }
         provinces = res.data.provinces;
+        unassignedNodes = validNodes(res.data.unassigned_nodes) ? res.data.unassigned_nodes : [];
         options($province, "انتخاب استان", false);
         $.each(provinces, function (_, province) { $province.append($("<option>").val(String(province.id)).text(province.title)); });
+        if (unassignedNodes.length) $province.append($("<option>").val("unassigned").text("مراکز بدون استان مشخص"));
+        var catalogDate = res.data.catalog && new Date(res.data.catalog.fetched_at);
+        if (catalogDate && Number.isFinite(catalogDate.getTime())) {
+          $view.find("[data-po-catalog-date]").text("آخرین به‌روزرسانی فهرست مراکز: " + catalogDate.toLocaleDateString("fa-IR")).prop("hidden", false);
+        }
         $referenceState.text(res.data.stale ? "فهرست ذخیره‌شده نمایش داده می‌شود؛ برای دریافت اطلاعات تازه دوباره تلاش کنید." : "");
         if (res.data.stale) { retryStage = "references"; $retry.prop("hidden", false).show().prop("disabled", false); }
         if (referencesLoading) referencesLoading.ready();
@@ -141,12 +147,19 @@ jQuery(function ($) {
     options($location, pid ? "در حال دریافت مناطق پستی…" : "ابتدا استان را انتخاب کنید", true);
     $retry.prop("hidden", true).hide();
     $locationState.text("").removeClass("sg-field__state--error sg-feedback-toast-only");
+    $view.find("#sg-po-results-title").text(pid === "unassigned" ? "مراکز بدون استان مشخص" : "مراکز منطقه انتخاب‌شده");
     resultMessage("برای مشاهده مراکز، منطقه پستی را انتخاب کنید.");
     if (!pid) return;
+    if (pid === "unassigned") {
+      options($location, "منطقهٔ هر مرکز در اطلاعات آن آمده است", true);
+      $locationState.text("استان این مراکز در فهرست سلام‌گیت مشخص نشده است؛ نشانی و اطلاعات تماس را بررسی کنید.");
+      renderNodes(unassignedNodes);
+      return;
+    }
     locationLoading = window.WoosalamGateLoading && window.WoosalamGateLoading.begin($view[0], "locations", function () { loadLocations($province.val()); });
     var loading = locationLoading;
     $locationState.text("در حال دریافت مناطق پستی…");
-    locationRequest = sgPost("salam_gate_provider_locations", { province_id: pid })
+    locationRequest = sgPost("salam_gate_public_provider_locations", { province_id: pid })
       .done(function (res) {
         if (epoch !== locationEpoch || String($province.val()) !== String(pid)) return;
         if (res && res.success && res.data && res.data.has_coverage === false && Array.isArray(res.data.locations) && res.data.locations.length === 0) {
@@ -185,7 +198,7 @@ jQuery(function ($) {
     nodeLoading = window.WoosalamGateLoading && window.WoosalamGateLoading.begin($view[0], "nodes", function () { loadNodes($location.val()); });
     var loading = nodeLoading;
     $results.html("<div class='sg-settings__loading'><span class='sg-loading-spinner' aria-hidden='true'></span> در حال دریافت اطلاعات…</div>");
-    nodeRequest = sgPost("salam_gate_provider_nodes", { provider_location_id: lid })
+    nodeRequest = sgPost("salam_gate_public_provider_nodes", { provider_location_id: lid })
       .done(function (res) {
         if (epoch !== nodeEpoch || String($location.val()) !== String(lid)) return;
         if (res && res.success && res.data && validNodes(res.data.nodes)) {

@@ -35,12 +35,13 @@ $faqs = [
             <span class="sg-intro__eyebrow">ارسال مرسوله، از همین فروشگاه</span>
             <h2 class="sg-hero__title" id="sg-intro-title">سفارش‌ها را برای ارسال آماده کنید</h2>
             <p class="sg-hero__desc">
-                از محاسبهٔ هزینه تا دریافت برچسب پستی، همهٔ مراحل ارسال را در ووسلام انجام دهید.
-                برای شروع، حساب سلام‌گیت خود را فعال کنید.
+                مرسوله‌های فروشگاه را تکی یا گروهی ثبت کنید و برچسب پستی بگیرید.
+                قبل از فعال‌سازی، ابزارهای ارسال را امتحان کنید؛ برای ثبت مرسوله، سلام‌گیت را فعال کنید.
             </p>
             <div class="sg-hero__actions">
                 <a class="sg-button sg-button--primary sg-button--lg" href="#sg-activation" data-sg-open-activation>فعال‌سازی سلام‌گیت<span class="dashicons dashicons-arrow-left-alt2" aria-hidden="true"></span></a>
             </div>
+            <p class="sg-public-tools-note">هزینهٔ فعال‌سازی سرویس از هزینهٔ ارسال هر مرسوله جداست؛ مبلغ فعال‌سازی پیش از پرداخت نمایش داده می‌شود.</p>
         </div>
         <div class="sg-hero__art" aria-hidden="true">
             <span class="sg-intro-visual__truck"><?php echo \SyncBasalam\SalamGate\Admin\Menus::shipmentIcon(); ?></span>
@@ -48,6 +49,23 @@ $faqs = [
             <div class="sg-intro-visual__row"><span class="dashicons dashicons-archive"></span>مشخصات مرسوله</div>
             <div class="sg-intro-visual__row"><span class="dashicons dashicons-location-alt"></span>انتخاب روش ارسال</div>
             <div class="sg-intro-visual__row"><span class="dashicons dashicons-printer"></span>بارکد و برچسب پستی</div>
+        </div>
+    </section>
+
+    <section class="sg-section" aria-labelledby="sg-public-tools-title">
+        <h2 class="sg-section__title" id="sg-public-tools-title">قبل از فعال‌سازی امتحان کنید</h2>
+        <p class="sg-public-tools-note">این ابزارها بدون فعال‌سازی سلام‌گیت و پرداخت هزینهٔ فعال‌سازی در دسترس‌اند.</p>
+        <div class="sg-public-tools">
+            <?php foreach ([
+                ['calculator', 'calculator', 'هزینه ارسال چقدر می‌شود؟', 'مبدأ، مقصد و مشخصات بسته را وارد کنید و برآورد هزینه را ببینید.'],
+                ['post-offices', 'location-alt', 'بسته را کجا تحویل بدهم؟', 'مراکز تحویل منطقه‌تان را با نشانی و اطلاعات تماس پیدا کنید.'],
+                ['tracking', 'search', 'مرسوله‌ام کجاست؟', 'با کد رهگیری، وضعیت مرسوله را در سامانه پست ببینید.'],
+            ] as [$toolView, $toolIcon, $toolTitle, $toolDescription]) : ?>
+                <a class="sg-public-tool" href="<?php echo esc_url(admin_url('admin.php?page=salam_gate&view=' . $toolView)); ?>">
+                    <span class="dashicons dashicons-<?php echo esc_attr($toolIcon); ?>" aria-hidden="true"></span>
+                    <div><strong><?php echo esc_html($toolTitle); ?></strong><p><?php echo esc_html($toolDescription); ?></p></div>
+                </a>
+            <?php endforeach; ?>
         </div>
     </section>
 

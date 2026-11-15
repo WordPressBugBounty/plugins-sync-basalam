@@ -9,6 +9,8 @@ use SyncBasalam\Jobs\Types\CreateSingleProductJob;
 use SyncBasalam\Jobs\Types\CreateAllProductsJob;
 use SyncBasalam\Jobs\Types\AutoConnectProductsJob;
 use SyncBasalam\Jobs\Types\FetchOrdersJob;
+use SyncBasalam\Jobs\Types\FindUnmappedProductsJob;
+use SyncBasalam\Jobs\Types\ArchiveUnmappedProductsJob;
 
 defined('ABSPATH') || exit;
 
@@ -40,6 +42,8 @@ class JobRegistry
         $this->register($container->get(CreateAllProductsJob::class));
         $this->register($container->get(AutoConnectProductsJob::class));
         $this->register($container->get(FetchOrdersJob::class));
+        $this->register($container->get(FindUnmappedProductsJob::class));
+        $this->register($container->get(ArchiveUnmappedProductsJob::class));
     }
 
     public function register(JobType $jobType): void

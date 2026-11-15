@@ -49,9 +49,10 @@ final class ProductPriceStockRetry
                 );
             }, $restricted['variants']);
 
-            // An explicit [] converts a simple Woo product's remote counterpart
-            // to simple. Missing variants means preserve its current variations.
-            if ($restricted['variants'] === [] && ($restricted['type'] ?? null) === 'variable') {
+            // Explicit deletion also makes an unavailable, unpriced variable
+            // product's parent stock writable. Omission never implies deletion.
+            if ($restricted['variants'] === [] && ($restricted['type'] ?? null) === 'variable'
+                && ($restricted['stock'] ?? null) !== 0) {
                 unset($restricted['variants']);
             }
         }

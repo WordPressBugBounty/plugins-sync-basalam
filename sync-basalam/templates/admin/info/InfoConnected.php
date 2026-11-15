@@ -1,8 +1,10 @@
 <?php
 use SyncBasalam\Admin\Components\SettingPageComponents;
+use SyncBasalam\Services\Products\UnmappedProducts\UnmappedProductsAlert;
 use SyncBasalam\Services\VendorInfoService;
 
 $vendorInfo = (new VendorInfoService())->FetchVendorInfo();
+$syncBasalamUnmappedOpenCount = UnmappedProductsAlert::menuUnresolvedCount();
 
 defined('ABSPATH') || exit;
 ?>
@@ -34,6 +36,16 @@ defined('ABSPATH') || exit;
                 <div class="info-label">محصولات فعال غرفه</div>
                 <div class="info-value"><?php echo esc_html($vendorInfo['product_count'] ?? ''); ?></div>
             </div>
+        </div>
+        <div class="basalam-unmapped-info-link-row">
+            <a class="basalam-secondary-button basalam-p basalam-padding-small"
+                href="<?php echo esc_url(UnmappedProductsAlert::pageUrl()); ?>">
+                <span class="dashicons dashicons-editor-unlink basalom-icon-medium"></span>
+                محصولات باسلامِ متصل‌نشده به ووکامرس
+                <?php if ($syncBasalamUnmappedOpenCount > 0): ?>
+                    <span class="basalam-unmapped-info-count"><?php echo esc_html(number_format_i18n($syncBasalamUnmappedOpenCount)); ?></span>
+                <?php endif; ?>
+            </a>
         </div>
     </div>
     <center>

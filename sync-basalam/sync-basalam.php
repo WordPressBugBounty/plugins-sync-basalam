@@ -9,13 +9,14 @@ use SyncBasalam\Infrastructure\Container\Container;
 use SyncBasalam\Services\ForceUpdateGate;
 use SyncBasalam\Services\VendorSyncPolicy;
 use SyncBasalam\Services\ScheduledProductSync;
+use SyncBasalam\Services\Products\UnmappedProducts\ScheduledUnmappedScan;
 
 defined('ABSPATH') || exit;
 
 /**
  * Plugin Name: sync basalam | ووسلام
  * Description: با استفاده از پلاگین ووسلام  میتوایند تمامی محصولات ووکامرس را با یک کلیک به غرفه باسلامی خود اضافه کنید‌، همچنین تمامی سفارش باسلامی شما به سایت شما اضافه میگردد.
- * Version: 1.10.46
+ * Version: 1.10.47
  * Author: Woosalam Dev
  * Author URI: https://hamsalam.ir/wp
  * Plugin URI: https://hamsalam.ir/wp
@@ -93,6 +94,7 @@ function syncBasalamActivatePlugin()
     Activator::activate();
     syncBasalamContainer()->get(VendorSyncPolicy::class)->ensureScheduled();
     (new ScheduledProductSync())->ensureScheduled();
+    (new ScheduledUnmappedScan())->ensureScheduled();
     set_transient('sync_basalam_just_activated', true, 10);
 }
 
@@ -100,6 +102,7 @@ function syncBasalamDeactivatePlugin()
 {
     VendorSyncPolicy::unschedule();
     ScheduledProductSync::unschedule();
+    ScheduledUnmappedScan::unschedule();
     \SyncBasalam\SalamGate\Module::deactivate();
     \SyncBasalam\SalamPay\Module::deactivate();
 }
@@ -107,3 +110,4 @@ function syncBasalamDeactivatePlugin()
 syncBasalamContainer()->get(JobsRunner::class);
 syncBasalamContainer()->get(VendorSyncPolicy::class)->registerHooks();
 (new ScheduledProductSync())->registerHooks();
+(new ScheduledUnmappedScan())->registerHooks();

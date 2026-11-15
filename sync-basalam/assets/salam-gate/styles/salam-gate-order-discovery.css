@@ -1,0 +1,69 @@
+/* Only loaded on inactive Woo order lists; no workflow assets or global notice overrides. */
+.sg-order-discovery-preference {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 20px;
+    box-sizing: border-box;
+    margin: 12px 20px 12px 0;
+    padding: 12px 16px;
+    border: 1px solid #f0dfd5;
+    border-radius: 10px;
+    background: #fffaf7;
+    color: #5c4c44;
+    font-family: "PelakFA", Tahoma, sans-serif;
+    line-height: 1.8;
+}
+.rtl .sg-order-discovery-preference { margin: 12px 0 12px 20px; }
+.sg-order-discovery-preference.is-hidden { border-color: #dcdcde; background: #fff; color: #646970; }
+.sg-order-discovery-preference p { margin: 0; font-size: 12px; }
+.sg-order-discovery-preference form { flex: 0 0 auto; margin: 0; }
+.sg-order-discovery-preference .button-link { color: #91401f; font: inherit; font-size: 12px; text-decoration: underline; text-underline-offset: 3px; }
+.sg-order-discovery-preference .button-link:focus-visible { outline: 2px solid #b94f25; outline-offset: 4px; box-shadow: none; }
+.sg-order-discovery-help { display: inline-block; color: #646970; font-size: 12px; line-height: 1.8; }
+.wp-list-table .sg-order-discovery-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-sizing: border-box;
+    width: 144px;
+    max-width: 100%;
+    min-height: 36px;
+    margin: 0;
+    padding: 7px 10px;
+    border: 1px solid #ef7844;
+    border-radius: 9px;
+    background: #ef7844;
+    color: #fff;
+    font-family: var(--sg-font-body, "PelakFA", sans-serif);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.6;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background .18s, border-color .18s, box-shadow .18s;
+}
+.wp-list-table .sg-order-discovery-link:hover { background: #df6231; border-color: #df6231; color: #fff; }
+.wp-list-table .sg-order-discovery-link:focus { outline: 2px solid #c65127; outline-offset: 3px; background: #df6231; border-color: #df6231; color: #fff; box-shadow: none; }
+.wp-list-table .sg-order-discovery-link > span { color: inherit; font: inherit; }
+.sg-order-discovery-link__icon {
+    display: inline-block;
+    flex: 0 0 17px;
+    width: 17px;
+    height: 17px;
+    background: currentColor;
+    -webkit-mask: url('../images/salam-gate-icons/truck.svg') center / contain no-repeat;
+    mask: url('../images/salam-gate-icons/truck.svg') center / contain no-repeat;
+}
+@media (prefers-reduced-motion: reduce) {
+    .wp-list-table .sg-order-discovery-link { transition: none; }
+}
+@media (min-width: 783px) {
+    .wp-list-table .column-salam_gate_action { width: 150px; }
+}
+@media (max-width: 782px) {
+    .sg-order-discovery-preference, .rtl .sg-order-discovery-preference { align-items: flex-start; flex-direction: column; margin: 12px 0; padding: 12px; }
+    .sg-order-discovery-preference .button-link { min-height: 36px; }
+    .wp-list-table .sg-order-discovery-link { min-height: 40px; }
+}

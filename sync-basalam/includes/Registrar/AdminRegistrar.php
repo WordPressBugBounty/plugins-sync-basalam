@@ -21,6 +21,7 @@ use SyncBasalam\Admin\Announcement\AnnouncementCenter;
 use SyncBasalam\Admin\Onboarding\PointerTour;
 use SyncBasalam\Services\Products\DuplicateConnectionReport;
 use SyncBasalam\Services\Products\ProductConnection;
+use SyncBasalam\Services\Products\UnmappedProducts\UnmappedProductsAlert;
 use SyncBasalam\Services\SystemResourceMonitor;
 use SyncBasalam\Utilities\ProductMetaKey;
 use SyncBasalam\Utilities\ProductOperationNotice;
@@ -142,6 +143,9 @@ class AdminRegistrar implements RegistrarInterface
 
         // Duplicate connection report (admin notice + dismiss handler)
         DuplicateConnectionReport::registerHooks();
+
+        // Unmapped Basalam products report (admin notice + dismiss handler)
+        UnmappedProductsAlert::registerHooks();
 
         // Order Check Buttons (HPOS)
         \add_action("woocommerce_order_list_table_extra_tablenav", [OrderPageComponents::class, "renderCheckOrdersButton"], 20, 1);
@@ -619,6 +623,30 @@ class AdminRegistrar implements RegistrarInterface
             wp_localize_script('basalam-product-queue-status', 'basalamProductQueueStatus', [
                 'url' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('get_update_queue_status_nonce'),
+            ]);
+        }
+
+        if (self::isPluginPage('basalam-show-products')) {
+            $unmappedScript = syncBasalamPlugin()->pluginPath() . '/assets/js/unmapped-products.js';
+            wp_enqueue_script(
+                'basalam-unmapped-products',
+                self::assetsUrl('js/unmapped-products.js'),
+                ['jquery', 'basalam-admin-toast-script'],
+                file_exists($unmappedScript) ? $version . '-' . filemtime($unmappedScript) : $version,
+                true
+            );
+            wp_localize_script('basalam-unmapped-products', 'basalamUnmappedProducts', [
+                'url' => admin_url('admin-ajax.php'),
+                'nonces' => [
+                    'start' => wp_create_nonce('start_unmapped_products_scan_nonce'),
+                    'status' => wp_create_nonce('get_unmapped_scan_status_nonce'),
+                    'archive' => wp_create_nonce('archive_unmapped_product_nonce'),
+                    'archiveAll' => wp_create_nonce('archive_all_unmapped_products_nonce'),
+                    'stopArchive' => wp_create_nonce('stop_unmapped_products_archive_nonce'),
+                    'ignore' => wp_create_nonce('ignore_unmapped_product_nonce'),
+                    'connect' => wp_create_nonce('connect_unmapped_product_nonce'),
+                    'search' => wp_create_nonce('search_woo_products_for_unmapped_nonce'),
+                ],
             ]);
         }
 

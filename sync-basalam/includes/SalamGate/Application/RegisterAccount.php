@@ -100,25 +100,10 @@ final class RegisterAccount
 
         $shopsService = new ShopsService();
         try {
-            $shop = $shopsService->register($body, function () use ($input, $price, $account, $profile): void {
+            $shop = $shopsService->register($body, function () use ($account, $profile): void {
+                // Displayed balances are advisory. The provider decides whether
+                // funds are sufficient; retain identity and duplicate safeguards.
                 $account->assertSnapshot($profile);
-                // A valid zero activation fee does not require available funds.
-                if ($price === 0) return;
-                try {
-                    $balance = (new AccountBootstrap($this->input, $this->context))->activationBalance($input['pay_method'], true);
-                } catch (\Throwable $exception) {
-                    throw new SalamGateException('موجودی روش پرداخت تأیید نشد؛ موجودی را تازه‌سازی کنید. ثبت یا پرداختی انجام نشده است.',
-                        0, [['location' => 'activation_balance', 'message' => 'balance_unavailable']],
-                        SalamGateException::KIND_UNEXPECTED_RESPONSE);
-                }
-                $account->assertSnapshot($profile);
-                if ($balance['balance_rial'] < $price) {
-                    $message = $input['pay_method'] === PayMethods::SHOP_ACTIVATION_VENDOR_BALANCE
-                        ? 'موجودی تراز غرفه برای فعال‌سازی کافی نیست؛ کیف پول باسلام را انتخاب و در صورت نیاز شارژ کنید.'
-                        : 'موجودی کیف پول برای فعال‌سازی کافی نیست؛ ابتدا کیف پول باسلام را شارژ کنید.';
-                    throw new SalamGateException($message, 422,
-                        [['location' => 'activation_balance', 'message' => 'insufficient_balance']], SalamGateException::KIND_VALIDATION);
-                }
             });
 
             return [
@@ -135,12 +120,7 @@ final class RegisterAccount
             $payload = (new RegistrationInput($this->input, $this->context))->errorPayload($exception);
             $registrationErrors = $exception->errorsAt('registration');
 
-            if (!$shopsService->registrationSubmitted() && $exception->errorsAt('activation_balance') !== []) {
-                $payload['code'] = $exception->errorsAt('activation_balance')[0]['message'];
-                $payload['message'] = $exception->getMessage();
-                $payload['errors'] = [];
-                $payload['registration_submitted'] = false;
-            } elseif ($registrationErrors !== []) {
+            if ($registrationErrors !== []) {
                 $payload['code'] = $registrationErrors[0]['message'];
                 $payload['message'] = $exception->getMessage();
                 $payload['errors'] = [];
@@ -159,7 +139,7 @@ final class RegisterAccount
             } elseif ($this->isDuplicateRegistration($exception)) {
                 $payload['code'] = 'duplicate_registration';
                 $payload['message'] = 'برای این کاربر/سرویس‌دهنده با این کدپستی قبلاً ثبت انجام شده است.';
-            } elseif ($this->mentionsBalance($exception)) {
+            } elseif ($this->isInsufficientActivationBalance($exception, $input['pay_method'])) {
                 $payload['code'] = 'insufficient_balance';
                 $payload['message'] = 'موجودی روش پرداخت انتخاب‌شده برای هزینه فعال‌سازی کافی نیست.';
             }
@@ -239,18 +219,24 @@ final class RegisterAccount
         throw new SalamGateException($message, 422, [['location' => 'body.' . $field, 'message' => $message]], SalamGateException::KIND_VALIDATION);
     }
 
-    public function mentionsBalance(SalamGateException $exception): bool
+    public function isInsufficientActivationBalance(SalamGateException $exception, int $method): bool
     {
-        foreach ($exception->getErrors() as $error) {
-            $haystack = $error['message'] . ' ' . $error['location'];
-            if (str_contains($haystack, 'balance') || str_contains($haystack, 'vendor_balance')
-                || str_contains($haystack, 'user_wallet') || str_contains($haystack, 'موجودی')
-            ) {
-                return true;
-            }
+        if ($exception->getStatus() !== 422 || !$exception->isKind(SalamGateException::KIND_VALIDATION)) {
+            return false;
         }
 
-        return false;
+        // ShopActivationBalanceValidator exposes field/message pairs, not an
+        // error code. A vendor_balance error can also mean a missing vendor;
+        // neither a field name nor a generic balance message proves low funds.
+        $expected = [
+            PayMethods::SHOP_ACTIVATION_VENDOR_BALANCE => ['vendor_balance', 'تراز غرفه کافی نیست'],
+            PayMethods::SHOP_ACTIVATION_WALLET => ['user_wallet', 'موجودی کیف پول کافی نیست'],
+        ][$method] ?? null;
+        $errors = $exception->getErrors();
+
+        return $expected !== null && count($errors) === 1
+            && $errors[0]['location'] === $expected[0]
+            && in_array(trim($errors[0]['message']), [$expected[1], $expected[1] . '.'], true);
     }
 
     public function isDuplicateRegistration(SalamGateException $exception): bool

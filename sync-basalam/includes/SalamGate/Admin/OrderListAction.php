@@ -16,6 +16,10 @@ final class OrderListAction
     public static function render(\WC_Order $order, ?array $state = null): void
     {
         if (!current_user_can('manage_woocommerce')) { return; }
+        if (!\SyncBasalam\SalamGate\FeatureAvailability::isVisible()) {
+            OrderDiscovery::renderOrder($order);
+            return;
+        }
         $state = $state ?? self::forOrder($order);
         $mode = $state['mode'];
         $source = OrderShippingStatus::sourceOrderStatus($order);

@@ -11,6 +11,7 @@ use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Admin\Settings\SettingsManager;
 use SyncBasalam\Admin\Product\Data\ProductDataBuilder;
+use SyncBasalam\Admin\Product\Data\Services\VariantService;
 use SyncBasalam\Services\Products\ProductConnection;
 use SyncBasalam\Services\Products\ProductOwnership;
 use SyncBasalam\Services\Products\ProductSkuRetry;
@@ -161,6 +162,12 @@ class BulkUpdateProductsJob extends AbstractJobType
                 $batchPayload
             );
             $outcome = $this->settleBatchResponse($url, $batchPayload['data'], $res);
+            foreach ($batchPayload['data'] as $productData) {
+                if (($productData['variants'] ?? null) === []
+                    && in_array((string) $productData['id'], $outcome['successful_ids'], true)) {
+                    VariantService::clearVariationIds($productIdsByRemote[(string) $productData['id']]);
+                }
+            }
             $deferred = $this->enqueueRetryableItems($outcome['retryable'], $productIdsByRemote);
             $newLastId = max($productIds);
             $this->enqueueContinuation($newLastId);
@@ -232,8 +239,12 @@ class BulkUpdateProductsJob extends AbstractJobType
 
         $failed = [];
         $retryable = [];
+        $successfulIds = [];
         foreach ($results as $id => $result) {
-            if (!$this->batchItemFailed($result)) continue;
+            if (!$this->batchItemFailed($result)) {
+                $successfulIds[] = (string) $id;
+                continue;
+            }
             $status = $this->batchItemStatus($result);
             $failed[$id] = [
                 'status_code' => $status,
@@ -245,7 +256,7 @@ class BulkUpdateProductsJob extends AbstractJobType
             }
         }
 
-        return ['updated' => count($results) - count($failed) - count($retryable), 'failed' => $failed, 'retryable' => $retryable];
+        return ['updated' => count($successfulIds), 'successful_ids' => $successfulIds, 'failed' => $failed, 'retryable' => $retryable];
     }
 
     /** Persist failed products independently so retry exhaustion cannot strand later pages. */

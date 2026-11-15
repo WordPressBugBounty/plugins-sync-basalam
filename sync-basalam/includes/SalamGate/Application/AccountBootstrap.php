@@ -88,17 +88,11 @@ final class AccountBootstrap
         $account->assertSnapshot($profile);
         $balances = [];
         if ($activation) {
+            // Balances are advisory and are fetched concurrently by the
+            // payment step. Preparing identity/address must not wait on them.
             foreach ([PayMethods::SHOP_ACTIVATION_VENDOR_BALANCE, PayMethods::SHOP_ACTIVATION_WALLET] as $method) {
-                try {
-                    $balance = $this->activationBalance($method, true);
-                    $balances[$method] = $balance + ['state' => 'ready'];
-                } catch (\Throwable $exception) {
-                    // A failed financial read is not a zero balance and must
-                    // not prevent identity/address completion or recovery.
-                    $balances[$method] = ['method' => $method, 'state' => 'unavailable',
-                        'balance_rial' => null, 'display_balance_rial' => null, 'fetched_at' => null];
-                }
-                $account->assertSnapshot($profile);
+                $balances[$method] = ['method' => $method, 'state' => 'not_loaded',
+                    'balance_rial' => null, 'display_balance_rial' => null, 'fetched_at' => null];
             }
         }
 

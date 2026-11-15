@@ -183,6 +183,8 @@ class UpdateSingleProductService
 
         if (is_wp_error($request)) throw NonRetryableException::permanent('خطایی در ارتباط با سرور رخ داد.');
 
+        $this->clearDeletedVariationIds($productId, $productData, $body);
+
         // Basalam may return a successful response with a stale/null product SKU
         // when another product field (most commonly a long description) is
         // present in the same patch.  Send the SKU on its own when the response
@@ -322,8 +324,12 @@ class UpdateSingleProductService
             }
             unset($variant);
             if (!$variants) {
-                if ($product->get_stock_status() === 'outofstock') $productData['stock'] = 0;
-                unset($productData['variants']);
+                if ($product->get_stock_status() === 'outofstock') {
+                    $productData['stock'] = 0;
+                    $productData['variants'] = [];
+                } else {
+                    unset($productData['variants']);
+                }
             } else {
                 $productData['variants'] = $variants;
             }
@@ -511,9 +517,20 @@ class UpdateSingleProductService
         if (isset($skuData['variants'])) {
             $skuBody = $skuRequest['body'] ?? [];
             if (is_string($skuBody)) $skuBody = json_decode($skuBody, true);
-            if (is_array($skuBody) && isset($skuBody['variants'])) {
+            $this->clearDeletedVariationIds($productId, $skuData, $skuBody);
+            if (is_array($skuBody) && array_key_exists('variants', $skuBody)) {
                 $responseBody['variants'] = $skuBody['variants'];
             }
+        }
+    }
+
+    private function clearDeletedVariationIds(int $productId, array $payload, $body): void
+    {
+        // A successful explicit deletion returns variants:null on OpenAPI v1.
+        // Omitted or nonempty response variants do not confirm a deletion.
+        if (($payload['variants'] ?? null) === [] && is_array($body)
+            && array_key_exists('variants', $body) && ($body['variants'] === null || $body['variants'] === [])) {
+            VariantService::clearVariationIds($productId);
         }
     }
 }

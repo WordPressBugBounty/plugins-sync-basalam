@@ -24,7 +24,10 @@ final class OrderShippingStatus
 
     public static function columns(array $columns): array
     {
-        if (!\SyncBasalam\SalamGate\FeatureAvailability::isVisible()) return $columns;
+        if (!\SyncBasalam\SalamGate\FeatureAvailability::isVisible()) {
+            if (OrderDiscovery::shouldShow()) $columns[self::ACTION_COLUMN] = 'ارسال مرسوله';
+            return $columns;
+        }
         unset($columns[self::COLUMN], $columns[self::ACTION_COLUMN], $columns['basalam_order']);
         $result = [];
         foreach ($columns as $key => $label) {
@@ -74,11 +77,16 @@ final class OrderShippingStatus
     /** HPOS supplies WC_Order; the legacy screen supplies a post ID. */
     public static function render(string $column, $orderOrId): void
     {
-        if (!\SyncBasalam\SalamGate\FeatureAvailability::isVisible()) return;
         if (!in_array($column, [self::COLUMN, self::ACTION_COLUMN], true)) { return; }
+        $active = \SyncBasalam\SalamGate\FeatureAvailability::isVisible();
+        if (!$active && ($column !== self::ACTION_COLUMN || !OrderDiscovery::shouldShow())) return;
         $order = $orderOrId instanceof \WC_Order ? $orderOrId
             : (function_exists('wc_get_order') ? wc_get_order($orderOrId) : false);
         if (!$order instanceof \WC_Order) { echo '&mdash;'; return; }
+        if (!$active) {
+            OrderDiscovery::renderOrder($order);
+            return;
+        }
         $action = OrderListAction::forOrder($order);
         if ($column === self::ACTION_COLUMN) {
             OrderListAction::render($order, $action);

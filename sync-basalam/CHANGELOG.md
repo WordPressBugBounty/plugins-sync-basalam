@@ -1,5 +1,30 @@
 # Changelog
 
+## Unreleased
+
+<details>
+
+<summary>1.10.47 - 2026-11-15</summary>
+
+### Added
+
+- Add a vendor-scoped report for active Basalam products without WooCommerce mappings, with connect, ignore, single archive and bulk archive actions, durable progress and stop/resume.
+- Schedule daily scans through the WooSalam JobManager runner without a dedicated WP-Cron event; preserve existing due times and prevent repeat scans until the report is resolved.
+
+### Changed
+
+- Reserve two of every ten non-order job starts for scans and bulk archives, alternate when both are ready, and immediately lend idle capacity. Orders retain first priority and rotation persists across workers.
+- Expose cancelled/failed-order exclusions in site order-statistics responses.
+- Include upstream SalamGate discovery, public calculator/post-office tools and activation/account-balance refinements.
+
+### Fixed
+
+- Clear remote variants and stock for unavailable unpriced variable products across full, quick, custom, fresh retry, restricted-vendor and batch updates. Remove stale local variation mappings only after confirmed deletion.
+- Preserve explicit empty variants when custom price/stock updates replace a simple product's remote variations.
+- Preserve null redirects from invoice and address-label bulk actions so FaktorYar printing does not trigger a SalamGate type error.
+
+</details>
+
 <details>
 
 <summary>1.10.46 - 2026-11-14</summary>

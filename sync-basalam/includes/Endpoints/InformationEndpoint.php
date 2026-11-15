@@ -74,6 +74,7 @@ class InformationEndpoint
             'request_status'        => RequestStatusTracker::getSummary(),
             'order_counts'          => $orderStatistics['counts'],
             'order_amounts'         => $orderStatistics['amounts'],
+            'order_statistics'      => ['excluded_statuses' => ['cancelled', 'failed']],
             'last_10_log'           => [
                 'info'  => self::getLastLogsByLevel('INFO', 10),
                 'error' => self::getLastLogsByLevel('ERROR', 10),

@@ -76,5 +76,11 @@ $backUrl = admin_url('admin.php?page=salam_gate');
         </div>
 
         <div class="sg-calc-result" data-calc-result style="display:none;" role="status" aria-live="polite"></div>
+        <?php if (!\SyncBasalam\SalamGate\FeatureAvailability::isVisible()) : ?>
+            <div class="sg-calc-activation" data-calc-activation-cta hidden>
+                <div><strong>برای ارسال سفارش‌ها آماده‌اید؟</strong><p>سلام‌گیت را فعال کنید و ثبت مرسوله و چاپ برچسب را از داخل ووسلام انجام دهید.</p></div>
+                <a class="sg-button sg-button--primary" href="<?php echo esc_url($backUrl); ?>">آشنایی و فعال‌سازی سلام‌گیت</a>
+            </div>
+        <?php endif; ?>
     </section>
 </div>

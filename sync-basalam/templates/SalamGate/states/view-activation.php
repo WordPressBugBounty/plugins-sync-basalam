@@ -212,7 +212,6 @@ $backUrl = admin_url('admin.php?page=salam_gate');
                     <span class="sg-field__label">روش پرداخت <span class="sg-req">*</span></span>
                     <div class="sg-wizard__radios" data-pay-methods></div>
                     <div class="sg-activation__balance-actions">
-                        <a class="sg-activation__topup" data-wizard-topup href="https://wallet.basalam.com/?from=vendor" target="_blank" rel="noopener noreferrer" hidden><span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span>شارژ کیف پول باسلام<span aria-hidden="true">↗</span></a>
                         <button type="button" class="sg-activation__balance-refresh" data-wizard-balance-refresh><span class="dashicons dashicons-update" aria-hidden="true"></span><span data-wizard-balance-refresh-label>تازه‌سازی موجودی</span></button>
                     </div>
                     <p class="sg-activation__balance-hint" data-wizard-balance-hint role="status" aria-live="polite" hidden></p>
@@ -238,7 +237,8 @@ $backUrl = admin_url('admin.php?page=salam_gate');
             <div class="sg-wizard__nav">
                 <button type="button" class="sg-button sg-button--secondary" data-wizard-prev style="display:none;">مرحله قبل</button>
                 <button type="button" class="sg-button sg-button--primary" data-wizard-next disabled>مرحله بعد</button>
-                <button type="button" class="sg-button sg-button--primary" data-wizard-submit style="display:none;" disabled>فعال‌سازی و پرداخت هزینه</button>
+                <button type="button" class="sg-button sg-button--primary" data-wizard-submit style="display:none;">فعال‌سازی و پرداخت هزینه</button>
+                <a class="sg-button sg-button--secondary" data-wizard-topup href="https://wallet.basalam.com/?from=vendor" target="_blank" rel="noopener noreferrer" hidden>شارژ کیف پول<span aria-hidden="true">↗</span></a>
             </div>
         </form>
 

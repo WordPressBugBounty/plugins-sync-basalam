@@ -9,6 +9,11 @@ final class ActionRegistry
     public static function all(): array
     {
         return [
+            'salam_gate_public_calculator_references' => new ActionDefinition([PublicToolsActions::class, 'calculatorReferences'], ['manage_options'], true, 'independent', 'read', false),
+            'salam_gate_public_calculate' => new ActionDefinition([PublicToolsActions::class, 'calculate'], ['manage_options'], true, 'independent', 'read', false),
+            'salam_gate_public_post_offices' => new ActionDefinition([PublicToolsActions::class, 'postOffices'], ['manage_options'], true, 'independent', 'read', false),
+            'salam_gate_public_provider_locations' => new ActionDefinition([PublicToolsActions::class, 'providerLocations'], ['manage_options'], true, 'independent', 'read', false),
+            'salam_gate_public_provider_nodes' => new ActionDefinition([PublicToolsActions::class, 'providerNodes'], ['manage_options'], true, 'independent', 'read', false),
             'salam_gate_site_activation' => new ActionDefinition([\SyncBasalam\SalamGate\Admin\Ajax\StatusActions::class, 'siteActivation'], ['manage_options'], true, 'control', 'mutation', false),
             'salam_gate_order_availability' => new ActionDefinition([\SyncBasalam\SalamGate\Admin\OrderFeatureGate::class, 'availability'], ['manage_woocommerce'], true, 'control', 'read', false),
             'salam_gate_save_sync_settings' => new ActionDefinition([\SyncBasalam\SalamGate\Admin\Ajax\SyncActions::class, 'save'], ['manage_options'], true, 'control', 'mutation', true),
@@ -32,7 +37,7 @@ final class ActionRegistry
             'salam_gate_order_preview' => new ActionDefinition([\SyncBasalam\SalamGate\Admin\Ajax\OrderPreviewActions::class, 'preview'], ['manage_options', 'manage_woocommerce'], true, 'active', 'read', true),
             'salam_gate_send_creation_status' => new ActionDefinition([\SyncBasalam\SalamGate\Admin\Ajax\SendActions::class, 'creationStatus'], ['manage_woocommerce'], true, 'active', 'read', true),
             'salam_gate_search_products' => new ActionDefinition([\SyncBasalam\SalamGate\Admin\Ajax\ProductSearchActions::class, 'search'], ['manage_woocommerce'], true, 'active', 'read', true),
-            'salam_gate_payment_balance' => new ActionDefinition([\SyncBasalam\SalamGate\Admin\Ajax\PaymentBalanceActions::class, 'balance'], ['manage_woocommerce'], true, 'active', 'read', true),
+            'salam_gate_payment_balance' => new ActionDefinition([\SyncBasalam\SalamGate\Admin\Ajax\PaymentBalanceActions::class, 'balance'], ['manage_woocommerce'], true, 'balance', 'read', true),
             'salam_gate_send_upsert' => new ActionDefinition([\SyncBasalam\SalamGate\Admin\Ajax\SendActions::class, 'upsert'], ['manage_woocommerce'], true, 'active', 'mutation', true),
             'salam_gate_send_select_quote' => new ActionDefinition([\SyncBasalam\SalamGate\Admin\Ajax\SendActions::class, 'selectQuote'], ['manage_woocommerce'], true, 'active', 'quote', true),
             'salam_gate_send_quotes' => new ActionDefinition([\SyncBasalam\SalamGate\Admin\Ajax\SendActions::class, 'quotes'], ['manage_woocommerce'], true, 'active', 'quote', true),

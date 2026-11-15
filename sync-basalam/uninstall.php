@@ -43,6 +43,8 @@ function sync_basalam_cleanup_runtime_data(): void
     sync_basalam_delete_option_rows_like(
         [
             'sync_basalam_%_last_run',
+            'sync_basalam_unmapped_scan_next_run',
+            'sync_basalam_jobs_runner_fair_schedule',
             'sync_basalam_last_creatable_product_id',
             'CreateSingleProduct_%_batch_%',
             'sync_basalam_update_single_product_%_batch_%',
@@ -76,6 +78,7 @@ function sync_basalam_remove_all_plugin_data(): void
         $wpdb->prefix . 'sync_basalam_discount_tasks',
         $wpdb->prefix . 'sync_basalam_category_mappings',
         $wpdb->prefix . 'sync_basalam_job_manager',
+        $wpdb->prefix . 'sync_basalam_unmapped_products',
         // Legacy tables from older naming/migrations.
         $wpdb->prefix . 'sync_basalam_uploaded_photo',
         $wpdb->prefix . 'bsl_payments',

@@ -131,5 +131,7 @@ class Activator
         dbDelta($sql_discount_tasks);
         dbDelta($sql_category_mappings);
         dbDelta($sql_jobs_manager);
+
+        \SyncBasalam\Services\Products\UnmappedProducts\UnmappedProductsRepository::ensureTable();
     }
 }

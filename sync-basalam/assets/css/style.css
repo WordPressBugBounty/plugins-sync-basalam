@@ -4088,7 +4088,8 @@ body>.basalam-info-modal {
 }
 
 .basalam-hidden {
-  display: none;
+  /* utility hide: must beat later component display rules (e.g. .basalam-unmapped-progress{display:flex}) */
+  display: none !important;
 }
 
 #BasalamUpdateProductsModal [hidden] {
@@ -8891,5 +8892,779 @@ body.sync-basalam-announcement-open {
   #BasalamUpdateProductsModal .basalam-bg-warning-info-margin {
     padding: 12px;
     margin-top: 10px;
+  }
+}
+
+/* ===== صفحه گزارش محصولات باسلامِ متصل‌نشده (basalam-show-products) ===== */
+.basalam-unmapped-container {
+  font-family: PelakFA, Tahoma, sans-serif;
+}
+
+.basalam-unmapped-page {
+  width: 90%;
+  max-width: 1080px;
+  box-sizing: border-box;
+}
+
+.basalam-unmapped-logo {
+  flex: 0 0 48px;
+  width: 48px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.basalam-unmapped-head .basalam-h {
+  text-align: start;
+}
+
+.basalam-unmapped-page {
+  margin-top: 0;
+  min-width: 0;
+}
+
+.basalam-unmapped-page > .basalam-status-card {
+  width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.basalam-unmapped-page .basalam-pagination {
+  width: 100%;
+  margin-top: 0;
+  gap: 16px;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+}
+
+.basalam-unmapped-page .basalam-pagination a {
+  min-height: 44px;
+  box-sizing: border-box;
+}
+
+.basalam-unmapped-empty {
+  text-align: center;
+  padding: 40px 24px;
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+}
+
+.basalam-unmapped-empty > .dashicons {
+  width: 48px;
+  height: 48px;
+  padding: 12px;
+  box-sizing: border-box;
+  font-size: 24px;
+  border-radius: 12px;
+  background: var(--basalam-gray-100);
+  color: var(--basalam-gray-600);
+}
+
+.basalam-unmapped-page .basalam-unmapped-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.basalam-unmapped-actions > .basalam-secondary-button {
+  width: 100%;
+  min-width: 0;
+  min-height: 36px;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.basalam-unmapped-actions > .basalam-secondary-button:only-child {
+  grid-column: 1 / -1;
+}
+
+.basalam-unmapped-actions .basalam-unmapped-archive {
+  color: #a52a35;
+  background: #fff1f2;
+}
+
+.basalam-unmapped-actions .basalam-unmapped-archive:hover {
+  background: #ffe1e4;
+}
+
+.basalam-unmapped-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.basalam-unmapped-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.basalam-unmapped-context {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--basalam-gray-200);
+}
+
+.basalam-unmapped-context > .basalam-unmapped-sub {
+  flex: 1;
+}
+
+.basalam-unmapped-head-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.basalam-unmapped-head .basalam-h {
+  margin-bottom: 8px !important;
+}
+
+.basalam-unmapped-page .basalam-unmapped-sub {
+  color: var(--basalam-gray-600);
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 2;
+  margin: 0;
+  text-align: start;
+}
+
+/* برچسب وضعیت بررسی */
+.basalam-unmapped-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  font-family: PelakFA;
+  flex-shrink: 0;
+}
+
+.basalam-unmapped-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.basalam-unmapped-status.is-idle {
+  background: #e8f7ee;
+  color: #1d7a3d;
+}
+
+.basalam-unmapped-status.is-scanning,
+.basalam-unmapped-status.is-awaiting {
+  background: #fff4e0;
+  color: #9a6b00;
+}
+
+.basalam-unmapped-status.is-scanning .basalam-unmapped-status-dot {
+  animation: basalamUnmappedPulse 1.2s ease-in-out infinite;
+}
+
+/* کارت‌های آمار گزارش؛ رنگ و آیکون هر وضعیت مکمل عنوان آن است. */
+.basalam-unmapped-tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.basalam-unmapped-tile {
+  --tile-accent: #53647c;
+  --tile-tint: #edf2f7;
+  background: #fff;
+  border: 1px solid var(--basalam-gray-200);
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  min-width: 0;
+}
+
+.basalam-unmapped-tile.is-pending {
+  --tile-accent: #b85a15;
+  --tile-tint: #ffebda;
+  border-color: #f5d9c2;
+  background: #fff9f4;
+}
+
+.basalam-unmapped-tile.is-connected {
+  --tile-accent: #247b50;
+  --tile-tint: #e8f5ec;
+}
+
+.basalam-unmapped-tile.is-ignored {
+  --tile-accent: #785790;
+  --tile-tint: #f2ecf7;
+}
+
+.basalam-unmapped-tile-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0;
+}
+
+.basalam-unmapped-page .basalam-unmapped-tile-label {
+  color: var(--basalam-gray-700);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.8;
+  text-align: start;
+}
+
+.basalam-unmapped-tile-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  background: var(--tile-tint);
+  color: var(--tile-accent);
+  border-radius: 10px;
+}
+
+.basalam-unmapped-tile-metric {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+}
+
+.basalam-unmapped-tile-value {
+  color: var(--basalam-gray-800);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+  font-family: PelakFA;
+  font-variant-numeric: tabular-nums;
+  unicode-bidi: isolate;
+}
+
+.basalam-unmapped-tile-unit {
+  color: var(--basalam-gray-600);
+  font-size: 11px;
+}
+
+/* بلوک پیشرفت زندهٔ پیمایش */
+.basalam-unmapped-progress {
+  background: #fffaf2;
+  border: 1px solid #ffe3bd;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.basalam-unmapped-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.basalam-unmapped-page .basalam-unmapped-progress-text {
+  margin: 0;
+  text-align: start;
+  line-height: 2;
+}
+
+.basalam-unmapped-progress-text strong {
+  font-size: 15px;
+}
+
+.basalam-unmapped-progress.is-archiving .basalam-unmapped-progress-text {
+  flex: 1;
+}
+
+.basalam-unmapped-stop-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  flex: 0 0 auto;
+  border: 1px solid #f2c7b9;
+  border-radius: 10px;
+  color: #c64122;
+  background: #fff;
+  cursor: pointer;
+}
+
+.basalam-unmapped-stop-button:hover:not(:disabled) {
+  border-color: #c64122;
+  background: #fff0eb;
+}
+
+.basalam-unmapped-stop-button:disabled {
+  cursor: wait;
+}
+
+.basalam-unmapped-spinner {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  border: 3px solid #ffe3bd;
+  border-top-color: var(--basalam-primary-color);
+  border-radius: 50%;
+  animation: basalamUnmappedSpin 0.9s linear infinite;
+}
+
+.basalam-unmapped-progressbar {
+  height: 6px;
+  border-radius: 999px;
+  background: #ffe9cc;
+  overflow: hidden;
+}
+
+.basalam-unmapped-progressbar > span {
+  display: block;
+  height: 100%;
+  width: 38%;
+  border-radius: 999px;
+  background: var(--basalam-primary-color);
+  animation: basalamUnmappedSlide 1.5s ease-in-out infinite;
+}
+
+.basalam-unmapped-progress.is-archiving .basalam-unmapped-progressbar > span {
+  animation: none;
+  margin: 0;
+  transition: width 0.3s ease;
+}
+
+.basalam-unmapped-archive-recent {
+  border-top: 1px solid #ffe3bd;
+  padding-top: 12px;
+}
+
+.basalam-unmapped-archive-recent > .basalam-h {
+  font-size: 14px;
+  line-height: 1.8;
+  text-align: start;
+}
+
+.basalam-unmapped-archive-recent > .basalam-p {
+  text-align: start;
+}
+
+#basalam-unmapped-archive-recent-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 20px;
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+}
+
+#basalam-unmapped-archive-recent-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  color: var(--basalam-gray-700);
+  font-size: 12px;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+
+#basalam-unmapped-archive-recent-list li::before {
+  content: "\2713";
+  color: #247b50;
+  flex-shrink: 0;
+}
+
+.basalam-unmapped-page .basalam-unmapped-hint {
+  margin: 0;
+  color: var(--basalam-gray-600);
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  text-align: start;
+}
+
+/* ردیف پایانی: اقدام‌ها + زمان آخرین بررسی */
+.basalam-unmapped-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--basalam-gray-200);
+  padding-top: 16px;
+}
+
+.basalam-unmapped-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.basalam-unmapped-actions-row .basalam-primary-button,
+.basalam-unmapped-actions-row .basalam-secondary-button {
+  width: auto;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+
+.basalam-unmapped-page .basalam-unmapped-lastscan {
+  margin: 0;
+  color: var(--basalam-gray-600);
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  text-align: start;
+}
+
+.basalam-unmapped-list .basalam-status-header {
+  gap: 12px;
+}
+
+.basalam-unmapped-list .basalam-unmapped-list-hint {
+  color: var(--basalam-gray-600);
+  font-weight: 400 !important;
+  text-align: start;
+}
+
+.basalam-unmapped-page .basalam-unmapped-list-empty {
+  padding: 24px 0;
+  font-weight: 400 !important;
+  color: var(--basalam-gray-600);
+}
+
+#basalam-unmapped-table {
+  max-width: none;
+  table-layout: fixed;
+  text-align: start;
+}
+
+#basalam-unmapped-table th,
+#basalam-unmapped-table td {
+  border: 0;
+  border-bottom: 1px solid var(--basalam-gray-200);
+  padding: 16px 8px;
+  vertical-align: middle;
+  text-align: start;
+  box-sizing: border-box;
+}
+
+#basalam-unmapped-table th {
+  padding-block: 12px;
+  color: var(--basalam-gray-600);
+  font-weight: 600;
+}
+
+#basalam-unmapped-table .basalam-table-header {
+  background: var(--basalam-gray-100);
+}
+
+#basalam-unmapped-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+#basalam-unmapped-table tbody tr:hover {
+  background: #fafbfc;
+}
+
+#basalam-unmapped-table .basalam-unmapped-number {
+  width: 5%;
+  color: var(--basalam-gray-600);
+  text-align: center;
+}
+
+#basalam-unmapped-table .basalam-unmapped-product {
+  width: 34%;
+}
+
+#basalam-unmapped-table .basalam-unmapped-price {
+  width: 15%;
+  white-space: nowrap;
+}
+
+#basalam-unmapped-table .basalam-unmapped-state-cell {
+  width: 17%;
+}
+
+#basalam-unmapped-table .basalam-unmapped-operations {
+  width: 29%;
+}
+
+.basalam-unmapped-product-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.basalam-unmapped-product-info > div {
+  min-width: 0;
+}
+
+.basalam-unmapped-product-info .basalam-product-img-table,
+.basalam-unmapped-product-placeholder {
+  flex: 0 0 56px;
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--basalam-gray-200);
+  border-radius: 8px;
+  box-sizing: border-box;
+  background: #fff;
+}
+
+.basalam-unmapped-product-placeholder {
+  display: grid;
+  place-items: center;
+  color: var(--basalam-gray-500);
+}
+
+.basalam-unmapped-product-title {
+  display: block;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+
+.basalam-unmapped-product-id {
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--basalam-gray-600);
+}
+
+#basalam-unmapped-table .basalam-badge {
+  display: inline-flex;
+  width: auto;
+  margin: 0;
+  padding: 5px 8px;
+  border-radius: 6px;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  line-height: 1.8;
+}
+
+.basalam-unmapped-container :is(button, a):focus-visible {
+  outline: 2px solid var(--basalam-primary-color);
+  outline-offset: 3px;
+}
+
+.basalam-unmapped-page button:disabled {
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* لینک گزارش در صفحه «اطلاعات غرفه» */
+.basalam-unmapped-info-link-row {
+  margin-top: 16px;
+  display: flex;
+}
+
+.basalam-unmapped-info-link-row .basalam-secondary-button {
+  width: auto;
+}
+
+.basalam-unmapped-info-count {
+  background: var(--basalam-danger-color);
+  color: #fff;
+  border-radius: 999px;
+  min-width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  padding: 0 6px;
+}
+
+@keyframes basalamUnmappedSpin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes basalamUnmappedSlide {
+  0% { margin-inline-start: -38%; }
+  100% { margin-inline-start: 100%; }
+}
+
+@keyframes basalamUnmappedPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.75); }
+}
+
+@media (max-width: 782px) {
+  .basalam-unmapped-page {
+    width: 100%;
+  }
+
+  .basalam-unmapped-head {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+  }
+
+  .basalam-unmapped-head .basalam-h {
+    font-size: 18px;
+    line-height: 1.7;
+  }
+
+  .basalam-unmapped-page > .basalam-status-card {
+    padding: 20px;
+  }
+
+  .basalam-unmapped-context {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .basalam-unmapped-tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .basalam-unmapped-tile {
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .basalam-unmapped-tile-icon {
+    flex-basis: 28px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+  }
+
+  .basalam-unmapped-tile-icon .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .basalam-unmapped-tile-value {
+    font-size: 28px;
+  }
+
+  .basalam-unmapped-foot {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #basalam-unmapped-archive-recent-list {
+    grid-template-columns: 1fr;
+  }
+
+  .basalam-unmapped-actions-row {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .basalam-unmapped-actions-row .basalam-primary-button,
+  .basalam-unmapped-actions-row .basalam-secondary-button {
+    width: 100%;
+  }
+
+  .basalam-unmapped-list .basalam-status-header {
+    align-items: flex-start;
+    text-align: start;
+  }
+
+  #basalam-unmapped-list-title {
+    text-align: start;
+  }
+
+  #basalam-unmapped-table,
+  #basalam-unmapped-table tbody {
+    display: block;
+    width: 100%;
+  }
+
+  #basalam-unmapped-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    clip-path: inset(50%);
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  #basalam-unmapped-table tbody tr {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr) auto;
+    gap: 12px 8px;
+    padding-block: 20px;
+    border-bottom: 1px solid var(--basalam-gray-200);
+  }
+
+  #basalam-unmapped-table tbody tr:first-child {
+    padding-top: 0;
+  }
+
+  #basalam-unmapped-table tbody tr:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  #basalam-unmapped-table td {
+    display: block;
+    width: auto !important;
+    border: 0;
+    padding: 0;
+  }
+
+  #basalam-unmapped-table .basalam-unmapped-number {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: start;
+    padding-top: 4px;
+  }
+
+  #basalam-unmapped-table .basalam-unmapped-product {
+    grid-column: 2 / -1;
+    grid-row: 1;
+  }
+
+  #basalam-unmapped-table .basalam-unmapped-price {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: center;
+  }
+
+  #basalam-unmapped-table .basalam-unmapped-price::before {
+    content: attr(data-label);
+    display: block;
+    color: var(--basalam-gray-600);
+    font-size: 10px;
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+
+  #basalam-unmapped-table .basalam-unmapped-state-cell {
+    grid-column: 3;
+    grid-row: 2;
+    align-self: center;
+  }
+
+  #basalam-unmapped-table .basalam-unmapped-operations {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+
+  .basalam-unmapped-actions > .basalam-secondary-button {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .basalam-unmapped-container *,
+  .basalam-unmapped-container *::before,
+  .basalam-unmapped-container *::after {
+    animation: none !important;
+    transition: none !important;
   }
 }

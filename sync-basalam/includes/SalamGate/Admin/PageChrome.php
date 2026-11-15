@@ -7,9 +7,15 @@ defined('ABSPATH') || exit;
 /** Shared presentation metadata; account routing and permissions stay in their existing handlers. */
 class PageChrome
 {
-    /** Only the dashboard and the explicit first-activation flow exist before account readiness. */
+    public static function isPublicTool(string $view): bool
+    {
+        return in_array($view, ['calculator', 'post-offices', 'tracking'], true);
+    }
+
+    /** Public tools are independent of paid registration, OAuth and the site opt-out. */
     public static function viewForState(string $view, string $state): string
     {
+        if (self::isPublicTool($view)) return $view;
         if ($view === 'activation') {
             return $state === 'not_registered' ? $view : '';
         }
@@ -58,12 +64,12 @@ class PageChrome
         $current = in_array($view, ['', 'activation'], true) ? 'dashboard' : $view;
         $mainUrl = admin_url('admin.php?page=' . Menus::MAIN_SLUG);
         $items = [
-            ['id' => 'dashboard', 'label' => 'داشبورد', 'url' => $mainUrl, 'requires_active' => false],
+            ['id' => 'dashboard', 'label' => $state === 'active' ? 'داشبورد' : 'فعال‌سازی سلام‌گیت', 'url' => $mainUrl, 'requires_active' => false],
             ['id' => 'send', 'label' => 'ثبت مرسوله', 'url' => $mainUrl . '&view=send', 'requires_active' => true],
             ['id' => 'parcels', 'label' => 'مرسوله‌ها', 'url' => admin_url('admin.php?page=' . Menus::PARCELS_SLUG), 'requires_active' => true],
-            ['id' => 'tracking', 'label' => 'پیگیری مرسوله', 'url' => $mainUrl . '&view=tracking', 'requires_active' => true],
-            ['id' => 'calculator', 'label' => 'ماشین‌حساب', 'url' => $mainUrl . '&view=calculator', 'requires_active' => true],
-            ['id' => 'post-offices', 'label' => 'مراکز تحویل', 'url' => $mainUrl . '&view=post-offices', 'requires_active' => true],
+            ['id' => 'tracking', 'label' => 'پیگیری مرسوله', 'url' => $mainUrl . '&view=tracking', 'requires_active' => false],
+            ['id' => 'calculator', 'label' => 'ماشین‌حساب', 'url' => $mainUrl . '&view=calculator', 'requires_active' => false],
+            ['id' => 'post-offices', 'label' => 'مراکز تحویل', 'url' => $mainUrl . '&view=post-offices', 'requires_active' => false],
             ['id' => 'settings', 'label' => 'تنظیمات', 'url' => $mainUrl . '&view=settings', 'requires_active' => true],
         ];
 
