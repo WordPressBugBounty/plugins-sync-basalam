@@ -4,6 +4,16 @@
 
 <details>
 
+<summary>1.10.48 - 2026-11-16</summary>
+
+### Fixed
+
+- Restore the dashboard product update and automatic connection dialogs by relying on the modal's own initial hidden state instead of the shared `basalam-hidden` utility, whose `!important` rule prevented JavaScript from opening them.
+
+</details>
+
+<details>
+
 <summary>1.10.47 - 2026-11-15</summary>
 
 ### Added

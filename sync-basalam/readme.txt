@@ -4,7 +4,7 @@ Tags: woocommerce, basalam, woosalam, integration
 Requires at least: 6.0  
 Tested up to: 7.0
 Requires PHP: 7.4 
-Stable tag: 1.10.47
+Stable tag: 1.10.48
 License: GPL-2.0-or-later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -146,6 +146,9 @@ API calls use HTTPS. Authenticated operations use the configured account and che
 1. تنظیمات اولیه افزونه در وردپرس
 
 == Changelog ==
+
+= 1.10.48 =
+* Fix the dashboard product update and automatic connection dialogs failing to open after clicking their buttons.
 
 = 1.10.47 =
 * Add a report for active Basalam products without WooCommerce mappings, with connect, ignore, archive and bulk archive stop/resume.

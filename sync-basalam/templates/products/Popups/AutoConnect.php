@@ -1,5 +1,5 @@
 <?php defined('ABSPATH') || exit; ?>
-<div id="BasalamConnectProductsModal" class="basalam-modal basalam-hidden">
+<div id="BasalamConnectProductsModal" class="basalam-modal">
     <div class="basalam-modal-content basalam-max-width-400">
         <span class="basalam-modal-close">
             <img class="basalam-img-20" src="<?php echo esc_url(syncBasalamPlugin()->assetsUrl() . '/icons/close.svg'); ?>">
