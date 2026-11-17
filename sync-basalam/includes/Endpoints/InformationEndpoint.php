@@ -83,6 +83,16 @@ class InformationEndpoint
         ]);
     }
 
+    /** Paid monitoring tokens must be bound to this exact WordPress site. */
+    public static function checkSitePermissions($request)
+    {
+        $token = self::extractRequestToken($request);
+        if (!$token || !self::validateStatusEndpointToken($token, true)) {
+            return new \WP_Error('monitoring_invalid_token', 'دسترسی پایش معتبر نیست.', ['status' => 403]);
+        }
+        return true;
+    }
+
     private static function getPublicSettings(array $settings): array
     {
         foreach (self::SENSITIVE_SETTING_KEYS as $settingKey) {
@@ -121,12 +131,23 @@ class InformationEndpoint
         return !empty($paramToken) ? sanitize_text_field($paramToken) : null;
     }
 
-    private static function validateStatusEndpointToken(string $token): bool
+    private static function validateStatusEndpointToken(string $token, bool $siteScoped = false): bool
     {
+        $params = ['token' => $token];
+        if ($siteScoped) $params['base_url'] = untrailingslashit(get_site_url());
         $url = add_query_arg(
-            ['token' => $token],
+            $params,
             self::TOKEN_VALIDATION_URL
         );
+
+        if ($siteScoped) {
+            // Monitoring authentication must remain available when the Basalam
+            // circuit breaker is open; it reads the fixed gateway authority only.
+            $response = wp_remote_get($url, ['timeout' => 5, 'redirection' => 0]);
+            if (is_wp_error($response) || wp_remote_retrieve_response_code($response) !== 200) return false;
+            $body = json_decode(wp_remote_retrieve_body($response), true);
+            return is_array($body) && ($body['success'] ?? false) === true;
+        }
 
 
         $apiServiceManager = syncBasalamContainer()->get(ApiServiceManager::class);

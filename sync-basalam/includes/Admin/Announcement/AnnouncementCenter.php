@@ -3,6 +3,7 @@
 namespace SyncBasalam\Admin\Announcement;
 
 use SyncBasalam\Admin\Components\AnnouncementComponents;
+use SyncBasalam\Admin\Pages\MonitoringPage;
 use SyncBasalam\Services\FetchAnnouncements;
 
 defined('ABSPATH') || exit;
@@ -18,6 +19,10 @@ class AnnouncementCenter
     {
 
         $page = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
+
+        // Its synchronous announcement fetch must not delay the embedded
+        // monitoring dashboard. Announcements remain on other plugin pages.
+        if ($page === MonitoringPage::SLUG) return false;
 
         if ($page === '' || !is_admin() || !current_user_can('manage_options') || !syncBasalamSettings()->hasToken()) {
             return false;

@@ -152,6 +152,8 @@ jQuery(document).ready(function ($) {
 
   $("#submit-shipping-method").click(function (e) {
     e.preventDefault();
+    var submitButton = $(this);
+    if (submitButton.prop("disabled")) return;
     var orderId = $(".save-tracking-code").data("order");
     var trackingCode = $("#order_tracking_code").val();
     var phoneNumber = $("#phone_number").val();
@@ -162,6 +164,13 @@ jQuery(document).ready(function ($) {
       window.BasalamToast.warning("لطفاً روش ارسال را انتخاب کنید.");
       return;
     }
+
+    var showTrackingError = function (message) {
+      $("#tracking-code-error").text(message).prop("hidden", false);
+      window.BasalamToast.error(message);
+    };
+    $("#tracking-code-error").text("").prop("hidden", true);
+    submitButton.prop("disabled", true);
 
     $.ajax({
       url: ajaxurl,
@@ -177,23 +186,21 @@ jQuery(document).ready(function ($) {
       success: function (data) {
         if (data.success) {
           window.BasalamToast.success(data.data?.message || "عملیات با موفقیت انجام شد.");
+          location.reload();
         } else {
-          window.BasalamToast.error(data.data?.message || "خطایی رخ داده است.");
-          console.error("Server error:", data);
+          showTrackingError(data.data?.message || "ثبت کد رهگیری تأیید نشد.");
         }
-        location.reload();
       },
       error: function (xhr) {
         let errorMsg = "خطایی در ارسال درخواست رخ داد.";
         try {
-          const json = JSON.parse(xhr.responseText);
+          const json = xhr.responseJSON || JSON.parse(xhr.responseText);
           errorMsg = json.data?.message || errorMsg;
-        } catch (e) {
-          console.error("JSON parse error:", e);
-        }
-        window.BasalamToast.error(errorMsg);
-        console.error("AJAX error:", xhr);
-        location.reload();
+        } catch (e) {}
+        showTrackingError(errorMsg);
+      },
+      complete: function () {
+        submitButton.prop("disabled", false);
       },
     });
   });

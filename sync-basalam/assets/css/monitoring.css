@@ -1,0 +1,940 @@
+/* Scoped D3 visuals; imported with local-design/scope-css.cjs. */
+.basalam-monitoring-page .tabs{overflow-x:auto;max-width:100%;scrollbar-width:thin}
+.basalam-monitoring-page .tabs button{flex-shrink:0}
+.basalam-monitoring-page{color-scheme:light;--brand:#ff5c35;--action:#bd391f;--action-hover:#a62e17;--ink:#273447;--muted:#5b6677;--faint:#f5f7fa;--paper:#fff;--line:#e1e6eb;--success:#166a4b;--success-bg:#edf8f2;--warning:#855006;--warning-bg:#fff8e9;--danger:#b13232;--danger-bg:#fff2f1;--info:#315d90;--info-bg:#f0f5fc;--font-body:PelakFA,Tahoma,sans-serif;--font-heading:Morabba,PelakFA,Tahoma,sans-serif;--radius:12px;--focus:#315d90;--shell-top:109px}
+.basalam-monitoring-page *{box-sizing:border-box}.basalam-monitoring-page{direction:rtl;scroll-behavior:smooth;scroll-padding-top:24px}.basalam-monitoring-page{margin:0;min-height:100vh;position:relative;background:#f4f6f8;color:var(--ink);font:14px/1.9 var(--font-body);text-align:right}.basalam-monitoring-page button,.basalam-monitoring-page input,.basalam-monitoring-page select{font:inherit}.basalam-monitoring-page button,.basalam-monitoring-page a,.basalam-monitoring-page input,.basalam-monitoring-page select,.basalam-monitoring-page summary{-webkit-tap-highlight-color:transparent}.basalam-monitoring-page button,.basalam-monitoring-page summary,.basalam-monitoring-page select{cursor:pointer}.basalam-monitoring-page a{color:var(--action);text-underline-offset:4px}.basalam-monitoring-page button{color:inherit}.basalam-monitoring-page button:disabled{cursor:not-allowed;background:#f2f3f5!important;color:#74808e!important;border-color:#e1e6eb!important}.basalam-monitoring-page input:disabled{cursor:not-allowed}.basalam-monitoring-page button:focus-visible,.basalam-monitoring-page a:focus-visible,.basalam-monitoring-page input:focus-visible,.basalam-monitoring-page select:focus-visible,.basalam-monitoring-page summary:focus-visible,.basalam-monitoring-page [tabindex="0"]:focus-visible{outline:3px solid var(--focus);outline-offset:3px}.basalam-monitoring-page button:hover:not(:disabled){transition:background .14s,border-color .14s}.basalam-monitoring-page h1,.basalam-monitoring-page h2,.basalam-monitoring-page h3,.basalam-monitoring-page h4{font-family:var(--font-heading);font-weight:600;line-height:1.6;margin:0}.basalam-monitoring-page h1{font-size:28px;font-weight:700}.basalam-monitoring-page h2{font-size:20px}.basalam-monitoring-page h3{font-size:17px}.basalam-monitoring-page h4{font-size:15px}.basalam-monitoring-page p{margin:0}.basalam-monitoring-page small,.basalam-monitoring-page .small-text{font-size:13px}.basalam-monitoring-page strong{font-weight:600}.basalam-monitoring-page button strong{pointer-events:none}.basalam-monitoring-page bdi{unicode-bidi:isolate}.basalam-monitoring-page input[type=checkbox],.basalam-monitoring-page input[type=radio]{accent-color:var(--action);width:18px;height:18px;flex:none}.basalam-monitoring-page input,.basalam-monitoring-page select{max-width:100%}.basalam-monitoring-page select{border:1px solid #cbd2dc;border-radius:8px;background:#fff;padding:8px 10px;min-height:44px}.basalam-monitoring-page .muted{color:var(--muted)}.basalam-monitoring-page .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}.basalam-monitoring-page [hidden]{display:none!important}
+.basalam-monitoring-page .icon{display:inline-block;width:20px;height:20px;flex:none;background:currentColor;mask:var(--icon) center/contain no-repeat;-webkit-mask:var(--icon) center/contain no-repeat;vertical-align:middle}.basalam-monitoring-page .button .icon,.basalam-monitoring-page .badge .icon{width:17px;height:17px}.basalam-monitoring-page .icon-lg{width:28px;height:28px}.basalam-monitoring-page .button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border:1px solid var(--action);border-radius:8px;padding:9px 18px;background:var(--action);color:#fff;font-weight:600;font-size:14px;text-decoration:none;line-height:1.7;white-space:normal}.basalam-monitoring-page .button:hover:not(:disabled){background:var(--action-hover);border-color:var(--action-hover)}.basalam-monitoring-page .button.secondary{background:#fff;color:var(--ink);border-color:#d5dce4}.basalam-monitoring-page .button.secondary:hover:not(:disabled){background:var(--faint);border-color:#a7b3c0}.basalam-monitoring-page .button.ghost{border-color:transparent;background:transparent;color:var(--action)}.basalam-monitoring-page .button.ghost:hover:not(:disabled){background:#fff1eb;border-color:transparent}.basalam-monitoring-page .button.small{font-size:13px;padding:7px 12px}.basalam-monitoring-page .button.danger{background:var(--danger);border-color:var(--danger)}.basalam-monitoring-page .text-button{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:8px 0;min-height:44px;color:var(--action);font-weight:600;font-size:13px;text-decoration:none}.basalam-monitoring-page .text-button:hover{text-decoration:underline}.basalam-monitoring-page .icon-button{width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;background:#fff;border:1px solid var(--line);border-radius:8px;flex:none}.basalam-monitoring-page .icon-button:hover{background:var(--faint)}.basalam-monitoring-page .button-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.basalam-monitoring-page .badge{display:inline-flex;align-items:center;gap:6px;border-radius:6px;padding:3px 9px;font-size:12px;font-weight:600;color:var(--muted);background:#eef1f5;white-space:nowrap}.basalam-monitoring-page .badge.success{color:var(--success);background:var(--success-bg)}.basalam-monitoring-page .badge.warning{color:var(--warning);background:var(--warning-bg)}.basalam-monitoring-page .badge.danger{color:var(--danger);background:var(--danger-bg)}.basalam-monitoring-page .badge.info{color:var(--info);background:var(--info-bg)}.basalam-monitoring-page .app-shell{max-width:1200px;margin:auto}.basalam-monitoring-page .breadcrumb{display:flex;gap:10px;color:var(--muted);font-size:12px;margin-bottom:14px}.basalam-monitoring-page .page-head{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:24px}.basalam-monitoring-page .heading-line{display:flex;gap:12px;align-items:center}.basalam-monitoring-page .brand-mark{display:grid;place-items:center;background:#ffede5;color:var(--action);width:42px;height:42px;border-radius:12px}.basalam-monitoring-page .brand-mark .icon{width:24px;height:24px}.basalam-monitoring-page .page-head p{color:var(--muted);font-size:13px;margin-top:6px}.basalam-monitoring-page .identity{display:flex;align-items:center;gap:10px;font-size:13px}.basalam-monitoring-page .identity strong{display:block}.basalam-monitoring-page .identity bdi{color:var(--muted);font-family:Arial,sans-serif;font-size:12px}.basalam-monitoring-page .store-avatar{width:38px;height:38px;background:#e9edf2;display:grid;place-items:center;border-radius:50%;font-family:Morabba;font-size:20px;color:#607086}.basalam-monitoring-page .tabs{display:flex;align-items:stretch;gap:28px;border-bottom:1px solid #dce1e7}.basalam-monitoring-page .tabs button{display:flex;align-items:center;justify-content:center;gap:8px;background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-1px;padding:11px 4px 13px;min-height:49px;font-size:14px;color:var(--muted);white-space:nowrap}.basalam-monitoring-page .tabs button .icon{width:18px;height:18px}.basalam-monitoring-page .tabs button[aria-selected=true]{color:var(--action);border-color:var(--brand);font-weight:600}.basalam-monitoring-page .tabs button:hover{color:var(--action)}.basalam-monitoring-page .report-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:20px 0 20px}.basalam-monitoring-page .report-toolbar>div{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap}.basalam-monitoring-page .refresh-help{font-size:12px;color:var(--muted);text-align:end;margin:4px 0 18px}.basalam-monitoring-page .section-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:27px 0 14px}.basalam-monitoring-page .section-heading:first-child{margin-top:0}.basalam-monitoring-page .section-heading p{font-size:13px;color:var(--muted);margin-top:3px}.basalam-monitoring-page .section-eyebrow{font-size:12px;color:var(--muted);margin-bottom:2px}.basalam-monitoring-page .card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:22px}.basalam-monitoring-page .card-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.basalam-monitoring-page .card-header>span.icon{color:var(--muted)}
+.basalam-monitoring-page .status-strip{display:flex;align-items:center;gap:14px;padding:20px 22px;background:#fff;border:1px solid var(--line);border-inline-start:3px solid var(--warning);border-radius:12px;margin-bottom:20px}.basalam-monitoring-page .status-strip.success{border-inline-start-color:var(--success)}.basalam-monitoring-page .status-strip.info{border-inline-start-color:var(--info)}.basalam-monitoring-page .status-symbol{width:42px;height:42px;background:var(--warning-bg);color:var(--warning);border-radius:50%;display:grid;place-items:center;flex:none}.basalam-monitoring-page .status-strip.success .status-symbol{background:var(--success-bg);color:var(--success)}.basalam-monitoring-page .status-strip.info .status-symbol{background:var(--info-bg);color:var(--info)}.basalam-monitoring-page .status-strip p{font-size:13px;color:var(--muted);margin-top:3px}.basalam-monitoring-page .status-strip>div:nth-child(2){flex:1}.basalam-monitoring-page .status-strip h2{font-size:18px}.basalam-monitoring-page .status-strip .button{flex:none}.basalam-monitoring-page .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.basalam-monitoring-page .kpi{padding:18px 20px;min-width:0}.basalam-monitoring-page .kpi-head{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:13px;color:var(--muted)}.basalam-monitoring-page .kpi-head .icon{width:18px;height:18px;color:#738296}.basalam-monitoring-page .kpi strong{font-size:31px;line-height:1.5;display:block;margin:10px 0 2px;letter-spacing:-.5px;font-weight:600;font-variant-numeric:tabular-nums}.basalam-monitoring-page .kpi p{font-size:12px;color:var(--muted)}.basalam-monitoring-page .kpi.attention{background:#fffcf5;border-color:#e9d5b1}.basalam-monitoring-page .kpi.attention .kpi-head,.basalam-monitoring-page .kpi.attention strong{color:var(--warning)}.basalam-monitoring-page .scan-meta{display:flex;align-items:center;gap:8px 22px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:12px}.basalam-monitoring-page .scan-meta .icon{width:15px;height:15px}.basalam-monitoring-page .layout-two{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(250px,1fr);gap:20px;align-items:start;margin-top:26px}.basalam-monitoring-page .layout-two>.section-heading{grid-column:1/-1}.basalam-monitoring-page .side-stack{display:grid;gap:16px}.basalam-monitoring-page .mini-card h3{font-size:16px}.basalam-monitoring-page .mini-card p{font-size:13px;color:var(--muted);margin:10px 0}.basalam-monitoring-page .mini-card .text-button{padding-bottom:0}.basalam-monitoring-page .mini-card .badge{font-size:11px}.basalam-monitoring-page .mini-card .card-header{margin-bottom:12px}.basalam-monitoring-page .capacity-line{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin:12px 0 7px}.basalam-monitoring-page .meter{height:7px;display:block;width:100%;background:#eef1f5;border-radius:6px;overflow:hidden}.basalam-monitoring-page .meter>span{display:block;height:100%;background:var(--brand);border-radius:6px;max-width:100%}.basalam-monitoring-page .meter.success>span{background:#25815d}.basalam-monitoring-page .meter.warning>span{background:#b58127}.basalam-monitoring-page .capacity-caption{font-size:12px;color:var(--muted);margin-top:8px}.basalam-monitoring-page .meta-row{display:flex;justify-content:space-between;gap:16px;font-size:13px;padding:8px 0}.basalam-monitoring-page .meta-row span{color:var(--muted)}.basalam-monitoring-page .mini-card .meta-row{border-top:1px solid var(--line);margin-top:13px;padding-top:13px}.basalam-monitoring-page .issues-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:14px;border-bottom:1px solid var(--line)}.basalam-monitoring-page .issues-heading h2{font-size:18px}.basalam-monitoring-page .issues-heading span{font-size:12px;color:var(--muted)}.basalam-monitoring-page .issue{border-bottom:1px solid var(--line)}.basalam-monitoring-page .issue:last-child{border-bottom:0}.basalam-monitoring-page .issue summary{list-style:none;display:flex;align-items:center;gap:12px;padding:16px 0;min-height:72px}.basalam-monitoring-page .issue summary::-webkit-details-marker{display:none}.basalam-monitoring-page .product-symbol{width:35px;height:35px;border-radius:8px;background:#f2f4f7;display:grid;place-items:center;color:#6d7989;flex:none}.basalam-monitoring-page .product-symbol .icon{width:19px;height:19px}.basalam-monitoring-page .issue-name{flex:1;min-width:0}.basalam-monitoring-page .issue-name strong{display:block;font-size:13px}.basalam-monitoring-page .issue-name small{display:block;color:var(--muted);font-size:12px}.basalam-monitoring-page .issue summary>.icon{width:14px;height:14px;color:var(--muted);transition:transform .15s}.basalam-monitoring-page .issue[open] summary>.icon{transform:rotate(180deg)}.basalam-monitoring-page .issue-content{padding:0 0 18px;font-size:13px}.basalam-monitoring-page .issue-content>p{margin-bottom:12px}.basalam-monitoring-page .issue-action{border-inline-start:3px solid var(--brand);padding-inline-start:10px;margin:14px 0 0;color:var(--muted)}.basalam-monitoring-page .issue-labels{display:flex;align-items:center;gap:10px;margin:12px 0}.basalam-monitoring-page .list-footer{font-size:12px;color:var(--muted);margin-top:12px}.basalam-monitoring-page .inline-expander{display:inline-flex;margin-top:10px}.basalam-monitoring-page .empty{padding:44px 24px;text-align:center;background:#fff;border:1px solid var(--line);border-radius:12px}.basalam-monitoring-page .empty>.empty-icon{display:grid;place-items:center;width:60px;height:60px;border-radius:18px;background:#f3f5f8;color:#64758a;margin:0 auto 16px}.basalam-monitoring-page .empty.success .empty-icon{color:var(--success);background:var(--success-bg)}.basalam-monitoring-page .empty p{color:var(--muted);max-width:540px;margin:10px auto 18px;font-size:14px}.basalam-monitoring-page .empty .button-row{justify-content:center}.basalam-monitoring-page .empty .inline-details{text-align:right;max-width:520px;margin:20px auto 0}.basalam-monitoring-page .empty-compact{padding:25px 14px}.basalam-monitoring-page .empty-compact h3{font-size:17px}.basalam-monitoring-page .empty-compact p{font-size:13px;margin-bottom:0}.basalam-monitoring-page .notice{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:9px;background:var(--warning-bg);color:var(--warning);font-size:13px;margin:0 0 18px}.basalam-monitoring-page .notice .icon{width:18px;height:18px;margin-top:4px}.basalam-monitoring-page .notice.info{background:var(--info-bg);color:var(--info)}.basalam-monitoring-page .notice.danger{background:var(--danger-bg);color:var(--danger)}.basalam-monitoring-page .notice.success{background:var(--success-bg);color:var(--success)}.basalam-monitoring-page .notice>div{flex:1}.basalam-monitoring-page .notice strong{display:block;margin-bottom:2px}.basalam-monitoring-page .notice .text-button{color:inherit;min-height:36px;margin-top:3px}.basalam-monitoring-page .inline-details{border-top:1px solid var(--line);padding-top:12px;margin-top:16px;color:var(--muted);font-size:13px}.basalam-monitoring-page .inline-details summary{min-height:34px;list-style-position:inside;font-weight:600}.basalam-monitoring-page .inline-details p{margin-top:8px;font-size:13px;line-height:1.95}.basalam-monitoring-page .overall{margin-top:30px}.basalam-monitoring-page .overall .kpis{gap:0;background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 0}.basalam-monitoring-page .overall .kpi{border:0;border-radius:0;padding:0 22px;background:none;border-inline-end:1px solid var(--line)}.basalam-monitoring-page .overall .kpi:last-child{border-inline-end:0}.basalam-monitoring-page .overall .kpi strong{font-size:26px}.basalam-monitoring-page .overall-note{font-size:12px;color:var(--muted);margin-top:10px}.basalam-monitoring-page .impact-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}.basalam-monitoring-page .impact-number{font-size:32px;font-weight:600;line-height:1.6;margin:12px 0 0}.basalam-monitoring-page .impact-number span{font-size:13px;color:var(--muted);margin-inline-start:8px;font-weight:400}.basalam-monitoring-page .impact-card p{font-size:13px;color:var(--muted)}.basalam-monitoring-page .impact-card .meta-row{border-bottom:1px solid var(--line)}.basalam-monitoring-page .comparison{margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center}.basalam-monitoring-page .comparison p{font-size:13px;color:var(--muted);margin-top:4px}.basalam-monitoring-page .comparison-values{display:flex;align-items:center;gap:20px;justify-content:flex-end}.basalam-monitoring-page .comparison-values>div{min-width:100px;flex:1}.basalam-monitoring-page .comparison-values small{color:var(--muted)}.basalam-monitoring-page .comparison-values strong{display:block;font-size:23px;margin:5px 0 9px;font-weight:600}.basalam-monitoring-page .comparison-values>.icon{color:#7c8796}.basalam-monitoring-page .comparison-values .meter{height:6px}.basalam-monitoring-page .comparison-note{font-size:12px;color:var(--muted);margin-top:12px}
+.basalam-monitoring-page .history-list{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}.basalam-monitoring-page .scan-row{padding:0 20px;border-bottom:1px solid var(--line)}.basalam-monitoring-page .scan-row:last-child{border:0}.basalam-monitoring-page .scan-row>summary{list-style:none;display:grid;grid-template-columns:minmax(160px,1.5fr) repeat(2,minmax(65px,.6fr)) 150px 18px;gap:15px;align-items:center;padding:18px 0;min-height:90px}.basalam-monitoring-page .scan-row>summary::-webkit-details-marker{display:none}.basalam-monitoring-page .scan-date strong{display:block;font-size:14px}.basalam-monitoring-page .scan-date small{display:block;color:var(--muted);font-size:12px;margin-top:3px}.basalam-monitoring-page .scan-count strong{display:block;font-size:19px}.basalam-monitoring-page .scan-count small{font-size:12px;color:var(--muted)}.basalam-monitoring-page .scan-row summary>.icon{width:15px;height:15px;color:var(--muted)}.basalam-monitoring-page .scan-row[open] summary>.icon{transform:rotate(180deg)}.basalam-monitoring-page .scan-detail{padding:0 0 20px}.basalam-monitoring-page .detail-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:var(--faint);border-radius:8px;padding:15px;margin-bottom:14px}.basalam-monitoring-page .detail-grid div{font-size:12px;color:var(--muted)}.basalam-monitoring-page .detail-grid strong{display:block;font-size:18px;color:var(--ink);margin-top:3px}.basalam-monitoring-page .scan-detail .button-row{margin-top:14px;justify-content:space-between}.basalam-monitoring-page .pagination{display:flex;gap:14px;justify-content:space-between;align-items:center;margin-top:18px;font-size:13px;color:var(--muted)}.basalam-monitoring-page .history-summary{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:18px;font-size:13px;color:var(--muted)}.basalam-monitoring-page .history-summary strong{color:var(--ink)}
+.basalam-monitoring-page .settings-layout,.basalam-monitoring-page .subscription-summary{display:grid;grid-template-columns:1.6fr 1fr;gap:20px}.basalam-monitoring-page .settings-card .card-header{padding-bottom:16px;border-bottom:1px solid var(--line)}.basalam-monitoring-page .settings-card p{font-size:14px;color:var(--muted)}.basalam-monitoring-page .flow-explainer{display:grid;grid-template-columns:1fr 22px 1fr;gap:12px;align-items:center;margin:24px 0}.basalam-monitoring-page .flow-explainer>div{background:var(--faint);padding:16px;text-align:center;border-radius:10px}.basalam-monitoring-page .flow-explainer strong{display:block;margin-top:5px;font-size:14px}.basalam-monitoring-page .flow-explainer small{color:var(--muted);font-size:12px}.basalam-monitoring-page .flow-explainer>.icon{width:17px;color:var(--muted)}.basalam-monitoring-page .consent{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--ink);margin:18px 0;cursor:pointer}.basalam-monitoring-page .consent input{margin:5px 0 0}.basalam-monitoring-page .consent span{flex:1}.basalam-monitoring-page .settings-action{border-top:1px solid var(--line);padding-top:18px;margin-top:22px}.basalam-monitoring-page .settings-action p{font-size:13px;margin-top:12px}.basalam-monitoring-page .help-list{padding:0;list-style:none;counter-reset:help}.basalam-monitoring-page .help-list li{counter-increment:help;position:relative;padding-inline-start:35px;margin:20px 0;font-size:13px;color:var(--muted)}.basalam-monitoring-page .help-list li:before{content:counter(help,persian);position:absolute;inset-inline-start:0;top:0;width:24px;height:24px;display:grid;place-items:center;background:#edf0f4;border-radius:50%;color:var(--ink)}.basalam-monitoring-page .help-list strong{color:var(--ink);display:block}.basalam-monitoring-page .subscription-summary{margin-bottom:26px}.basalam-monitoring-page .subscription-summary .card>p{color:var(--muted);font-size:13px}.basalam-monitoring-page .subscription-summary .card-header{margin-bottom:12px}.basalam-monitoring-page .plan-heading{display:flex;align-items:center;gap:10px}.basalam-monitoring-page .plan-heading>.icon{color:var(--action)}.basalam-monitoring-page .plan-current-value{font-size:25px;font-family:Morabba;margin:10px 0}.basalam-monitoring-page .plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:0;border:0;margin:18px 0}.basalam-monitoring-page .plans legend{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}.basalam-monitoring-page .plan{border:1px solid var(--line);border-radius:12px;padding:20px;background:#fff;position:relative;cursor:pointer;min-width:0}.basalam-monitoring-page .plan:has(input:checked){border:2px solid var(--action);padding:19px;background:#fffaf7}.basalam-monitoring-page .plan:has(input:disabled){background:#f7f8fa;color:#6c7888;cursor:not-allowed}.basalam-monitoring-page .plan-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px}.basalam-monitoring-page .plan-title{font-family:Morabba;font-size:20px}.basalam-monitoring-page .plan input{margin:0}.basalam-monitoring-page .plan-price{font-size:25px;white-space:nowrap;line-height:1.6;display:block;font-weight:600}.basalam-monitoring-page .plan-price small{font-size:12px;font-weight:400}.basalam-monitoring-page .plan-duration{display:block;color:var(--muted);font-size:12px;margin-bottom:16px}.basalam-monitoring-page .plan-feature{display:flex;align-items:center;gap:8px;font-size:13px;margin:10px 0}.basalam-monitoring-page .plan-feature .icon{width:15px;color:var(--success)}.basalam-monitoring-page .plan-caption{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;margin-top:16px;display:block}.basalam-monitoring-page .plan .badge{margin-bottom:12px}.basalam-monitoring-page .checkout-box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px}.basalam-monitoring-page .checkout-box>p{font-size:13px;color:var(--muted);margin-top:6px}.basalam-monitoring-page .checkout-actions{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}.basalam-monitoring-page .checkout-actions p{font-size:12px;color:var(--muted);max-width:470px}.basalam-monitoring-page .subscription-terms{margin:20px 0}.basalam-monitoring-page .payment-card{margin-bottom:24px}.basalam-monitoring-page .payment-card h3{font-size:19px}.basalam-monitoring-page .payment-card>p{font-size:13px;color:var(--muted);margin:8px 0 16px}.basalam-monitoring-page .payment-amounts{display:grid;grid-template-columns:repeat(3,1fr);background:var(--faint);border-radius:8px;margin:18px 0;padding:16px;gap:16px}.basalam-monitoring-page .payment-amounts dt{font-size:12px;color:var(--muted)}.basalam-monitoring-page .payment-amounts dd{margin:5px 0 0;font-size:18px}.basalam-monitoring-page .payment-amounts dd small{font-size:12px;color:var(--muted)}.basalam-monitoring-page .payment-amounts div:last-child dd{font-weight:700}.basalam-monitoring-page .tracking{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);margin:16px 0;flex-wrap:wrap}.basalam-monitoring-page .tracking bdi{font-family:monospace;overflow-wrap:anywhere}.basalam-monitoring-page .steps{display:flex;list-style:none;padding:0;margin:24px 0;gap:15px;font-size:13px}.basalam-monitoring-page .steps li{display:flex;align-items:center;gap:6px;color:var(--muted)}.basalam-monitoring-page .steps .current{color:var(--action);font-weight:600}.basalam-monitoring-page .steps .done{color:var(--success)}.basalam-monitoring-page .steps li+li:before{content:'←';color:#7c8796;margin-inline-end:6px}.basalam-monitoring-page .help-box{font-size:13px;color:var(--muted)}.basalam-monitoring-page .app-footer{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:35px;border-top:1px solid var(--line);padding:18px 0;color:var(--muted);font-size:12px}.basalam-monitoring-page .app-footer>p{flex:1}.basalam-monitoring-page .app-footer>.icon{width:18px;height:18px}.basalam-monitoring-page .app-footer .text-button{white-space:nowrap}
+.basalam-monitoring-page dialog{border:1px solid #dce2e9;border-radius:16px;width:min(850px,calc(100% - 40px));max-height:calc(100dvh - 48px);padding:0;color:var(--ink);font-family:var(--font-body);box-shadow:0 24px 80px #17203333;overflow:auto}.basalam-monitoring-page dialog::backdrop{background:#17203377}.basalam-monitoring-page.dialog-open{overflow:hidden}.basalam-monitoring-page .dialog-head{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:20px 24px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:2}.basalam-monitoring-page .dialog-head h2{font-size:21px}.basalam-monitoring-page .dialog-head p{font-size:12px;color:var(--muted);margin-bottom:3px}.basalam-monitoring-page .dialog-body{padding:24px}.basalam-monitoring-page .change-item{padding:20px 0;border-bottom:1px solid var(--line)}.basalam-monitoring-page .change-item:first-of-type{padding-top:0}.basalam-monitoring-page .change-item:last-of-type{border-bottom:0}.basalam-monitoring-page .change-title{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}.basalam-monitoring-page .change-title>div{flex:1;min-width:0}.basalam-monitoring-page .change-title h3{font-family:PelakFA;font-size:14px}.basalam-monitoring-page .change-title p{font-size:12px;color:var(--muted);margin-top:3px}.basalam-monitoring-page .change-time{font-size:12px;color:var(--muted);margin-top:10px}.basalam-monitoring-page .compare-table{width:100%;border-collapse:collapse;text-align:right;font-size:13px}.basalam-monitoring-page .compare-table th{font-weight:400;color:var(--muted);font-size:12px;background:var(--faint);padding:10px 12px}.basalam-monitoring-page .compare-table td{padding:11px 12px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}.basalam-monitoring-page .compare-table tr:last-child td{border-bottom:0}.basalam-monitoring-page .compare-table td:last-child{font-weight:600;color:var(--success)}.basalam-monitoring-page .compare-table td:first-child{font-size:12px;color:var(--muted)}.basalam-monitoring-page .compare-table .unknown{color:var(--muted)}.basalam-monitoring-page .compare-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}.basalam-monitoring-page .compare-pair>div{padding:14px;background:var(--faint);border-radius:8px}.basalam-monitoring-page .compare-pair strong{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}.basalam-monitoring-page .compare-pair p{font-size:13px}.basalam-monitoring-page .dialog-summary{margin-bottom:20px;color:var(--muted);font-size:13px}.basalam-monitoring-page .simulation{background:#fff8ef;border:1px solid #eddbc3;border-radius:10px;padding:20px}.basalam-monitoring-page .simulation p{margin:10px 0 20px;color:var(--muted);font-size:13px}.basalam-monitoring-page #toast{position:fixed;bottom:24px;left:24px;z-index:20;max-width:min(450px,calc(100% - 48px));background:#24364b;color:#fff;padding:12px 18px;border-radius:10px;box-shadow:0 8px 30px #20304026;font-size:13px}.basalam-monitoring-page .skeleton{background:linear-gradient(90deg,#eef1f5 25%,#f8f9fb 50%,#eef1f5 75%);background-size:200% 100%;animation:wsm-shimmer 1.6s linear infinite;border-radius:8px;height:20px;margin:10px 0}.basalam-monitoring-page .skeleton.large{height:85px}.basalam-monitoring-page .skeleton.wide{height:130px}.basalam-monitoring-page .loading-caption{font-size:14px;color:var(--muted);margin-bottom:16px}.basalam-monitoring-page .spin{animation:wsm-spin 1s linear infinite}@keyframes wsm-shimmer{to{background-position:-200% 0}}@keyframes wsm-spin{to{transform:rotate(360deg)}}
+@media(min-width:1550px){.basalam-monitoring-page .app-shell{max-width:1270px}}
+@media(max-width:1200px){.basalam-monitoring-page{--shell-top:126px}.basalam-monitoring-page .layout-two{grid-template-columns:minmax(0,1.5fr) minmax(240px,1fr)}.basalam-monitoring-page .card{padding:18px}.basalam-monitoring-page .kpi{padding:16px}.basalam-monitoring-page .kpi p{font-size:11px}.basalam-monitoring-page .tabs{gap:20px}.basalam-monitoring-page .scan-row>summary{grid-template-columns:minmax(145px,1.5fr) 65px 65px 125px 16px;gap:10px}.basalam-monitoring-page .scan-row .badge{font-size:11px}.basalam-monitoring-page .plan{padding:16px}.basalam-monitoring-page .plan:has(input:checked){padding:15px}.basalam-monitoring-page .plan-price{font-size:22px}.basalam-monitoring-page .plan-feature{font-size:12px}.basalam-monitoring-page .page-head{gap:12px}.basalam-monitoring-page .identity{font-size:12px}}
+@media(max-width:1000px){.basalam-monitoring-page .layout-two,.basalam-monitoring-page .settings-layout{grid-template-columns:1fr}.basalam-monitoring-page .side-stack{grid-template-columns:1fr 1fr}.basalam-monitoring-page .comparison{grid-template-columns:1fr}.basalam-monitoring-page .comparison-values{max-width:440px}.basalam-monitoring-page .kpis{gap:10px}.basalam-monitoring-page .kpi strong{font-size:27px}.basalam-monitoring-page .kpi-head{font-size:12px}.basalam-monitoring-page .tabs{gap:18px}.basalam-monitoring-page .tabs button{font-size:13px}.basalam-monitoring-page .identity{display:none}.basalam-monitoring-page .plans{gap:10px}.basalam-monitoring-page .plan-price{font-size:20px}.basalam-monitoring-page .plan-feature{font-size:12px}.basalam-monitoring-page .plan-title{font-size:18px}.basalam-monitoring-page .steps{font-size:12px;gap:10px}.basalam-monitoring-page .overall .kpi{padding:0 14px}.basalam-monitoring-page .overall .kpi strong{font-size:24px}.basalam-monitoring-page .subscription-summary{grid-template-columns:1fr 1fr}}
+@media(max-width:782px){.basalam-monitoring-page .page-head{margin-bottom:18px}.basalam-monitoring-page .page-head h1{font-size:26px}.basalam-monitoring-page .identity{display:flex}.basalam-monitoring-page .section-heading h2{font-size:19px}.basalam-monitoring-page .scan-row>summary{grid-template-columns:minmax(140px,1fr) 58px 58px 115px 14px;gap:10px}.basalam-monitoring-page .plan-title{font-size:19px}.basalam-monitoring-page .plan-price{font-size:24px}}
+@media(max-width:600px){.basalam-monitoring-page{font-size:14px}.basalam-monitoring-page .breadcrumb{margin-bottom:12px}.basalam-monitoring-page .page-head{margin-bottom:16px}.basalam-monitoring-page .page-head h1{font-size:24px}.basalam-monitoring-page .brand-mark{width:36px;height:36px;border-radius:10px}.basalam-monitoring-page .brand-mark .icon{width:22px;height:22px}.basalam-monitoring-page .heading-line{gap:9px}.basalam-monitoring-page .identity{display:none}.basalam-monitoring-page .page-head p{font-size:12px;line-height:1.9;margin-top:8px}.basalam-monitoring-page .tabs{gap:0;justify-content:space-between}.basalam-monitoring-page .tabs button{font-size:12px;gap:5px;padding:12px 3px;min-height:50px}.basalam-monitoring-page .tabs button .icon{width:15px;height:15px}.basalam-monitoring-page .report-toolbar{align-items:flex-start;gap:8px;margin-top:16px}.basalam-monitoring-page .report-toolbar>div{font-size:11px;gap:4px;max-width:165px}.basalam-monitoring-page .report-toolbar .button{font-size:11px;min-height:42px;padding:8px}.basalam-monitoring-page .report-toolbar .icon{width:15px;height:15px}.basalam-monitoring-page .refresh-help{font-size:11px;line-height:1.9;margin-bottom:16px}.basalam-monitoring-page .status-strip{padding:16px;gap:10px;flex-wrap:wrap}.basalam-monitoring-page .status-symbol{width:34px;height:34px}.basalam-monitoring-page .status-strip h2{font-size:16px}.basalam-monitoring-page .status-strip p{font-size:12px}.basalam-monitoring-page .status-strip .button{flex-basis:calc(100% - 44px);margin-inline-start:44px;font-size:12px}.basalam-monitoring-page .kpis{grid-template-columns:1fr 1fr;gap:10px}.basalam-monitoring-page .kpi{padding:15px}.basalam-monitoring-page .kpi-head{font-size:12px}.basalam-monitoring-page .kpi strong{font-size:29px}.basalam-monitoring-page .kpi p{font-size:12px}.basalam-monitoring-page .scan-meta{gap:4px 12px;line-height:1.9}.basalam-monitoring-page .scan-meta span{font-size:11px}.basalam-monitoring-page .section-heading{margin:24px 0 12px}.basalam-monitoring-page .section-heading h2{font-size:18px}.basalam-monitoring-page .section-heading p{font-size:12px}.basalam-monitoring-page .section-heading .badge{font-size:11px}.basalam-monitoring-page .layout-two{margin-top:22px;gap:14px}.basalam-monitoring-page .side-stack{grid-template-columns:1fr}.basalam-monitoring-page .card{padding:18px}.basalam-monitoring-page .issue summary{gap:8px;flex-wrap:wrap;padding:14px 0}.basalam-monitoring-page .issue-name strong{font-size:13px}.basalam-monitoring-page .issue-name small{font-size:11px}.basalam-monitoring-page .issue summary .badge{font-size:11px}.basalam-monitoring-page .issue summary>.badge{margin-inline-start:43px}.basalam-monitoring-page .issue summary>.icon{margin-inline-start:auto}.basalam-monitoring-page .issue-name{flex-basis:calc(100% - 48px)}.basalam-monitoring-page .issue .product-symbol{width:34px;height:34px}.basalam-monitoring-page .issues-heading h2{font-size:17px}.basalam-monitoring-page .issues-heading span{font-size:11px}.basalam-monitoring-page .impact-grid,.basalam-monitoring-page .comparison,.basalam-monitoring-page .subscription-summary{grid-template-columns:1fr;gap:14px}.basalam-monitoring-page .overall .kpis{padding:0}.basalam-monitoring-page .overall .kpi{padding:16px;border-bottom:1px solid var(--line);border-inline-end:1px solid var(--line)}.basalam-monitoring-page .overall .kpi:nth-child(2){border-inline-end:0}.basalam-monitoring-page .overall .kpi:nth-child(n+3){border-bottom:0}.basalam-monitoring-page .overall .kpi:last-child{border-inline-end:0}.basalam-monitoring-page .overall .kpi strong{font-size:26px}.basalam-monitoring-page .comparison-values{gap:12px}.basalam-monitoring-page .comparison-values>div{min-width:0}.basalam-monitoring-page .comparison-values strong{font-size:24px}.basalam-monitoring-page .compare-pair{grid-template-columns:1fr}.basalam-monitoring-page .scan-row{padding:0 16px}.basalam-monitoring-page .scan-row>summary{grid-template-columns:1fr 1fr 20px;gap:8px;padding:17px 0}.basalam-monitoring-page .scan-date{grid-column:1/3}.basalam-monitoring-page .scan-row summary>.icon{grid-column:3;grid-row:1}.basalam-monitoring-page .scan-count{display:flex;gap:6px;align-items:center}.basalam-monitoring-page .scan-count strong{font-size:16px}.basalam-monitoring-page .scan-count small{font-size:11px}.basalam-monitoring-page .scan-row summary>.badge{grid-row:3;grid-column:1/4;justify-self:start}.basalam-monitoring-page .detail-grid{grid-template-columns:1fr 1fr;gap:14px}.basalam-monitoring-page .scan-detail .button-row{gap:8px}.basalam-monitoring-page .scan-detail .button{font-size:12px}.basalam-monitoring-page .pagination{gap:8px;font-size:11px}.basalam-monitoring-page .pagination .button{padding:8px;font-size:11px}.basalam-monitoring-page .history-summary{gap:7px 14px;font-size:12px}.basalam-monitoring-page .empty{padding:35px 20px}.basalam-monitoring-page .empty h2{font-size:19px}.basalam-monitoring-page .empty p{font-size:13px}.basalam-monitoring-page .settings-card p{font-size:13px}.basalam-monitoring-page .settings-layout{gap:14px}.basalam-monitoring-page .flow-explainer{gap:8px;grid-template-columns:1fr 15px 1fr}.basalam-monitoring-page .flow-explainer>div{padding:12px 8px}.basalam-monitoring-page .flow-explainer strong{font-size:12px}.basalam-monitoring-page .flow-explainer small{font-size:11px}.basalam-monitoring-page .flow-explainer>.icon{width:14px}.basalam-monitoring-page .plans{grid-template-columns:1fr;gap:12px}.basalam-monitoring-page .plan{padding:20px}.basalam-monitoring-page .plan:has(input:checked){padding:19px}.basalam-monitoring-page .plan-head{margin-bottom:8px}.basalam-monitoring-page .plan-price{font-size:27px}.basalam-monitoring-page .plan-feature{font-size:13px}.basalam-monitoring-page .plan-duration{margin-bottom:10px}.basalam-monitoring-page .plan-caption{padding-top:10px;margin-top:12px}.basalam-monitoring-page .steps{gap:5px;font-size:11px;flex-wrap:wrap}.basalam-monitoring-page .checkout-actions{align-items:stretch}.basalam-monitoring-page .checkout-actions .button{width:100%}.basalam-monitoring-page .payment-amounts{grid-template-columns:1fr;gap:12px;padding:16px}.basalam-monitoring-page .payment-amounts>div{display:flex;justify-content:space-between;align-items:center;gap:12px}.basalam-monitoring-page .payment-amounts dd{font-size:17px;margin:0}.basalam-monitoring-page .payment-amounts>div:last-child{border-top:1px solid var(--line);padding-top:12px}.basalam-monitoring-page .payment-card .button-row{align-items:stretch;flex-direction:column}.basalam-monitoring-page .app-footer{align-items:flex-start;flex-wrap:wrap;font-size:11px;margin-top:28px}.basalam-monitoring-page .app-footer p{flex-basis:80%}.basalam-monitoring-page .app-footer .text-button{margin-inline-start:0;padding-top:0;min-height:36px}.basalam-monitoring-page dialog{width:100%;max-width:none;height:100dvh;max-height:none;margin:0;border:0;border-radius:0}.basalam-monitoring-page .dialog-head{padding:16px}.basalam-monitoring-page .dialog-head h2{font-size:18px}.basalam-monitoring-page .dialog-body{padding:18px}.basalam-monitoring-page .change-title h3{font-size:13px}.basalam-monitoring-page .compare-table,.basalam-monitoring-page .compare-table tbody,.basalam-monitoring-page .compare-table tr,.basalam-monitoring-page .compare-table td{display:block;width:100%}.basalam-monitoring-page .compare-table thead{display:none}.basalam-monitoring-page .compare-table tr{background:var(--faint);padding:10px 14px;border-radius:8px;margin-bottom:10px}.basalam-monitoring-page .compare-table td{border:0;padding:5px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px}.basalam-monitoring-page .compare-table td:before{content:attr(data-label);color:var(--muted);font-size:12px;font-weight:400}.basalam-monitoring-page .compare-table td:first-child{font-size:13px;font-weight:600;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:5px;color:var(--ink)}.basalam-monitoring-page .compare-table td:first-child:before{display:none}.basalam-monitoring-page .notice{padding:13px;font-size:13px}.basalam-monitoring-page .tracking bdi{font-size:11px}.basalam-monitoring-page .simulation .button-row{flex-direction:column;align-items:stretch}.basalam-monitoring-page #toast{bottom:16px;left:16px;max-width:calc(100% - 32px)}}
+@media(max-width:360px){.basalam-monitoring-page .tabs button .icon{display:none}.basalam-monitoring-page .tabs button{font-size:12px}.basalam-monitoring-page .kpi{padding:12px}.basalam-monitoring-page .kpi-head .icon{display:none}.basalam-monitoring-page .refresh-help{font-size:10px}.basalam-monitoring-page .report-toolbar .button{font-size:10px}.basalam-monitoring-page .report-toolbar>div{font-size:11px;max-width:138px}.basalam-monitoring-page .status-strip .button{flex-basis:100%;margin-inline-start:0;width:100%}}
+@media(prefers-reduced-motion:reduce){.basalam-monitoring-page{scroll-behavior:auto}.basalam-monitoring-page *,.basalam-monitoring-page *:before,.basalam-monitoring-page *:after{animation:none!important;transition:none!important}}
+@media print{.basalam-monitoring-page .tabs,.basalam-monitoring-page .report-toolbar button,.basalam-monitoring-page .app-footer button{display:none}.basalam-monitoring-page .card{break-inside:avoid}.basalam-monitoring-page{background:#fff}.basalam-monitoring-page dialog{position:static}}
+
+/* Inline icons work without external mask-image requests, including file previews. */
+.basalam-monitoring-page .icon.inline-icon{background:transparent;mask:none;-webkit-mask:none}
+.basalam-monitoring-page .icon.inline-icon>svg{display:block;width:100%;height:100%}
+
+/* Review 2: WooSalam visual language, progressive help and actionable states. */
+.basalam-monitoring-page .page-head{gap:20px}.basalam-monitoring-page .page-head>.button{flex:none;color:var(--action);border-color:#efc6b8;background:#fff9f5}.basalam-monitoring-page .badge{justify-content:center;text-align:center}.basalam-monitoring-page .layout-two{align-items:stretch}.basalam-monitoring-page .layout-two>.side-stack{align-content:start}.basalam-monitoring-page .layout-two>#issues-section{display:flex;flex-direction:column}.basalam-monitoring-page .layout-two>#issues-section>.button:last-child{align-self:flex-start;margin-top:auto;padding-top:14px}.basalam-monitoring-page .impact-section{margin-bottom:30px}.basalam-monitoring-page .impact-section>.section-heading{margin-top:0}.basalam-monitoring-page .impact-seal{display:inline-flex;align-items:center;gap:7px;color:var(--action);font-size:12px}.basalam-monitoring-page .impact-showcase{display:grid;grid-template-columns:1.12fr 1fr;border:1px solid #f1d8ce;background:#fff;border-radius:16px;overflow:hidden}.basalam-monitoring-page .impact-money,.basalam-monitoring-page .impact-products{padding:24px 28px;position:relative;min-width:0}.basalam-monitoring-page .impact-money{background:linear-gradient(115deg,#fffaf5,#fff1e9);border-inline-end:1px solid #f1d8ce}.basalam-monitoring-page .impact-money h3{color:#804125}.basalam-monitoring-page .impact-icon{position:absolute;inset-inline-end:26px;top:25px;color:var(--action);display:grid;place-items:center;width:38px;height:38px;background:#ffe0d2;border-radius:12px}.basalam-monitoring-page .impact-icon .icon{width:23px;height:23px}.basalam-monitoring-page .impact-money .impact-number{font-size:38px;margin-top:14px;color:#95311b}.basalam-monitoring-page .impact-number{font-variant-numeric:tabular-nums}.basalam-monitoring-page .impact-money .impact-number span{color:#804125}.basalam-monitoring-page .impact-split{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}.basalam-monitoring-page .impact-split span{display:block;font-size:11px;color:#83513f}.basalam-monitoring-page .impact-split strong{font-size:15px;display:block;margin-top:4px}.basalam-monitoring-page .impact-money .inline-details{font-size:11px;border-color:#ebd0c5;margin-top:16px;padding-top:8px}.basalam-monitoring-page .impact-money .inline-details summary{min-height:26px}.basalam-monitoring-page .impact-money .inline-details p{font-size:12px}.basalam-monitoring-page .impact-products .card-header{margin-bottom:8px}.basalam-monitoring-page .impact-products h3{font-size:16px}.basalam-monitoring-page .impact-products .card-header>.icon{color:var(--action)}.basalam-monitoring-page .impact-products .impact-number{margin:10px 0 18px;font-size:38px}.basalam-monitoring-page .impact-counters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.basalam-monitoring-page .impact-counters>div{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:5px 8px;background:var(--faint);padding:12px;border-radius:10px}.basalam-monitoring-page .impact-counters .icon{color:var(--action);width:16px;height:16px}.basalam-monitoring-page .impact-counters strong{font-size:19px;line-height:1.4}.basalam-monitoring-page .impact-counters span{grid-column:1/-1;font-size:11px;color:var(--muted)}.basalam-monitoring-page .impact-products .change-time{margin-top:18px;font-size:11px}.basalam-monitoring-page .impact-section .comparison{margin-top:12px;padding-block:18px}.basalam-monitoring-page .comparison-values strong{font-size:27px}.basalam-monitoring-page .comparison-values .meter{height:8px}.basalam-monitoring-page .scan-row summary>.badge{width:100%;text-align:center;justify-content:center;white-space:normal}.basalam-monitoring-page .scan-count{text-align:center}.basalam-monitoring-page .scan-followup{display:flex;align-items:center;gap:20px;justify-content:space-between;background:#fff8ec;border:1px solid #f3e5c7;border-radius:10px;padding:16px;margin-top:16px}.basalam-monitoring-page .scan-followup strong{font-size:13px;color:#794b12}.basalam-monitoring-page .scan-followup p{font-size:12px;color:#805e30;margin:5px 0}.basalam-monitoring-page .scan-followup small{font-size:11px;color:var(--muted)}.basalam-monitoring-page .scan-followup .button{flex-shrink:0}.basalam-monitoring-page .scan-actions{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:18px}.basalam-monitoring-page .scan-actions>span{font-size:12px;color:var(--muted)}.basalam-monitoring-page .detail-grid{gap:16px}.basalam-monitoring-page .scan-detail .detail-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.basalam-monitoring-page .scan-detail .notice .button{margin-top:8px}.basalam-monitoring-page .button.danger-outline{background:#fff;color:#b13232;border-color:#e8b9b7}.basalam-monitoring-page .button.danger-outline:hover:not(:disabled){background:#fff1f0;color:#9e2727;border-color:#b13232}.basalam-monitoring-page .button.danger:hover:not(:disabled){background:#902626;border-color:#902626}.basalam-monitoring-page .settings-layout{grid-template-columns:minmax(0,1.7fr) minmax(250px,1fr);align-items:start}.basalam-monitoring-page .repair-state{display:flex;align-items:center;gap:14px}.basalam-monitoring-page .repair-state>div{flex:1}.basalam-monitoring-page .repair-state h3{font-size:17px}.basalam-monitoring-page .repair-state p{font-size:12px}.basalam-monitoring-page .repair-symbol{width:48px;height:48px;display:grid;place-items:center;background:var(--faint);color:var(--muted);border-radius:14px;flex:none}.basalam-monitoring-page .repair-symbol.active{background:#fff0e8;color:var(--action)}.basalam-monitoring-page .repair-symbol .icon{width:24px;height:24px}.basalam-monitoring-page .repair-route{display:flex;align-items:center;gap:20px;margin:26px 0;background:#fafbfc;border:1px solid #edf0f3;padding:20px 26px;border-radius:12px}.basalam-monitoring-page .repair-route>span{display:grid;grid-template-columns:24px auto;gap:0 10px;align-items:center;flex:none}.basalam-monitoring-page .repair-route>span>.icon{grid-row:1/3;color:var(--action);width:23px;height:23px}.basalam-monitoring-page .repair-route small{font-size:11px;color:var(--muted)}.basalam-monitoring-page .repair-route strong{font-size:14px}.basalam-monitoring-page .route-line{height:1px;background:#e7c7b7;flex:1;display:flex;justify-content:center;align-items:center}.basalam-monitoring-page .route-line .icon{background:var(--action);width:16px;height:16px}.basalam-monitoring-page .settings-controls{display:flex;gap:16px;align-items:center;justify-content:space-between}.basalam-monitoring-page .settings-controls>div{flex:1}.basalam-monitoring-page .settings-controls strong{font-size:14px}.basalam-monitoring-page .settings-controls p{margin-top:4px;font-size:12px}.basalam-monitoring-page .settings-controls .button{font-size:12px;flex:none}.basalam-monitoring-page .settings-action{margin-top:20px;padding-top:20px}.basalam-monitoring-page .help-box h3{color:var(--ink)}.basalam-monitoring-page .repair-steps{list-style:none;padding:0;margin:22px 0}.basalam-monitoring-page .repair-steps li{display:flex;gap:12px;margin:14px 0}.basalam-monitoring-page .repair-steps li>span{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:#fff0e8;color:var(--action);font-size:12px;flex:none}.basalam-monitoring-page .repair-steps strong{display:block;color:var(--ink);font-size:13px}.basalam-monitoring-page .repair-steps p{font-size:12px}.basalam-monitoring-page .settings-unlock{padding:44px;display:grid;grid-template-columns:150px minmax(0,1fr);align-items:center;gap:38px;background:linear-gradient(115deg,#fff9f4,#fff 65%)}.basalam-monitoring-page .settings-unlock h2{font-size:23px;margin:6px 0 12px;max-width:570px}.basalam-monitoring-page .settings-unlock p{font-size:13px;color:var(--muted);max-width:620px;line-height:2}.basalam-monitoring-page .settings-unlock .button{margin-top:24px}.basalam-monitoring-page .unlock-art{height:130px;width:130px;display:grid;place-items:center;background:#fff0e7;color:var(--action);border:1px solid #ffd9c7;border-radius:36px;position:relative;transform:rotate(-6deg)}.basalam-monitoring-page .unlock-art>.icon{width:64px;height:64px}.basalam-monitoring-page .unlock-art>span{position:absolute;bottom:-9px;inset-inline-end:-7px;display:grid;place-items:center;width:48px;height:48px;border-radius:16px;background:#fff;border:1px solid #f0ddd2;box-shadow:0 8px 16px #b8522110}.basalam-monitoring-page .unlock-art>span>.icon{width:24px;height:24px}.basalam-monitoring-page .unlock-features{display:flex;gap:18px;flex-wrap:wrap;margin-top:18px;font-size:12px}.basalam-monitoring-page .unlock-features span{display:flex;align-items:center;gap:7px}.basalam-monitoring-page .unlock-features .icon{color:var(--success);width:16px;height:16px}.basalam-monitoring-page .confirm-symbol{width:60px;height:60px;border-radius:18px;background:#fff1f0;color:var(--danger);display:grid;place-items:center;margin-bottom:20px}.basalam-monitoring-page .confirm-symbol .icon{width:28px;height:28px}.basalam-monitoring-page .confirm-copy{line-height:2.1;font-size:14px;max-width:560px}.basalam-monitoring-page .dialog-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}.basalam-monitoring-page .dialog-head{background:#fff;box-shadow:0 3px 15px #17203304}.basalam-monitoring-page .dialog-head .icon-button{border:0;background:#f5f7fa;border-radius:12px;width:38px;height:38px}.basalam-monitoring-page .dialog-head .icon-button:focus-visible{outline:2px solid var(--action);outline-offset:2px}.basalam-monitoring-page .dialog-body{background:#fcfcfd}.basalam-monitoring-page .dialog-body:has(.confirm-copy){background:#fff}.basalam-monitoring-page .dialog-summary-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}.basalam-monitoring-page .dialog-summary-stats>div{display:flex;align-items:center;gap:12px;background:#fff3eb;border-radius:12px;padding:14px 18px;color:#984023}.basalam-monitoring-page .dialog-summary-stats strong{font-size:23px}.basalam-monitoring-page .dialog-summary-stats span{font-size:12px}.basalam-monitoring-page .change-item{border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px;background:#fff}.basalam-monitoring-page .change-item:first-of-type{padding-top:18px}.basalam-monitoring-page .change-item:last-of-type{border:1px solid var(--line)}.basalam-monitoring-page .change-title{align-items:center;margin-bottom:16px}.basalam-monitoring-page .change-title .product-symbol{width:42px;height:42px;background:#fff3ed;color:var(--action);border-radius:12px}.basalam-monitoring-page .change-title h3{font-size:14px}.basalam-monitoring-page .change-title p{font-size:11px}.basalam-monitoring-page .change-fields{display:grid;gap:10px}.basalam-monitoring-page .field-change{display:grid;grid-template-columns:110px minmax(0,1fr) 16px minmax(0,1fr);gap:12px;align-items:center;background:#f7f8fa;border-radius:10px;padding:14px 16px}.basalam-monitoring-page .field-label{font-weight:600;font-size:12px}.basalam-monitoring-page .field-value{display:flex;flex-direction:column;gap:3px;font-size:15px;font-variant-numeric:tabular-nums}.basalam-monitoring-page .field-value small{color:var(--muted);font-size:10px}.basalam-monitoring-page .field-value.after{color:var(--success);font-weight:600}.basalam-monitoring-page .field-change>.icon{width:14px;height:14px;color:#809385}.basalam-monitoring-page .source-values{font-size:11px;color:var(--muted);margin-top:10px}.basalam-monitoring-page .change-time{display:flex;align-items:center;gap:6px}.basalam-monitoring-page .change-time>.icon{width:15px;height:15px;color:var(--success)}.basalam-monitoring-page .trouble-intro,.basalam-monitoring-page .guide-invitation{display:flex;align-items:center;gap:16px;background:#fff3eb;padding:22px;border-radius:14px}.basalam-monitoring-page .trouble-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:#ffe1d1;color:var(--action);flex:none}.basalam-monitoring-page .trouble-icon>.icon{width:25px;height:25px}.basalam-monitoring-page .trouble-intro h3,.basalam-monitoring-page .guide-invitation h3{font-size:17px}.basalam-monitoring-page .trouble-intro p,.basalam-monitoring-page .guide-invitation p{font-size:12px;color:var(--muted);margin-top:4px}.basalam-monitoring-page .guide-invitation{flex-wrap:wrap}.basalam-monitoring-page .guide-invitation>div{flex:1;min-width:200px}.basalam-monitoring-page .guide-invitation>.button{margin-inline-start:64px}.basalam-monitoring-page .trouble-list li{margin:24px 0;padding-inline-start:40px}.basalam-monitoring-page .trouble-list li:before{background:#fff0e7;color:var(--action)}.basalam-monitoring-page .trouble-meta{display:flex;align-items:center;gap:10px;border:1px dashed #cdd5df;border-radius:10px;padding:12px 16px;font-size:12px;color:var(--muted)}
+/* SalamGate feedback presentation. */
+.basalam-monitoring-page :is(#toast,#payment-toast).feedback-toast{position:fixed;top:50px;right:20px;bottom:auto;left:auto;display:flex;align-items:flex-start;gap:12px;width:430px;max-width:calc(100vw - 40px);background:#fff;color:#273447;border:1px solid #e4eaf2;border-right:4px solid #ff5c35;border-radius:16px;padding:18px;box-shadow:0 12px 40px #172b4d22;z-index:10000;overflow:hidden;animation:wsm-toast-in .25s ease-out}.basalam-monitoring-page .toast-copy{flex:1;min-width:0}.basalam-monitoring-page .toast-copy strong{font:600 15px/1.7 var(--font-heading)}.basalam-monitoring-page .toast-copy p{font-size:12px;line-height:1.9;margin-top:4px;color:#5b6677}.basalam-monitoring-page .toast-symbol{display:grid;place-items:center;width:34px;height:34px;background:#f7f9fc;color:var(--action);border-radius:10px;flex:none}.basalam-monitoring-page .toast-close{border:0;background:transparent;width:28px;height:28px;display:grid;place-items:center;padding:0;color:#718096}.basalam-monitoring-page .toast-close>.icon{width:16px;height:16px}.basalam-monitoring-page .toast-progress{position:absolute;bottom:0;right:0;height:3px;background:#ff5c35;animation:wsm-toast-progress 6.5s linear forwards;width:100%}.basalam-monitoring-page :is(#toast,#payment-toast):hover .toast-progress,.basalam-monitoring-page :is(#toast,#payment-toast):focus-within .toast-progress{animation-play-state:paused}.basalam-monitoring-page :is(#toast,#payment-toast).success{border-right-color:#168765}.basalam-monitoring-page .success .toast-symbol{color:#168765}.basalam-monitoring-page .success .toast-progress{background:#168765}.basalam-monitoring-page :is(#toast,#payment-toast).error{border-right-color:#d8394d}.basalam-monitoring-page .error .toast-symbol{color:#d8394d}.basalam-monitoring-page .error .toast-progress{background:#d8394d}.basalam-monitoring-page :is(#toast,#payment-toast).warning{border-right-color:#d48b13}.basalam-monitoring-page .warning .toast-symbol{color:#d48b13}.basalam-monitoring-page .warning .toast-progress{background:#d48b13}@keyframes wsm-toast-in{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}@keyframes wsm-toast-progress{to{width:0}}
+@media(max-width:1100px){.basalam-monitoring-page .impact-money,.basalam-monitoring-page .impact-products{padding:22px}.basalam-monitoring-page .impact-counters{gap:6px}.basalam-monitoring-page .impact-counters>div{padding:10px}.basalam-monitoring-page .settings-controls{align-items:flex-start;flex-direction:column}.basalam-monitoring-page .repair-route{gap:12px;padding:18px}.basalam-monitoring-page .impact-products h3{font-size:15px}}
+@media(max-width:900px){.basalam-monitoring-page .settings-layout{grid-template-columns:1fr}.basalam-monitoring-page .settings-controls{flex-direction:row;align-items:center}.basalam-monitoring-page .impact-seal{display:none}.basalam-monitoring-page .impact-counters>div{display:flex;flex-direction:column;align-items:flex-start}.basalam-monitoring-page .impact-products .impact-number,.basalam-monitoring-page .impact-money .impact-number{font-size:31px}.basalam-monitoring-page .impact-icon{display:none}}
+@media(max-width:640px){.basalam-monitoring-page .page-head{align-items:flex-start;gap:12px;flex-wrap:wrap}.basalam-monitoring-page .page-head>.button{font-size:11px;min-height:36px;padding:6px 10px}.basalam-monitoring-page .impact-showcase{grid-template-columns:1fr;border-radius:14px}.basalam-monitoring-page .impact-money{border-inline-end:0;border-bottom:1px solid #f1d8ce}.basalam-monitoring-page .impact-money,.basalam-monitoring-page .impact-products{padding:20px}.basalam-monitoring-page .impact-money .impact-number,.basalam-monitoring-page .impact-products .impact-number{font-size:33px}.basalam-monitoring-page .impact-products .impact-number{margin-top:2px}.basalam-monitoring-page .impact-counters>div{display:grid}.basalam-monitoring-page .impact-section>.section-heading h2{font-size:19px}.basalam-monitoring-page .impact-section .section-eyebrow{font-size:11px}.basalam-monitoring-page .impact-seal{display:none}.basalam-monitoring-page .impact-split{gap:10px;margin-top:14px}.basalam-monitoring-page .impact-split span{font-size:10px}.basalam-monitoring-page .impact-split strong{font-size:13px}.basalam-monitoring-page .impact-counters{gap:8px}.basalam-monitoring-page .impact-counters strong{font-size:18px}.basalam-monitoring-page .impact-counters span{font-size:10px}.basalam-monitoring-page .impact-counters .icon{width:14px;height:14px}.basalam-monitoring-page .impact-section .comparison{padding:18px 20px;gap:12px}.basalam-monitoring-page .impact-section{margin-bottom:24px}.basalam-monitoring-page .scan-row summary>.badge{width:auto;min-width:145px;justify-self:start}.basalam-monitoring-page .scan-count{text-align:start}.basalam-monitoring-page .scan-followup{flex-direction:column;align-items:stretch;gap:12px;padding:14px}.basalam-monitoring-page .scan-followup strong{font-size:12px}.basalam-monitoring-page .scan-followup p{font-size:11px}.basalam-monitoring-page .scan-followup small{font-size:10px}.basalam-monitoring-page .scan-actions{flex-wrap:wrap;gap:8px}.basalam-monitoring-page .scan-actions>span{font-size:11px}.basalam-monitoring-page .scan-detail .detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.basalam-monitoring-page .settings-controls{flex-direction:column;align-items:stretch}.basalam-monitoring-page .settings-controls .button{width:100%}.basalam-monitoring-page .repair-state{gap:10px;flex-wrap:wrap}.basalam-monitoring-page .repair-state h3{font-size:16px}.basalam-monitoring-page .repair-state p{font-size:11px}.basalam-monitoring-page .repair-state>.badge{margin-inline-start:58px}.basalam-monitoring-page .repair-route{padding:16px 12px;gap:8px}.basalam-monitoring-page .repair-route>span{grid-template-columns:1fr;text-align:center;gap:4px}.basalam-monitoring-page .repair-route>span>.icon{grid-row:auto;justify-self:center;width:21px;height:21px}.basalam-monitoring-page .repair-route strong{font-size:13px}.basalam-monitoring-page .repair-route small{font-size:10px}.basalam-monitoring-page .settings-unlock{grid-template-columns:1fr;padding:26px 22px;gap:24px}.basalam-monitoring-page .unlock-art{width:82px;height:82px;border-radius:24px}.basalam-monitoring-page .unlock-art>.icon{width:40px;height:40px}.basalam-monitoring-page .unlock-art>span{width:32px;height:32px;border-radius:10px}.basalam-monitoring-page .unlock-art>span>.icon{width:18px;height:18px}.basalam-monitoring-page .settings-unlock h2{font-size:21px}.basalam-monitoring-page .settings-unlock p{font-size:12px}.basalam-monitoring-page .settings-unlock .section-eyebrow{font-size:10px}.basalam-monitoring-page .unlock-features{gap:10px;font-size:11px}.basalam-monitoring-page .settings-unlock .button{margin-top:18px}.basalam-monitoring-page .dialog-summary-stats{gap:8px}.basalam-monitoring-page .dialog-summary-stats>div{flex-direction:column;align-items:flex-start;gap:2px;padding:12px 14px}.basalam-monitoring-page .dialog-summary-stats strong{font-size:24px}.basalam-monitoring-page .dialog-summary-stats span{font-size:11px}.basalam-monitoring-page .change-item{padding:14px;margin-bottom:12px}.basalam-monitoring-page .change-item:first-of-type{padding-top:14px}.basalam-monitoring-page .change-title{align-items:flex-start;gap:8px}.basalam-monitoring-page .change-title h3{font-size:12px}.basalam-monitoring-page .change-title p{font-size:10px}.basalam-monitoring-page .change-title .product-symbol{width:32px;height:32px;border-radius:9px}.basalam-monitoring-page .field-change{grid-template-columns:minmax(0,1fr) 14px minmax(0,1fr);gap:6px 12px;padding:12px}.basalam-monitoring-page .field-label{grid-column:1/-1;font-size:11px}.basalam-monitoring-page .field-value{font-size:16px}.basalam-monitoring-page .field-value small{font-size:10px}.basalam-monitoring-page .change-time{font-size:10px}.basalam-monitoring-page .source-values{font-size:10px}.basalam-monitoring-page .trouble-intro{align-items:flex-start;padding:16px;gap:12px}.basalam-monitoring-page .trouble-intro h3{font-size:16px}.basalam-monitoring-page .trouble-icon{width:38px;height:38px;border-radius:10px}.basalam-monitoring-page .trouble-intro p{font-size:11px}.basalam-monitoring-page .guide-invitation{padding:18px;gap:12px}.basalam-monitoring-page .guide-invitation>div{min-width:180px}.basalam-monitoring-page .guide-invitation>.button{margin-inline-start:0;width:100%}.basalam-monitoring-page .dialog-actions{flex-direction:column}.basalam-monitoring-page .dialog-actions>.button{width:100%}.basalam-monitoring-page :is(#toast,#payment-toast).feedback-toast{top:62px;right:12px;left:12px;width:auto;max-width:none;padding:14px;gap:10px}.basalam-monitoring-page .toast-copy p{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.basalam-monitoring-page :is(#toast,#payment-toast).feedback-toast,.basalam-monitoring-page .toast-progress{animation:none}.basalam-monitoring-page .impact-section *{scroll-behavior:auto}}
+.basalam-monitoring-page .invoice-card{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(260px,1fr);background:#fff;border:1px solid #edcfc0;border-radius:16px;overflow:hidden;box-shadow:0 5px 20px #9b471a05}.basalam-monitoring-page .invoice-main{padding:26px}.basalam-monitoring-page .invoice-title{display:flex;gap:12px;align-items:center}.basalam-monitoring-page .invoice-title>div{flex:1}.basalam-monitoring-page .invoice-symbol{display:grid;place-items:center;width:46px;height:46px;background:#fff1e8;border-radius:14px;color:var(--action);flex:none}.basalam-monitoring-page .invoice-symbol .icon{width:23px;height:23px}.basalam-monitoring-page .invoice-title h3{font-size:20px}.basalam-monitoring-page .invoice-title .section-eyebrow{font-size:11px}.basalam-monitoring-page .invoice-description{font-size:12px;color:var(--muted);margin:16px 0}.basalam-monitoring-page .invoice-plan{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#f7f8fa;padding:12px 16px;border-radius:10px}.basalam-monitoring-page .invoice-plan strong{font-size:14px}.basalam-monitoring-page .invoice-plan span{font-size:12px;color:var(--muted)}.basalam-monitoring-page .invoice-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:24px 0;font-size:12px}.basalam-monitoring-page .invoice-steps li{gap:7px;white-space:nowrap}.basalam-monitoring-page .invoice-steps li+li:before{display:none}.basalam-monitoring-page .invoice-steps li>span{width:24px;height:24px;border-radius:50%;background:#f0f3f6;display:grid;place-items:center;font-size:11px;flex:none}.basalam-monitoring-page .invoice-steps .current>span{background:#fff0e8}.basalam-monitoring-page .invoice-steps .done>span{background:var(--success-bg)}.basalam-monitoring-page .invoice-main .tracking{margin:0;padding-top:16px;border-top:1px dashed var(--line);font-size:11px}.basalam-monitoring-page .invoice-pay{padding:28px;background:#fff8f3;border-inline-start:1px solid #f3ded2;display:flex;flex-direction:column;justify-content:center}.basalam-monitoring-page .invoice-breakdown{display:grid;gap:12px;margin:0}.basalam-monitoring-page .invoice-breakdown>div{display:flex;gap:16px;align-items:center;justify-content:space-between;font-size:13px}.basalam-monitoring-page .invoice-breakdown dt{color:var(--muted)}.basalam-monitoring-page .invoice-breakdown dd{margin:0}.basalam-monitoring-page .invoice-total{border-top:1px dashed #e4c3b1;margin-top:20px;padding-top:18px;display:flex;flex-direction:column;gap:8px}.basalam-monitoring-page .invoice-total>span{font-size:12px;color:#85553d}.basalam-monitoring-page .invoice-total strong{font-size:30px;line-height:1.6;color:#97371f}.basalam-monitoring-page .invoice-total small{font-size:12px;font-weight:400}.basalam-monitoring-page .invoice-actions{display:flex;flex-direction:column;gap:10px;margin-top:20px}.basalam-monitoring-page .invoice-actions .button{width:100%;font-size:13px}.basalam-monitoring-page .plan{padding-top:42px;transition:border-color .2s,box-shadow .2s,transform .2s}.basalam-monitoring-page .plan:has(input:checked){padding-top:41px;box-shadow:0 5px 20px #d4562010}.basalam-monitoring-page .plan:hover:not(:has(input:disabled)){border-color:#e59978;box-shadow:0 8px 22px #d4562010;transform:translateY(-2px)}.basalam-monitoring-page .plan-ribbon{position:absolute;top:0;inset-inline-end:20px;border-radius:0 0 9px 9px;background:#fff0e4;color:#9b4326;padding:4px 12px;font-size:11px;font-weight:600;display:flex;align-items:center;gap:5px}.basalam-monitoring-page .plan-ribbon.recommended{background:var(--action);color:#fff}.basalam-monitoring-page .plan-ribbon .icon{width:14px;height:14px}.basalam-monitoring-page .plan-current{display:block;font-size:11px;color:var(--muted);margin-top:4px;min-height:22px}.basalam-monitoring-page .plan-head{align-items:flex-start}.basalam-monitoring-page .plan-head>span:first-child{display:flex;flex-direction:column}.basalam-monitoring-page .plan-head input{margin-top:7px}.basalam-monitoring-page .next-plan{margin:18px 0;padding:15px 18px;border:1px solid #e7d5c7;background:#fff8ef;border-radius:10px;font-size:12px}.basalam-monitoring-page .next-plan strong{display:block;color:#8b492b;margin-bottom:4px}.basalam-monitoring-page .next-plan p{color:var(--muted)}.basalam-monitoring-page .checkout-selection{display:flex;justify-content:space-between;align-items:center;gap:18px}.basalam-monitoring-page .checkout-selection p{font-size:13px;color:var(--muted)}.basalam-monitoring-page .checkout-selection>strong{color:var(--action);font-size:22px;white-space:nowrap}.basalam-monitoring-page .checkout-selection small{font-size:12px}.basalam-monitoring-page .checkout-timing{font-size:12px;color:var(--muted);margin:12px 0}.basalam-monitoring-page .checkout-box .consent{max-width:750px}
+@media(max-width:1100px){.basalam-monitoring-page .invoice-card{grid-template-columns:minmax(0,1.3fr) minmax(240px,1fr)}.basalam-monitoring-page .invoice-main,.basalam-monitoring-page .invoice-pay{padding:22px}.basalam-monitoring-page .invoice-title h3{font-size:18px}.basalam-monitoring-page .invoice-steps{font-size:11px;gap:6px}.basalam-monitoring-page .invoice-steps li{gap:4px}.basalam-monitoring-page .invoice-total strong{font-size:26px}}
+@media(max-width:760px){.basalam-monitoring-page .invoice-card{grid-template-columns:1fr}.basalam-monitoring-page .invoice-pay{border-inline-start:0;border-top:1px solid #f3ded2}.basalam-monitoring-page .invoice-total{flex-direction:row;justify-content:space-between;align-items:center}.basalam-monitoring-page .invoice-actions{flex-direction:row}.basalam-monitoring-page .invoice-actions .button{font-size:12px}.basalam-monitoring-page .invoice-plan{font-size:12px}.basalam-monitoring-page .checkout-selection{align-items:flex-start;flex-direction:column;gap:8px}}
+@media(max-width:640px){.basalam-monitoring-page .invoice-main,.basalam-monitoring-page .invoice-pay{padding:20px}.basalam-monitoring-page .invoice-title{gap:10px;flex-wrap:wrap}.basalam-monitoring-page .invoice-symbol{width:38px;height:38px;border-radius:11px}.basalam-monitoring-page .invoice-title h3{font-size:18px}.basalam-monitoring-page .invoice-title .badge{margin-inline-start:48px}.basalam-monitoring-page .invoice-title .section-eyebrow{font-size:10px}.basalam-monitoring-page .invoice-plan{padding:10px 12px}.basalam-monitoring-page .invoice-plan strong{font-size:13px}.basalam-monitoring-page .invoice-plan span{font-size:11px}.basalam-monitoring-page .invoice-description{font-size:11px}.basalam-monitoring-page .invoice-steps{font-size:11px}.basalam-monitoring-page .invoice-total strong{font-size:25px}.basalam-monitoring-page .invoice-actions{flex-direction:column}.basalam-monitoring-page .plan,.basalam-monitoring-page .plan:has(input:checked){padding-top:42px}.basalam-monitoring-page .plan-ribbon{font-size:11px}.basalam-monitoring-page .plan-current{min-height:0}.basalam-monitoring-page .plan-price{font-size:28px}.basalam-monitoring-page .checkout-selection>strong{font-size:23px}}
+@media(min-width:1001px){.basalam-monitoring-page .layout-two>.side-stack{grid-template-rows:auto 1fr}.basalam-monitoring-page .layout-two>.side-stack>.mini-card{display:flex;flex-direction:column}.basalam-monitoring-page .layout-two>.side-stack>.mini-card>.text-button{align-self:flex-start;margin-top:auto}}
+
+/* Checkout preview and explicit control colors, including WordPress hover rules. */
+.basalam-monitoring-page .button:is(:hover,:focus,:active,:visited){color:#fff;text-decoration:none}
+.basalam-monitoring-page .button.secondary:is(:hover,:focus,:active,:visited){color:var(--ink)}
+.basalam-monitoring-page .button.ghost:is(:hover,:focus,:active,:visited),.basalam-monitoring-page .page-head>.button:is(:hover,:focus,:active,:visited){color:var(--action)}
+.basalam-monitoring-page .button.danger:is(:hover,:focus,:active){color:#fff;background:var(--danger);border-color:var(--danger)}
+.basalam-monitoring-page .button:disabled{color:#fff}.basalam-monitoring-page .button.secondary:disabled{color:var(--muted)}
+.basalam-monitoring-page dialog:has(.checkout-preview){width:560px;max-width:calc(100vw - 24px)}
+.basalam-monitoring-page .checkout-preview{display:grid;gap:24px}.basalam-monitoring-page .preview-plan{display:flex;align-items:center;gap:14px}.basalam-monitoring-page .preview-plan h3{font-size:23px;margin:0}.basalam-monitoring-page .preview-specs{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:12px;background:var(--faint)}.basalam-monitoring-page .preview-specs>div{display:flex;gap:10px;align-items:center;padding:16px}.basalam-monitoring-page .preview-specs>div+div{border-inline-start:1px solid var(--line)}.basalam-monitoring-page .preview-specs .icon{color:var(--action)}.basalam-monitoring-page .preview-specs span{color:var(--muted);font-size:12px}.basalam-monitoring-page .preview-specs strong{display:block;color:var(--ink);font-size:16px}.basalam-monitoring-page .preview-total{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 18px;border:1px solid #f1d8ce;background:#fff7f2;border-radius:12px}.basalam-monitoring-page .preview-total>span{color:var(--muted)}.basalam-monitoring-page .preview-total strong{color:var(--action);font-size:28px;white-space:nowrap}.basalam-monitoring-page .preview-total small{font-size:13px}.basalam-monitoring-page .preview-actions{display:grid;gap:10px}.basalam-monitoring-page .preview-actions .button{width:100%;min-height:48px}.basalam-monitoring-page .checkout-preview #invoice-message:empty{display:none}
+@media(max-width:420px){.basalam-monitoring-page .preview-total{align-items:flex-start;flex-direction:column;gap:6px}.basalam-monitoring-page .preview-specs>div{padding:12px;gap:8px}.basalam-monitoring-page .preview-specs strong{font-size:14px}.basalam-monitoring-page .preview-plan h3{font-size:20px}.basalam-monitoring-page .checkout-preview{gap:18px}}
+
+/* Issued invoices and recovered payment results live only inside the modal. */
+.basalam-monitoring-page .payment-summary{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 18px;margin:20px 0;border:1px solid var(--line);border-radius:12px;background:var(--faint)}.basalam-monitoring-page .payment-summary>span{display:flex;align-items:center;gap:10px}.basalam-monitoring-page .payment-summary strong{font-size:13px}.basalam-monitoring-page .payment-summary>span>.icon{color:var(--action)}
+.basalam-monitoring-page dialog:has(.invoice-card){width:620px;max-width:calc(100vw - 24px)}
+.basalam-monitoring-page dialog .invoice-card{display:block;margin:0;border:0;border-radius:0;box-shadow:none}
+.basalam-monitoring-page dialog .invoice-main{padding:0 0 20px}.basalam-monitoring-page dialog .invoice-title{margin-bottom:16px}.basalam-monitoring-page dialog .invoice-title h3{font-size:19px}.basalam-monitoring-page dialog .invoice-main .tracking{margin-top:18px;flex-wrap:wrap;overflow-wrap:anywhere}.basalam-monitoring-page dialog .invoice-pay{border:1px solid #f3ded2;border-radius:12px;padding:20px}.basalam-monitoring-page dialog .invoice-total{flex-direction:row;align-items:center;justify-content:space-between;gap:12px}.basalam-monitoring-page dialog .invoice-total strong{font-size:20px}.basalam-monitoring-page dialog .invoice-actions{flex-direction:column}.basalam-monitoring-page dialog .invoice-actions .button{width:100%}.basalam-monitoring-page dialog .invoice-steps{font-size:11px}
+@media(max-width:480px){.basalam-monitoring-page .payment-summary{align-items:flex-start;flex-direction:column}.basalam-monitoring-page .payment-summary .button{width:100%}.basalam-monitoring-page dialog .invoice-title h3{font-size:17px}.basalam-monitoring-page dialog .invoice-plan{align-items:flex-start;flex-direction:column}.basalam-monitoring-page dialog .invoice-total{align-items:flex-start;flex-direction:column}.basalam-monitoring-page dialog .invoice-main .tracking bdi{font-size:10px}}
+.basalam-monitoring-page dialog .invoice-main{padding-bottom:14px}.basalam-monitoring-page dialog .invoice-main .notice{padding:10px 12px;margin-bottom:12px}.basalam-monitoring-page dialog .invoice-main p{margin:8px 0}.basalam-monitoring-page dialog .invoice-main .tracking{margin-top:12px;padding-top:10px}.basalam-monitoring-page dialog .invoice-pay{padding:16px}.basalam-monitoring-page dialog .invoice-total{margin-top:14px;padding-top:12px}.basalam-monitoring-page dialog .invoice-actions{margin-top:14px}
+
+/* Review 3 — activation, renewal and an explanatory, state-aware sync motion. */
+.basalam-monitoring-page { background: #fff; }
+.basalam-monitoring-page .settings-layout { align-items: stretch; }
+.basalam-monitoring-page .settings-card { display: flex; flex-direction: column; min-width: 0; }
+.basalam-monitoring-page .settings-card .settings-action { margin-top: auto; }
+.basalam-monitoring-page .settings-layout .help-box { display: flex; flex-direction: column; }
+.basalam-monitoring-page .settings-layout .help-box > .meta-row { margin-top: auto; padding-top: 20px; }
+.basalam-monitoring-page .settings-layout .help-box > .text-button { align-self: flex-start; margin-top: 12px; }
+.basalam-monitoring-page .repair-steps { margin: 26px 0; }
+.basalam-monitoring-page .repair-steps li { margin: 22px 0; }
+.basalam-monitoring-page #monitoring-help { margin-inline-start: auto; flex: none; }
+.basalam-monitoring-page .status-symbol.is-scanning > .icon { animation: wsm-monitoring-scan-spin 1.6s linear infinite; transform-origin: center; }
+@keyframes wsm-monitoring-scan-spin { to { transform: rotate(360deg); } }
+
+/* The illustration is a demonstration, never a live activity indicator. */
+.basalam-monitoring-page .sync-scene { --cycle: 9s; --store-pad: 14px; --field-height: 40px; margin: 26px 0 22px; border: 1px solid #eee8e2; border-radius: 16px; background: #fffcfa; padding: 20px 16px 10px; }
+.basalam-monitoring-page .sync-stage { display: grid; grid-template-columns: minmax(0,1fr) minmax(68px,.6fr) minmax(0,1fr); align-items: center; max-width: 600px; margin: auto; }
+.basalam-monitoring-page .sync-store { position: relative; z-index: 1; min-width: 0; padding: 14px; border: 1px solid #e5e4eb; border-radius: 14px; background: #fff; box-shadow: 0 5px 16px #27344705; }
+.basalam-monitoring-page .sync-store-title { display: flex; gap: 8px; align-items: center; }
+.basalam-monitoring-page .sync-store-title strong { font: 600 15px/1.8 var(--font-heading); }
+.basalam-monitoring-page .sync-shop-icon { display: grid; place-items: center; width: 29px; height: 29px; border-radius: 8px; background: #f5f0fa; color: #76509b; flex: none; }
+.basalam-monitoring-page .sync-shop-icon .icon { width: 18px; height: 18px; }
+.basalam-monitoring-page .sync-destination { border-color: #f5d3c5; }
+.basalam-monitoring-page .sync-destination .sync-shop-icon { background: #fff0e8; color: var(--action); }
+.basalam-monitoring-page .sync-store-caption { display: block; font-size: 10px; color: var(--muted); margin: 3px 0 14px; }
+.basalam-monitoring-page .sync-product { display: flex; align-items: center; gap: 7px; padding: 8px 0; margin-bottom: 6px; border-top: 1px solid #f0f1f4; font-size: 11px; color: #687487; }
+.basalam-monitoring-page .sync-product .icon { width: 15px; height: 15px; }
+.basalam-monitoring-page .sync-field { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 4px; position: relative; padding: 7px 0; height: var(--field-height); }
+.basalam-monitoring-page .sync-field > span:first-child { font-size: 10px; color: var(--muted); }
+.basalam-monitoring-page .sync-field strong { text-align: left; white-space: nowrap; font-size: 12px; font-variant-numeric: tabular-nums; }
+.basalam-monitoring-page .sync-field small { font-size: 9px; font-weight: 400; margin-inline-start: 3px; color: var(--muted); }
+.basalam-monitoring-page .sync-value-stack { display: grid; }
+.basalam-monitoring-page .sync-value-stack > strong { grid-area: 1/1; }
+.basalam-monitoring-page .sync-new, .basalam-monitoring-page .sync-confirm { opacity: 0; }
+.basalam-monitoring-page .sync-new { color: var(--success); }
+.basalam-monitoring-page .sync-confirm { position: absolute; left: -23px; width: 18px; height: 18px; border-radius: 50%; background: var(--success); color: #fff; display: grid; place-items: center; border: 3px solid #fffcfa; box-sizing: content-box; }
+.basalam-monitoring-page .sync-confirm .icon { width: 12px; height: 12px; }
+.basalam-monitoring-page .sync-transit { position: relative; align-self: stretch; direction: ltr; }
+.basalam-monitoring-page .sync-lane { position: absolute; width: 100%; border-top: 1px dashed #ebc2b0; left: 0; }
+.basalam-monitoring-page .lane-price { bottom: calc(var(--store-pad) + var(--field-height) * 1.5); }
+.basalam-monitoring-page .lane-stock { bottom: calc(var(--store-pad) + var(--field-height) * .5); }
+.basalam-monitoring-page .sync-packet { display: inline-flex; justify-content: center; gap: 5px; align-items: center; border-radius: 7px; border: 1px solid #ffd4bf; background: #fff0e6; color: #b14620; padding: 3px 5px; position: absolute; width: 63px; left: 100%; transform: translateX(-100%); opacity: 0; font-size: 10px; direction: rtl; box-shadow: 0 3px 9px #b24e1410; }
+.basalam-monitoring-page .sync-packet .icon { width: 13px; height: 13px; }
+.basalam-monitoring-page .sync-packet { z-index: 2; }
+.basalam-monitoring-page .packet-price { bottom: calc(var(--store-pad) + var(--field-height) * 1.5 - 13px); }
+.basalam-monitoring-page .packet-stock { bottom: calc(var(--store-pad) + var(--field-height) * .5 - 13px); background: #edf8f3; border-color: #cfe8da; color: #246b4f; }
+.basalam-monitoring-page .sync-route-arrow { display: grid; place-items: center; position: absolute; top: 25px; left: calc(50% - 15px); width: 30px; height: 30px; border-radius: 50%; color: var(--action); background: #fff1e8; }
+.basalam-monitoring-page .sync-route-arrow .icon { width: 16px; height: 16px; }
+.basalam-monitoring-page .sync-phases { display: grid; place-items: center; margin-top: 18px; min-height: 26px; color: var(--muted); font-size: 11px; }
+.basalam-monitoring-page .sync-phases > span { grid-area: 1/1; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.basalam-monitoring-page .sync-phases .icon { width: 15px; height: 15px; }
+.basalam-monitoring-page .sync-phases .phase-done { color: var(--success); }
+.basalam-monitoring-page .sync-caption { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; border-top: 1px solid #eee8e2; padding-top: 6px; color: #6d7480; font-size: 10px; }
+.basalam-monitoring-page .sync-preview .sync-old { opacity: 0; }
+.basalam-monitoring-page .sync-preview .sync-new, .basalam-monitoring-page .sync-preview .sync-confirm { opacity: 1; }
+.basalam-monitoring-page .sync-preview .sync-phases { color: var(--success); }
+.basalam-monitoring-page .is-idle:not(.sync-preview) .sync-transit { opacity: .4; }
+.basalam-monitoring-page .is-idle:not(.sync-preview) .sync-destination { border-color: #e5e4eb; }
+.basalam-monitoring-page .is-running .packet-price { animation: wsm-send-price var(--cycle) cubic-bezier(.4,0,.2,1) infinite; }
+.basalam-monitoring-page .is-running .packet-stock { animation: wsm-send-stock var(--cycle) cubic-bezier(.4,0,.2,1) infinite; }
+.basalam-monitoring-page .is-running .sync-price .sync-new, .basalam-monitoring-page .is-running .sync-price .sync-confirm { animation: wsm-receive-price var(--cycle) ease infinite; }
+.basalam-monitoring-page .is-running .sync-price .sync-old { animation: wsm-replace-price var(--cycle) ease infinite; }
+.basalam-monitoring-page .is-running .sync-stock .sync-new, .basalam-monitoring-page .is-running .sync-stock .sync-confirm { animation: wsm-receive-stock var(--cycle) ease infinite; }
+.basalam-monitoring-page .is-running .sync-stock .sync-old { animation: wsm-replace-stock var(--cycle) ease infinite; }
+.basalam-monitoring-page .is-running .phase-compare { animation: wsm-phase-compare var(--cycle) ease infinite; }
+.basalam-monitoring-page .is-running .phase-update { animation: wsm-phase-update var(--cycle) ease infinite; }
+.basalam-monitoring-page .is-running .phase-done { animation: wsm-phase-done var(--cycle) ease infinite; }
+@keyframes wsm-send-price {
+  0%, 12% { opacity: 0; left: 100%; transform: translateX(-30%) scale(.9); }
+  18% { opacity: 1; left: 100%; transform: translateX(-30%) scale(1); }
+  39% { opacity: 1; left: 0; transform: translateX(-70%) scale(1); }
+  45%, 100% { opacity: 0; left: 0; transform: translateX(-70%) scale(.9); }
+}
+@keyframes wsm-send-stock {
+  0%, 43% { opacity: 0; left: 100%; transform: translateX(-30%) scale(.9); }
+  49% { opacity: 1; left: 100%; transform: translateX(-30%) scale(1); }
+  69% { opacity: 1; left: 0; transform: translateX(-70%) scale(1); }
+  75%, 100% { opacity: 0; left: 0; transform: translateX(-70%) scale(.9); }
+}
+@keyframes wsm-receive-price { 0%, 40%, 100% { opacity: 0; transform: translateY(3px); } 46%, 91% { opacity: 1; transform: translateY(0); } }
+@keyframes wsm-replace-price { 0%, 40%, 100% { opacity: 1; } 46%, 91% { opacity: 0; } }
+@keyframes wsm-receive-stock { 0%, 70%, 100% { opacity: 0; transform: translateY(3px); } 76%, 91% { opacity: 1; transform: translateY(0); } }
+@keyframes wsm-replace-stock { 0%, 70%, 100% { opacity: 1; } 76%, 91% { opacity: 0; } }
+@keyframes wsm-phase-compare { 0%, 10%, 100% { opacity: 1; } 16%, 94% { opacity: 0; } }
+@keyframes wsm-phase-update { 0%, 10%, 76%, 100% { opacity: 0; } 16%, 70% { opacity: 1; } }
+@keyframes wsm-phase-done { 0%, 70%, 100% { opacity: 0; } 76%, 94% { opacity: 1; } }
+
+/* Activation uses the same fonts, icons, warm surfaces and CTA as SalamGate. */
+.basalam-monitoring-page .activation { margin-top: 14px; }
+.basalam-monitoring-page .activation-hero { display: grid; grid-template-columns: minmax(0,1.1fr) minmax(0,1fr); gap: 36px; padding: 44px 36px; border: 1px solid #f0ded3; border-radius: 22px; background: linear-gradient(135deg,#fff5ed 0%,#fffdfb 40%,#fff 76%); align-items: center; }
+.basalam-monitoring-page .activation-eyebrow { display: inline-flex; align-items: center; gap: 8px; color: var(--action); font-size: 12px; padding: 5px 10px; border-radius: 7px; background: #fff0e7; margin-bottom: 18px; }
+.basalam-monitoring-page .activation-eyebrow .icon { width: 16px; height: 16px; }
+.basalam-monitoring-page .activation-copy h2 { font-size: clamp(25px,2.3vw,34px); line-height: 1.7; font-weight: 700; letter-spacing: -.5px; }
+.basalam-monitoring-page .activation-copy h2 em { font-style: normal; color: var(--action); }
+.basalam-monitoring-page .activation-copy > p { color: var(--muted); font-size: 13px; line-height: 2.2; margin-top: 18px; max-width: 510px; }
+.basalam-monitoring-page .activation-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 25px; }
+.basalam-monitoring-page .activation-actions .button { font-size: 12px; padding: 11px 15px; }
+.basalam-monitoring-page .activation-trust { display: flex; align-items: flex-start; gap: 7px; font-size: 11px; color: #627164; margin-top: 16px; }
+.basalam-monitoring-page .activation-trust .icon { width: 15px; height: 15px; flex: none; margin-top: 3px; }
+.basalam-monitoring-page .activation-art { position: relative; padding: 14px 0 34px; min-width: 0; }
+.basalam-monitoring-page .activation-art::before { content: ''; position: absolute; inset: -18px 25px 4px; border: 1px solid #f3d6c4; border-radius: 50%; background: radial-gradient(ellipse,#ffeadb88,transparent 70%); transform: rotate(-15deg); }
+.basalam-monitoring-page .activation-art .sync-scene { position: relative; background: #ffffffdd; box-shadow: 0 16px 40px #a15f1b0a; margin: 0; border-color: #ecdacb; padding: 22px 16px; }
+.basalam-monitoring-page .activation-art-note { display: inline-flex; align-items: center; gap: 7px; position: absolute; bottom: 12px; left: 28px; padding: 8px 13px; background: #fff; border: 1px solid #eaded4; border-radius: 9px; font-size: 11px; color: var(--action); box-shadow: 0 5px 16px #9f614311; }
+.basalam-monitoring-page .activation-art-note .icon { width: 17px; height: 17px; }
+.basalam-monitoring-page .activation-benefits { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 24px; padding: 30px 0; }
+.basalam-monitoring-page .activation-benefits article { padding: 10px 22px; border-inline-end: 1px solid var(--line); }
+.basalam-monitoring-page .activation-benefits article:last-child { border: 0; }
+.basalam-monitoring-page .activation-benefits article > span { display: inline-grid; place-items: center; width: 38px; height: 38px; border-radius: 11px; background: #fff3ec; color: var(--action); margin-bottom: 12px; }
+.basalam-monitoring-page .activation-benefits h3 { font-size: 17px; }
+.basalam-monitoring-page .activation-benefits p { font-size: 12px; line-height: 2; color: var(--muted); margin-top: 7px; }
+.basalam-monitoring-page .activation-start { display: flex; gap: 28px; align-items: center; justify-content: space-between; padding: 24px 28px; border: 1px solid var(--line); border-radius: 14px; }
+.basalam-monitoring-page .activation-start .section-eyebrow { font-size: 11px; }
+.basalam-monitoring-page .activation-start h3 { font-size: 17px; margin-top: 3px; }
+.basalam-monitoring-page .activation-start ol { display: flex; gap: 24px; list-style: none; padding: 0; margin: 0; }
+.basalam-monitoring-page .activation-start li { display: flex; gap: 9px; align-items: center; font-size: 12px; }
+.basalam-monitoring-page .activation-start li > span { border: 1px solid #f2d6c7; color: var(--action); width: 29px; height: 29px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; flex: none; }
+
+/* Subscription interruptions stay above historical statistics. */
+.basalam-monitoring-page .renewal-banner { display: flex; align-items: center; gap: 18px; border: 1px solid #efdab2; border-inline-start: 4px solid #d79528; border-radius: 14px; background: linear-gradient(110deg,#fffdf8,#fff9ec); padding: 24px; margin: 0 0 26px; }
+.basalam-monitoring-page .renewal-symbol { width: 50px; height: 50px; flex: none; display: grid; place-items: center; border: 1px solid #efd79f; background: #fff3d7; color: #94600e; border-radius: 14px; }
+.basalam-monitoring-page .renewal-symbol .icon { width: 25px; height: 25px; }
+.basalam-monitoring-page .renewal-copy { flex: 1; min-width: 0; }
+.basalam-monitoring-page .renewal-eyebrow { font-size: 11px; color: #82590e; }
+.basalam-monitoring-page .renewal-copy h2 { font-size: 20px; margin: 3px 0 7px; color: #63471f; }
+.basalam-monitoring-page .renewal-copy p { font-size: 12px; color: #796146; }
+.basalam-monitoring-page .renewal-meta { display: flex; gap: 8px 20px; flex-wrap: wrap; margin-top: 12px; font-size: 10px; color: #806b4d; }
+.basalam-monitoring-page .renewal-meta span { display: inline-flex; align-items: center; gap: 5px; }
+.basalam-monitoring-page .renewal-meta .icon { width: 13px; height: 13px; }
+.basalam-monitoring-page .renewal-cta { flex: none; font-size: 12px; padding-inline: 16px; }
+.basalam-monitoring-page .renewal-next { font-size: 11px; color: #82590e; }
+
+/* The warm impact card gets its own clear header and grouped breakdown. */
+.basalam-monitoring-page .impact-money { background: #fff8f1; display: flex; flex-direction: column; }
+.basalam-monitoring-page .impact-money h3 { padding-inline-end: 48px; min-height: 38px; display: flex; align-items: center; font-size: 17px; }
+.basalam-monitoring-page .impact-money .impact-number { font-size: clamp(29px,3vw,42px); margin: 12px 0 20px; line-height: 1.7; }
+.basalam-monitoring-page .impact-money .impact-icon { background: #ffeadc; border: 1px solid #f6d9c6; border-radius: 11px; }
+.basalam-monitoring-page .impact-split { margin-top: auto; gap: 12px; }
+.basalam-monitoring-page .impact-split > div { border: 1px solid #eeded2; border-radius: 10px; padding: 12px; background: #ffffffa8; }
+.basalam-monitoring-page .impact-split span { font-size: 11px; line-height: 1.9; }
+.basalam-monitoring-page .impact-split strong { font-size: 16px; margin-top: 5px; }
+.basalam-monitoring-page .impact-money .inline-details { margin-top: 14px; }
+
+@media(max-width:1200px) {
+  .basalam-monitoring-page .activation-hero { gap: 24px; padding: 32px 24px; }
+  .basalam-monitoring-page .activation-start { align-items: flex-start; flex-direction: column; gap: 18px; }
+  .basalam-monitoring-page .sync-store { padding: 14px 9px; }
+  .basalam-monitoring-page .sync-field strong { font-size: 11px; }
+  .basalam-monitoring-page .sync-stage { grid-template-columns: minmax(0,1fr) 68px minmax(0,1fr); }
+}
+@media(max-width:1000px) {
+  .basalam-monitoring-page .activation-hero { grid-template-columns: 1fr; gap: 22px; }
+  .basalam-monitoring-page .activation-art { max-width: 520px; width: 100%; margin: auto; }
+  .basalam-monitoring-page .activation-copy h2 { font-size: 30px; }
+  .basalam-monitoring-page .activation-copy > p { max-width: 620px; }
+  .basalam-monitoring-page .sync-store { padding: 14px; }
+  .basalam-monitoring-page .sync-stage { grid-template-columns: minmax(0,1fr) minmax(68px,.6fr) minmax(0,1fr); }
+  .basalam-monitoring-page .activation-benefits { gap: 8px; }
+  .basalam-monitoring-page .activation-benefits article { padding: 8px 14px; }
+  .basalam-monitoring-page .renewal-banner { flex-wrap: wrap; }
+  .basalam-monitoring-page .renewal-cta { margin-inline-start: 68px; }
+  .basalam-monitoring-page .impact-money h3 { padding-inline-end: 0; }
+}
+@media(max-width:640px) {
+  .basalam-monitoring-page .settings-layout { gap: 16px; }
+  .basalam-monitoring-page .sync-scene { --store-pad: 10px; --field-height: 56px; padding: 16px 10px 8px; margin: 20px -4px; border-radius: 12px; }
+  .basalam-monitoring-page .sync-stage { grid-template-columns: minmax(0,1fr) 48px minmax(0,1fr); }
+  .basalam-monitoring-page .sync-store { padding: 10px 8px; border-radius: 10px; }
+  .basalam-monitoring-page .sync-store-title { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .basalam-monitoring-page .sync-store-title strong { font-size: 14px; }
+  .basalam-monitoring-page .sync-store-caption { margin-bottom: 10px; font-size: 9px; }
+  .basalam-monitoring-page .sync-field { grid-template-columns: 1fr; gap: 2px; padding-block: 5px; }
+  .basalam-monitoring-page .sync-field strong { font-size: 12px; text-align: right; }
+  .basalam-monitoring-page .sync-field small { font-size: 9px; }
+  .basalam-monitoring-page .sync-product { font-size: 9px; gap: 4px; }
+  .basalam-monitoring-page .sync-product .icon { width: 12px; height: 12px; }
+  .basalam-monitoring-page .sync-packet { width: 44px; font-size: 8px; gap: 2px; padding-inline: 1px; }
+  .basalam-monitoring-page .sync-packet .icon { width: 10px; height: 10px; }
+  .basalam-monitoring-page .sync-route-arrow { top: 25px; width: 25px; height: 25px; left: calc(50% - 12px); }
+  .basalam-monitoring-page .sync-confirm { width: 14px; height: 14px; left: -17px; border-width: 2px; }
+  .basalam-monitoring-page .sync-confirm .icon { width: 10px; height: 10px; }
+  .basalam-monitoring-page .sync-phases { margin-top: 14px; font-size: 10px; }
+  .basalam-monitoring-page .sync-phases .icon { width: 13px; height: 13px; }
+  .basalam-monitoring-page .activation-hero { padding: 26px 20px 16px; border-radius: 16px; }
+  .basalam-monitoring-page .activation-copy h2 { font-size: 26px; }
+  .basalam-monitoring-page .activation-copy > p { font-size: 12px; margin-top: 12px; }
+  .basalam-monitoring-page .activation-eyebrow { font-size: 11px; margin-bottom: 14px; }
+  .basalam-monitoring-page .activation-actions { flex-direction: column; align-items: stretch; margin-top: 20px; }
+  .basalam-monitoring-page .activation-trust { font-size: 10px; }
+  .basalam-monitoring-page .activation-art .sync-scene { padding: 16px 10px; margin: 0 -6px; }
+  .basalam-monitoring-page .activation-art-note { font-size: 10px; left: 8px; }
+  .basalam-monitoring-page .activation-art::before { inset: 0 6px 10px; }
+  .basalam-monitoring-page .activation-benefits { grid-template-columns: 1fr; padding: 14px 0; gap: 0; }
+  .basalam-monitoring-page .activation-benefits article { display: grid; grid-template-columns: 38px 1fr; gap: 0 12px; padding: 18px 10px; border-inline-end: 0; border-bottom: 1px solid var(--line); }
+  .basalam-monitoring-page .activation-benefits article > span { grid-row: 1/3; margin: 0; }
+  .basalam-monitoring-page .activation-benefits h3 { font-size: 16px; }
+  .basalam-monitoring-page .activation-benefits p { font-size: 11px; margin-top: 5px; }
+  .basalam-monitoring-page .activation-start { padding: 20px; gap: 16px; }
+  .basalam-monitoring-page .activation-start ol { flex-direction: column; gap: 14px; }
+  .basalam-monitoring-page .renewal-banner { gap: 12px; padding: 18px 16px; align-items: flex-start; }
+  .basalam-monitoring-page .renewal-symbol { width: 36px; height: 36px; border-radius: 10px; }
+  .basalam-monitoring-page .renewal-symbol .icon { width: 20px; height: 20px; }
+  .basalam-monitoring-page .renewal-copy { flex-basis: calc(100% - 48px); }
+  .basalam-monitoring-page .renewal-eyebrow { font-size: 10px; }
+  .basalam-monitoring-page .renewal-copy h2 { font-size: 18px; }
+  .basalam-monitoring-page .renewal-copy p { font-size: 11px; line-height: 2; }
+  .basalam-monitoring-page .renewal-meta { font-size: 10px; flex-direction: column; gap: 4px; }
+  .basalam-monitoring-page .renewal-cta { width: 100%; margin-inline-start: 0; }
+  .basalam-monitoring-page .renewal-next { margin-inline-start: 48px; }
+  .basalam-monitoring-page .impact-money h3 { font-size: 16px; min-height: 0; }
+  .basalam-monitoring-page .impact-money .impact-number { margin: 10px 0 16px; font-size: 34px; }
+  .basalam-monitoring-page .impact-split { gap: 8px; }
+  .basalam-monitoring-page .impact-split > div { padding: 10px; }
+  .basalam-monitoring-page .impact-split span { font-size: 10px; }
+  .basalam-monitoring-page .impact-split strong { font-size: 13px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .basalam-monitoring-page .sync-scene *, .basalam-monitoring-page .sync-scene *::before { animation: none !important; transition: none !important; }
+  .basalam-monitoring-page .sync-scene .sync-packet, .basalam-monitoring-page .is-running .phase-compare, .basalam-monitoring-page .is-running .phase-update, .basalam-monitoring-page .is-running .sync-old { opacity: 0; }
+  .basalam-monitoring-page .is-running .sync-new, .basalam-monitoring-page .is-running .sync-confirm, .basalam-monitoring-page .is-running .phase-done { opacity: 1; transform: none; }
+  .basalam-monitoring-page .status-symbol.is-scanning > .icon { animation: none; }
+}
+
+/* Native-modal spotlight tour. All styles are scoped to avoid WordPress bleed. */
+.basalam-monitoring-page dialog.monitor-tour {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink, #273447);
+  text-align: right;
+  font: 14px/1.9 var(--font-body, PelakFA, Tahoma, sans-serif);
+  overscroll-behavior: contain;
+  box-shadow: none;
+}
+.basalam-monitoring-page dialog.monitor-tour::backdrop { background: transparent; }
+.basalam-monitoring-page .monitor-tour .mt-shade { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.basalam-monitoring-page .monitor-tour .mt-spotlight {
+  position: fixed;
+  pointer-events: none;
+  border: 2px solid var(--brand, #ff5c35);
+  border-radius: 16px;
+  box-shadow: 0 0 0 5px rgb(255 255 255 / .2), 0 0 36px rgb(255 92 53 / .18);
+}
+.basalam-monitoring-page .monitor-tour .mt-card {
+  position: fixed;
+  width: 380px;
+  max-width: calc(100vw - 24px);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  overscroll-behavior: contain;
+  background: #fff;
+  border: 1px solid #ffe0d4;
+  border-radius: 20px;
+  padding: 18px 22px 20px;
+  box-shadow: 0 20px 70px rgb(11 22 38 / .24);
+  opacity: 0;
+  transform: translateY(12px) scale(.98);
+  transition: opacity 200ms ease, transform 280ms cubic-bezier(.2,.8,.2,1);
+}
+.basalam-monitoring-page .monitor-tour.mt-ready .mt-card { opacity: 1; transform: translateY(0) scale(1); }
+.basalam-monitoring-page .monitor-tour.mt-ready .mt-spotlight { animation: wsm-mt-spotlight-in 700ms ease both; }
+@keyframes wsm-mt-spotlight-in { from { opacity: .35; box-shadow: 0 0 0 10px rgb(255 255 255 / .08); } to { opacity: 1; box-shadow: 0 0 0 5px rgb(255 255 255 / .2), 0 0 36px rgb(255 92 53 / .18); } }
+.basalam-monitoring-page .monitor-tour .mt-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.basalam-monitoring-page .monitor-tour .mt-label { color: var(--action, #bd391f); font-size: 12px; font-weight: 600; }
+.basalam-monitoring-page .monitor-tour .mt-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  margin-inline-end: -8px;
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+  color: #657386;
+  cursor: pointer;
+}
+.basalam-monitoring-page .monitor-tour .mt-close:hover { background: #f4f6f8; color: var(--ink); }
+.basalam-monitoring-page .monitor-tour .mt-icon {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  flex: none;
+  vertical-align: middle;
+}
+.basalam-monitoring-page .monitor-tour .mt-icon > svg { display: block; width: 100%; height: 100%; }
+.basalam-monitoring-page .monitor-tour .mt-step-content { position: relative; min-height: 0; overflow: auto; overscroll-behavior: contain; transition: opacity 140ms ease, transform 180ms ease; }
+.basalam-monitoring-page .monitor-tour .mt-header,
+.basalam-monitoring-page .monitor-tour .mt-progress,
+.basalam-monitoring-page .monitor-tour .mt-footer { flex-shrink: 0; }
+.basalam-monitoring-page .monitor-tour .mt-spotlight[hidden] { display: none; }
+.basalam-monitoring-page .mt-scroll-space { width: 1px; pointer-events: none; }
+.basalam-monitoring-page .monitor-tour.mt-changing .mt-step-content { opacity: .3; transform: translateY(4px); }
+.basalam-monitoring-page .monitor-tour .mt-step-icon { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 13px; color: var(--action); background: #fff0e9; margin-bottom: 13px; transition: transform 240ms cubic-bezier(.2,.8,.2,1); }
+.basalam-monitoring-page .monitor-tour.mt-changing .mt-step-icon { transform: scale(.85) rotate(-8deg); }
+.basalam-monitoring-page .monitor-tour .mt-step-icon .mt-icon { width: 25px; height: 25px; }
+.basalam-monitoring-page .monitor-tour .mt-counter { color: #6d7787; font-size: 12px; margin: 0 0 4px; }
+.basalam-monitoring-page .monitor-tour .mt-title { font: 600 21px/1.7 var(--font-heading, Morabba, PelakFA, Tahoma, sans-serif); margin: 0 0 9px; outline: 0; }
+.basalam-monitoring-page .monitor-tour .mt-copy { font-size: 13px; line-height: 2; color: #556174; margin: 0; }
+.basalam-monitoring-page .monitor-tour .mt-progress { display: flex; gap: 5px; margin: 22px 0 20px; }
+.basalam-monitoring-page .monitor-tour .mt-progress span { display: block; height: 4px; flex: 1; border-radius: 8px; background: #e9edf2; transition: background 180ms; }
+.basalam-monitoring-page .monitor-tour .mt-progress [data-state="done"] { background: #ffc4ae; }
+.basalam-monitoring-page .monitor-tour .mt-progress [data-state="current"] { background: var(--brand, #ff5c35); }
+.basalam-monitoring-page .monitor-tour .mt-footer { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.basalam-monitoring-page .monitor-tour .mt-footer button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 9px 13px; font: 600 12px/1.7 var(--font-body); border-radius: 9px; cursor: pointer; }
+.basalam-monitoring-page .monitor-tour .mt-next { background: var(--action, #bd391f); border: 1px solid var(--action, #bd391f); color: white; }
+.basalam-monitoring-page .monitor-tour .mt-next:hover { background: var(--action-hover, #a62e17); }
+.basalam-monitoring-page .monitor-tour .mt-next .mt-icon, .basalam-monitoring-page .monitor-tour .mt-back .mt-icon { width: 16px; height: 16px; }
+.basalam-monitoring-page .monitor-tour .mt-back { background: #fff; border: 1px solid #dce2e9; color: #39465a; }
+.basalam-monitoring-page .monitor-tour .mt-back:hover { background: #f4f6f8; }
+.basalam-monitoring-page .monitor-tour .mt-skip { margin-inline-start: auto; background: transparent; border: 1px solid transparent; color: #697385; }
+.basalam-monitoring-page .monitor-tour .mt-skip:hover { color: var(--action); background: #fff4ee; }
+.basalam-monitoring-page .monitor-tour button:focus-visible { outline: 3px solid var(--focus, #315d90); outline-offset: 3px; }
+.basalam-monitoring-page .monitor-tour .mt-live { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+@media (max-width: 599px) {
+  .basalam-monitoring-page .monitor-tour .mt-card { padding: 14px 17px 16px; border-radius: 17px; }
+  .basalam-monitoring-page .monitor-tour .mt-header { margin-bottom: 0; }
+  .basalam-monitoring-page .monitor-tour .mt-title { font-size: 19px; margin-bottom: 6px; }
+  .basalam-monitoring-page .monitor-tour .mt-step-icon { width: 36px; height: 36px; margin-bottom: 7px; border-radius: 11px; }
+  .basalam-monitoring-page .monitor-tour .mt-step-icon .mt-icon { width: 21px; height: 21px; }
+  .basalam-monitoring-page .monitor-tour .mt-progress { margin: 16px 0 14px; }
+  .basalam-monitoring-page .monitor-tour .mt-footer { gap: 5px; }
+  .basalam-monitoring-page .monitor-tour .mt-footer button { padding-inline: 10px; }
+}
+@media (max-height: 720px) {
+  .basalam-monitoring-page .monitor-tour .mt-card { padding: 10px 17px 14px; }
+  .basalam-monitoring-page .monitor-tour .mt-header { margin-bottom: 0; }
+  .basalam-monitoring-page .monitor-tour .mt-step-icon { display: none; }
+  .basalam-monitoring-page .monitor-tour .mt-title { font-size: 18px; line-height: 1.65; margin-bottom: 5px; }
+  .basalam-monitoring-page .monitor-tour .mt-counter { font-size: 11px; margin-bottom: 2px; }
+  .basalam-monitoring-page .monitor-tour .mt-copy { font-size: 12px; line-height: 1.9; }
+  .basalam-monitoring-page .monitor-tour .mt-progress { margin: 12px 0; }
+}
+@media (max-height: 520px) {
+  .basalam-monitoring-page .monitor-tour .mt-card { padding-block: 8px; }
+  .basalam-monitoring-page .monitor-tour .mt-progress { margin-block: 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .basalam-monitoring-page .monitor-tour *, .basalam-monitoring-page .monitor-tour *::before, .basalam-monitoring-page .monitor-tour *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+.basalam-monitoring-page {background:#fff; color:var(--ink); font:14px/1.8 PelakFA,Tahoma,sans-serif; max-width:none; padding:24px; margin:0; min-width:0; direction:rtl}
+.basalam-monitoring-page .app-shell{max-width:1320px;margin-inline:auto}
+.basalam-monitoring-page .card{max-width:none;margin:0;box-sizing:border-box}
+.basalam-monitoring-page h1,.basalam-monitoring-page h2,.basalam-monitoring-page h3{color:inherit}
+.basalam-monitoring-page button,.basalam-monitoring-page input{font-family:inherit}
+.basalam-monitoring-page .button{height:auto;line-height:1.7;box-shadow:none;white-space:normal}
+.basalam-monitoring-page .button::after{display:none}
+.basalam-monitoring-page .feedback-toast{z-index:100000;top:48px}
+.basalam-monitoring-page .request-status:empty{display:none}
+.basalam-monitoring-page .request-status{margin:12px 0;color:var(--muted)}
+.basalam-monitoring-page .product-link{display:inline-flex;min-height:44px;align-items:center;color:var(--action)}
+.basalam-monitoring-page [hidden]{display:none!important}
+.basalam-monitoring-page :focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+@media(max-width:782px){.basalam-monitoring-page{padding:12px 8px}.basalam-monitoring-page .feedback-toast{top:60px}}
+
+/* Keep the invoice consent and replacement note compact inside the modal. */
+.basalam-monitoring-page .checkout-preview .subscription-terms,.basalam-monitoring-page .checkout-preview .consent,.basalam-monitoring-page .preview-replacement{margin:0}
+.basalam-monitoring-page .preview-replacement{font-size:13px;line-height:1.9;color:var(--muted)}
+.basalam-monitoring-page .checkout-preview{gap:18px}
+
+/* Seller workflow refresh: compact overview, clear subscription and quiet navigation. */
+.basalam-monitoring-page [hidden]{display:none!important}
+.basalam-monitoring-page .tabs{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;align-items:center}
+.basalam-monitoring-page .tabs::-webkit-scrollbar{display:none;width:0;height:0}
+.basalam-monitoring-page .overview-support{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:24px}
+.basalam-monitoring-page .history-attention{margin-bottom:28px}
+.basalam-monitoring-page .subscription-hub{display:grid;grid-template-columns:1.15fr 1fr;gap:24px;margin:8px 0 24px;align-items:stretch}
+.basalam-monitoring-page .subscription-pass{padding:26px 30px;border-radius:18px;border:1px solid #f2d6c8;background:linear-gradient(120deg,#fff8f2,#fff);position:relative;overflow:hidden}
+.basalam-monitoring-page .subscription-pass-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.basalam-monitoring-page .subscription-emblem{width:46px;height:46px;border-radius:14px;background:#ffe9dc;color:var(--action);display:grid;place-items:center}
+.basalam-monitoring-page .subscription-pass h2{font-size:28px;margin:4px 0 6px}
+.basalam-monitoring-page .subscription-pass>p{font-size:13px;color:var(--muted)}
+.basalam-monitoring-page .subscription-facts{display:grid;grid-template-columns:1fr 1fr;margin:26px 0 18px;gap:24px}
+.basalam-monitoring-page .subscription-facts>div{display:flex;flex-direction:column;gap:6px}
+.basalam-monitoring-page .subscription-facts span{font-size:12px;color:var(--muted)}
+.basalam-monitoring-page .subscription-facts strong{font-size:24px}
+.basalam-monitoring-page .subscription-facts small{font-size:12px;font-weight:400}
+.basalam-monitoring-page .subscription-expiry{display:flex;gap:10px;align-items:center;border-top:1px solid #eddccf;padding-top:18px;font-size:12px}
+.basalam-monitoring-page .subscription-expiry strong{margin-inline-start:auto}
+.basalam-monitoring-page .subscription-capacity{padding:28px;display:flex;flex-direction:column;justify-content:center}
+.basalam-monitoring-page .subscription-capacity .card-header{margin-bottom:20px}
+.basalam-monitoring-page .capacity-note{color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:16px;margin-top:12px}
+.basalam-monitoring-page .plans-heading{margin-top:32px}
+.basalam-monitoring-page .plans{align-items:stretch}
+.basalam-monitoring-page .plan{padding:42px 24px 24px;display:flex;flex-direction:column;gap:8px}
+.basalam-monitoring-page .plan:has(input:checked){padding:41px 23px 23px}
+.basalam-monitoring-page .plan-price{margin:12px 0 0;font-size:29px}
+.basalam-monitoring-page .plan-price small,.basalam-monitoring-page .plan-title small{font-size:13px;font-weight:400}
+.basalam-monitoring-page .plan-duration{margin:0 0 18px}
+.basalam-monitoring-page .plan-caption{margin-top:18px}
+.basalam-monitoring-page .purchase-footer{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:30px;align-items:center;padding:24px;border:1px solid var(--line);border-radius:16px;background:#f9fafc;margin:20px 0}
+.basalam-monitoring-page .purchase-selected{display:flex;gap:14px;align-items:center}
+.basalam-monitoring-page .purchase-selected p,.basalam-monitoring-page .purchase-price>span{font-size:12px;color:var(--muted)}
+.basalam-monitoring-page .purchase-price{display:flex;flex-direction:column;gap:4px}
+.basalam-monitoring-page .purchase-price strong{font-size:23px}
+.basalam-monitoring-page .purchase-price small{font-size:12px}
+.basalam-monitoring-page .purchase-submit{display:flex;flex-direction:column;gap:6px;text-align:center}
+.basalam-monitoring-page .purchase-submit>small{font-size:10px;color:var(--muted)}
+.basalam-monitoring-page .purchase-footer #preflight-message:empty{display:none}
+.basalam-monitoring-page dialog:has(.repair-confirm){width:min(520px,calc(100% - 32px));border:0;border-radius:22px}
+.basalam-monitoring-page dialog:has(.repair-confirm) .dialog-head{border:0;padding:18px 24px 0;box-shadow:none}
+.basalam-monitoring-page dialog:has(.repair-confirm) .dialog-head h2{font-size:13px;color:var(--muted)}
+.basalam-monitoring-page dialog:has(.repair-confirm) .dialog-body{background:#fff;padding:12px 28px 28px}
+.basalam-monitoring-page .repair-confirm .confirm-symbol{width:56px;height:56px;margin:0 0 18px;border-radius:16px}
+.basalam-monitoring-page .repair-confirm h3{font-size:21px;margin-bottom:12px}
+.basalam-monitoring-page .repair-confirm .confirm-copy{font-size:13px;color:var(--muted)}
+.basalam-monitoring-page .confirm-effects{display:grid;gap:10px;padding:16px;background:#f7f9fa;border-radius:12px;margin-top:20px;font-size:12px}
+.basalam-monitoring-page .confirm-effects span{display:flex;gap:8px;align-items:center}
+.basalam-monitoring-page .confirm-effects .icon{width:16px;height:16px;color:var(--success)}
+.basalam-monitoring-page .repair-confirm .dialog-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.basalam-monitoring-page .repair-confirm .dialog-actions .button{font-size:12px;padding:10px}
+@media(max-width:900px){.basalam-monitoring-page .subscription-hub{grid-template-columns:1fr}.basalam-monitoring-page .purchase-footer{grid-template-columns:1fr auto}.basalam-monitoring-page .purchase-submit{grid-column:1/-1}.basalam-monitoring-page .purchase-submit .button{width:100%}}
+@media(max-width:600px){.basalam-monitoring-page .overview-support{grid-template-columns:1fr}.basalam-monitoring-page .subscription-pass{padding:22px}.basalam-monitoring-page .subscription-pass h2{font-size:24px}.basalam-monitoring-page .purchase-footer{grid-template-columns:1fr;gap:20px}.basalam-monitoring-page .purchase-price{flex-direction:row;align-items:center;justify-content:space-between}.basalam-monitoring-page .repair-confirm .dialog-actions{grid-template-columns:1fr}}
+.basalam-monitoring-page .plan-head>.plan-title{display:block;font-size:23px;line-height:1.6}
+.basalam-monitoring-page .plan-head{margin-bottom:4px;align-items:center}
+.basalam-monitoring-page .plan-price{margin:4px 0 0;font-size:27px}
+.basalam-monitoring-page .plan-duration{margin:0 0 10px}
+.basalam-monitoring-page .plan-feature{margin:4px 0}
+.basalam-monitoring-page .plan-caption{margin-top:12px}
+
+.basalam-monitoring-page .purchase-footer #preflight-message:not(:empty){grid-column:1/-1;margin:0;padding:12px 16px;border-radius:10px;background:var(--info-bg);color:var(--info);font-size:12px}
+.basalam-monitoring-page .overview-support .sync-scene{margin:18px 0;--store-pad:10px;--field-height:38px;padding:16px 10px 8px}
+.basalam-monitoring-page .overview-support .sync-stage{grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr)}
+.basalam-monitoring-page .overview-support .sync-store-title strong{font-size:13px}
+.basalam-monitoring-page .overview-support .sync-field{gap:4px}
+.basalam-monitoring-page .overview-support .sync-field strong{font-size:13px}
+@media(max-width:1200px){.basalam-monitoring-page .overview-support{grid-template-columns:1fr}.basalam-monitoring-page .overview-support .sync-stage{grid-template-columns:minmax(0,1fr) minmax(48px,.4fr) minmax(0,1fr)}}
+
+/* Compact monitoring products workspace; shared WooSalam typography. */
+.basalam-monitoring-page[data-section=coverage] .page-head{margin-bottom:12px}
+.basalam-monitoring-page[data-section=coverage] .page-head h1{font-size:25px}
+.basalam-monitoring-page .coverage-workspace{padding-top:18px}
+.basalam-monitoring-page .coverage-overview{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:18px}
+.basalam-monitoring-page .coverage-capacity{min-width:260px;max-width:460px;flex:1}
+.basalam-monitoring-page .coverage-capacity>div:first-child{display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:12px;color:var(--muted)}
+.basalam-monitoring-page .coverage-capacity strong{font-size:22px;color:var(--ink);font-weight:700}
+.basalam-monitoring-page .coverage-capacity strong span{font-size:14px;font-weight:500}
+.basalam-monitoring-page .coverage-meter{height:4px;background:#e6ebe9;border-radius:8px;margin-top:10px;overflow:hidden}
+.basalam-monitoring-page .coverage-meter>span{display:block;height:100%;background:#338268;border-radius:8px;min-width:0}
+.basalam-monitoring-page .coverage-tools{display:flex;align-items:center;gap:10px}
+.basalam-monitoring-page .coverage-tools>.button{font-size:12px;min-height:38px}
+.basalam-monitoring-page .coverage-tools>.button:last-child{width:38px;padding:8px}
+.basalam-monitoring-page .coverage-catalog{background:var(--paper);border:1px solid var(--line);border-radius:12px}
+.basalam-monitoring-page .coverage-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px 10px}
+.basalam-monitoring-page .coverage-search{display:flex;align-items:center;gap:0;flex:1;min-width:180px;max-width:430px;min-height:42px;border:1px solid #d8dee6;border-radius:8px;background:#fff;margin:0;position:relative}
+.basalam-monitoring-page .coverage-search:focus-within{border-color:var(--focus);box-shadow:0 0 0 2px #315d9018}
+.basalam-monitoring-page .coverage-search input{flex:1;width:0;min-width:0;min-height:40px;border:0;border-radius:8px;box-shadow:none;outline:0;background:transparent;padding:8px 2px 8px 12px;font:inherit;font-size:13px;color:var(--ink);margin:0}
+.basalam-monitoring-page .coverage-search input::placeholder{color:#7a8491;opacity:1}
+.basalam-monitoring-page .coverage-search input::-webkit-search-cancel-button{display:none}
+.basalam-monitoring-page .coverage-search-submit,.basalam-monitoring-page .coverage-search .coverage-search-clear{display:grid;place-items:center;flex:none;width:38px;min-height:38px;padding:8px;border:0;background:transparent;color:var(--muted);border-radius:6px;margin:1px}
+.basalam-monitoring-page .coverage-search .coverage-search-clear:hover,.basalam-monitoring-page .coverage-search-submit:hover{background:var(--faint);color:var(--ink)}
+.basalam-monitoring-page .coverage-filters{display:flex;gap:2px;padding:3px;background:#f3f5f7;border-radius:8px;flex-shrink:0}
+.basalam-monitoring-page .coverage-filters .coverage-filter{background:transparent;border:1px solid transparent;color:var(--muted);font-size:12px;padding:6px 11px;min-height:34px;gap:7px;white-space:nowrap}
+.basalam-monitoring-page .coverage-filters .coverage-filter[aria-pressed=true]{background:#fff;border-color:#e5e8ed;color:var(--ink);box-shadow:0 1px 3px #1c33420a}
+.basalam-monitoring-page .coverage-filters .coverage-filter:hover:not(:disabled){background:#fff;border-color:#e5e8ed}
+.basalam-monitoring-page .coverage-count{font-size:11px;line-height:1.8;color:#697586;padding:0 4px;border-radius:4px;background:#e9edf1}
+.basalam-monitoring-page .coverage-filter[aria-pressed=true] .coverage-count{color:#b44329;background:#fff0ea}
+.basalam-monitoring-page .coverage-list-note{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:0 20px 12px;font-size:11px;color:var(--muted)}
+.basalam-monitoring-page .coverage-policy{max-width:640px}
+.basalam-monitoring-page .coverage-policy summary{display:flex;gap:6px;align-items:center;font-size:11px;list-style:none;min-height:28px;cursor:pointer}
+.basalam-monitoring-page .coverage-policy summary::-webkit-details-marker{display:none}
+.basalam-monitoring-page .coverage-policy summary:hover{color:var(--ink)}
+.basalam-monitoring-page .coverage-policy summary>span{font-size:14px}
+.basalam-monitoring-page .coverage-policy p{font-size:12px;line-height:1.9;padding:8px 12px;border-inline-start:2px solid #c5d3e0;margin-top:4px;background:#f8fafc}
+.basalam-monitoring-page .coverage-result-status{font-size:11px;color:var(--muted);min-height:28px;line-height:28px}
+.basalam-monitoring-page .coverage-list-note>.coverage-result-status{white-space:nowrap}
+.basalam-monitoring-page .coverage-status-note{font-size:12px;color:var(--muted);margin:8px 0 12px}
+.basalam-monitoring-page .coverage-list-head,.basalam-monitoring-page .coverage-row{display:grid;grid-template-columns:minmax(0,1fr) 140px 180px;gap:24px;align-items:center;padding:11px 20px}
+.basalam-monitoring-page .coverage-list-head{font-size:11px;color:var(--muted);background:#f8f9fb;border-block:1px solid var(--line);padding-block:8px}
+.basalam-monitoring-page .coverage-list-head>span:last-child{text-align:left}
+.basalam-monitoring-page .coverage-row+.coverage-row{border-top:1px solid #edf0f3}
+.basalam-monitoring-page .coverage-row:hover{background:#fcfdff}
+.basalam-monitoring-page .coverage-product{display:flex;gap:12px;align-items:center;min-width:0}
+.basalam-monitoring-page .coverage-product-copy{min-width:0;overflow-wrap:anywhere}
+.basalam-monitoring-page .coverage-product-copy strong{display:block;font-size:13px;font-weight:500;line-height:1.8}
+.basalam-monitoring-page .coverage-product-copy p{font-size:11px;color:#738091;line-height:1.6;margin-top:3px}
+.basalam-monitoring-page .coverage-product-copy bdi{font-variant-numeric:tabular-nums}
+.basalam-monitoring-page .coverage-image{display:grid;place-items:center;width:48px;height:48px;flex:none;position:relative;border:1px solid #edf0f3;border-radius:8px;background:#f3f6f8;overflow:hidden;color:#8b98a5}
+.basalam-monitoring-page .coverage-image img{position:absolute;inset:0;height:100%;width:100%;object-fit:cover}
+.basalam-monitoring-page .coverage-image-placeholder{display:grid;place-items:center}
+.basalam-monitoring-page .coverage-image-placeholder svg{width:21px;height:21px}
+.basalam-monitoring-page .coverage-status{display:grid;gap:2px;justify-items:start}
+.basalam-monitoring-page .coverage-status-label{display:flex;align-items:center;gap:6px;font-size:12px;white-space:nowrap;color:var(--muted)}
+.basalam-monitoring-page .coverage-status-label i{width:6px;height:6px;border-radius:50%;background:#a9b3be;flex:none}
+.basalam-monitoring-page .coverage-status-label.is-monitored{color:#26745a}
+.basalam-monitoring-page .coverage-status-label.is-monitored i{background:#338268;animation:wsm-coverage-pulse 1.8s ease-in-out infinite}
+@keyframes wsm-coverage-pulse{0%,100%{opacity:1;transform:scale(1);box-shadow:0 0 0 0 rgb(51 130 104 / .25)}50%{opacity:.5;transform:scale(.85);box-shadow:0 0 0 4px rgb(51 130 104 / 0)}}
+.basalam-monitoring-page .coverage-status small{font-size:10px;color:#7c8794;padding-inline-start:12px}
+.basalam-monitoring-page .coverage-row-actions{display:flex;gap:8px;align-items:center;justify-content:flex-end}
+.basalam-monitoring-page .coverage-row-actions .button{min-height:34px;padding:5px 12px;font-size:12px;border-radius:7px}
+.basalam-monitoring-page .coverage-row-actions .button.secondary{background:transparent;border-color:#e0e5eb;color:#4e5968}
+.basalam-monitoring-page .coverage-more{position:relative;flex:none}
+.basalam-monitoring-page .coverage-more summary,.basalam-monitoring-page .coverage-more-disabled{display:grid;place-items:center;width:32px;height:34px;min-height:34px;font:24px/1 Arial,sans-serif;border:0;border-radius:6px;background:transparent;color:#738091;cursor:pointer;list-style:none}
+.basalam-monitoring-page .coverage-more summary::-webkit-details-marker{display:none}
+.basalam-monitoring-page .coverage-more summary:hover,.basalam-monitoring-page .coverage-more[open] summary{background:#f0f3f6;color:var(--ink)}
+.basalam-monitoring-page .coverage-more-popover{position:absolute;inset-inline-end:0;top:calc(100% + 5px);z-index:5;min-width:155px;background:#fff;border:1px solid var(--line);border-radius:9px;padding:5px;box-shadow:0 6px 24px #152a4220}
+.basalam-monitoring-page .coverage-more-popover .button{width:100%;justify-content:flex-start;color:var(--danger);min-height:38px;white-space:nowrap}
+.basalam-monitoring-page .coverage-row:last-child .coverage-more-popover{top:auto;bottom:calc(100% + 5px)}
+.basalam-monitoring-page .coverage-catalog>.pagination{margin:0;border-top:1px solid var(--line);padding:12px 20px;min-height:60px}
+.basalam-monitoring-page .coverage-catalog>.pagination .button{min-height:34px;font-size:12px;padding:5px 12px}
+.basalam-monitoring-page .coverage-loading{padding:60px 20px;text-align:center;color:var(--muted);font-size:13px}
+/* Dedicated dialog keeps payment and coverage state independent. */
+body:has(.basalam-monitoring-page #coverage-dialog[open]){overflow:hidden}
+.basalam-monitoring-page #coverage-dialog{overscroll-behavior:contain}
+.basalam-monitoring-page .coverage-dialog{width:min(620px,calc(100% - 32px));height:fit-content;max-height:calc(100dvh - 40px);margin:auto;border:1px solid var(--line);border-radius:16px;overflow:auto;background:#fff}
+.basalam-monitoring-page .coverage-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 22px;border-bottom:1px solid var(--line);background:#fff;position:sticky;top:0;z-index:3}
+.basalam-monitoring-page .coverage-dialog-head h2{font-family:var(--font-body);font-size:17px;font-weight:600}
+.basalam-monitoring-page .coverage-dialog-head p{font-size:12px;color:var(--muted);margin-top:3px}
+.basalam-monitoring-page .coverage-dialog-head .icon-button{width:34px;height:34px;border:0;background:#f3f5f7;flex:none}
+.basalam-monitoring-page .coverage-current{padding:14px 22px;background:#f8fafb;border-bottom:1px solid var(--line)}
+.basalam-monitoring-page .coverage-current>span{display:block;font-size:11px;color:var(--muted);margin-bottom:8px}
+.basalam-monitoring-page .coverage-current>p{font-size:11px;color:var(--muted);margin:8px 0 0}
+.basalam-monitoring-page .coverage-candidates{padding:16px 22px 0}
+.basalam-monitoring-page .coverage-candidates h3{font-family:var(--font-body);font-size:13px;font-weight:600;margin:0 0 10px}
+.basalam-monitoring-page .coverage-candidates .coverage-search{max-width:none;width:100%;margin-bottom:4px}
+.basalam-monitoring-page .coverage-candidate-list{max-height:260px;min-height:100px;overflow-y:auto;overscroll-behavior:contain;margin:4px -6px 0;padding:0 6px 4px;scrollbar-width:thin}
+.basalam-monitoring-page .coverage-candidate{display:flex;gap:10px;align-items:center;padding:9px 10px;margin:5px 0;border:1px solid #e4e8ed;border-radius:9px;cursor:pointer;background:#fff}
+.basalam-monitoring-page .coverage-candidate:hover{background:#fcfaf7;border-color:#d6b5a2}
+.basalam-monitoring-page .coverage-candidate.is-chosen{border-color:var(--action);background:#fff7f1}
+.basalam-monitoring-page .coverage-candidate:focus-within{outline:2px solid var(--focus);outline-offset:1px}
+.basalam-monitoring-page .coverage-candidate input{margin:0;flex:none}
+.basalam-monitoring-page .coverage-candidate .coverage-product{flex:1}
+.basalam-monitoring-page .coverage-candidate .coverage-image{width:40px;height:40px}
+.basalam-monitoring-page .coverage-choice-mark{color:var(--action);visibility:hidden}
+.basalam-monitoring-page .coverage-candidate.is-chosen .coverage-choice-mark{visibility:visible}
+.basalam-monitoring-page .coverage-no-candidate{padding:30px 15px;text-align:center;color:var(--muted);font-size:13px}
+.basalam-monitoring-page .coverage-candidates>.pagination{margin:0;padding:8px 0;font-size:11px}
+.basalam-monitoring-page .coverage-candidates>.pagination .button{min-height:32px;font-size:11px;padding:3px 10px}
+.basalam-monitoring-page .coverage-dialog-footer{position:sticky;bottom:0;padding:14px 22px;background:#fff;border-top:1px solid var(--line);z-index:2}
+.basalam-monitoring-page .coverage-dialog-footer>p{font-size:12px;line-height:1.8;color:var(--muted);margin-bottom:12px;overflow-wrap:anywhere}
+.basalam-monitoring-page .coverage-dialog-footer .button-row{justify-content:flex-end}
+.basalam-monitoring-page .coverage-dialog-footer .button{min-height:40px;font-size:13px;padding:7px 16px}
+@media(min-width:1500px){.basalam-monitoring-page[data-section=coverage] .app-shell{max-width:1180px}}
+@media(max-width:1050px){.basalam-monitoring-page .coverage-toolbar{flex-wrap:wrap;gap:10px}.basalam-monitoring-page .coverage-search{max-width:none}.basalam-monitoring-page .coverage-list-head,.basalam-monitoring-page .coverage-row{grid-template-columns:minmax(0,1fr) 110px 150px;gap:16px;padding-inline:16px}}
+@media(max-width:700px){.basalam-monitoring-page .coverage-overview{flex-wrap:wrap;gap:12px}.basalam-monitoring-page .coverage-capacity{flex-basis:100%;max-width:none;min-width:0}.basalam-monitoring-page .coverage-tools{width:100%;justify-content:flex-end;gap:8px}.basalam-monitoring-page .coverage-overview{margin-bottom:10px}.basalam-monitoring-page .coverage-toolbar{padding:12px 12px 8px}.basalam-monitoring-page .coverage-search{flex-basis:100%}.basalam-monitoring-page .coverage-filters{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.basalam-monitoring-page .coverage-filters .coverage-filter{padding:5px 4px;gap:4px;font-size:11px}.basalam-monitoring-page .coverage-count{font-size:10px}.basalam-monitoring-page .coverage-list-note{padding:0 14px 8px;gap:8px;flex-wrap:wrap}.basalam-monitoring-page .coverage-list-note>.coverage-result-status{min-height:18px;line-height:18px}.basalam-monitoring-page .coverage-list-head{display:none}.basalam-monitoring-page .coverage-row{grid-template-columns:1fr auto;gap:9px;padding:12px 14px;border-top:1px solid #edf0f3}.basalam-monitoring-page .coverage-product{grid-column:1/-1}.basalam-monitoring-page .coverage-image{width:44px;height:44px}.basalam-monitoring-page .coverage-product-copy strong{font-size:13px}.basalam-monitoring-page .coverage-status{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.basalam-monitoring-page .coverage-status small{padding:0}.basalam-monitoring-page .coverage-status-label{font-size:11px}.basalam-monitoring-page .coverage-row-actions{gap:4px}.basalam-monitoring-page .coverage-row-actions .button{padding:5px 9px;font-size:11px;min-height:34px}.basalam-monitoring-page .coverage-more summary{width:28px}.basalam-monitoring-page .coverage-dialog{width:calc(100% - 16px);max-height:calc(100dvh - 16px);margin:8px auto;border-radius:12px}.basalam-monitoring-page .coverage-dialog-head{padding:14px 16px}.basalam-monitoring-page .coverage-current{padding:12px 16px}.basalam-monitoring-page .coverage-candidates{padding:12px 16px 0}.basalam-monitoring-page .coverage-candidate-list{max-height:220px}.basalam-monitoring-page .coverage-dialog-footer{padding:12px 16px}.basalam-monitoring-page .coverage-dialog-footer .button-row{flex-wrap:nowrap}.basalam-monitoring-page .coverage-dialog-footer .button{flex:1;padding-inline:10px}}
+
+/* Keep payment recovery actionable without dimming the plan catalogue. */
+.basalam-monitoring-page .payment-summary{align-items:flex-start;background:#fff;gap:14px}
+.basalam-monitoring-page .payment-summary.warning{border-color:#efd6a5;background:#fffcf5}
+.basalam-monitoring-page .payment-summary.success{border-color:#bce1d1;background:#f6fcf9}
+.basalam-monitoring-page .payment-status-icon{display:grid;place-items:center;flex:0 0 38px;height:38px;border-radius:11px;background:var(--faint);color:var(--action)}
+.basalam-monitoring-page .payment-summary-copy{flex:1;min-width:0}
+.basalam-monitoring-page .payment-summary-copy>strong{display:block;font-size:14px;margin:2px 0 5px}
+.basalam-monitoring-page .payment-summary-copy>p{font-size:13px;line-height:1.95;color:var(--ink);margin:0}
+.basalam-monitoring-page .payment-meta{display:block;font-size:11px;color:var(--muted);margin-top:8px}
+.basalam-monitoring-page .payment-summary-actions{display:flex;flex-wrap:wrap;gap:8px;align-self:center}
+.basalam-monitoring-page .payment-feedback{font-size:12px!important;color:var(--muted)!important;margin-top:10px!important}
+.basalam-monitoring-page .invoice-check-time{font-size:12px;color:var(--muted)}
+.basalam-monitoring-page .plan:focus-within{outline:2px solid var(--action);outline-offset:3px}
+@media(max-width:760px){.basalam-monitoring-page .payment-summary{flex-wrap:wrap}.basalam-monitoring-page .payment-summary-actions{flex-basis:100%;padding-inline-start:52px}.basalam-monitoring-page .payment-summary-actions .button{flex:1}}
+@media(max-width:480px){.basalam-monitoring-page .payment-summary{flex-direction:row}.basalam-monitoring-page .payment-summary-actions{padding-inline-start:0}.basalam-monitoring-page .payment-summary-actions .button{width:auto}.basalam-monitoring-page .payment-summary-copy{flex-basis:calc(100% - 52px)}}
+
+/* The native invoice owns scrolling while open, including narrow screens. */
+body:has(.basalam-monitoring-page #detail-dialog[open]){overflow:hidden}
+.basalam-monitoring-page #detail-dialog{overscroll-behavior:contain}
+@media(max-width:600px){.basalam-monitoring-page #detail-dialog:has(.checkout-preview),.basalam-monitoring-page #detail-dialog:has(.invoice-card){width:100vw;max-width:100vw;inset:0;margin:0;border-radius:0}}
+
+/* Compact subscription flow: one selection, one payment action. */
+.basalam-monitoring-page .subscription-simple{max-width:1120px;margin-inline:auto;display:grid;gap:22px}
+.basalam-monitoring-page .subscription-simple>.section-heading{margin:0}
+.basalam-monitoring-page .subscription-current{background:linear-gradient(120deg,#fff 65%,#fff4ed);border:1px solid #e9e1db;border-radius:24px;padding:30px}
+.basalam-monitoring-page .subscription-current-heading{display:flex;align-items:center;gap:20px}
+.basalam-monitoring-page .subscription-current-icon{display:grid;place-items:center;flex:none;width:76px;height:76px;border-radius:24px;background:#fff0e4;color:#ad4a17;font-size:34px}
+.basalam-monitoring-page .subscription-current-heading h3{font-size:25px;margin:10px 0 5px}
+.basalam-monitoring-page .subscription-current-heading p{margin:0;color:#616873}
+.basalam-monitoring-page .subscription-numbers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:28px 0;padding:24px 0;border-block:1px solid #eee7e1}
+.basalam-monitoring-page .subscription-numbers div+div{border-inline-start:1px solid #eee7e1;padding-inline-start:24px}
+.basalam-monitoring-page .subscription-numbers dt{font-size:13px;color:#626975;margin-bottom:10px}
+.basalam-monitoring-page .subscription-numbers dd{font-size:28px;font-weight:800;margin:0;line-height:1.5;font-variant-numeric:tabular-nums}
+.basalam-monitoring-page .subscription-numbers small{font-size:12px;font-weight:500;color:#626975}
+.basalam-monitoring-page .subscription-current-footer,.basalam-monitoring-page .subscription-help{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.basalam-monitoring-page .subscription-current-footer p,.basalam-monitoring-page .subscription-help>span{margin:0;color:#616873;font-size:13px}
+.basalam-monitoring-page .simple-plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;border:0;padding:0;margin:0;min-width:0}
+.basalam-monitoring-page .simple-plan{display:grid;gap:22px;min-width:0;padding:24px;border:2px solid #e6e8ec;background:#fff;border-radius:20px;cursor:pointer;transition:border-color .15s,background .15s,box-shadow .15s}
+.basalam-monitoring-page .simple-plan:hover{border-color:#d2a48b}
+.basalam-monitoring-page .simple-plan.is-selected{border-color:#cf6535;background:#fff8f3;box-shadow:0 4px 16px #9b42100a}
+.basalam-monitoring-page .simple-plan:focus-within{outline:3px solid #224fa1;outline-offset:3px}
+.basalam-monitoring-page .simple-plan-top{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:25px;font-weight:800}
+.basalam-monitoring-page .simple-plan input{accent-color:#c55b2a;width:20px;height:20px;margin:0;flex:none}
+.basalam-monitoring-page .simple-plan strong{font-size:24px}
+.basalam-monitoring-page .simple-plan small{font-size:12px;font-weight:500;color:#626975}
+.basalam-monitoring-page .simple-plan-period{font-size:12px;color:#616873}
+.basalam-monitoring-page .subscription-unit{margin:-8px 0 0;color:#616873;font-size:12px}
+.basalam-monitoring-page .simple-purchase{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;background:#fff;border:1px solid #e6e8ec;border-radius:18px;padding:22px 26px}
+.basalam-monitoring-page .simple-purchase>div{display:flex;flex-direction:column;gap:7px}
+.basalam-monitoring-page .simple-purchase>div>span{font-size:12px;color:#626975}
+.basalam-monitoring-page .simple-purchase strong{font-size:24px}
+.basalam-monitoring-page .simple-purchase small{font-size:12px;font-weight:500}
+.basalam-monitoring-page .simple-purchase>.button{min-width:200px;min-height:48px}
+.basalam-monitoring-page .checkout-feedback{flex-basis:100%;margin:0;font-size:13px;color:#93400e}
+.basalam-monitoring-page .checkout-feedback:empty{display:none}
+.basalam-monitoring-page .simple-terms{margin:0;font-size:12px}
+.basalam-monitoring-page .simple-terms p{line-height:2.2;color:#616873;max-width:850px}
+.basalam-monitoring-page .subscription-help{padding-top:8px}
+.basalam-monitoring-page .simple-payment{display:flex;align-items:flex-start;gap:14px;background:#f6f8fb;border:1px solid #dde4ee;border-radius:16px;padding:18px;min-width:0}
+.basalam-monitoring-page .simple-payment.error{background:#fff7f4;border-color:#f1d7ca}
+.basalam-monitoring-page .simple-payment>div{flex:1;min-width:0}
+.basalam-monitoring-page .simple-payment strong{font-size:14px}
+.basalam-monitoring-page .simple-payment p{font-size:12px;color:#606874;line-height:1.9;margin:6px 0}
+.basalam-monitoring-page .simple-payment .payment-status-icon{width:32px;height:32px;flex:none}
+.basalam-monitoring-page .payment-tracking{font-size:11px;color:#626975;margin-top:10px}
+.basalam-monitoring-page .payment-tracking summary{cursor:pointer;display:list-item;list-style:disclosure-closed inside}
+.basalam-monitoring-page .payment-tracking bdi{display:block;overflow-wrap:anywhere;margin-top:8px;user-select:all}
+.basalam-monitoring-page .subscription-celebration{text-align:center;padding:12px 16px 24px;overflow:hidden}
+.basalam-monitoring-page .celebration-art{height:150px;position:relative;display:grid;place-items:center}
+.basalam-monitoring-page .celebration-art>span{width:94px;height:94px;display:grid;place-items:center;border-radius:50%;background:#e9f6ee;color:#23824b;font-size:48px;box-shadow:0 0 0 12px #f3faf5;animation:subscription-pop .6s ease both}
+.basalam-monitoring-page .celebration-art i{position:absolute;left:50%;top:50%;width:7px;height:14px;border-radius:3px;background:#e79a62;transform:rotate(calc(var(--piece)*30deg)) translateY(-65px);animation:subscription-confetti 1.2s ease-out both;animation-delay:calc(var(--piece)*.025s)}
+.basalam-monitoring-page .celebration-art i:nth-child(odd){background:#62ac82}
+.basalam-monitoring-page .celebration-label{color:#23824b;font-size:12px;font-weight:700}
+.basalam-monitoring-page .subscription-celebration h3{font-size:25px;margin:10px 0}
+.basalam-monitoring-page .subscription-celebration p{color:#626975;font-size:14px;line-height:2;max-width:420px;margin:0 auto 24px}
+.basalam-monitoring-page .subscription-celebration .dialog-actions{justify-content:center;flex-wrap:wrap}
+@keyframes subscription-pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:scale(1)}}
+@keyframes subscription-confetti{0%{opacity:0;transform:rotate(calc(var(--piece)*30deg)) translateY(-25px)}35%{opacity:1}100%{opacity:0;transform:rotate(calc(var(--piece)*30deg)) translateY(-125px)}}
+@media(max-width:760px){.basalam-monitoring-page .simple-plans{grid-template-columns:1fr;gap:12px}.basalam-monitoring-page .simple-plan{grid-template-columns:1fr auto;gap:12px;padding:18px}.basalam-monitoring-page .simple-plan-top{font-size:22px}.basalam-monitoring-page .simple-plan-top input{order:-1}.basalam-monitoring-page .simple-plan strong{font-size:20px;align-self:center}.basalam-monitoring-page .simple-plan-period{grid-column:1/-1}.basalam-monitoring-page .subscription-current{padding:20px;border-radius:20px}.basalam-monitoring-page .subscription-current-heading{gap:14px}.basalam-monitoring-page .subscription-current-heading h3{font-size:21px}.basalam-monitoring-page .subscription-current-icon{width:56px;height:56px;font-size:28px;border-radius:18px}.basalam-monitoring-page .subscription-numbers{gap:12px;padding-block:18px}.basalam-monitoring-page .subscription-numbers div+div{padding-inline-start:12px}.basalam-monitoring-page .subscription-numbers dt{font-size:11px}.basalam-monitoring-page .subscription-numbers dd{font-size:23px}.basalam-monitoring-page .subscription-numbers small{display:block;font-size:10px}.basalam-monitoring-page .subscription-current-footer,.basalam-monitoring-page .subscription-help{align-items:stretch;flex-direction:column}.basalam-monitoring-page .simple-purchase{padding:20px}.basalam-monitoring-page .simple-purchase>.button{width:100%}.basalam-monitoring-page .simple-payment{flex-wrap:wrap}.basalam-monitoring-page .simple-payment>.button{margin-inline-start:46px}.basalam-monitoring-page .subscription-celebration{padding-inline:0}.basalam-monitoring-page .subscription-celebration h3{font-size:21px}.basalam-monitoring-page .subscription-celebration .dialog-actions .button{width:100%}}
+@media(prefers-reduced-motion:reduce){.basalam-monitoring-page .celebration-art>span,.basalam-monitoring-page .celebration-art i{animation:none}.basalam-monitoring-page .celebration-art i{display:none}.basalam-monitoring-page .simple-plan{transition:none}}
+
+/* Seller feedback and product care — shared card rhythm and readable actions. */
+.basalam-monitoring-page .overview-support .mini-card{display:flex;flex-direction:column;min-width:0}
+.basalam-monitoring-page .mini-card-body{flex:1;min-width:0;padding-bottom:20px}
+.basalam-monitoring-page .mini-card-body>.sync-scene{margin-bottom:0}
+.basalam-monitoring-page .mini-card-footer{border-top:1px solid var(--line);padding-top:16px;margin-top:auto}
+.basalam-monitoring-page .mini-card-footer .meta-row{border:0;margin:0;padding:0 0 14px;min-height:40px;align-items:center}
+.basalam-monitoring-page .mini-card-footer>.text-button{min-height:40px;padding:6px 0}
+.basalam-monitoring-page .subscription-intro{font-size:14px;color:var(--muted);margin:8px 0 24px}
+.basalam-monitoring-page .subscription-simple:has(>.subscription-current){padding-top:24px}
+.basalam-monitoring-page .simple-payment{position:relative;flex-wrap:nowrap;align-items:flex-start;margin-bottom:20px;padding:18px 20px;border-radius:12px}
+.basalam-monitoring-page .simple-payment .payment-dismiss{flex:none;width:32px;height:32px;min-height:32px;padding:6px;margin:0;border:0;border-radius:8px;background:transparent;color:var(--muted)}
+.basalam-monitoring-page .simple-payment .payment-dismiss:hover{background:#00000008;color:var(--ink)}
+.basalam-monitoring-page .payment-result-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.basalam-monitoring-page .payment-result-actions:empty{display:none}
+.basalam-monitoring-page .payment-tracking{font-size:12px;color:var(--muted);margin-top:8px}
+.basalam-monitoring-page .payment-tracking summary{list-style-position:inside;min-height:32px;display:list-item}
+.basalam-monitoring-page .payment-tracking-code{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;max-width:100%}
+.basalam-monitoring-page .payment-tracking-code bdi{font:12px/1.8 monospace;overflow-wrap:anywhere;user-select:all}
+.basalam-monitoring-page .payment-tracking-code .button{margin-inline-start:auto}
+.basalam-monitoring-page .payment-collapsed{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;margin-bottom:20px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.basalam-monitoring-page .payment-collapsed>span{font-size:12px;color:var(--muted)}
+.basalam-monitoring-page .history-attention .issue{border:1px solid var(--line);border-radius:12px;margin-top:12px;overflow:clip;background:#fff}
+.basalam-monitoring-page .issue>summary{padding:16px 18px;min-height:76px;gap:12px}
+.basalam-monitoring-page .issue>summary:hover{background:#fcfcfd}
+.basalam-monitoring-page .issue>summary:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--focus);border-radius:11px}
+.basalam-monitoring-page .issue-name strong{font-size:14px;line-height:1.8}
+.basalam-monitoring-page .issue-name small{font-size:12px;margin-top:3px}
+.basalam-monitoring-page .issue-content{padding:18px 20px 20px;border-top:1px solid var(--line)}
+.basalam-monitoring-page .issue-content>.issue-explanation{font-size:13px;color:var(--muted);margin-bottom:16px}
+.basalam-monitoring-page .issue-comparison{border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:16px}
+.basalam-monitoring-page .issue-target+.issue-target{border-top:1px solid var(--line)}
+.basalam-monitoring-page .issue-target .issue-variant{padding:8px 14px;background:var(--faint);font-size:12px;font-weight:600}
+.basalam-monitoring-page .issue-comparison table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:14px;text-align:right}
+.basalam-monitoring-page .issue-comparison caption{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+.basalam-monitoring-page .issue-comparison thead th{padding:10px 14px;background:#f8fafb;color:var(--muted);font-size:12px;font-weight:500}
+.basalam-monitoring-page .issue-comparison th:first-child{width:20%}
+.basalam-monitoring-page .issue-comparison tbody th{font-size:12px;font-weight:500;color:var(--muted)}
+.basalam-monitoring-page .issue-comparison tbody th,.basalam-monitoring-page .issue-comparison td{padding:14px;border-top:1px solid #edf0f3;font-variant-numeric:tabular-nums}
+.basalam-monitoring-page .issue-comparison td{font-weight:600;overflow-wrap:anywhere}
+.basalam-monitoring-page .issue-comparison .has-difference td:last-child{background:#fffaf0;color:#8b5b0b}
+.basalam-monitoring-page .issue-difference{display:inline-block;font-size:10px;font-weight:400;padding:1px 5px;margin-inline-start:8px;border-radius:4px;background:#fbefd0;color:#79520c;white-space:nowrap}
+.basalam-monitoring-page .issue-next-step{display:flex;gap:20px;justify-content:space-between;align-items:center;padding-top:4px}
+.basalam-monitoring-page .issue-next-step>div:first-child{flex:1;min-width:0}
+.basalam-monitoring-page .issue-next-step strong{font-size:13px}
+.basalam-monitoring-page .issue-next-step p{font-size:12px;line-height:1.9;color:var(--muted);margin:5px 0 0;max-width:560px}
+.basalam-monitoring-page .issue-actions{display:flex;flex-wrap:wrap;gap:8px;flex:none;align-items:center}
+.basalam-monitoring-page .issue-actions>.button{font-size:12px;min-height:40px;padding:8px 12px}
+.basalam-monitoring-page .issue-guide-title{display:flex;gap:12px;align-items:center;padding-bottom:20px;border-bottom:1px solid var(--line)}
+.basalam-monitoring-page .issue-guide-title h3{font:600 16px/1.8 var(--font-body)}
+.basalam-monitoring-page .issue-guide-title p{font-size:13px;color:var(--muted);margin-top:4px}
+.basalam-monitoring-page .issue-guide-steps{list-style:none;margin:24px 0;padding:0;display:grid;gap:24px}
+.basalam-monitoring-page .issue-guide-steps li{display:flex;gap:14px;align-items:flex-start}
+.basalam-monitoring-page .issue-guide-steps li>span{display:grid;place-items:center;width:30px;height:30px;flex:none;border-radius:9px;background:#fff0e8;color:var(--action);font-weight:600}
+.basalam-monitoring-page .issue-guide-steps h4{font:600 14px/1.8 var(--font-body);margin:0 0 5px}
+.basalam-monitoring-page .issue-guide-steps p{font-size:13px;color:var(--muted);line-height:2}
+.basalam-monitoring-page .issue-guide-meta{padding:12px 0;border-top:1px solid var(--line);font-size:12px;color:var(--muted);margin-bottom:14px}
+@media(max-width:1000px){
+ .basalam-monitoring-page .issue-next-step{align-items:stretch;flex-direction:column;gap:14px}
+}
+@media(max-width:760px){
+ .basalam-monitoring-page .issue>summary{flex-wrap:wrap;padding:14px;gap:10px}
+ .basalam-monitoring-page .issue>summary>.badge{margin-inline-start:45px;font-size:11px}
+ .basalam-monitoring-page .issue-name{flex-basis:calc(100% - 60px)}
+ .basalam-monitoring-page .issue>summary>.icon{margin-inline-start:auto}
+ .basalam-monitoring-page .issue-content{padding:16px 12px}
+ .basalam-monitoring-page .issue-comparison table{font-size:12px}
+ .basalam-monitoring-page .issue-comparison thead th{font-size:11px;padding:10px 8px}
+ .basalam-monitoring-page .issue-comparison td,.basalam-monitoring-page .issue-comparison tbody th{padding:12px 8px}
+ .basalam-monitoring-page .issue-difference{display:block;width:fit-content;margin:4px 0 0}
+ .basalam-monitoring-page .issue-actions{flex-wrap:wrap}
+ .basalam-monitoring-page .issue-actions .button{flex:1;white-space:normal}
+ .basalam-monitoring-page .simple-payment{padding:14px 12px;gap:8px}
+ .basalam-monitoring-page .simple-payment .payment-dismiss{margin:0;width:28px;min-height:28px;height:28px;padding:4px}
+ .basalam-monitoring-page .simple-payment .payment-status-icon{width:24px;height:24px}
+ .basalam-monitoring-page .payment-tracking-code{padding:8px}
+ .basalam-monitoring-page .payment-tracking-code bdi{font-size:11px}
+}
+
+/* Introduction and offers: benefits first, one direct checkout action. */
+.basalam-monitoring-page .activation-hero{padding:38px;gap:36px;background:linear-gradient(120deg,#fff8f1,#fff 72%);border-color:#ecdace;align-items:center}
+.basalam-monitoring-page .activation-copy h2{font-size:clamp(25px,2.25vw,36px);font-weight:800;line-height:1.85;letter-spacing:-.7px}
+.basalam-monitoring-page .activation-copy>p{font-size:14px;line-height:2.15;margin-top:16px}
+.basalam-monitoring-page .activation-promise{display:flex;align-items:flex-start;gap:10px;margin-top:18px;max-width:510px;color:#554b42;font-size:13px;line-height:2}
+.basalam-monitoring-page .activation-promise>.icon{color:var(--action);flex:none;margin-top:4px}
+.basalam-monitoring-page .activation-actions .button{min-height:48px;padding:12px 22px;font-size:14px}
+.basalam-monitoring-page .activation-trust{line-height:1.9;font-size:11px;max-width:480px}
+.basalam-monitoring-page .activation-art{padding:14px 0 32px}
+.basalam-monitoring-page .activation-art::before{display:none}
+.basalam-monitoring-page .activation-art-heading{position:relative;text-align:center;margin-bottom:22px}
+.basalam-monitoring-page .activation-art-heading h3{font-size:18px;margin-top:8px}
+.basalam-monitoring-page .activation-art .sync-scene{box-shadow:0 16px 38px #5f39200b;border-color:#eadfd6;background:#fff}
+.basalam-monitoring-page .activation-art-note{bottom:12px;left:20px;color:#376343;border-color:#d6e4d8;background:#f5faf5}
+.basalam-monitoring-page .activation-benefits{padding:22px 0;gap:16px}
+.basalam-monitoring-page .activation-benefits article{padding:24px;border:1px solid var(--line);border-radius:16px;background:#fff}
+.basalam-monitoring-page .activation-benefits h3{font-size:17px;line-height:1.8}
+.basalam-monitoring-page .activation-benefits p{font-size:12px;line-height:2.1;margin-top:10px}
+.basalam-monitoring-page .activation-start{border:0;border-radius:16px;background:#f5f7f4;padding:24px 28px;gap:30px}
+.basalam-monitoring-page .activation-start h3{font-size:19px}
+.basalam-monitoring-page .activation-start p{font-size:12px;line-height:2;color:var(--muted);margin:8px 0 0;max-width:480px}
+.basalam-monitoring-page .activation-start-points{display:grid;gap:12px;flex-shrink:0}
+.basalam-monitoring-page .activation-start-points>span{display:flex;align-items:center;gap:10px;font-size:12px;color:#3f6049}
+/* Plan comparison and a single checkout dock. */
+.basalam-monitoring-page .subscription-offers{max-width:1140px;gap:16px;padding-top:0;isolation:isolate;scroll-margin-top:16px}
+.basalam-monitoring-page[data-section=subscription]:has(.subscription-offers) .page-head{display:none}
+.basalam-monitoring-page .offers-heading{display:flex;justify-content:space-between;align-items:center;gap:24px;margin:0 0 4px}
+.basalam-monitoring-page .offers-eyebrow{display:flex;align-items:center;gap:7px;font-size:11px;color:#936440;font-weight:600}
+.basalam-monitoring-page .offers-eyebrow .icon{width:16px;height:16px}
+.basalam-monitoring-page .offers-heading h2{font-size:27px;line-height:1.6;margin:5px 0;color:#28362e}
+.basalam-monitoring-page .offers-heading p{font-size:12px;color:var(--muted);margin:0}
+.basalam-monitoring-page .offers-actions{display:flex;align-items:center;gap:8px;flex:none}
+.basalam-monitoring-page .offers-actions .button{font-size:11px}
+.basalam-monitoring-page .offer-plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;border:0;margin:0;padding:0;min-width:0}
+.basalam-monitoring-page .offer-card{--offer-ink:#293b30;--offer-muted:#657269;--offer-line:#dfe6dd;--offer-accent:#53745c;display:flex;flex-direction:column;min-width:0;position:relative;overflow:hidden;padding:18px;border:1px solid var(--offer-line);border-radius:22px;background:radial-gradient(ellipse at 0 18%,#edf3e9,transparent 65%),#fcfdfb;color:var(--offer-ink);cursor:pointer;box-shadow:0 8px 24px #253b2906;transition:box-shadow .18s,border-color .18s,transform .18s}
+.basalam-monitoring-page .offer-card:nth-of-type(2){--offer-ink:#453729;--offer-muted:#82705f;--offer-line:#eaded0;--offer-accent:#ac784b;background:radial-gradient(ellipse at 0 18%,#f8e8d2,transparent 65%),#fffcf7}
+.basalam-monitoring-page .offer-card.is-recommended{--offer-ink:#fff8ed;--offer-muted:#c9d3c8;--offer-line:#53614f;--offer-accent:#f2bc85;background:radial-gradient(ellipse at 5% 25%,#64725099,transparent 65%),#293b31;box-shadow:0 10px 28px #263a3020}
+.basalam-monitoring-page .offer-card::before{content:"";position:absolute;inset:0 auto auto 0;width:120px;height:120px;border:1px solid var(--offer-line);border-radius:50%;transform:translate(-40%,-55%);pointer-events:none}
+.basalam-monitoring-page .offer-card.is-selected{border-color:#cb6637;box-shadow:0 0 0 2px #cb6637,0 12px 28px #9c562b14}
+.basalam-monitoring-page .offer-card.is-recommended.is-selected{border-color:#f2b777;box-shadow:0 0 0 2px #f2b777,0 12px 28px #263a3025}
+.basalam-monitoring-page .offer-card:hover{transform:translateY(-3px);box-shadow:0 10px 28px #273b2918}
+.basalam-monitoring-page .offer-card:focus-within{outline:3px solid var(--focus);outline-offset:5px}
+.basalam-monitoring-page .offer-plans:disabled .offer-card{cursor:wait;opacity:.7;transform:none}
+.basalam-monitoring-page .offer-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative}
+.basalam-monitoring-page .offer-kicker{display:block;font-size:10px;font-weight:600;color:var(--offer-accent);margin-bottom:1px}
+.basalam-monitoring-page .offer-name{font:750 22px/1.6 var(--font-heading);color:var(--offer-ink)}
+.basalam-monitoring-page .offer-card input[type=radio]{width:20px;height:20px;flex:none;margin:0;border:1.5px solid var(--offer-accent);background:transparent;box-shadow:none}
+.basalam-monitoring-page .offer-card input[type=radio]:checked{background:#bd391f;border-color:#bd391f}
+.basalam-monitoring-page .offer-card input[type=radio]:checked::before{background:#fff}
+.basalam-monitoring-page .offer-card.is-recommended input[type=radio]:checked{border-color:#efb77e;background:#efb77e}
+.basalam-monitoring-page .offer-card.is-recommended input[type=radio]:checked::before{background:#293b31}
+.basalam-monitoring-page .offer-description{font-size:11px;color:var(--offer-muted);line-height:1.8;margin-top:6px}
+.basalam-monitoring-page .offer-visual{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:10px 0;min-height:72px}
+.basalam-monitoring-page .offer-capacity{display:grid;gap:0;position:relative;z-index:1}
+.basalam-monitoring-page .offer-capacity>small{font-size:10px;color:var(--offer-muted)}
+.basalam-monitoring-page .offer-capacity>span{display:flex;align-items:baseline;gap:7px;font-size:11px;color:var(--offer-muted);white-space:nowrap}
+.basalam-monitoring-page .offer-capacity b{font:800 43px/1.3 var(--font-heading);font-variant-numeric:tabular-nums;color:var(--offer-ink)}
+.basalam-monitoring-page .offer-art{width:92px;height:72px;position:relative;flex:none;perspective:200px}
+.basalam-monitoring-page .offer-art>i{position:absolute;display:grid;place-items:center;width:45px;height:51px;border:1px solid var(--offer-line);border-radius:12px;background:#fff8;color:var(--offer-accent);box-shadow:0 5px 10px #293b3008;transform:rotate(-12deg);left:29px;top:4px}
+.basalam-monitoring-page .offer-art>i:nth-child(2){left:5px;top:24px;transform:rotate(-12deg)}
+.basalam-monitoring-page .offer-art>i:nth-child(3){left:40px;top:25px;transform:rotate(8deg);background:#fffef9;box-shadow:0 7px 16px #293b3012}
+.basalam-monitoring-page .offer-art>span{position:absolute;left:32px;top:55px;display:grid;place-items:center;background:#f8fcf5;color:#55784f;width:21px;height:21px;border:1px solid var(--offer-line);border-radius:50%}
+.basalam-monitoring-page .offer-art>span .icon{width:12px;height:12px}
+.basalam-monitoring-page .is-recommended .offer-art>i{background:#d0dbbf15;border-color:#87977d66}
+.basalam-monitoring-page .is-recommended .offer-art>i:nth-child(3){background:linear-gradient(135deg,#f7d2a8,#dba66c);color:#4d4931;border-color:#f4c58d}
+.basalam-monitoring-page .is-recommended .offer-art>span{background:#e0ebce;color:#314b36;border-color:#e0ebce}
+.basalam-monitoring-page .offer-price{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px 8px;padding-bottom:12px;border-bottom:1px dashed var(--offer-line)}
+.basalam-monitoring-page .offer-price strong{font-size:24px;line-height:1.5;white-space:nowrap;color:var(--offer-ink)}
+.basalam-monitoring-page .offer-price strong small{font-size:11px;font-weight:400;color:var(--offer-muted)}
+.basalam-monitoring-page .offer-price>span{display:flex;align-items:center;gap:4px;padding:3px 7px;border-radius:6px;background:#71856b0c;font-size:10px;color:var(--offer-muted)}
+.basalam-monitoring-page .offer-price>span .icon{width:12px;height:12px}
+.basalam-monitoring-page .is-recommended .offer-price>span{background:#ffffff0c}
+.basalam-monitoring-page .offer-features{display:grid;align-content:start;gap:6px;padding:12px 0;flex:1}
+.basalam-monitoring-page .offer-features>[role=listitem]{display:flex;align-items:flex-start;gap:8px;font-size:11px;line-height:1.8;color:var(--offer-ink)}
+.basalam-monitoring-page .offer-features .icon{width:16px;height:16px;flex:none;margin-top:2px;color:var(--offer-accent)}
+.basalam-monitoring-page .offer-select{display:flex;align-items:center;gap:8px;min-height:38px;padding:8px 12px;border:1px solid var(--offer-line);border-radius:10px;font-size:11px;font-weight:600;color:var(--offer-ink);background:#ffffff50}
+.basalam-monitoring-page .offer-select>.icon{width:15px;height:15px}
+.basalam-monitoring-page .offer-select>.icon:last-child{margin-inline-start:auto}
+.basalam-monitoring-page .is-selected .offer-select{background:#bd391f;color:#fff;border-color:#bd391f}
+.basalam-monitoring-page .is-recommended .offer-select{background:#ffffff0a;border-color:#8b9a81;color:#fff3df}
+.basalam-monitoring-page .is-recommended.is-selected .offer-select{background:#f2c18c;color:#293b31;border-color:#f2c18c}
+.basalam-monitoring-page .subscription-unit{display:flex;align-items:center;gap:8px;margin:0;font-size:11px;color:var(--muted)}
+.basalam-monitoring-page .subscription-unit .icon{width:16px;height:16px;flex:none}
+.basalam-monitoring-page .subscription-offers>.purchase-coverage{margin:0;font-size:11px;line-height:1.8;color:var(--muted)}
+.basalam-monitoring-page .subscription-offers .simple-terms{margin:0;font-size:11px}
+.basalam-monitoring-page .offer-checkout{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(190px,230px);align-items:center;gap:24px;position:sticky;bottom:12px;z-index:10;padding:16px 22px;border:1px solid #e2dbcf;border-radius:18px;background:#fffffff5;backdrop-filter:blur(16px);box-shadow:0 -6px 30px #263b3010,0 10px 30px #263b3010}
+.basalam-monitoring-page .offer-checkout-plan{display:flex;align-items:center;gap:12px;min-width:0}
+.basalam-monitoring-page .offer-checkout-icon{display:grid;place-items:center;width:44px;height:48px;border:1px solid #e3d8c7;border-radius:13px;background:linear-gradient(145deg,#fff8ed,#f3e5ce);color:#946a3c;flex:none}
+.basalam-monitoring-page .offer-checkout-plan>div{display:grid;grid-template-columns:auto auto;align-items:baseline;gap:0 8px}
+.basalam-monitoring-page .offer-checkout-plan>div>span{font-size:10px;color:var(--muted)}
+.basalam-monitoring-page .offer-checkout-plan strong{font:700 18px/1.7 var(--font-heading);color:#293b30}
+.basalam-monitoring-page .offer-checkout-plan small{grid-column:1/-1;font-size:11px;color:var(--muted)}
+.basalam-monitoring-page .offer-checkout-price{border-inline-start:1px solid #e6e4dc;padding-inline-start:24px;display:grid;gap:2px}
+.basalam-monitoring-page .offer-checkout-price>span{font-size:10px;color:var(--muted)}
+.basalam-monitoring-page .offer-checkout-price strong{font-size:24px;line-height:1.5;white-space:nowrap;color:#293b30}
+.basalam-monitoring-page .offer-checkout-price small{font-size:11px;font-weight:400}
+.basalam-monitoring-page .offer-checkout-action{display:grid;gap:4px}
+.basalam-monitoring-page .offer-checkout-action>.button{width:100%;min-height:44px;border:1px solid #aa351f;background:#bd391f linear-gradient(115deg,#cf542b,#af331e);color:#fff;box-shadow:0 4px 10px #b2442220}
+.basalam-monitoring-page .offer-checkout-action>.button:is(:hover,:focus,:active):not(:disabled){background:#a62e17 linear-gradient(115deg,#bc4524,#982a18);border-color:#982a18;color:#fff}
+.basalam-monitoring-page .offer-checkout-action>.button:disabled{box-shadow:none}
+.basalam-monitoring-page .offer-checkout-action>span{display:flex;align-items:center;justify-content:center;gap:4px;font-size:10px;color:var(--muted)}
+.basalam-monitoring-page .offer-checkout-action>span .icon{width:12px;height:12px}
+.basalam-monitoring-page .subscription-current{border-radius:20px;box-shadow:0 8px 28px #40302106}
+.basalam-monitoring-page .subscription-current-heading{padding-bottom:6px}
+.basalam-monitoring-page .subscription-current-icon{background:#edf5ed;color:#3d7350}
+.basalam-monitoring-page .subscription-numbers{background:#fff;border-radius:14px;border:1px solid #ece7e1;padding:22px}
+@media(max-width:1000px){
+ .basalam-monitoring-page .activation-hero{padding:28px;gap:24px}
+ .basalam-monitoring-page .activation-copy>p{font-size:13px}
+}
+@media(max-width:760px){
+ .basalam-monitoring-page[data-section=subscription] .page-head{scroll-margin-top:62px}
+ .basalam-monitoring-page .activation-hero{grid-template-columns:1fr;padding:24px;gap:24px}
+ .basalam-monitoring-page .activation-copy h2{font-size:27px}
+ .basalam-monitoring-page .activation-art{max-width:500px;width:100%;margin:auto}
+ .basalam-monitoring-page .activation-benefits{grid-template-columns:1fr;gap:12px}
+ .basalam-monitoring-page .activation-benefits article{padding:20px;display:grid;grid-template-columns:38px 1fr;gap:0 12px}
+ .basalam-monitoring-page .activation-benefits article>span{grid-row:1/3;margin:0}
+ .basalam-monitoring-page .activation-start{align-items:flex-start;flex-direction:column;padding:22px;gap:20px}
+}
+@media(max-width:420px){
+ .basalam-monitoring-page .activation-hero{padding:20px 16px}
+ .basalam-monitoring-page .activation-copy h2{font-size:23px;letter-spacing:-.3px}
+ .basalam-monitoring-page .activation-promise{font-size:12px}
+ .basalam-monitoring-page .activation-art-heading h3{font-size:16px}
+}
+
+/* Payment outcomes float above the page; details open only on request. */
+.basalam-monitoring-page .payment-followup{display:flex;justify-content:flex-end;margin:0}
+.basalam-monitoring-page :is(#toast,#payment-toast) .toast-copy{display:flex;flex-direction:column;align-items:flex-start;gap:4px;overflow-wrap:anywhere}
+.basalam-monitoring-page :is(#toast,#payment-toast) .toast-copy>strong{display:block;width:100%}
+.basalam-monitoring-page :is(#toast,#payment-toast) .toast-copy>p{margin:0;max-width:100%}
+.basalam-monitoring-page #payment-toast .toast-copy>.button{align-self:flex-start;margin-top:2px;min-height:30px;padding:2px 0;text-align:start}
+.basalam-monitoring-page :is(#toast,#payment-toast) .toast-close{flex:none}
+.basalam-monitoring-page #detail-dialog .simple-payment{margin-bottom:0}
+
+@media(max-width:1100px){
+ .basalam-monitoring-page .offer-card{padding:18px}
+ .basalam-monitoring-page .offer-plans{gap:14px}
+ .basalam-monitoring-page .offer-name{font-size:20px}
+ .basalam-monitoring-page .offer-art{transform:scale(.75);transform-origin:left center;width:64px}
+ .basalam-monitoring-page .offer-capacity b{font-size:34px}
+ .basalam-monitoring-page .offer-price strong{font-size:21px}
+ .basalam-monitoring-page .offer-price>span{font-size:9px;padding:2px 4px}
+ .basalam-monitoring-page .offer-checkout{gap:16px;padding:14px 18px;grid-template-columns:minmax(0,1fr) auto minmax(180px,210px)}
+ .basalam-monitoring-page .offer-checkout-price{padding-inline-start:16px}
+ .basalam-monitoring-page .offers-actions{flex-direction:column;gap:0;align-items:flex-end}
+}
+@media(max-width:860px){
+ .basalam-monitoring-page .offer-plans{grid-template-columns:1fr}
+ .basalam-monitoring-page .offer-card{padding:22px}
+ .basalam-monitoring-page .offer-name{font-size:23px}
+ .basalam-monitoring-page .offer-art{transform:none;width:92px}
+ .basalam-monitoring-page .offer-capacity b{font-size:44px}
+ .basalam-monitoring-page .offer-price strong{font-size:25px}
+ .basalam-monitoring-page .offer-features>[role=listitem]{font-size:12px}
+ .basalam-monitoring-page .offers-heading{gap:12px;align-items:flex-start}
+ .basalam-monitoring-page .offers-heading h2{font-size:23px}
+ .basalam-monitoring-page .offer-checkout{grid-template-columns:1fr auto;gap:12px;bottom:8px;padding:14px 16px;border-radius:14px}
+ .basalam-monitoring-page .offer-checkout-plan{grid-column:1/-1}
+ .basalam-monitoring-page .offer-checkout-icon{width:32px;height:36px;border-radius:10px}
+ .basalam-monitoring-page .offer-checkout-plan>div{display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline}
+ .basalam-monitoring-page .offer-checkout-plan>div>span{display:none}
+ .basalam-monitoring-page .offer-checkout-plan strong{font-size:16px}
+ .basalam-monitoring-page .offer-checkout-price{padding:0;border:0}
+ .basalam-monitoring-page .offer-checkout-price strong{font-size:21px}
+ .basalam-monitoring-page .offer-checkout-price>span,.basalam-monitoring-page .offer-checkout-action>span{display:none}
+ .basalam-monitoring-page .offer-checkout-action>.button{font-size:12px;min-height:42px}
+}
+@media(max-width:480px){
+ .basalam-monitoring-page .offers-heading{flex-direction:column;gap:6px}
+ .basalam-monitoring-page .offers-actions{flex-direction:row;justify-content:space-between;width:100%}
+ .basalam-monitoring-page .offers-eyebrow{font-size:10px}
+ .basalam-monitoring-page .offers-heading h2{font-size:24px}
+ .basalam-monitoring-page .offer-checkout{margin-inline:-4px;gap:8px}
+ .basalam-monitoring-page .offer-checkout-price strong{font-size:19px}
+}
+@media(prefers-reduced-motion:reduce){.basalam-monitoring-page .offer-card{transition:none}.basalam-monitoring-page .offer-card:hover{transform:none}}

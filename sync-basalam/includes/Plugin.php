@@ -15,7 +15,7 @@ defined('ABSPATH') || exit;
 
 class Plugin
 {
-    public const VERSION = '1.10.48';
+    public const VERSION = '1.10.49';
 
     public function __construct()
     {
@@ -92,6 +92,8 @@ class Plugin
 
     private function registrars()
     {
+        (new \SyncBasalam\Services\MonitoringClient())->registerHooks();
+        (new \SyncBasalam\Services\MonitoringDashboard())->registerHooks();
         $registrars = [
             AdminRegistrar::class,
             ProductRegistrar::class,

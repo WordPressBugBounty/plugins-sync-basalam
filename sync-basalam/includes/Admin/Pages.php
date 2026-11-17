@@ -7,6 +7,7 @@ use SyncBasalam\Admin\Pages\HelpPage;
 use SyncBasalam\Admin\Pages\InfoPage;
 use SyncBasalam\Admin\Pages\LogsPage;
 use SyncBasalam\Admin\Pages\MainPage;
+use SyncBasalam\Admin\Pages\MonitoringPage;
 use SyncBasalam\Admin\Pages\OnboardingPage;
 use SyncBasalam\Admin\Pages\UnsyncedProductsPage;
 use SyncBasalam\Admin\Pages\TicketListPage;
@@ -44,6 +45,15 @@ class Pages
             'manage_options',
             'sync_basalam',
             [new MainPage(), 'render']
+        );
+
+        add_submenu_page(
+            'sync_basalam',
+            'پایشگر',
+            $this->renderUi->renderIcon('dashicons-shield') . 'پایشگر',
+            'manage_options',
+            MonitoringPage::SLUG,
+            [new MonitoringPage(), 'render']
         );
 
         add_submenu_page(

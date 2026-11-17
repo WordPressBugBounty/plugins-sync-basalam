@@ -24,7 +24,8 @@ defined("ABSPATH") || exit;
             <option value="3259">پیک</option>
             <option value="6114">سلام رسان</option>
         </select>
-        <button id="submit-shipping-method" class="basalam-button basalam-btn basalam-p basalam-height-35"
+        <p id="tracking-code-error" class="basalam-p" role="alert" hidden></p>
+        <button type="button" id="submit-shipping-method" class="basalam-button basalam-btn basalam-p basalam-height-35"
             data-nonce="<?php echo esc_attr(wp_create_nonce("tracking_code_basalam_order_nonce")); ?>">تایید</button>
         <a id="cancel-shipping-method" class="basalam-button basalam-btn basalam-p basalam-a basalam-height-35">لغو</a>
     </div>

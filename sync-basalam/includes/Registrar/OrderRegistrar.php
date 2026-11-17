@@ -12,6 +12,7 @@ class OrderRegistrar implements RegistrarInterface
 {
     public static function register(): void
     {
+        \SyncBasalam\Services\MonitoringCatalog::registerHooks();
         // REST API Endpoints
         \add_action('rest_api_init', [EndpointRegistrar::class, 'registerRoutes']);
         \add_filter('woocommerce_order_item_get_formatted_meta_data', [BasalamItemMeta::class, 'hideFromFormattedMeta']);

@@ -4,6 +4,24 @@
 
 <details>
 
+<summary>1.10.49 - 2026-11-17</summary>
+
+### Added
+
+- Add the WooSalam monitoring dashboard, parent product coverage, subscription checkout and payment recovery.
+- Combine Salam Pay and SalamGate promotions in one automatic slider, with previous/next icons, on plugin pages and the WordPress dashboard.
+
+### Fixed
+
+- Keep monitoring and existing product endpoints registered together.
+- Strip nested development files from the shared API/WordPress release payload and gate publication with package, ZIP and autoloader regression checks. Keep development manifests out of the installable plugin.
+- Defer WooCommersa order notifications until the import transaction commits, preventing implicit database commits from leaving stock-reducing orders without invoice mappings (ticket 9634).
+- Preserve tracking inputs and HPOS state when Basalam rejects or does not confirm a shipment; validate invoice mappings before sending and normalize Persian/Arabic digits.
+
+</details>
+
+<details>
+
 <summary>1.10.48 - 2026-11-16</summary>
 
 ### Fixed
@@ -53,6 +71,30 @@
 ### Fixed
 
 - Restrict Basalam item details to the WooCommerce order editor and its item AJAX refreshes, preventing extra name and link rows in invoice and postal-label output. Preserve legacy metadata and normal product attributes.
+
+</details>
+
+<details>
+
+<summary>1.10.45-rc.1 - 2026-11-09 (monitoring release candidate)</summary>
+
+### Added
+
+- Browse and manage selected parent products; all connected variations of a parent share one capacity unit. Show selected, available and uncovered capacity independently of catalog size.
+- Apply the current WooCommerce price and stock to one product from monitoring history, with authorization and verified repair results.
+
+### Changed
+
+- Simplify subscription purchase to direct Basalam App 13 checkout and authenticated status recovery. Offer 2,000 / 3,500 / 6,000 parent products for 1,000,000 / 2,000,000 / 3,500,000 toman per 30-day period.
+- Prevent a new purchase during an unexpired subscription, including when its capacity is full; show activation feedback only after server confirmation.
+- Consolidate overview totals, history actions, subscription presentation and product selection into the monitoring dashboard.
+
+### Fixed
+
+- Recover interrupted checkout intents without duplicate invoices and allow an unpaid plan choice to be replaced safely.
+- Recognize both Gateway schema errors (HTTP 400) and checkout validation errors (HTTP 422) without exposing upstream text or automatically retrying the purchase.
+
+This candidate includes master 1.10.44 and requires the matching Gateway changes. It has not been tagged or published. Live payment acceptance and target deployment verification remain separate release gates.
 
 </details>
 

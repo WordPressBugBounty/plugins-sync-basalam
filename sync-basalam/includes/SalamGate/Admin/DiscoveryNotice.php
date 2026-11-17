@@ -2,6 +2,7 @@
 
 namespace SyncBasalam\SalamGate\Admin;
 
+use SyncBasalam\Admin\PromotionBanner;
 use SyncBasalam\SalamGate\FeatureAvailability;
 use SyncBasalam\SalamGate\Paths;
 use SyncBasalam\SalamGate\Services\SiteActivation;
@@ -15,7 +16,7 @@ final class DiscoveryNotice
 
     public static function register(): void
     {
-        add_action('admin_notices', [self::class, 'render']);
+        PromotionBanner::register('salamgate', 20, [self::class, 'slide']);
         add_action('admin_post_salam_gate_dismiss_intro', [self::class, 'dismiss']);
         add_action('admin_enqueue_scripts', [self::class, 'enqueue']);
     }
@@ -27,6 +28,7 @@ final class DiscoveryNotice
         $screen = function_exists('get_current_screen') ? get_current_screen() : null;
         $page = is_string($_GET['page'] ?? null) ? $_GET['page'] : '';
         return $page === 'sync_basalam'
+            || ($screen->id ?? '') === 'dashboard'
             || (in_array($screen->id ?? '', ['edit-shop_order', 'woocommerce_page_wc-orders'], true)
                 && empty($_GET['action']));
     }
@@ -34,17 +36,28 @@ final class DiscoveryNotice
     public static function enqueue(): void
     {
         $page = is_string($_GET['page'] ?? null) ? $_GET['page'] : '';
-        if (!self::visible() && $page !== 'salam_gate') return;
+        if ($page !== 'salam_gate') return;
         Assets\AssetRegistrar::base('basalam-admin-font-style', 'assets/css/font.css');
         wp_enqueue_style('woosalam-sg-discovery', Paths::assetsUrl('styles/salam-gate-discovery.css'), ['basalam-admin-font-style'],
             (string) filemtime(Paths::assetPath('styles/salam-gate-discovery.css')));
     }
 
-    public static function render(): void
+    public static function slide(): ?array
     {
-        if (!self::visible()) return;
+        if (!self::visible()) return null;
         $disabled = !SiteActivation::isEnabled();
-        include Paths::templatePath('SalamGate/discovery-notice.php');
+        return [
+            'name' => 'سلام‌گیت',
+            'icon' => Menus::shipmentIcon(),
+            'text' => $disabled
+                ? 'هر وقت خواستید، دوباره با سلام‌گیت بفرستید! هزینه ارسال را حساب کنید، مراکز تحویل را ببینید و مرسوله‌هایتان را پیگیری کنید.'
+                : 'با سلام‌گیت، سفارش‌های فروشگاه خود را در ووسلام تکی یا گروهی ارسال کنید و برچسب پستی بگیرید. محاسبه هزینه، مراکز تحویل و پیگیری مرسوله هم در دسترس شماست.',
+            'url' => admin_url('admin.php?page=salam_gate'),
+            'cta' => $disabled ? 'فعال‌سازی مجدد سلام‌گیت' : 'فعال‌سازی سلام‌گیت',
+            'external' => false,
+            'dismiss_action' => 'salam_gate_dismiss_intro',
+            'dismiss_hint' => 'این اعلان دیگر نمایش داده نمی‌شود.',
+        ];
     }
 
     public static function dismiss(): void

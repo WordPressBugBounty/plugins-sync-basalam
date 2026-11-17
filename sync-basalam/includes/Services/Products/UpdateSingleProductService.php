@@ -281,6 +281,27 @@ class UpdateSingleProductService
             $priceStockOnly);
     }
 
+    /** Monitoring uses the same API stack and never remaps or recreates variants. */
+    public function updateMonitoringTarget(int $productId, int $remoteId, array $target): void
+    {
+        $policy = syncBasalamContainer()->get(VendorSyncPolicy::class);
+        if (!$policy->canUpdate(false)
+                || (int) get_post_meta($productId, ProductMetaKey::basalamProductId(), true) !== $remoteId) {
+            throw NonRetryableException::invalidData('مجوز یا نگاشت محصول تغییر کرده است.');
+        }
+        ProductConnection::assertUnique($productId, $remoteId);
+        $variationId = $target['variation_id'] ?? null;
+        $data = array_intersect_key($target, ['primary_price' => true, 'stock' => true]);
+        if (!$data) throw NonRetryableException::invalidData('فیلد قابل اصلاح وجود ندارد.');
+        $url = $variationId ? sprintf(Endpoints::PRODUCT_VARIATION_UPDATE, $remoteId, $variationId)
+                            : sprintf(Endpoints::PRODUCT_UPDATE, $remoteId);
+        $response = $this->apiservice->patch($url, $data);
+        if (!is_array($response) || (int) ($response['status_code'] ?? 0) !== 200) {
+            throw NonRetryableException::permanent('اصلاح پایشگر در باسلام تکمیل نشد.');
+        }
+        do_action('sync_basalam_after_monitoring_update', $productId, $variationId, $data);
+    }
+
     private function finishUpdate($productId, $body, string $message, bool $priceStockOnly = false): array
     {
         update_post_meta($productId, ProductMetaKey::basalamProductSyncStatus(), 'synced');

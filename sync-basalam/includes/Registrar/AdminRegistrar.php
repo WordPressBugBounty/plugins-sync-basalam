@@ -313,6 +313,7 @@ class AdminRegistrar implements RegistrarInterface
     {
         return [
             'sync_basalam',
+            'sync_basalam_monitoring',
             'sync_basalam_logs',
             'sync_basalam_vendor_info',
             'sync_basalam_help',
@@ -569,11 +570,12 @@ class AdminRegistrar implements RegistrarInterface
         }
 
         if ($isOrderScreen) {
+            $orderScript = syncBasalamPlugin()->pluginPath() . '/assets/js/order.js';
             wp_enqueue_script(
                 "basalam-order-script",
                 self::assetsUrl("js/order.js"),
                 ["jquery", "basalam-admin-toast-script"],
-                $version,
+                $version . '-' . filemtime($orderScript),
                 true
             );
         }

@@ -264,9 +264,18 @@ class VariantService
                 }
             }
 
+            // WooCommerce attribute text is already UTF-8. Some mbstring polyfills
+            // return false for an 'auto' source encoding, corrupting the API value.
+            $attributeLabel = wp_check_invalid_utf8($attributeLabel);
+            $valueName = wp_check_invalid_utf8((string) $valueName);
+            // Validate the final expanded properties, not the provisional Any-variation template.
+            if ($attributes !== null && (trim($attributeLabel) === '' || trim($valueName) === '')) {
+                throw new \InvalidArgumentException('نام و مقدار ویژگی تنوع باید متن معتبر و غیرخالی باشند.');
+            }
+
             $properties[] = [
                 'property' => $attributeLabel,
-                'value' => mb_convert_encoding($valueName, 'UTF-8', 'auto'),
+                'value' => $valueName,
             ];
         }
 

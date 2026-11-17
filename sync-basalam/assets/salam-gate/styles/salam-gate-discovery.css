@@ -1,25 +1,3 @@
-.sg-discovery-banner {
-  display: flex; align-items: center; gap: 18px; box-sizing: border-box;
-  margin: 20px 0; padding: 20px 24px; background: #fff;
-  border: 1px solid #f3d9c6; border-inline-start: 4px solid #e56322;
-  border-radius: 12px; color: #293241;
-  font: 400 13px/1.85 "PelakFA", Tahoma, sans-serif;
-}
-.sg-discovery-banner__icon {
-  display: grid; place-items: center; flex: 0 0 52px; width: 52px; height: 52px;
-  color: #cf4c0d; background: #fff1e8; border-radius: 14px;
-}
-.sg-discovery-banner__icon svg { width: 30px; height: 30px; }
-.sg-discovery-banner__copy { flex: 1; min-width: 0; }
-.sg-discovery-banner__copy h2 { margin: 0 0 6px; font: 700 18px/1.7 "Morabba", "PelakFA", Tahoma, sans-serif; color: #293241; }
-.sg-discovery-banner__copy p { margin: 0; font: inherit; color: #526071; }
-.sg-discovery-banner__actions { display: flex; flex-direction: column; align-items: center; gap: 8px; flex-shrink: 0; }
-.sg-discovery-banner__primary { display: inline-block; padding: 9px 16px; background: #d94d12; color: #fff; border-radius: 8px; text-decoration: none; font: 600 13px/1.85 "PelakFA", Tahoma, sans-serif; }
-.sg-discovery-banner__primary:hover { background: #bb3e09; color: #fff; }
-.sg-discovery-banner__dismiss { border: 0; background: none; color: #566171; font: inherit; font-size: 12px; cursor: pointer; padding: 4px 10px; }
-.sg-discovery-banner__dismiss:hover { color: #9f350c; text-decoration: underline; }
-.sg-discovery-banner__primary:focus-visible, .sg-discovery-banner__dismiss:focus-visible { outline: 2px solid #9a3910; outline-offset: 3px; }
-.sg-discovery-banner form { margin: 0; }
 .salam-gate-page .sg-public-tools { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 18px; }
 .salam-gate-page .sg-public-tool { display: flex; gap: 12px; padding: 20px; color: #27364b; text-decoration: none; background: #fff; border: 1px solid #e6e9ed; border-radius: 12px; transition: border-color .15s, box-shadow .15s; }
 .salam-gate-page .sg-public-tool:hover { border-color: #eaa576; box-shadow: 0 4px 15px #b94c1010; }
@@ -31,14 +9,7 @@
 .salam-gate-page .sg-calc-activation[hidden] { display: none; }
 .salam-gate-page .sg-calc-activation p { margin: 4px 0 0; font-size: 13px; }
 .salam-gate-page .sg-po-catalog-date { color: #657083; font-size: 12px; margin: 8px 0 0; }
-@media (max-width: 1100px) {
-  .sg-discovery-banner { flex-wrap: wrap; }
-  .sg-discovery-banner__actions { flex-direction: row; flex-wrap: wrap; width: 100%; }
-}
 @media (max-width: 782px) {
-  .sg-discovery-banner { padding: 16px; gap: 12px; }
-  .sg-discovery-banner__copy { flex-basis: calc(100% - 70px); }
-  .sg-discovery-banner__primary { white-space: normal; text-align: center; }
   .salam-gate-page .sg-public-tools { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { .salam-gate-page .sg-public-tool { transition: none; } }

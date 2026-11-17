@@ -1,0 +1,218 @@
+.woosalam-promotion-banner {
+  box-sizing: border-box;
+  padding: 16px;
+  border-inline-start: 4px solid #3858e9;
+  background: #fff;
+  font: 400 13px/1.9 PelakFA, Tahoma, sans-serif;
+}
+
+.woosalam-promotion-banner__slide {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.woosalam-promotion-banner__slide + .woosalam-promotion-banner__slide {
+  margin-block-start: 16px;
+}
+
+.woosalam-promotion-banner__brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 104px;
+  color: #1d2327;
+  white-space: nowrap;
+}
+
+.woosalam-promotion-banner__brand img {
+  display: block;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.woosalam-promotion-banner__brand strong {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.woosalam-promotion-banner__icon {
+  display: flex;
+  color: #d94d12;
+}
+
+.woosalam-promotion-banner__icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.woosalam-promotion-banner__slide p {
+  flex: 1 1 240px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  color: #50575e;
+  font: inherit;
+  text-align: start;
+}
+
+.woosalam-promotion-banner__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.woosalam-promotion-banner__actions .button {
+  height: auto;
+  padding: 6px 12px;
+  border-radius: 2px;
+  border-color: #3858e9;
+  color: #3858e9;
+  background: #fff;
+  font: inherit;
+  text-align: center;
+  white-space: normal;
+}
+
+.woosalam-promotion-banner__actions .button-primary {
+  border-color: #3858e9;
+  color: #fff;
+  background: #3858e9;
+}
+
+.woosalam-promotion-banner__actions .button:hover {
+  border-color: #2845c6;
+  color: #2845c6;
+  background: #f3f5ff;
+}
+
+.woosalam-promotion-banner__actions .button-primary:hover {
+  color: #fff;
+  background: #2845c6;
+}
+
+.woosalam-promotion-banner.is-enhanced .woosalam-promotion-banner__slides {
+  display: grid;
+}
+
+.woosalam-promotion-banner.is-enhanced .woosalam-promotion-banner__slide {
+  grid-area: 1 / 1;
+  margin: 0;
+}
+
+.woosalam-promotion-banner.is-enhanced .woosalam-promotion-banner__slide[aria-hidden="true"] {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.woosalam-promotion-banner.is-enhanced .woosalam-promotion-banner__slide.is-current {
+  animation: woosalam-promotion-appear 180ms ease-out;
+}
+
+.woosalam-promotion-banner__controls {
+  display: flex;
+  direction: rtl;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  margin-block-start: 6px;
+}
+
+.woosalam-promotion-banner__controls[hidden] {
+  display: none;
+}
+
+.woosalam-promotion-banner__controls button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #646970;
+  font: inherit;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.woosalam-promotion-banner__controls button:hover {
+  background: #f0f2fc;
+  color: #3858e9;
+}
+
+.woosalam-promotion-banner__dots {
+  display: flex;
+  direction: rtl;
+}
+
+.woosalam-promotion-banner__dots button span {
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 6px;
+  background: #b9becb;
+}
+
+.woosalam-promotion-banner__dots button[aria-pressed="true"] span {
+  width: 18px;
+  background: #3858e9;
+}
+
+.woosalam-promotion-banner :is(a, button):focus-visible {
+  outline: 2px solid #3858e9;
+  outline-offset: 3px;
+  box-shadow: none;
+}
+
+@keyframes woosalam-promotion-appear {
+  from { opacity: .4; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 1100px) {
+  .woosalam-promotion-banner__slide {
+    display: grid;
+    grid-template-columns: 104px minmax(0, 1fr);
+    gap: 12px 16px;
+  }
+
+  .woosalam-promotion-banner__actions {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 600px) {
+  .woosalam-promotion-banner {
+    padding: 14px;
+  }
+
+  .woosalam-promotion-banner__slide {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .woosalam-promotion-banner__brand {
+    min-height: 60px;
+  }
+
+  .woosalam-promotion-banner__actions .button {
+    flex: 1 1 auto;
+    min-height: 40px;
+  }
+
+  .woosalam-promotion-banner__controls button {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .woosalam-promotion-banner.is-enhanced .woosalam-promotion-banner__slide.is-current {
+    animation: none;
+  }
+}

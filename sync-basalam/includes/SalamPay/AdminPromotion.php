@@ -2,6 +2,8 @@
 
 namespace SyncBasalam\SalamPay;
 
+use SyncBasalam\Admin\PromotionBanner;
+
 defined('ABSPATH') || exit;
 
 final class AdminPromotion
@@ -12,11 +14,7 @@ final class AdminPromotion
 
     public static function register(): void
     {
-        add_action('admin_notices', [self::class, 'renderAdminNotice'], 0);
-        // WooCommerce's payments page suppresses third-party admin notices.
-        add_action('woocommerce_settings_checkout', [self::class, 'renderPaymentNotice'], 5);
-        add_action('admin_enqueue_scripts', [self::class, 'enqueueStyles']);
-        add_action('admin_footer', [self::class, 'renderDismissForm']);
+        PromotionBanner::register('salampay', 10, [self::class, 'slide']);
         add_action('admin_post_' . self::DISMISS_ACTION, [self::class, 'dismiss']);
     }
 
@@ -29,57 +27,22 @@ final class AdminPromotion
 
     public static function isPaymentScreen(): bool
     {
-        $screen = get_current_screen();
-        $tab = $_GET['tab'] ?? '';
-        return $screen && $screen->id === 'woocommerce_page_wc-settings'
-            && $tab === 'checkout';
+        return PromotionBanner::isPaymentScreen();
     }
 
-    public static function enqueueStyles(): void
+    public static function slide(): ?array
     {
-        $screen = get_current_screen();
-        if (!self::eligible() || !$screen) {
-            return;
-        }
-        wp_enqueue_style('woosalam-salampay-admin', Module::assetUrl('admin.css'), [],
-            (string) filemtime(dirname(__DIR__, 2) . '/assets/salam-pay/admin.css'));
-    }
-
-    public static function renderAdminNotice(): void
-    {
-        if (!self::isPaymentScreen()) {
-            self::renderNotice();
-        }
-    }
-
-    public static function renderPaymentNotice(): void
-    {
-        if (self::isPaymentScreen()) {
-            self::renderNotice();
-        }
-    }
-
-    private static function renderNotice(): void
-    {
-        if (!self::eligible()) {
-            return;
-        }
-        $activationUrl = self::ACTIVATION_URL;
-        require dirname(__DIR__, 2) . '/templates/admin/SalamPayPromotion.php';
-    }
-
-    public static function renderDismissForm(): void
-    {
-        if (!self::eligible()) {
-            return;
-        }
-        // Keep this form outside WooCommerce's settings form.
-        ?>
-        <form id="woosalam-salampay-dismiss" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post" hidden>
-            <input type="hidden" name="action" value="<?php echo esc_attr(self::DISMISS_ACTION); ?>">
-            <?php wp_nonce_field(self::DISMISS_ACTION); ?>
-        </form>
-        <?php
+        if (!self::eligible()) return null;
+        return [
+            'name' => 'سلام‌پی',
+            'logo' => Module::assetUrl('logo.svg'),
+            'text' => 'می‌توانید درگاه پرداخت سلام‌پی را برای فروشگاه خود در ووسلام فعال کنید. برای شروع، از طریق لینک فعال‌سازی اقدام کنید.',
+            'url' => self::ACTIVATION_URL,
+            'cta' => 'درخواست فعال‌سازی سلام‌پی',
+            'external' => true,
+            'dismiss_action' => self::DISMISS_ACTION,
+            'dismiss_hint' => 'این اعلان برای ۱۰ روز پنهان می‌شود.',
+        ];
     }
 
     public static function dismiss(): void

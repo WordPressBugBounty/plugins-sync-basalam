@@ -4,7 +4,7 @@ Tags: woocommerce, basalam, woosalam, integration
 Requires at least: 6.0  
 Tested up to: 7.0
 Requires PHP: 7.4 
-Stable tag: 1.10.48
+Stable tag: 1.10.49
 License: GPL-2.0-or-later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -147,6 +147,11 @@ API calls use HTTPS. Authenticated operations use the configured account and che
 
 == Changelog ==
 
+= 1.10.49 =
+* Add the WooSalam monitoring dashboard with selected parent-product coverage, history and authenticated repair actions.
+* Add direct Basalam App 13 subscription checkout, payment recovery and confirmed activation feedback.
+* Combine Salam Pay and SalamGate promotions in an automatic slider on plugin pages and the WordPress dashboard.
+* Harden order import transactions and shipment tracking recovery; keep development files out of release packages.
 = 1.10.48 =
 * Fix the dashboard product update and automatic connection dialogs failing to open after clicking their buttons.
 

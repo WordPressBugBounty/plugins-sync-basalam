@@ -159,6 +159,12 @@ class RequestStatusTracker
         ];
     }
 
+    public static function getLastBasalamRequest(): ?array
+    {
+        $event = self::getState()['last_basalam_request'] ?? null;
+        return is_array($event) ? $event : null;
+    }
+
     private static function categorizeWpError(string $errorCode, string $errorMessage): string
     {
         $haystack = strtolower($errorCode . ' ' . $errorMessage);
@@ -297,6 +303,9 @@ class RequestStatusTracker
         }
 
         $host = self::extractHost($context['url'] ?? '');
+        if ($host !== null && ($host === 'basalam.com' || substr($host, -12) === '.basalam.com')) {
+            $state['last_basalam_request'] = ['category' => $category, 'at' => time()];
+        }
         if ($host !== null) {
             self::incrementCount($state['buckets'][$bucketKey]['hosts'], $host);
             if (!isset($state['buckets'][$bucketKey]['hosts_by_category'][$host])) {

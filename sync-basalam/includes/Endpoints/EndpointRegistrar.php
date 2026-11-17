@@ -12,6 +12,7 @@ class EndpointRegistrar
             OrderEndpoint::class,
             InformationEndpoint::class,
             ProductEndpoint::class,
+            MonitoringEndpoint::class,
         ];
 
         foreach ($endpoints as $endpointClass) {
