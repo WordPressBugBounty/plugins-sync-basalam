@@ -301,12 +301,106 @@ class OrderManager
         }
     }
 
+    /**
+     * Recover the invoice mapping when a third-party callback implicitly
+     * commits the WooCommerce order before the import transaction reaches the
+     * mapping insert. The import lock is still held by the caller, so this
+     * autocommit write cannot race another import for the same invoice.
+     */
+    private static function recoverPersistedOrderMapping(
+        string $table,
+        int $invoiceId,
+        int $orderId,
+        int $expectedItems,
+        $paymentId,
+        $userId,
+        $cityId,
+        $provinceId
+    ): ?array {
+        global $wpdb;
+
+        try {
+            if (!self::persistedOrderExists($orderId)) {
+                return null;
+            }
+
+            self::assertOrderPersisted($orderId, $expectedItems);
+
+            // A mapping may already have been committed immediately before
+            // the savepoint disappeared. Reuse it only when it points to the
+            // same durable order; never overwrite another order's identity.
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom mapping table; invoice is held by the advisory lock and the result is re-verified below.
+            $row = $wpdb->get_row(
+                $wpdb->prepare(
+                    "SELECT order_id FROM {$table} WHERE invoice_id = %d LIMIT 1",
+                    $invoiceId
+                )
+            );
+
+            if ($wpdb->last_error !== '') {
+                throw new \RuntimeException($wpdb->last_error);
+            }
+
+            if ($row && $row->order_id !== null && (int) $row->order_id !== $orderId) {
+                return null;
+            }
+
+            if ($row) {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Repair only this invoice's dangling mapping while its lock is held.
+                $updated = $wpdb->query(
+                    $wpdb->prepare(
+                        "UPDATE {$table} SET order_id = %d WHERE invoice_id = %d AND order_id IS NULL",
+                        $orderId,
+                        $invoiceId
+                    )
+                );
+                if ($updated === false) {
+                    throw new \RuntimeException($wpdb->last_error);
+                }
+            } else {
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Custom mapping table; values are prepared and the invoice lock is held.
+                $inserted = $wpdb->insert(
+                    $table,
+                    [
+                        'payment_id'  => $paymentId,
+                        'invoice_id'  => $invoiceId,
+                        'user_id'     => $userId,
+                        'city_id'     => $cityId,
+                        'province_id' => $provinceId,
+                        'order_id'    => $orderId,
+                    ],
+                    ['%d', '%d', '%d', '%d', '%d', '%d']
+                );
+                if ($inserted === false) {
+                    throw new \RuntimeException($wpdb->last_error);
+                }
+            }
+
+            self::assertMappingPersisted($table, $invoiceId, $orderId);
+            Logger::warning("اتصال فاکتور {$invoiceId} پس از commit ضمنی تراکنش بازیابی شد؛ سفارش {$orderId} دوباره ساخته نمی‌شود.");
+
+            return [
+                'success'  => true,
+                'message'  => 'Order created successfully',
+                'order_id' => $orderId,
+                'created'  => true,
+                'status'   => 200,
+            ];
+        } catch (\Throwable $error) {
+            Logger::warning("بازیابی اتصال فاکتور {$invoiceId} ناموفق بود: " . $error->getMessage());
+            return null;
+        }
+    }
+
     private static function createOrderWooLocked($params, $invoice_id, $payment_id, $user_id, $city_id, $province_id, $table_name, $staleOrderId)
     {
         global $wpdb;
 
         $transaction = new OrderImportTransaction($wpdb);
         $order = null;
+        $data = [];
+        $failure = null;
+        $recoveryCandidate = null;
         $completed = false;
         try {
 
@@ -617,12 +711,19 @@ class OrderManager
         } catch (\Throwable $e) {
             Logger::error($e->getMessage());
 
-            return [
+            $failure = [
                 'success' => false,
                 'message' => 'Failed to create order.',
                 'error'   => 'The order could not be fully stored. Retry the invoice import.',
                 'status'  => 500,
             ];
+
+            if ($order instanceof \WC_Order && $order->get_id() && !empty($data['items']) && is_array($data['items'])) {
+                $recoveryCandidate = [
+                    'order_id'       => (int) $order->get_id(),
+                    'expected_items' => count($data['items']),
+                ];
+            }
         } finally {
             $transaction->finish();
             if (!$completed && $order instanceof \WC_Order) {
@@ -641,6 +742,24 @@ class OrderManager
                 self::clearRolledBackOrderCaches($order);
             }
         }
+
+        if ($failure !== null && $recoveryCandidate !== null) {
+            $recovered = self::recoverPersistedOrderMapping(
+                $table_name,
+                (int) $invoice_id,
+                $recoveryCandidate['order_id'],
+                $recoveryCandidate['expected_items'],
+                $payment_id,
+                $user_id,
+                $city_id,
+                $province_id
+            );
+            if ($recovered !== null) {
+                return $recovered;
+            }
+        }
+
+        return $failure;
     }
 
     private static function clearRolledBackOrderCaches(\WC_Order $order): void

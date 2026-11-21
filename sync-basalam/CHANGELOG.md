@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 1.10.50 - 2026-11-21
+
+### Fixed
+
+- Recover the Basalam invoice mapping when a third-party WooCommerce callback implicitly commits the order transaction, preventing retries from creating duplicate orders or reducing stock again.
+
 <details>
 
 <summary>1.10.49 - 2026-11-17</summary>
