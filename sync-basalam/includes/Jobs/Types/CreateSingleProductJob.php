@@ -58,7 +58,15 @@ class CreateSingleProductJob extends AbstractJobType
         }
 
         try {
-            $result = $this->productOperations->createNewProduct($productId, null);
+            $result = $this->productOperations->createNewProduct($productId, $payload['category_ids'] ?? null);
+            if (empty($result['success'])) {
+                $status = (int) ($result['status_code'] ?? 0);
+                $message = (string) ($result['message'] ?? 'ایجاد محصول ناموفق بود.');
+                if ($status >= 500 || in_array($status, [408, 425, 429], true)) {
+                    throw new RetryableException($message, $status);
+                }
+                throw new NonRetryableException($message, $status);
+            }
             return $this->success(['product_id' => $productId, 'result' => $result]);
         } catch (RetryableException $e) {
             Logger::error("خطا در اضافه کردن محصول به باسلام: " . $e->getMessage(), [

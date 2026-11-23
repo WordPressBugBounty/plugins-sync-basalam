@@ -12,6 +12,8 @@ class MonitoringDashboardClient
 {
     const FRESH_SECONDS = 30;
     const LAST_GOOD_SECONDS = 3600;
+    /** Longer than Gateway's ten-minute purchase approval; a rejected id is dropped at once. */
+    const SITE_SECONDS = 900;
     const REPAIR_TERMS = '2026-10-12-plugin-sync';
     protected $deadline;
     protected $requestTimeout = 2.5;
@@ -95,14 +97,15 @@ class MonitoringDashboardClient
     protected function site(): ?int
     {
         if (!(bool) SettingsManager::getSettings(SettingsConfig::TOKEN)) { $this->error = 'disconnected'; return null; }
+        // Stored in the options table, an integer comes back as a numeric string.
         $cached = get_transient($this->key('site'));
-        if (is_int($cached) && $cached > 0) return $cached;
+        if ((is_int($cached) || (is_string($cached) && ctype_digit($cached))) && (int) $cached > 0) return (int) $cached;
         $response = $this->request('/sites');
         if (!isset($response['data']) || !is_array($response['data'])) return null;
         foreach ($response['data'] as $site) {
             if (is_array($site) && untrailingslashit((string) ($site['site_url'] ?? '')) === untrailingslashit(get_site_url())
                     && isset($site['id']) && is_int($site['id']) && $site['id'] > 0) {
-                set_transient($this->key('site'), $site['id'], self::FRESH_SECONDS);
+                set_transient($this->key('site'), $site['id'], self::SITE_SECONDS);
                 return $site['id'];
             }
         }
@@ -261,6 +264,11 @@ class MonitoringDashboardClient
                 // service validation uses 422. Both reject this purchase request.
                 if (in_array($code, [400, 422], true) && preg_match('~/sites/[1-9][0-9]*/checkout$~D', $path)) {
                     $this->error = 'purchase_request_invalid';
+                }
+                // Gateway registers only public HTTPS shop addresses. This
+                // rejection is permanent for the current address, not an outage.
+                if ($code === 422 && $path === '/prepare') {
+                    $this->error = 'site_url_invalid';
                 }
                 if (strpos($path, '/coverage') !== false) {
                     $failure = json_decode(wp_remote_retrieve_body($response), true);

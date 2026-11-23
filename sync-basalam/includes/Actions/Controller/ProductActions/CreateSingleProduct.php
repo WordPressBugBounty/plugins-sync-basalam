@@ -2,8 +2,8 @@
 
 namespace SyncBasalam\Actions\Controller\ProductActions;
 
-use SyncBasalam\Admin\Product\ProductOperations;
 use SyncBasalam\Actions\Controller\ActionController;
+use SyncBasalam\JobManager;
 use SyncBasalam\Logger\Logger;
 use SyncBasalam\Services\VendorSyncPolicy;
 
@@ -18,8 +18,6 @@ class CreateSingleProduct extends ActionController
             return wp_send_json_error(['message' => $vendorSyncPolicy->getRestrictionMessage(false)], 409);
         }
 
-        $productOperations = syncBasalamContainer()->get(ProductOperations::class);
-
         $productId = isset($_POST['product_id']) ? sanitize_text_field(wp_unslash($_POST['product_id'])) : null;
 
         $catId = isset($_POST['cat_id']) ? sanitize_text_field(wp_unslash($_POST['cat_id'])) : '';
@@ -30,19 +28,18 @@ class CreateSingleProduct extends ActionController
             wp_send_json_error(['message' => 'آیدی محصول الزامی است.'], 400);
         }
 
-        try {
-             $result = $productOperations->createNewProduct($productId, $catId);
-        } catch (\Exception $e) {
-            Logger::error("خطا در اضافه کردن محصول به باسلام: " . $e->getMessage(), [
-                'product_id' => intval($productId),
-                'operation' => 'اضافه کردن محصول به باسلام',
-            ]);
-            wp_send_json_error(['message' => $e->getMessage()], 500);
+        $queued = syncBasalamContainer()->get(JobManager::class)->createProductCreationJob((int) $productId, $catId);
+        if ($queued === 'exists') {
+            wp_send_json_error(['message' => 'این محصول هم‌اکنون در صف ارسال به باسلام قرار دارد.'], 409);
         }
-        if (!$result['success']) {
-            wp_send_json_error(['message' => $result['message']], $result['status_code'] ?? 500);
+        if ($queued !== 'created') {
+            Logger::error('خطا در افزودن محصول به صف باسلام.', [
+                'product_id' => intval($productId),
+                'operation' => 'افزودن محصول به صف باسلام',
+            ]);
+            wp_send_json_error(['message' => 'افزودن محصول به صف باسلام ناموفق بود؛ دوباره تلاش کنید.'], 500);
         }
 
-        wp_send_json_success(['message' => $result['message']], $result['status_code'] ?? 200);
+        wp_send_json_success(['message' => 'محصول با موفقیت در صف ارسال به باسلام قرار گرفت.'], 202);
     }
 }

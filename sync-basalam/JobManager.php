@@ -58,15 +58,41 @@ class JobManager
      *
      * @return string created|exists|failed
      */
-    public function createProductUpdateJob(int $productId, bool $automatic = true): string
+    public function createProductUpdateJob(int $productId, bool $automatic = true, ?array $categoryIds = null): string
     {
         if ($productId <= 0) return 'failed';
         $type = 'sync_basalam_update_single_product';
-        $payload = json_encode(['product_id' => $productId, 'automatic' => $automatic]);
+        $payloadData = ['product_id' => $productId, 'automatic' => $automatic];
+        if ($categoryIds !== null) $payloadData['category_ids'] = array_values($categoryIds);
+        $payload = wp_json_encode($payloadData);
         $result = $this->withProductQueueLock('update', function () use ($productId, $type, $payload) {
             if ($this->hasProductJobInProgress($productId, $type, false, false)) return 'exists';
             return $this->insertJobUnlocked($type, 'pending', $payload, 3) === false ? 'failed' : 'created';
         });
+        if ($result === 'created') do_action('sync_basalam_job_created', $type, 'pending', $payload);
+        return in_array($result, ['created', 'exists'], true) ? $result : 'failed';
+    }
+
+    /**
+     * Queue a manual single-product creation so the browser does not wait for
+     * the remote API call and the worker can retry transient failures.
+     *
+     * @return string created|exists|failed
+     */
+    public function createProductCreationJob(int $productId, ?array $categoryIds = null): string
+    {
+        if ($productId <= 0) return 'failed';
+
+        $type = 'sync_basalam_create_single_product';
+        $payloadData = ['product_id' => $productId, 'automatic' => false];
+        if ($categoryIds !== null) $payloadData['category_ids'] = array_values($categoryIds);
+        $payload = wp_json_encode($payloadData);
+
+        $result = $this->withProductQueueLock('create', function () use ($productId, $type, $payload) {
+            if ($this->hasProductJobInProgress($productId, $type)) return 'exists';
+            return $this->insertJobUnlocked($type, 'pending', $payload, 3) === false ? 'failed' : 'created';
+        });
+
         if ($result === 'created') do_action('sync_basalam_job_created', $type, 'pending', $payload);
         return in_array($result, ['created', 'exists'], true) ? $result : 'failed';
     }

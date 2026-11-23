@@ -175,7 +175,9 @@ class MonitoringDashboard
         elseif ($operation === 'purchase_checkout') $data = $client->checkout($plan, ($_POST['accepted'] ?? '') === '1', $key);
         elseif ($operation === 'purchase_new') $data = $client->newIntent() ? ['status' => 'none'] : null;
         else $data = $client->payment($key, $operation === 'purchase_check');
-        if (!$data) wp_send_json_error(['message' => MonitoringDashboardView::error($client->error()),
+        // Only purchase_status/purchase_check read an existing payment result.
+        $starting = !in_array($operation, ['purchase_status', 'purchase_check'], true);
+        if (!$data) wp_send_json_error(['message' => MonitoringDashboardView::error($client->error(), $starting),
             'code' => $client->error()], 409);
         if (in_array($operation, ['purchase_prepare', 'purchase_preflight'], true)) {
             $public = array_intersect_key($data, array_flip(['ready', 'eligible', 'message', 'guidance', 'connected_units', 'product_limit']));

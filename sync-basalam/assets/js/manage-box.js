@@ -40,7 +40,15 @@ document.addEventListener("DOMContentLoaded", function () {
               window.BasalamToast.success(data.data.message || "عملیات با موفقیت انجام شد.");
               location.reload();
             } else {
-              window.BasalamToast.error(data.data?.message || "خطا در انجام عملیات.");
+              const errorData = data.data || {};
+              if (errorData.refresh_required) {
+                window.BasalamToast.info(
+                  errorData.message || "وضعیت محصول تغییر کرده است؛ در حال بارگذاری مجدد صفحه..."
+                );
+                window.setTimeout(() => location.reload(), 900);
+                return;
+              }
+              window.BasalamToast.error(errorData.message || "خطا در انجام عملیات.");
             }
           })
           .catch((error) => {

@@ -110,7 +110,7 @@
     else if(key)[...panel.querySelectorAll('[id],[data-action]')].find(el=>el.id===key||el.dataset.action===key)?.focus({preventScroll:true});
   }
   function shell(){const activation=data.available&&!data.subscription.expires_at;$('.tabs').hidden=activation;$('.report-toolbar').hidden=activation;$('#freshness').innerHTML=data.available?`${data.stale?badge('گزارش ذخیره‌شده','warning','time'):icon('time')}<span>آخرین دریافت: ${time(data.fetched_at)}</span>`:'<span>منتظر دریافت گزارش</span>';$('#page-notice').innerHTML=data.stale?notice('آخرین گزارش ذخیره‌شده','برای دریافت وضعیت تازه، دوباره گزارش را دریافت کنید.','warning'):'';}
-  function renderPanel(tab=state.tab){view.update(data,plans);replacePanel(`#panel-${tab}`,tab==='overview'?view.overview():tab==='settings'?view.settingsPanel():tab==='history'?historyPanel():tab==='coverage'?(data.available?coverage.render():unavailable()):view.subscriptionPanel());renderPaymentToast();icons();}
+  function renderPanel(tab=state.tab){view.update(data,plans);replacePanel(`#panel-${tab}`,tab==='overview'?view.overview():tab==='settings'?view.settingsPanel():tab==='history'?historyPanel():tab==='coverage'?(data.available?coverage.render():unavailable()):view.subscriptionPanel());renderPaymentToast();icons();if(tab==='subscription')warmPurchase();}
   function render(){shell();renderPanel();void selectTab(state.tab,false,false);}
   async function selectTab(tab,focus=false,load=true){if(!tabs.includes(tab))return;if(data.available&&!data.subscription.expires_at&&!['overview','subscription'].includes(tab))tab='overview';state.tab=tab;paymentPoller.sync();root.dataset.section=tab;$('#monitoring-help').hidden=!data.available||!data.subscription.expires_at||tab==='coverage'||(tab==='subscription'&&!data.subscription.active);if(tab!=='coverage')coverage.cancel();$('.report-toolbar').hidden=tab!=='overview'||(data.available&&!data.subscription.expires_at);$$('.tabs [role=tab]').forEach(el=>{const chosen=el.dataset.tab===tab;el.setAttribute('aria-selected',String(chosen));el.tabIndex=chosen?0:-1;if(focus&&chosen)el.focus();});$$('[role=tabpanel]').forEach(el=>el.hidden=el.id!==`panel-${tab}`);const url=new URL(location.href);url.searchParams.set('tab',tab);url.hash=tab;history.replaceState(null,'',url);if(load)renderPanel();else renderPaymentToast();if(tab==='history'&&!pages.issues.loaded&&!pages.issues.busy&&data.available)await loadPage('issues');if(tab==='history'&&!pages.history.loaded&&!pages.history.busy&&data.available)await loadPage('history');if(tab==='coverage'&&!coverage.loaded&&!coverage.busy&&data.available)await coverage.load();if(tab==='subscription'&&data.available&&load){await Promise.allSettled([loadPlans(),paymentStatus(params.has('payment_return'),{background:paymentLoaded})]);if(state.tab===tab&&!$('#detail-dialog').open)$('.subscription-offers')?.scrollIntoView({block:'start',behavior:'instant'});}maybeTour();}
   const tourKey=()=>`woosalam-monitoring-tour-v3:${data.onboarding_scope||data.scope||location.host}`;
@@ -207,6 +207,32 @@
   function canChangePlan(){return !state.payment||state.payment.replaceable===true||['failed','success'].includes(state.payment.status);}
   function canCheckout(){return !state.paymentUnknown&&!!state.selected&&!data.stale&&!data.subscription.active&&!(Date.parse(data.subscription.expires_at)>Date.now())&&!data.subscription.next_plan&&canChangePlan();}
   function checkoutStatus(message='',tone='info'){state.checkoutMessage=message;if(message)toast(message,tone);}
+  // Ownership and plan checks move no money, and Gateway keeps its approval for
+  // ten minutes. Resolving them while the seller reads the plans leaves only the
+  // invoice for the click. The click trusts one fresh result for the same plan;
+  // otherwise it runs the same checks itself.
+  const READY_MS=480000,READY_RETRY_MS=60000;
+  let readiness=null,readinessTimer=0,readinessQueued='';
+  async function purchaseReadiness(code){
+    const ready=await request('purchase_prepare');
+    if(!ready.ready)throw new Error('اتصال و مجوز غرفه را در ووسلام بررسی کنید.');
+    return checkedPlan(code);
+  }
+  const readinessKnown=code=>!!readiness&&readiness.code===code&&readiness.version===epoch&&Date.now()-readiness.at<(readiness.failed?READY_RETRY_MS:READY_MS);
+  function warmPurchase(){
+    const code=state.selected,allowed=()=>state.selected===code&&state.tab==='subscription'&&!document.hidden&&!state.checkoutBusy&&canCheckout()&&plans.some(p=>p.code===code);
+    if(!allowed()){clearTimeout(readinessTimer);readinessQueued='';return;}
+    if(readinessQueued===code||readinessKnown(code))return;
+    clearTimeout(readinessTimer);readinessQueued=code;
+    // A short pause lets a seller move between plans without checking each one.
+    readinessTimer=setTimeout(()=>{
+      readinessQueued='';
+      if(!allowed()||readinessKnown(code))return;
+      const entry={code,version:epoch,at:Date.now(),failed:false};
+      entry.plan=purchaseReadiness(code).then(plan=>{entry.at=Date.now();return plan;},()=>{entry.failed=true;entry.at=Date.now();return null;});
+      readiness=entry;
+    },400);
+  }
   async function checkout(){
     if(state.checkoutBusy||(paymentBusy&&!paymentRequest)||!canCheckout())return;
     const plan=plans.find(p=>p.code===state.selected),version=epoch;if(!plan)return;
@@ -221,9 +247,16 @@
         if(['success','scheduled'].includes(state.payment?.status))await refresh(false,{duringCheckout:true});
         if(version!==epoch||!canCheckout())return;
       }
-      const ready=await request('purchase_prepare');if(version!==epoch)return;
-      if(!ready.ready)throw new Error('اتصال و مجوز غرفه را در ووسلام بررسی کنید.');
-      const fresh=await checkedPlan(plan.code);if(version!==epoch)return;
+      // Used once: a second click checks again instead of trusting this result.
+      const prepared=readiness;readiness=null;
+      let fresh=prepared&&!prepared.failed&&prepared.code===plan.code&&prepared.version===version&&Date.now()-prepared.at<READY_MS?await prepared.plan:null;
+      if(version!==epoch)return;
+      if(!fresh){
+        // Remember a failure the seller has just been told about, so it is not repeated silently.
+        try{fresh=await purchaseReadiness(plan.code);}
+        catch(error){readiness={code:plan.code,version,at:Date.now(),failed:true,plan:Promise.resolve(null)};throw error;}
+        if(version!==epoch)return;
+      }
       if(!quoteMatches(plan,fresh)){
         plans=plans.map(p=>p.code===fresh.code?fresh:p);
         checkoutStatus('مشخصات پلن به‌روز شد؛ مبلغ تازه را ببینید و دوباره خرید را بزنید.');return;

@@ -36,14 +36,17 @@ class MonitoringDashboardView
             'failed'=>['ناقص؛ نیازمند بررسی','warning'], 'interrupted'=>['متوقف‌شده','neutral']][$state] ?? ['در انتظار پایش','neutral'];
     }
 
-    public static function error(string $reason): string
+    /** Unknown reasons fall back to copy for the action that failed: a report refresh or the start of a purchase. */
+    public static function error(string $reason, bool $purchaseStart = false): string
     {
         return ['disconnected'=>'ابتدا غرفهٔ باسلام را به ووسلام متصل کنید.',
             'purchase_request_invalid'=>'اطلاعات درخواست خرید معتبر نیست؛ صفحه را به‌روز و دوباره تلاش کنید.',
-            'monitoring_billing_unavailable'=>'مبلغ پرداخت با پلن مطابقت ندارد؛ برای اصلاح تنظیمات پرداخت به پشتیبانی پیام بدهید.',
+            'monitoring_billing_unavailable'=>'پرداخت اشتراک فعلاً از سمت سرور در دسترس نیست و مبلغی از شما کسر نشده است؛ برای رفع آن به پشتیبانی پیام بدهید.',
             'subscription_active'=>'تا پایان اشتراک فعلی، خرید پلن جدید مجاز نیست.',
             'purchase_terms'=>'شرایط خرید و مرجع‌بودن قیمت و موجودی ووکامرس را بپذیرید.',
             'purchase_pending'=>'نتیجهٔ خرید قبلی را مشخص کنید؛ پرداخت تازه‌ای شروع نشده است.',
+            'site_url_invalid'=>'آدرس این فروشگاه برای پایشگر پذیرفته نشد؛ سایت باید با HTTPS و دامنهٔ عمومی در دسترس باشد.',
+            'site_unregistered'=>'این فروشگاه با آدرس فعلی در پایشگر ثبت نشده است؛ صفحه را به‌روز کنید و اگر آدرس سایت تغییر کرده، اتصال غرفه را دوباره بررسی کنید.',
             'authorization'=>'مجوز اتصال معتبر نیست؛ اتصال غرفه را در صفحهٔ اصلی ووسلام به‌روز کنید.',
             'connection_changed'=>'اتصال فروشگاه تغییر کرده است؛ اتصال غرفه را دوباره بررسی کنید.',
             'not_found'=>'این گزارش برای اتصال فعلی پیدا نشد؛ گزارش را تازه کنید.',
@@ -59,7 +62,9 @@ class MonitoringDashboardView
             'coverage_not_ready'=>'فهرست پوشش هنوز آماده نیست؛ کمی بعد وضعیت را دوباره دریافت کنید.',
             'coverage_source_unavailable'=>'فهرست محصولات از فروشگاه دریافت نشد؛ اتصال فروشگاه را بررسی و گزارش را دوباره دریافت کنید.',
             'stale'=>'این آخرین گزارش ذخیره‌شده است؛ در حال دریافت اطلاعات تازه هستیم.',
-        ][$reason] ?? 'گزارش تازه دریافت نشد. این وضعیت به معنی غیرفعال‌شدن اشتراک نیست؛ کمی بعد دوباره تلاش کنید.';
+        ][$reason] ?? ($purchaseStart
+            ? 'خرید در این لحظه انجام نشد. کمی بعد دوباره تلاش کنید؛ اگر تکرار شد به پشتیبانی پیام بدهید.'
+            : 'گزارش تازه دریافت نشد. این وضعیت به معنی غیرفعال‌شدن اشتراک نیست؛ کمی بعد دوباره تلاش کنید.');
     }
 
     public static function reason(string $reason): string

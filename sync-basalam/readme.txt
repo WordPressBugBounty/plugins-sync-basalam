@@ -4,7 +4,7 @@ Tags: woocommerce, basalam, woosalam, integration
 Requires at least: 6.0  
 Tested up to: 7.0
 Requires PHP: 7.4 
-Stable tag: 1.10.50
+Stable tag: 1.10.51
 License: GPL-2.0-or-later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -146,6 +146,14 @@ API calls use HTTPS. Authenticated operations use the configured account and che
 1. تنظیمات اولیه افزونه در وردپرس
 
 == Changelog ==
+
+= 1.10.51 =
+* Queue manual single-product creation and updates in the background.
+* Refresh stale product pages when archiving or restoring a product.
+* Open the monitoring subscription payment page faster and show clearer purchase errors.
+
+= 1.10.50 =
+* Recover missing invoice mappings for orders already saved to WooCommerce, avoiding duplicate orders and repeated stock reductions.
 
 = 1.10.49 =
 * Add the WooSalam monitoring dashboard with selected parent-product coverage, history and authenticated repair actions.

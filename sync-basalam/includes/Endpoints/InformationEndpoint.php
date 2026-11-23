@@ -84,13 +84,27 @@ class InformationEndpoint
     }
 
     /** Paid monitoring tokens must be bound to this exact WordPress site. */
+    /** Gateway's verdict for the token of the request being served; never kept for a later request. */
+    private static $siteTokenVerdict = [];
+
     public static function checkSitePermissions($request)
     {
         $token = self::extractRequestToken($request);
-        if (!$token || !self::validateStatusEndpointToken($token, true)) {
+        if (!$token || !self::siteTokenAccepted($token)) {
             return new \WP_Error('monitoring_invalid_token', 'دسترسی پایش معتبر نیست.', ['status' => 403]);
         }
         return true;
+    }
+
+    private static function siteTokenAccepted(string $token): bool
+    {
+        // WordPress runs permission_callback again to build the Allow header.
+        // Asking Gateway twice doubled the wait of every monitoring request.
+        $key = hash('sha256', ($_SERVER['REQUEST_TIME_FLOAT'] ?? '') . '|' . untrailingslashit(get_site_url()) . '|' . $token);
+        if (!array_key_exists($key, self::$siteTokenVerdict)) {
+            self::$siteTokenVerdict = [$key => self::validateStatusEndpointToken($token, true)];
+        }
+        return self::$siteTokenVerdict[$key];
     }
 
     private static function getPublicSettings(array $settings): array

@@ -51,9 +51,18 @@ class MonitoringCheckoutClient extends MonitoringDashboardClient
             'basalam_token' => (string) SettingsManager::getSettings(SettingsConfig::TOKEN)]);
     }
 
-    public function preflight(string $plan): ?array
+    /** Buying needs the site Gateway registered for exactly this address. */
+    private function registeredSite(): ?int
     {
         $site = $this->site();
+        // Zero is a definite answer, not an outage: retrying cannot help.
+        if ($site === 0) $this->error = 'site_unregistered';
+        return $site ?: null;
+    }
+
+    public function preflight(string $plan): ?array
+    {
+        $site = $this->registeredSite();
         return $site ? $this->request('/sites/' . $site . '/preflight', ['plan_code' => $plan]) : null;
     }
 
@@ -69,7 +78,7 @@ class MonitoringCheckoutClient extends MonitoringDashboardClient
     public function checkout(string $plan, bool $accepted, ?string $replaceKey = null): ?array
     {
         if (!$accepted) { $this->error = 'purchase_terms'; return null; }
-        $site = $this->site();
+        $site = $this->registeredSite();
         if (!$site) return null;
         $name = $this->intentKey();
         $intent = get_option($name);

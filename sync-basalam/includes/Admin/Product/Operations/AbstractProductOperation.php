@@ -100,14 +100,18 @@ abstract class AbstractProductOperation implements ProductOperationInterface
     protected function buildValidationErrorResult(int $product_id): array
     {
         $validation = $this->validator->validate($product_id);
+        $message = $validation['valid']
+            ? 'وضعیت محصول تغییر کرده است؛ در حال بارگذاری مجدد صفحه...'
+            : $validation['message'];
 
         return [
             'success' => false,
-            'message' => $validation['message'],
+            'message' => $message,
             'error' => 'validation_failed',
             'status_code' => 422,
             'product_id' => $product_id,
-            'validation_error' => true
+            'validation_error' => true,
+            'refresh_required' => (bool) $validation['valid']
         ];
     }
 

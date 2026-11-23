@@ -24,7 +24,9 @@ class RestoreProduct extends ActionController
             wp_send_json_error($e->getMessage(), 500);
         }
         if (!$result['success']) {
-            wp_send_json_error(['message' => $result['message']], $result['status_code'] ?? 500);
+            $error = ['message' => $result['message']];
+            if (!empty($result['refresh_required'])) $error['refresh_required'] = true;
+            wp_send_json_error($error, $result['status_code'] ?? 500);
         }
 
         wp_send_json_success(['message' => $result['message']], $result['status_code'] ?? 200);

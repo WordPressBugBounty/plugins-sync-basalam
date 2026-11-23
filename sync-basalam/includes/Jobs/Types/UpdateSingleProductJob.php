@@ -75,7 +75,7 @@ class UpdateSingleProductJob extends AbstractJobType
             }
             $result = !empty($payload['price_stock_only'])
                 ? $this->updatePriceStock((int) $productId)
-                : $this->productOperations->updateExistProduct($productId, null);
+                : $this->productOperations->updateExistProduct($productId, $payload['category_ids'] ?? null);
             if (empty($result['success'])) {
                 $status = (int) ($result['status_code'] ?? 0);
                 $message = (string) ($result['message'] ?? 'بروزرسانی محصول ناموفق بود.');

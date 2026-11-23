@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 1.10.51 - 2026-11-22
+
+### Changed
+
+- Run manual single-product creation and updates in the background queue, preserving selected categories and retrying temporary API failures.
+- Start monitoring purchase checks while the seller reviews the plan to reduce the wait before the payment page.
+
+### Fixed
+
+- Refresh the product page when an archive or restore action finds that the product status has already changed.
+- Show specific monitoring subscription purchase errors for invalid site addresses, unregistered stores and unavailable billing.
+
 ## 1.10.50 - 2026-11-21
 
 ### Fixed

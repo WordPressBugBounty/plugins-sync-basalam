@@ -2,8 +2,8 @@
 
 namespace SyncBasalam\Actions\Controller\ProductActions;
 
-use SyncBasalam\Admin\Product\ProductOperations;
 use SyncBasalam\Actions\Controller\ActionController;
+use SyncBasalam\JobManager;
 use SyncBasalam\Logger\Logger;
 use SyncBasalam\Services\VendorSyncPolicy;
 
@@ -20,8 +20,6 @@ class UpdateSingleProduct extends ActionController
 
         $productId = isset($_POST['product_id']) ? sanitize_text_field(wp_unslash($_POST['product_id'])) : null;
 
-        $productOperations = syncBasalamContainer()->get(ProductOperations::class);
-
         if (isset($_POST['cat_id'])) {
             $categoryIds = sanitize_text_field(wp_unslash($_POST['cat_id']));
 
@@ -37,18 +35,18 @@ class UpdateSingleProduct extends ActionController
         if (!$productId) {
             wp_send_json_error('آیدی محصول الزامی است.', 400);
         }
-        try {
-            $result = $productOperations->updateExistProduct($productId, $categoryIds);
-        } catch (\Exception $e) {
-            Logger::error("خطا در بروزرسانی محصول: " . $e->getMessage(), [
+        $queued = syncBasalamContainer()->get(JobManager::class)->createProductUpdateJob((int) $productId, false, $categoryIds);
+        if ($queued === 'exists') {
+            wp_send_json_error(['message' => 'این محصول هم‌اکنون در صف بروزرسانی باسلام قرار دارد.'], 409);
+        }
+        if ($queued !== 'created') {
+            Logger::error('خطا در افزودن بروزرسانی محصول به صف باسلام.', [
                 'product_id' => intval($productId),
-                'operation' => 'بروزرسانی محصول',
+                'operation' => 'افزودن بروزرسانی محصول به صف باسلام',
             ]);
-            wp_send_json_error(['message' => $e->getMessage()], 500);
+            wp_send_json_error(['message' => 'افزودن بروزرسانی محصول به صف باسلام ناموفق بود؛ دوباره تلاش کنید.'], 500);
         }
 
-        if (!$result['success']) wp_send_json_error(['message' => $result['message']], $result['status_code'] ?? 500);
-
-        wp_send_json_success(['message' => $result['message']], $result['status_code'] ?? 200);
+        wp_send_json_success(['message' => 'بروزرسانی محصول در صف ارسال به باسلام قرار گرفت.'], 202);
     }
 }
