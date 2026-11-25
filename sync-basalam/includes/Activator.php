@@ -32,7 +32,7 @@ class Activator
             user_id INT NOT NULL,
             city_id INT NOT NULL,
             province_id INT NOT NULL,
-            order_id INT DEFAULT NULL,
+            order_id BIGINT UNSIGNED DEFAULT NULL,
             PRIMARY KEY (id)
         ) $charset_collate;";
 

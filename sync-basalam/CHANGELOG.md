@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.10.52 - 2026-11-25
+
+- Store WooCommerce order IDs as unsigned 64-bit integers in Basalam invoice mappings.
+
 ## 1.10.51 - 2026-11-22
 
 ### Changed

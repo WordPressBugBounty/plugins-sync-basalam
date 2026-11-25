@@ -5,6 +5,7 @@ namespace SyncBasalam\Services\Orders;
 use SyncBasalam\Admin\Settings\SettingsConfig;
 use SyncBasalam\Config\Endpoints;
 use SyncBasalam\Logger\Logger;
+use SyncBasalam\Migrations\Versions\Migration_1_10_52;
 use SyncBasalam\Utilities\GetProvincesData;
 use SyncBasalam\Utilities\ProductMetaKey;
 use SyncBasalam\Services\ApiServiceManager;
@@ -234,6 +235,10 @@ class OrderManager
                     'created'  => false,
                     'status'   => 200,
                 ];
+            }
+
+            if (version_compare((string) get_option('sync_basalam_version', '0.0.0'), Migration_1_10_52::VERSION, '<')) {
+                return self::orderStorageUnavailable('The order mapping schema migration has not completed.');
             }
 
             return self::createOrderWooLocked($params, $invoice_id, $payment_id, $user_id, $city_id, $province_id, $table_name, $existingOrderId);

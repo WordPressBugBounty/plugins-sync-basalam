@@ -3,6 +3,7 @@
 namespace SyncBasalam\Migrations;
 
 use SyncBasalam\Admin\Settings\SettingsConfig;
+use SyncBasalam\Logger\Logger;
 use SyncBasalam\Services\Products\ProductConnection;
 use SyncBasalam\Services\WebhookService;
 use SyncBasalam\Utilities\ProductMetaKey;
@@ -261,6 +262,39 @@ class MigratorService
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter -- One-time schema migration; table identifier from $wpdb->prefix, not user input.
         $this->wpdb->query("ALTER TABLE {$table} ADD UNIQUE KEY unique_invoice_id (invoice_id)");
         $this->wpdb->show_errors();
+    }
+
+    public function widenPaymentOrderId(): bool
+    {
+        $table = $this->wpdb->prefix . 'sync_basalam_payments';
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+        $type = $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s AND COLUMN_NAME = 'order_id'",
+            $table
+        ));
+        if (!is_string($type)) {
+            Logger::error('Could not inspect the Basalam order mapping column: ' . $this->wpdb->last_error);
+            return false;
+        }
+        if (preg_match('/^bigint(?:\(\d+\))? unsigned$/iD', $type)) {
+            return true;
+        }
+
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, PluginCheck.Security.DirectDB.UnescapedDBParameter -- Table name derived from the WordPress prefix.
+        $negativeOrderId = $this->wpdb->get_var("SELECT order_id FROM `{$table}` WHERE order_id < 0 LIMIT 1");
+        if ($this->wpdb->last_error !== '' || $negativeOrderId !== null) {
+            Logger::error('Could not migrate the Basalam order mapping column with invalid or unreadable order IDs: ' . $this->wpdb->last_error);
+            return false;
+        }
+
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, PluginCheck.Security.DirectDB.UnescapedDBParameter -- One-time migration on a WordPress-prefixed table.
+        if ($this->wpdb->query("ALTER TABLE `{$table}` MODIFY COLUMN `order_id` BIGINT UNSIGNED DEFAULT NULL") === false) {
+            Logger::error('Could not widen the Basalam order mapping column: ' . $this->wpdb->last_error);
+            return false;
+        }
+
+        return true;
     }
 
     private function removeDuplicateInvoicePayments($table)

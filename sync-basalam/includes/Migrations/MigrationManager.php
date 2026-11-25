@@ -16,6 +16,7 @@ use SyncBasalam\Migrations\Versions\Migration_1_8_7;
 use SyncBasalam\Migrations\Versions\Migration_1_10_6;
 use SyncBasalam\Migrations\Versions\Migration_1_10_8;
 use SyncBasalam\Migrations\Versions\Migration_1_10_25;
+use SyncBasalam\Migrations\Versions\Migration_1_10_52;
 
 defined('ABSPATH') || exit;
 
@@ -40,13 +41,26 @@ class MigrationManager
             '1.10.6' => new Migration_1_10_6(),
             '1.10.8' => new Migration_1_10_8(),
             '1.10.25' => new Migration_1_10_25(),
+            Migration_1_10_52::VERSION => new Migration_1_10_52(),
         ];
     }
 
     public function runMigrations($currentVersion, $newVersion)
     {
+        $lastAppliedVersion = $currentVersion;
         foreach ($this->migrations as $version => $migration) {
-            if (version_compare($currentVersion, $version, '<')) $migration->up();
+            if (!version_compare($currentVersion, $version, '<')) {
+                continue;
+            }
+
+            if ($migration->up() === false) {
+                if ($lastAppliedVersion !== $currentVersion) {
+                    update_option('sync_basalam_version', $lastAppliedVersion);
+                }
+                return;
+            }
+
+            $lastAppliedVersion = $version;
         }
 
         update_option('sync_basalam_version', $newVersion);

@@ -4,7 +4,7 @@ Tags: woocommerce, basalam, woosalam, integration
 Requires at least: 6.0  
 Tested up to: 7.0
 Requires PHP: 7.4 
-Stable tag: 1.10.51
+Stable tag: 1.10.52
 License: GPL-2.0-or-later  
 License URI: https://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -146,6 +146,9 @@ API calls use HTTPS. Authenticated operations use the configured account and che
 1. تنظیمات اولیه افزونه در وردپرس
 
 == Changelog ==
+
+= 1.10.52 =
+* Fix order synchronization for WooCommerce order IDs exceeding the 32-bit integer range.
 
 = 1.10.51 =
 * Queue manual single-product creation and updates in the background.
